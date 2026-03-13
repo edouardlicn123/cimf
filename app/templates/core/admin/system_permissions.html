@@ -1,0 +1,110 @@
+{# 文件路径：app/templates/admin/permissions.html #}
+{# 更新日期：2026-03-11 #}
+{# 功能说明：角色权限编辑页面，提供管理员/组长/普通员工三类角色的权限矩阵配置 #}
+
+{% extends "core/frame_admin.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% block admin_title %}
+  <h1 class="settings-title h2 mb-4" style="display: none;">权限管理</h1>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* 隐藏传统 flash 消息，只显示 toast */
+  .alert, .flash-message, .flashed-messages {
+    display: none !important;
+  }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+  <div class="card shadow-sm border-0 rounded-3" style="height: 100%;">
+    <div class="card-body" style="height: 100%; width: 100%; padding: 1.5rem; box-sizing: border-box;">
+      
+      <!-- Toast 消息组件 -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+            {% for category, message in messages %}
+              <div class="toast show" role="alert">
+                <div class="toast-body">
+                  {{ message }}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        {{ role_name_form.hidden_tag() }}
+
+        <!-- 角色名称设置 - 放在表格上方 -->
+        <div class="row g-4 mb-4">
+          <div class="col-md-4">
+            <label class="form-label">{{ role_name_form.role_name_leader.label.text }}</label>
+            {{ role_name_form.role_name_leader(class="form-control form-control-lg") }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">{{ role_name_form.role_name_employee.label.text }}</label>
+            {{ role_name_form.role_name_employee(class="form-control form-control-lg") }}
+          </div>
+          <div class="col-md-4 d-flex align-items-end">
+            {{ form.submit(class="btn btn-lg px-5 primary-btn w-100", value="保存设置") }}
+          </div>
+        </div>
+
+        <div class="table-responsive mb-4">
+          <table class="table table-bordered table-hover">
+            <thead class="table-light">
+              <tr>
+                <th scope="col" style="min-width: 200px;">权限名称</th>
+                <th scope="col" class="text-center" style="width: 120px;">{{ role_labels['leader'] }}</th>
+                <th scope="col" class="text-center" style="width: 120px;">{{ role_labels['employee'] }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for perm_key, perm_label in all_permissions %}
+              <tr>
+                <td>
+                  <label class="form-check-label" for="perm_{{ perm_key }}">
+                    {{ perm_label }}
+                  </label>
+                </td>
+                <td class="text-center">
+                  <input type="checkbox" 
+                         class="form-check-input" 
+                         name="permissions_leader" 
+                         value="{{ perm_key }}"
+                         {% if perm_key in role_permissions['leader'] %}checked{% endif %}>
+                </td>
+                <td class="text-center">
+                  <input type="checkbox" 
+                         class="form-check-input" 
+                         name="permissions_employee" 
+                         value="{{ perm_key }}"
+                         {% if perm_key in role_permissions['employee'] %}checked{% endif %}>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="alert alert-info mb-0" role="alert">
+          <strong>说明：</strong>
+          <ul class="mb-0">
+            <li><strong>{{ role_labels['leader'] }}</strong>：可分配权限，默认拥有系统管理权限</li>
+            <li><strong>{{ role_labels['employee'] }}</strong>：可分配权限，默认无额外权限</li>
+          </ul>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+{% endblock %}

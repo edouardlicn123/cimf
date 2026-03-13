@@ -1,0 +1,37 @@
+{# includes/header.html
+   =============================================================================
+   作用：系统全局头部区域（品牌标识 + 标题 + slogan）
+   
+   设计原则：
+   - 主标题和副标题使用变量 + |default 过滤器
+   - 子模板可通过 {% set page_title = "..." %} 和 {% set page_slogan = "..." %} 修改
+   - 如果子模板未设置，则显示默认值
+   - 所有视觉样式（背景、文字颜色、边框、圆角、阴影、间距等）完全交给外部主题文件控制
+   - 不使用任何内联 style 属性
+   - 通过 class 名称挂钩主题样式（例如 system-header、header-title 等）
+   ============================================================================= #}
+
+<header class="system-header text-center py-3 py-md-4">
+    <div class="container">
+        <div class="d-flex flex-column align-items-center">
+
+            <!-- Logo 或图标占位（未来可启用） -->
+            <!-- 
+            <img src="{{ url_for('static', filename='images/logo.png') }}?v={{ timestamp }}" 
+                 alt="FFE Logo" 
+                 class="mb-3 logo-img" 
+                 style="max-height: 70px;">
+            -->
+
+            <!-- 系统名称（主标题） -->
+            <h1 class="header-title fw-bold mb-2">
+                {{ page_title | default(system_name) }}
+            </h1>
+            
+            <!-- 副标题 / slogan -->
+            <p class="header-slogan text-muted mb-0 fs-5">
+                {{ page_slogan | default('信息无价，管理有道') }}
+            </p>
+        </div>
+    </div>
+</header>

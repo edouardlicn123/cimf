@@ -1,0 +1,72 @@
+{# includes/watermark.html
+   =============================================================================
+   作用：网页水印显示模板
+   说明：
+   - 仅在用户登录且启用网页水印时显示
+   - 根据系统设置显示用户名/昵称/邮箱
+   - 多层嵌套span提高删除难度
+   ============================================================================= #}
+
+{# 获取水印相关设置（处理Python布尔值和字符串两种情况）#}
+{% set enable_wm = settings.get('enable_web_watermark') %}
+{% if enable_wm is sameas true or enable_wm == 'true' %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/watermark.css') }}?v={{ timestamp }}">
+
+{# 获取水印显示内容 #}
+{% set watermark_text = '' %}
+{% set wm_content = settings.get('web_watermark_content', 'username') %}
+{% if wm_content == 'username' %}
+    {% set watermark_text = current_user.username %}
+{% elif wm_content == 'nickname' %}
+    {% set watermark_text = current_user.nickname or current_user.username %}
+{% else %}
+    {% set watermark_text = current_user.email or current_user.username %}
+{% endif %}
+
+{# 获取透明度 #}
+{% set watermark_opacity = settings.get('web_watermark_opacity', 0.15) %}
+{% if watermark_opacity is string %}
+    {% set watermark_opacity = watermark_opacity|float %}
+{% endif %}
+
+{# 防护设置 #}
+{% set enable_detection = settings.get('enable_watermark_console_detection') %}
+{% set enable_shortcut = settings.get('enable_watermark_shortcut_block') %}
+{% if enable_detection is sameas true %}
+    {% set enable_detection = 'true' %}
+{% endif %}
+{% if enable_shortcut is sameas true %}
+    {% set enable_shortcut = 'true' %}
+{% endif %}
+
+{# 水印容器 #}
+<div class="watermark-container" id="watermarkContainer" 
+     data-watermark-text="{{ watermark_text }}" 
+     data-opacity="{{ watermark_opacity }}"
+     data-enable-detection="{{ enable_detection|default('true') }}"
+     data-enable-shortcut="{{ enable_shortcut|default('true') }}"
+     style="--watermark-opacity: {{ watermark_opacity }};">
+    
+    {# 使用表格布局铺满整个屏幕 #}
+    <table cellpadding="0" cellspacing="0" border="0" style="width: 100%; height: 100%;">
+    {% for row in range(15) %}
+        <tr>
+        {% for col in range(20) %}
+            <td align="center" valign="middle">
+                <span class="watermark-item" style="opacity: {{ watermark_opacity }}; transform: rotate(-30deg);">
+                    {{ watermark_text }}
+                </span>
+            </td>
+        {% endfor %}
+        </tr>
+    {% endfor %}
+    </table>
+</div>
+
+{# 控制台警告弹窗 #}
+<div class="watermark-warning" id="watermarkWarning">
+    ⚠️ 检测到开发者工具已打开<br>
+    <small>请关闭开发者工具以继续正常使用系统</small>
+</div>
+{% endif %}

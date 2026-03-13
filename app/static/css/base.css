@@ -1,0 +1,273 @@
+/* base.css
+   =============================================================================
+   重要开发指南（请务必阅读并遵守！）
+   =============================================================================
+   1. base.css 是整个项目的基础样式文件，所有页面都会加载它。
+   2. 为了实现“只修改某一页布局/间距，而不影响其他页面”，强烈推荐以下做法：
+      - 在目标页面的模板（如 auth/login.html、main/dashboard.html）最外层容器添加专属 class
+        （例如 class="login-page" 或 class="dashboard-page"）
+      - 然后在 base.css 文件末尾的“页面专属样式区”添加以该 class 为前缀的规则
+      - 使用 !important 确保覆盖主题变量或默认值
+   3. 优点：
+      - 所有页面特定调整集中在此文件，便于维护和查找
+      - 不需要修改 custom.css（仅用于入口导入）
+      - 不需要修改各个主题文件（保持主题纯净，仅负责配色）
+      - 换主题时页面布局调整自动继承，无需重复复制代码
+   4. 示例结构：
+      .xxx-page .some-element { ... !important; }
+   5. 请始终将新的页面专属样式添加到下面的“页面专属样式区”，并加上注释说明是哪个页面。
+   ============================================================================= */
+
+/* === 重置与 Normalize === */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 100%;
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+body {
+    font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    line-height: 1.6;
+    font-size: 16px;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+}
+
+/* 为 fixed 导航栏预留顶部空间（默认值） */
+body.has-fixed-navbar {
+    padding-top: 60px;
+}
+
+
+@media (max-width: 992px) {
+    body.has-fixed-navbar {
+        padding-top: 54px;
+    }
+}
+
+/* === 链接与按钮基础 === */
+a {
+    color: var(--primary);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+a:hover,
+a:focus {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+a:focus {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+/* === 通用容器 === */
+.container {
+    width: 100%;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+@media (min-width: 576px) {
+    .container { max-width: 540px; }
+}
+@media (min-width: 768px) {
+    .container { max-width: 720px; }
+}
+@media (min-width: 992px) {
+    .container { max-width: 960px; }
+}
+@media (min-width: 1200px) {
+    .container { max-width: 1140px; }
+}
+@media (min-width: 1400px) {
+    .container { max-width: 1320px; }
+}
+
+/* === 导航栏基础结构 === */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1030;
+    height: 60px;
+    padding: 0 1.5rem;
+    background-color: var(--navbar-bg);
+    border-bottom: 1px solid var(--border);
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.navbar.scrolled {
+    height: 54px;
+    box-shadow: var(--shadow-md);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--navbar-text) !important;
+    opacity: 1 !important;
+}
+
+.navbar-brand img {
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+    opacity: 1 !important;
+    filter: none !important;
+}
+
+.nav-link {
+    color: var(--navbar-text) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    transition: var(--transition);
+}
+
+.nav-link:hover,
+.nav-link:focus {
+    color: var(--text-inverse) !important;
+    background-color: var(--navbar-hover-bg);
+    border-radius: var(--radius);
+}
+
+/* === 通用按钮基础 === */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    line-height: 1.5;
+    padding: 0.5rem 1.25rem;
+    border-radius: var(--radius);
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+.btn-outline-primary {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary);
+    color: white;
+}
+
+/* === 卡片基础 === */
+.card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+/* === 表单元素基础 === */
+.form-control {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.625rem 1rem;
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: var(--focus-ring);
+    outline: none;
+}
+
+/* === 页面内容区域 === */
+main {
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+    min-height: calc(100vh - 180px);
+}
+
+/* === 页脚基础 === */
+footer {
+    background-color: var(--footer-bg);
+    color: var(--footer-text);
+    padding: 1rem 0;
+    font-size: 0.95rem;
+    border-top: 1px solid var(--border);
+    position: relative;
+    z-index: 10;
+}
+
+/* === 动画辅助类 === */
+.fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ==================== 页面专属样式区（所有页面特定调整请放在这里） ==================== */
+
+/* ---------- 仪表盘页（/dashboard）专属调整 ---------- */
+.dashboard-page body.has-fixed-navbar {
+    padding-top: 72px !important;
+}
+
+.dashboard-page main.container {
+    padding-top: 0 !important;
+}
+
+.dashboard-page .welcome-bar {
+    margin-bottom: 1rem !important;
+    padding-bottom: 0.5rem !important;
+}
+
+/* ---------- 示例：登录页（/auth/login）专属调整 ---------- */
+/* .login-page .card {
+    max-width: 480px !important;
+    margin: 4rem auto !important;
+} */
+
+/* ---------- 其他页面专属样式请继续添加在下方 ---------- */
+/* .some-page .some-element {
+    ... !important;
+} */

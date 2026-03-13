@@ -1,0 +1,100 @@
+{# includes/nav.html
+   =============================================================================
+   作用：系统顶部固定导航栏（纯导航功能）
+   
+   当前设计：
+   - 左侧：品牌标识（点击回仪表盘）
+   - 中间：仪表盘 + 系统管理（单个链接，仅管理员可见，直接跳到 system_settings）
+   - 右侧：已登录 → 个人下拉菜单（个人资料 / 偏好设置 / 退出）
+             未登录 → 登录按钮
+   - 所有颜色、圆角、阴影、hover 完全由主题文件控制
+   - 按钮统一使用 .card-btn + 颜色后缀
+   - 避免任何内联 style
+   - 高亮逻辑防护：request.endpoint 为 None 时不报错（404页等异常情况）
+   ============================================================================= #}
+
+<nav class="navbar navbar-expand-lg navbar-macaron fixed-top shadow-sm">
+    <div class="container-fluid px-3 px-lg-4">
+
+        <!-- 左侧品牌 -->
+        <a class="navbar-brand fw-bold fs-4 d-flex align-items-center" 
+           href="{{ url_for('workspace.dashboard') }}">
+            {{ system_name }}
+        </a>
+
+        <!-- 移动端折叠按钮 -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+                data-bs-target="#navbarContent" aria-controls="navbarContent" 
+                aria-expanded="false" aria-label="切换导航">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+
+            <!-- 中间主导航 -->
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link fw-bold {% if request.endpoint in ['workspace.dashboard', 'workspace.index'] %}active{% endif %}" 
+                       href="{{ url_for('workspace.dashboard') }}">
+                        首页
+                    </a>
+                </li>
+
+                {# 事务 - 节点管理入口 #}
+                <li class="nav-item">
+                    <a class="nav-link fw-bold {% if request.endpoint and request.endpoint.startswith('node.') %}active{% endif %}" 
+                       href="{{ url_for('node.dashboard') }}">
+                        事务
+                    </a>
+                </li>
+
+                {# 内容结构 - 仅管理员可见 #}
+                {% if current_user.is_authenticated and current_user.is_admin %}
+                <li class="nav-item">
+                    <a class="nav-link fw-bold {% if request.endpoint == 'taxonomy.content_structure_dashboard' %}active{% endif %}" 
+                       href="{{ url_for('taxonomy.content_structure_dashboard') }}">
+                        内容结构
+                    </a>
+                </li>
+                {% endif %}
+
+                {# 系统管理 - 直接链接，管理员/组长可见 #}
+                {% if current_user.is_authenticated and (current_user.is_admin or current_user.role == 'leader') %}
+                <li class="nav-item">
+                    <a class="nav-link fw-bold {% if request.endpoint == 'admin.system_settings' %}active{% endif %}" 
+                       href="{{ url_for('admin.system_settings') }}">
+                        系统管理
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+
+            <!-- 右侧用户区 -->
+            <ul class="navbar-nav ms-auto align-items-center gap-2">
+                {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center fw-medium" 
+                           href="{{ url_for('profile.view') }}">
+                            <i class="bi bi-person me-1"></i>
+                            <strong>{{ current_user.nickname or current_user.username }}</strong>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" 
+                           href="{{ url_for('auth.logout') }}">
+                            <i class="bi bi-box-arrow-right me-1"></i>
+                            退出登录
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="card-btn primary-btn rounded-pill px-4 py-2 fw-semibold" 
+                           href="{{ url_for('auth.login') }}">
+                            登录
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

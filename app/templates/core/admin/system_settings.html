@@ -1,0 +1,200 @@
+{# 文件路径：app/templates/admin/system_settings.html #}
+{# 更新日期：2026-03-13 #}
+{# 功能说明：系统设置页面模板 #}
+
+{% extends "core/frame_admin.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% block admin_title %}
+  <h1 class="settings-title h2 mb-4" style="display: none;">系统设置</h1>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .alert, .flash-message, .flashed-messages {
+    display: none !important;
+  }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+{# Toast 消息组件 #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+      {% for category, message in messages %}
+        <div class="toast show" role="alert">
+          <div class="toast-body">
+            {{ message }}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+{# 表单错误汇总 #}
+{% if form and form.errors %}
+  <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+    <strong>表单有 {{ form.errors|length }} 个错误，请检查：</strong>
+    <ul class="mb-0">
+      {% for field_name, field_errors in form.errors.items() %}
+        {% for error in field_errors %}
+          <li><strong>{{ form[field_name].label.text }}：</strong> {{ error }}</li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+{% endif %}
+
+<form method="POST" novalidate>
+  {{ form.hidden_tag() }}
+
+  <!-- 保存按钮在顶部 -->
+  <div class="text-end mb-3">
+    {{ form.submit(class="btn btn-primary", value="保存设置") }}
+  </div>
+
+  <!-- 系统基本信息 -->
+  <div class="card shadow-sm border-0 rounded-3 mb-3">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">系统基本信息</h5>
+    </div>
+    <div class="card-body">
+      {{ form.system_name.label(class="form-label fw-medium") }}
+      {{ form.system_name(class="form-control form-control-lg w-100") }}
+      <small class="form-text text-muted">
+        当前名称：{{ settings.system_name or '内部管理系统' }}
+      </small>
+    </div>
+  </div>
+
+  <!-- 水印设置 -->
+  <div class="card shadow-sm border-0 rounded-3 mb-3">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">水印设置</h5>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="form-check form-switch form-switch-lg">
+            {{ form.enable_web_watermark(class="form-check-input") }}
+            {{ form.enable_web_watermark.label(class="form-check-label fw-medium") }}
+          </div>
+          <small class="form-text text-muted mt-1">
+            当前状态：{{ '已启用' if settings.enable_web_watermark is sameas true or settings.enable_web_watermark == 'true' else '已禁用' }}
+          </small>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-check form-switch form-switch-lg">
+            {{ form.enable_export_watermark(class="form-check-input") }}
+            {{ form.enable_export_watermark.label(class="form-check-label fw-medium") }}
+          </div>
+          <small class="form-text text-muted mt-1">
+            当前状态：{{ '已启用' if settings.enable_export_watermark is sameas true or settings.enable_export_watermark == 'true' else '已禁用' }}
+          </small>
+        </div>
+
+        <div class="col-md-6">
+          {{ form.web_watermark_content.label(class="form-label fw-medium") }}
+          {{ form.web_watermark_content(class="form-select") }}
+          <small class="form-text text-muted">
+            当前内容：{{ settings.web_watermark_content or 'username' }}
+          </small>
+        </div>
+
+        <div class="col-md-6">
+          {{ form.web_watermark_opacity.label(class="form-label fw-medium") }}
+          {{ form.web_watermark_opacity(class="form-control") }}
+          <small class="form-text text-muted">
+            当前透明度：{{ settings.web_watermark_opacity or '0.15' }}
+          </small>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-check form-switch form-switch-lg">
+            {{ form.enable_watermark_console_detection(class="form-check-input") }}
+            {{ form.enable_watermark_console_detection.label(class="form-check-label fw-medium") }}
+          </div>
+          <small class="form-text text-muted mt-1">
+            当前状态：{{ '已启用' if settings.enable_watermark_console_detection is sameas true or settings.enable_watermark_console_detection == 'true' else '已禁用' }}
+          </small>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-check form-switch form-switch-lg">
+            {{ form.enable_watermark_shortcut_block(class="form-check-input") }}
+            {{ form.enable_watermark_shortcut_block.label(class="form-check-label fw-medium") }}
+          </div>
+          <small class="form-text text-muted mt-1">
+            当前状态：{{ '已启用' if settings.enable_watermark_shortcut_block is sameas true or settings.enable_watermark_shortcut_block == 'true' else '已禁用' }}
+          </small>
+        </div>
+
+        <div class="col-12">
+          {{ form.report_watermark_text.label(class="form-label fw-medium") }}
+          {{ form.report_watermark_text(class="form-control", placeholder="例如：内部保密 - 请勿外传") }}
+          <small class="form-text text-muted">
+            当前水印：{{ settings.report_watermark_text or '（无水印）' }}
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 其他设置 -->
+  <div class="card shadow-sm border-0 rounded-3">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">其他设置</h5>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          {{ form.upload_max_size_mb.label(class="form-label fw-medium") }}
+          <div class="input-group">
+            {{ form.upload_max_size_mb(class="form-control") }}
+            <span class="input-group-text">MB</span>
+          </div>
+          <small class="form-text text-muted">
+            当前限制：{{ settings.upload_max_size_mb or 50 }} MB
+          </small>
+        </div>
+
+        <div class="col-md-6">
+          {{ form.upload_max_files.label(class="form-label fw-medium") }}
+          {{ form.upload_max_files(class="form-control") }}
+          <small class="form-text text-muted">
+            当前限制：{{ settings.upload_max_files or 20 }} 个文件/项目
+          </small>
+        </div>
+
+        <div class="col-md-6">
+          {{ form.session_timeout_minutes.label(class="form-label fw-medium") }}
+          <div class="input-group">
+            {{ form.session_timeout_minutes(class="form-control") }}
+            <span class="input-group-text">分钟</span>
+          </div>
+          <small class="form-text text-muted">
+            当前设置：{{ settings.session_timeout_minutes or 30 }} 分钟
+          </small>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-check form-switch form-switch-lg mt-4">
+            {{ form.enable_audit_log(class="form-check-input") }}
+            {{ form.enable_audit_log.label(class="form-check-label fw-medium") }}
+          </div>
+          <small class="form-text text-muted mt-1">
+            当前状态：{{ '已启用（推荐）' if settings.enable_audit_log else '已禁用' }}
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</form>
+{% endblock %}

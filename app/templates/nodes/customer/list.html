@@ -1,0 +1,130 @@
+{% extends "core/frame_node.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'customer' %}
+
+{% block extra_head %}
+<style>
+  .alert, .flash-message, .flashed-messages {
+    display: none !important;
+  }
+</style>
+{% endblock %}
+
+{% block admin_title %}
+  客户管理
+{% endblock %}
+
+{% block admin_title_buttons %}
+  <a href="{{ url_for('customer.create') }}" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i> 新建客户
+  </a>
+{% endblock %}
+
+{% block admin_content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+      {% for category, message in messages %}
+        <div class="toast show" role="alert">
+          <div class="toast-body">
+            {{ message }}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div class="card shadow-sm border-0 rounded-3">
+  <div class="card-body p-4">
+    <div class="table-responsive">
+      <table class="table table-hover table-bordered align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>客户名称</th>
+            <th>联系人</th>
+            <th>电话</th>
+            <th>邮箱</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if customers %}
+            {% for customer in customers %}
+            <tr>
+              <td>
+                <a href="{{ url_for('customer.view', customer_id=customer.id) }}" class="text-decoration-none fw-bold">
+                  {{ customer.customer_name }}
+                </a>
+              </td>
+              <td>{{ customer.contact_person or '-' }}</td>
+              <td>{{ customer.phone or '-' }}</td>
+              <td>{{ customer.email or '-' }}</td>
+              <td>
+                <a href="{{ url_for('customer.view', customer_id=customer.id) }}" class="btn btn-outline-primary btn-sm px-2 py-1 me-1">
+                  <i class="bi bi-eye"></i>
+                </a>
+                <a href="{{ url_for('customer.edit', customer_id=customer.id) }}" class="btn btn-outline-secondary btn-sm px-2 py-1 me-1">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <form method="POST" action="{{ url_for('customer.delete', customer_id=customer.id) }}" style="display:inline;" onsubmit="return confirm('确定要删除此客户吗？');">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                  <button type="submit" class="btn btn-outline-danger btn-sm px-2 py-1">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="5" class="text-center py-5">
+                <div class="alert alert-info mb-0">
+                  暂无客户，请 <a href="{{ url_for('customer.create') }}">创建第一个客户</a>
+                </div>
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if pagination and pagination.pages > 1 %}
+    <nav aria-label="客户列表分页">
+      <ul class="pagination justify-content-center mt-4 mb-0">
+        {% if pagination.has_prev %}
+        <li class="page-item">
+          <a class="page-link" href="{{ url_for('customer.index', page=pagination.prev_num) }}">上一页</a>
+        </li>
+        {% endif %}
+        
+        {% for page_num in pagination.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
+          {% if page_num %}
+            <li class="page-item {{ 'active' if page_num == pagination.page else '' }}">
+              <a class="page-link" href="{{ url_for('customer.index', page=page_num) }}">{{ page_num }}</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">...</span></li>
+          {% endif %}
+        {% endfor %}
+        
+        {% if pagination.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="{{ url_for('customer.index', page=pagination.next_num) }}">下一页</a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+
+    {% if customers %}
+      <div class="text-end text-muted small mt-3">
+        共 {{ pagination.total }} 条记录
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

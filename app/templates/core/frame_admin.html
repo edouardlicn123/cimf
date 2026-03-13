@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% set use_custom_main = true %}
+
+{% block head %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/frame.css') }}?v={{ timestamp }}">
+{% endblock %}
+
+{% block main_content %}
+<div class="d-flex flex-column vh-100">
+  <div class="d-flex flex-grow-1 overflow-hidden">
+
+    <!-- 左侧导航栏（系统管理专属 sidebar） -->
+    <nav class="admin-sidebar flex-shrink-0 d-none d-md-block"
+         style="width: 220px; min-width: 220px; background: var(--bg-surface); border-right: 1px solid var(--border-light);">
+      <div class="h-100 overflow-auto">
+        <div class="position-sticky top-0 p-2 pt-4">
+          <ul class="nav flex-column mb-auto">
+            <li class="nav-item">
+              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {{ 'active' if active_section == 'settings' else '' }}" 
+                 href="{{ url_for('admin.system_settings') }}">
+                <i class="bi bi-gear me-2 fs-6"></i>
+                系统设置
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {{ 'active' if active_section == 'users' else '' }}" 
+                 href="{{ url_for('admin.system_users') }}">
+                <i class="bi bi-people me-2 fs-6"></i>
+                人员管理
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {{ 'active' if active_section == 'permissions' else '' }}" 
+                 href="{{ url_for('admin.permissions_edit') }}">
+                <i class="bi bi-shield-lock me-2 fs-6"></i>
+                权限管理
+              </a>
+            </li>
+            <!-- 后续模块可在此继续添加 -->
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- 右侧主内容区 -->
+    <div class="flex-grow-1 overflow-auto px-4 pt-2" style="background: var(--bg-body);">
+      <!-- 标题行 -->
+      <div class="d-flex justify-content-between align-items-center mb-2 flex-nowrap">
+        <h1 class="h2 mb-0 flex-grow-1 pe-3">
+          {% block admin_title %}{% endblock %}
+        </h1>
+        <div class="ms-auto ps-4">
+          {% block admin_title_buttons %}{% endblock %}
+        </div>
+      </div>
+
+      <!-- 子页面实际内容 -->
+      <div class="pb-4">
+        {% block admin_content %}{% endblock %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock main_content %}

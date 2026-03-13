@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="{{ current_user.theme|default('default') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <meta name="description" content="{{ system_name }} - 酒店家具项目管理与海运费用计算工具">
+
+    <title>{% block title %}{{ system_name }}{% endblock %}</title>
+
+    {% include "includes/style.html" %}
+
+    {% block head_extra %}{% endblock %}
+</head>
+
+<body{% if show_nav|default(true) %} class="has-fixed-navbar{% if page_class|default('') %} {{ page_class }}{% endif %}"{% else %}{% if page_class|default('') %} class="{{ page_class }}"{% endif %}{% endif %}>
+    {% if not hide_watermark|default(false) %}
+        {% include "includes/watermark.html" %}
+    {% endif %}
+
+    {% if show_nav|default(true) %}
+        {% include "includes/nav.html" %}
+    {% endif %}
+
+    {% if show_header|default(true) %}
+        {% include "includes/header.html" %}
+    {% endif %}
+
+    {% if use_custom_main|default(false) %}
+        <div class="d-flex flex-column" style="min-height: 100vh;">
+            {% block main_content %}{% endblock %}
+            {% include "includes/footer.html" %}
+        </div>
+    {% else %}
+        <main class="container py-4 py-md-5">
+            {% block content %}{% endblock %}
+        </main>
+        {% include "includes/footer.html" %}
+    {% endif %}
+
+    {% include "includes/toast_messages.html" %}
+
+    {% include "includes/js.html" %}
+
+    {% if not hide_watermark|default(false) %}
+        <script src="{{ url_for('static', filename='js/watermark.js') }}?v={{ timestamp }}"></script>
+    {% endif %}
+
+    {% block scripts %}{% endblock %}
+
+</body>
+</html>

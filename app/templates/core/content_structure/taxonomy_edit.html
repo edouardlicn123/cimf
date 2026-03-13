@@ -1,0 +1,118 @@
+{# app/templates/taxonomy/taxonomy_edit.html #}
+{% extends "core/frame_structure.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'taxonomies' %}
+
+{% block admin_title %}
+  <h1 class="settings-title h2 mb-4" style="display: none;">
+    {% if action == 'create' %}创建词汇表{% else %}编辑词汇表{% endif %}
+  </h1>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* 隐藏传统 flash 消息，只显示 toast */
+  .alert, .flash-message, .flashed-messages {
+    display: none !important;
+  }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="card shadow-sm border-0 rounded-3">
+  <div class="card-body d-flex flex-column p-4 p-md-5" style="min-height: 60vh;">
+
+    <!-- Toast 消息组件 -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+          {% for category, message in messages %}
+            <div class="toast show" role="alert">
+              <div class="toast-body">
+                {{ message }}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- 表单错误汇总 -->
+    {% if form and form.errors %}
+      <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+        <strong>表单有 {{ form.errors|length }} 个错误，请检查：</strong>
+        <ul class="mb-0">
+          {% for field_name, field_errors in form.errors.items() %}
+            {% for error in field_errors %}
+              <li><strong>{{ form[field_name].label.text }}：</strong> {{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endif %}
+
+    <form method="POST" novalidate class="flex-grow-1 d-flex flex-column">
+      {{ form.hidden_tag() }}
+
+      <div class="row g-4">
+
+        <!-- 名称 -->
+        <div class="col-md-6">
+          <div class="mb-3">
+            {{ form.name.label(class="form-label fw-medium") }}
+            {{ form.name(class="form-control form-control-lg" + (" is-invalid" if form.name.errors else ""), autofocus=true) }}
+            {% if form.name.errors %}
+              <div class="invalid-feedback">
+                {% for error in form.name.errors %}{{ error }}{% endfor %}
+              </div>
+            {% endif %}
+            <small class="form-text text-muted">词汇表的显示名称（必填）</small>
+          </div>
+        </div>
+
+        <!-- Slug -->
+        <div class="col-md-6">
+          <div class="mb-3">
+            {{ form.slug.label(class="form-label fw-medium") }}
+            {{ form.slug(class="form-control form-control-lg" + (" is-invalid" if form.slug.errors else "")) }}
+            {% if form.slug.errors %}
+              <div class="invalid-feedback">
+                {% for error in form.slug.errors %}{{ error }}{% endfor %}
+              </div>
+            {% endif %}
+            <small class="form-text text-muted">用于 URL，建议使用英文、数字和下划线</small>
+          </div>
+        </div>
+
+        <!-- 描述 -->
+        <div class="col-12">
+          <div class="mb-3">
+            {{ form.description.label(class="form-label fw-medium") }}
+            {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), rows=4) }}
+            {% if form.description.errors %}
+              <div class="invalid-feedback">
+                {% for error in form.description.errors %}{{ error }}{% endfor %}
+              </div>
+            {% endif %}
+            <small class="form-text text-muted">对该词汇表的描述说明</small>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 底部按钮区 -->
+      <div class="mt-auto pt-4 border-top d-flex justify-content-end gap-3">
+        <a href="{{ url_for('taxonomy.index') }}" class="btn btn-outline-secondary btn-lg px-5">
+          取消
+        </a>
+        {{ form.submit(class="btn btn-lg px-5 primary-btn") }}
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock %}

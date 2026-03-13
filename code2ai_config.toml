@@ -1,0 +1,144 @@
+# code2ai_config.toml
+# 用于 code2ai.py 的配置文件
+# 路径建议：放在项目根目录（与 run.sh 同级）
+
+[general]
+# 是否在文件内容开头添加时间戳、项目名称等信息
+add_timestamp = true
+
+# 项目名称，会显示在生成文件的头部
+project_name = "FFE 项目跟进系统"
+
+# 文件内容编码
+encoding = "utf-8"
+
+# 是否自动忽略二进制文件和大文件
+auto_ignore_binaries = true
+
+# 单个文件最大大小（字节），超过则跳过并打印警告
+# 512 KB = 524288 字节，建议根据实际情况调整（md 和 py 文件一般远小于此值）
+max_file_size_bytes = 524288
+
+[include]
+# 要包含的文件路径（相对项目根目录）
+# 支持通配符 * 和 **（** 表示递归所有子目录）
+files = [
+    # 根目录核心文件
+    "README.md",
+    "requirements.txt",
+    "run.py",
+    "run.sh",
+    "config.py",
+    "code2ai_config.toml",
+    "init_schema.py",
+    "test_path.py",
+    "list.txt",
+
+    # 所有 Python 源代码（最重要）
+    "app/**/*.py",
+
+    # Jinja2 模板文件
+    "app/templates/**/*.html",
+
+    # 静态资源 - CSS（主题、基础样式等）
+    "app/static/css/**/*.css",
+
+    # 静态资源 - JavaScript
+    "app/static/js/**/*.js",
+
+    # 文档 - Markdown（规划、设计、参考等）
+    "docs/**/*.md",
+    "docs/*.md",
+
+    # 文档 - 纯文本笔记或其他说明
+    "docs/**/*.txt",
+
+    # 其他可能的文本配置文件或说明
+    "docs/**/*.yaml",
+    "docs/**/*.json",
+    "docs/**/*.ini",
+
+    # 工具脚本（code2ai 本身）
+    "app/utils/code2ai.py",
+
+    # 未来可能出现的目录（预留通配，即使当前不存在也不会出错）
+    "tests/**/*.py",                # 单元测试
+    "migrations/**/*.py",           # alembic 迁移脚本
+    "app/blueprints/**/*.py",       # 如果未来把路由拆成蓝图
+    "app/api/**/*.py",              # 可能的 RESTful API 模块
+    "app/i18n/**/*.po",             # 国际化 .po 文件
+    "app/i18n/**/*.mo",
+    "app/services/**/*.py",         # 已存在，继续覆盖子目录
+
+    # 其他可能出现的配置文件
+    "**/*.toml",                    # 其他 toml 配置（如果未来有多个）
+    "**/*.yaml",
+    "**/*.yml",
+]
+
+[exclude]
+# 要明确排除的文件或目录（相对项目根目录）
+# 支持通配符
+patterns = [
+    # Python 缓存与编译文件
+    "**/__pycache__/**",
+    "**/*.pyc",
+    "**/*.pyo",
+    "**/*.pyd",
+
+    # 虚拟环境完整目录
+    "venv/**",
+    "lib/**",
+    "lib64/**",
+    "include/**",
+    "bin/**",
+
+    # 数据库文件与备份
+    "instance/*.db",
+    "instance/*.db.*.bak",
+    "instance/site.db*",
+
+    # 日志、上传、临时文件
+    "logs/**",
+    "persistent_uploads/**",
+    "*.log",
+    "*.bak",
+    "*.swp",
+
+    # code2ai 自身生成的审查文件（防止自我包含）
+    "code2ai/code_for_ai_review*.txt",
+
+    # Git 与编辑器目录
+    ".git/**",
+    ".idea/**",
+    ".vscode/**",
+
+    # 二进制资源、媒体文件（不适合文本审查）
+    "**/*.png",
+    "**/*.jpg",
+    "**/*.jpeg",
+    "**/*.gif",
+    "**/*.ico",
+    "**/*.svg",                     # svg 是文本，但通常很大，不审查
+    "**/*.woff",
+    "**/*.woff2",
+    "**/*.ttf",
+    "**/*.eot",
+    "**/*.otf",
+    "**/*.map",                     # source map
+    "**/*.min.js",
+    "**/*.min.css",
+
+    # 其他不必要的或敏感文件
+    "**/*.db-journal",
+    "**/*.sqlite3",
+    "**/*.pid",
+    "**/*.lock",
+    "migrations/versions/*",        # alembic 版本文件有时很大，可选排除
+]
+
+[output]
+# 输出内容的格式风格
+header_style = "markdown"         # 可选：markdown / plain / comment
+file_separator = "──────────────────────────────────────────────"
+show_line_numbers = false         # 是否在每个文件内容前显示行号（建议 false，减少 token 消耗）

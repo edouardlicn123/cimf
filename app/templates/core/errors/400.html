@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}400 - 无效请求{% endblock %}
+
+{% block extra_head %}
+<style>
+    .error-container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 5rem 1rem;
+        text-align: center;
+    }
+    
+    .error-code {
+        font-size: 8.5rem;
+        font-weight: 700;
+        color: var(--danger);
+        line-height: 0.95;
+        margin: 0 0 1.2rem;
+    }
+    
+    .error-message {
+        font-size: 1.9rem;
+        margin: 1rem 0 1.5rem;
+        color: var(--text-primary);
+    }
+    
+    .error-desc {
+        font-size: 1.125rem;
+        color: var(--text-muted);
+        margin-bottom: 2.5rem;
+        max-width: 580px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .btn-retry {
+        min-width: 200px;
+        font-size: 1.125rem;
+        padding: 0.85rem 1.8rem;
+    }
+    
+    .alert-info-custom {
+        max-width: 500px;
+        margin: 2rem auto 0;
+        font-size: 1rem;
+    }
+    
+    @media (max-width: 576px) {
+        .error-code {
+            font-size: 6rem;
+        }
+        .error-message {
+            font-size: 1.5rem;
+        }
+    }
+    
+    /* 隐藏传统 flash 消息，只显示 toast */
+    .alert, .flash-message, .flashed-messages {
+        display: none !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{# Toast 消息组件 #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+      {% for category, message in messages %}
+        <div class="toast show" role="alert">
+          <div class="toast-body">
+            {{ message }}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div class="error-container">
+    <h1 class="error-code">400</h1>
+    <h2 class="error-message">无效请求</h2>
+    
+    <p class="error-desc">
+        服务器无法理解您的请求，可能是因为请求格式错误、缺少必要参数或数据无效。
+    </p>
+
+    <p class="error-desc mb-4">
+        请检查您提交的内容（例如表单字段、URL 参数、文件大小等），然后重试。
+    </p>
+
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <a href="javascript:history.back()" class="btn btn-primary btn-lg btn-retry">
+            返回上一页重试
+        </a>
+        
+        <a href="{{ url_for('workspace.dashboard') }}" class="btn btn-outline-secondary btn-lg">
+            返回仪表盘
+        </a>
+    </div>
+
+    {% if request.args or request.form %}
+    <div class="alert alert-info alert-info-custom mt-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        常见原因提示：
+        <ul class="mb-0 text-start">
+            <li>表单提交缺少 CSRF 保护令牌（请确认模板中包含了正确的 hidden_tag()）</li>
+            <li>文件上传超过大小限制（请检查文件大小是否过大，通常为服务器默认 16MB 或配置值）</li>
+            <li>请求参数或 JSON 格式不正确</li>
+            <li>使用了错误的请求方法（例如用 GET 提交了 POST 表单）</li>
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- 管理员调试信息（仅管理员可见） -->
+    {% if current_user.is_authenticated and current_user.is_admin %}
+    <div class="mt-5 pt-4 border-top small text-muted">
+        （管理员调试信息，仅您可见）<br>
+        请求方法：{{ request.method }}<br>
+        请求路径：{{ request.path }}<br>
+        查询参数：{{ request.args | tojson }}<br>
+        表单数据：{{ request.form | tojson | safe }}<br>
+        如需排查，请检查：
+        <ul class="mb-0">
+            <li>模板是否正确调用了 form.hidden_tag()</li>
+            <li>表单 method 是否为 POST</li>
+            <li>CSRF token 是否过期或会话问题</li>
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

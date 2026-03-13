@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}404 - 页面未找到{% endblock %}
+
+{% block extra_head %}
+<style>
+    .error-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 5rem 1rem;
+        text-align: center;
+    }
+    
+    .error-code {
+        font-size: 9rem;
+        font-weight: 800;
+        color: var(--primary);
+        line-height: 0.9;
+        margin: 0 0 1rem;
+        letter-spacing: -0.05em;
+    }
+    
+    .error-message {
+        font-size: 2rem;
+        margin: 1rem 0 1.5rem;
+        color: var(--text-primary);
+    }
+    
+    .error-desc {
+        font-size: 1.15rem;
+        color: var(--text-muted);
+        margin-bottom: 2.5rem;
+        max-width: 620px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .btn-group-custom {
+        display: flex;
+        gap: 1.2rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .btn-home, .btn-back {
+        min-width: 180px;
+        font-size: 1.1rem;
+        padding: 0.8rem 1.6rem;
+    }
+    
+    @media (max-width: 576px) {
+        .error-code {
+            font-size: 6.5rem;
+        }
+        .error-message {
+            font-size: 1.6rem;
+        }
+        .btn-group-custom {
+            flex-direction: column;
+            gap: 1rem;
+        }
+    }
+    
+    /* 隐藏传统 flash 消息，只显示 toast */
+    .alert, .flash-message, .flashed-messages {
+        display: none !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{# Toast 消息组件 #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+      {% for category, message in messages %}
+        <div class="toast show" role="alert">
+          <div class="toast-body">
+            {{ message }}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div class="error-container">
+    <h1 class="error-code">404</h1>
+    <h2 class="error-message">页面未找到</h2>
+    
+    <p class="error-desc">
+        您访问的页面可能已被移动、删除，或者您输入的地址有误。
+    </p>
+
+    <p class="error-desc text-muted mb-5">
+        这可能是因为链接已过期、项目已归档，或者只是一个小小的拼写错误。
+    </p>
+
+    <div class="btn-group-custom">
+        <a href="{{ url_for('workspace.dashboard') }}" class="btn btn-primary btn-lg btn-home">
+            返回仪表盘
+        </a>
+        
+        <a href="javascript:history.back()" class="btn btn-outline-secondary btn-lg btn-back">
+            返回上一页
+        </a>
+        
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('workspace.dashboard') }}" class="btn btn-outline-info btn-lg">
+            查看我的项目
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- 可选：给管理员或调试时显示的额外信息 -->
+    {% if current_user.is_authenticated and current_user.is_admin %}
+    <div class="mt-5 pt-4 border-top small text-muted">
+        （管理员可见）请求路径：{{ request.path }}<br>
+        如需排查，请检查路由定义或项目是否存在。
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

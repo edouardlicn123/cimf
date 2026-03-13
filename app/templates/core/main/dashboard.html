@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+{% set page_class = 'dashboard-page' %}
+
+{% block title %}仪表盘 - {{ system_name }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* 隐藏传统 flash 消息，只显示 toast */
+    .alert, .flash-message, .flashed-messages {
+        display: none !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-md-5">
+            <!-- Toast 消息组件 -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+                        {% for category, message in messages %}
+                            <div class="toast show" role="alert">
+                                <div class="toast-body">
+                                    {{ message }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <!-- 无消息时占位，确保布局稳定 -->
+                    <div class="mt-auto"></div>
+                {% endif %}
+            {% endwith %}
+
+    <!-- 欢迎信息栏 -->
+    <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom welcome-bar">
+        <div>
+            <h2 class="mb-0 fw-semibold welcome-title">
+                欢迎回来，{{ current_user.nickname or current_user.username }}！
+            </h2>
+            <div class="text-muted small welcome-info">
+                {% if current_user.is_authenticated %}
+                    <span id="current-beijing-time">加载中...</span>　｜　
+                    账号：{{ current_user.username }}　｜　
+                    最后登录：{{ current_user.last_login_at.strftime('%Y-%m-%d %H:%M') if current_user.last_login_at else '首次登录' }}
+                {% else %}
+                    <span class="text-warning">当前为未登录状态（开发/测试模式）</span>
+                    <a href="{{ url_for('auth.login') }}" class="ms-2 btn btn-sm card-btn primary-btn">立即登录</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 右侧快速操作按钮组 -->
+        {% if current_user.is_authenticated %}
+        <div class="d-flex gap-2 quick-actions">
+            <a href="#" class="btn btn-sm card-btn secondary-btn">
+                <i class="bi bi-plus-lg me-1"></i> 新建项目
+            </a>
+            <button class="btn btn-sm card-btn info-btn">
+                <i class="bi bi-arrow-clockwise me-1"></i> 刷新
+            </button>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- 卡片列表 -->
+    <div class="dashboard-cards d-flex flex-wrap justify-content-center gap-2 mb-2">
+        <!-- 卡片 1：DDP 费用计算器（主色） -->
+        <div class="card shadow-sm border-0 card-entry">
+            <div class="card-body text-center d-flex flex-column justify-content-between py-3 px-3">
+                <div>
+                    <i class="bi bi-calculator fs-2 mb-2 d-block card-icon calculator-icon"></i>
+                    <h5 class="card-title fw-medium">DDP 费用计算器</h5>
+                    <p class="card-text text-muted small mb-2">
+                        吉布提港 / 迪拜 / 基加利 等多港口版本
+                    </p>
+                </div>
+                <a href="#" class="btn btn-sm card-btn primary-btn">
+                    立即使用
+                </a>
+            </div>
+        </div>
+
+        <!-- 卡片 2：KD 包装体积计算（成功色） -->
+        <div class="card shadow-sm border-0 card-entry">
+            <div class="card-body text-center d-flex flex-column justify-content-between py-3 px-3">
+                <div>
+                    <i class="bi bi-box-seam fs-2 mb-2 d-block card-icon kd-icon"></i>
+                    <h5 class="card-title fw-medium">KD 包装体积计算</h5>
+                    <p class="card-text text-muted small mb-2">
+                        26类家具 · 一键复制Excel
+                    </p>
+                </div>
+                <a href="#" class="btn btn-sm card-btn info-btn">
+                    进入计算器
+                </a>
+            </div>
+        </div>
+
+        <!-- 卡片 3：项目管理（信息色） -->
+        <div class="card shadow-sm border-0 card-entry">
+            <div class="card-body text-center d-flex flex-column justify-content-between py-3 px-3">
+                <div>
+                    <i class="bi bi-clipboard-data fs-2 mb-2 d-block card-icon project-icon"></i>
+                    <h5 class="card-title fw-medium">项目管理</h5>
+                    <p class="card-text text-muted small mb-2">
+                        创建 · 跟踪 · 导出报告
+                    </p>
+                </div>
+                <a href="#" class="btn btn-sm card-btn info-btn">
+                    查看项目
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 系统状态提示 -->
+    <div class="alert alert-info text-center mb-2 rounded-3 shadow-sm system-status" role="alert">
+        <i class="bi bi-info-circle-fill me-2"></i>
+        系统运行正常 · 核心功能已就绪 · 更多模块正在开发中
+    </div>
+
+</div>
+
+{% endblock %}

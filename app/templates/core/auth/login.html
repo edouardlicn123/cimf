@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+<div style="display: none;">
+{% set show_nav = false %}
+{% set show_header = false %}
+{% set hide_watermark = true %}
+</div>
+{% block title %}登录 - {{ system_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid d-flex align-items-start justify-content-center p-0 m-0 vh-100">
+    <div class="row g-0 shadow-lg rounded-4 overflow-hidden w-100 h-100" style="max-width: 800px; margin: 0;">
+
+        <!-- 左侧蓝色背景层 – 绝对定位，完全填满整个左侧高度 -->
+        <div class="position-absolute top-0 start-0 bottom-0 col-md-6" style="background-color: #0d6efd; z-index: 1;"></div>
+
+        <!-- 左侧内容层 – 文字和 Flash 消息放在背景之上 -->
+        <div class="col-md-6 d-flex flex-column p-5 text-white position-relative" style="z-index: 2; height: 100%;">
+            <!-- 欢迎文字（靠上） -->
+            <div class="text-center mt-3 mb-auto">
+                <h2 class="fw-bold mb-4">欢迎 !</h2>
+                <p class="mb-3 fs-5">让我们一起把项目完善吧。</p>
+                <p class="mb-4 small opacity-75">初始用户名：admin 初始密码：admin123456</p>
+            </div>
+
+            <!-- Flash 消息 – 推到底部 -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+                        {% for category, message in messages %}
+                            <div class="toast show" role="alert">
+                                <div class="toast-body">
+                                    {{ message }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <!-- 无消息时占位，确保布局稳定 -->
+                    <div class="mt-auto"></div>
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <!-- 右侧登录表单面板 -->
+        <div class="col-md-6 bg-white p-5 d-flex flex-column overflow-hidden" style="height: 100%;">
+            <div class="mt-2 flex-grow-0">
+                <h4 class="fw-bold mb-4 text-center text-primary">登录</h4>
+
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+
+                    <!-- 用户名 -->
+                    <div class="mb-3">
+                        <label class="form-label">用户名</label>
+                        {{ form.username(class="form-control rounded-pill", placeholder="用户名") }}
+                        {% for error in form.username.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- 密码 -->
+                    <div class="mb-3">
+                        <label class="form-label">密码</label>
+                        {{ form.password(class="form-control rounded-pill", placeholder="密码") }}
+                        {% for error in form.password.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- 记住我（删除忘记密码链接） -->
+                    <div class="mb-4">
+                        <div class="form-check">
+                            {{ form.remember_me(class="form-check-input") }}
+                            {{ form.remember_me.label(class="form-check-label text-muted") }}
+                        </div>
+                    </div>
+
+                    <!-- 提交按钮 -->
+                    <div class="d-grid">
+                        {{ form.submit(class="btn btn-primary btn-lg rounded-pill") }}
+                    </div>
+                </form>
+            </div>
+
+            <!-- 底部版权 -->
+            <div class="mt-auto text-center small text-muted pt-4 pb-3">
+                © 2026 {{ system_name }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 自定义样式 -->
+<style>
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        height: 100% !important;
+        overflow: hidden !important;
+    }
+
+    main.container{
+        margin: 0 !important;
+        padding: 0 !important;
+        min-height: 100vh !important;
+        padding-top: 50px !important; 
+    }
+
+    .container-fluid {
+        margin: 0 !important;
+        padding: 0 !important;
+        height: 100% !important;
+        min-height: 100vh !important;
+        padding-top: 0 !important;  /* 删除顶部灰色空间（padding-top: 100px） */
+    }
+
+    .row {
+        margin: 0 !important;
+        padding: 0 !important;
+        height: 100% !important;
+        position: relative;
+    }
+
+    .col-md-6 {
+        height: 100% !important;
+    }
+
+    .d-flex {
+        height: 100% !important;
+    }
+
+    .overflow-hidden {
+        overflow: hidden !important;
+    }
+
+    .col-md-6 {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .col-md-6.p-5 {
+        padding: 3rem !important;
+    }
+
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+
+    .btn-primary {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+
+    .bg-white {
+        background-color: #ffffff !important;
+    }
+
+    .login-message-container {
+        width: 70%;
+        max-width: 560px;
+    }
+
+    .login-message-container .alert {
+        margin-bottom: 1rem;
+    }
+    
+    /* 隐藏传统 flash 消息，只显示 toast */
+    .alert, .flash-message, .flashed-messages {
+        display: none !important;
+    }
+</style>
+
+{% endblock %}

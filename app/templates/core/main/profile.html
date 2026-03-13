@@ -1,0 +1,119 @@
+{% extends "core/frame_myinfo.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'profile' %}
+
+{% block title %}个人信息 - {{ system_name }}{% endblock %}
+
+{% block admin_title %}
+  <h1 class="settings-title h2 mb-4" style="display: none;">个人信息</h1>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* 隐藏传统 flash 消息，只显示 toast */
+  .alert, .flash-message, .flashed-messages {
+    display: none !important;
+  }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+{# Toast 消息组件 #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+      {% for category, message in messages %}
+        <div class="toast show" role="alert">
+          <div class="toast-body">
+            {{ message }}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div class="card shadow-sm border-0 rounded-3 w-50 mx-auto">
+  <div class="card-body">
+    <table class="table table-hover table-bordered align-middle mb-0">
+      <thead class="table-light" style="display: none;">
+        <tr>
+          <th style="width: 40%;">项目</th>
+          <th>内容</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr>
+            <td class="text-muted fw-medium">登录账号</td>
+            <td>{{ current_user.username }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted fw-medium">显示昵称</td>
+            <td>{{ current_user.nickname or '未设置' }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted fw-medium">邮箱地址</td>
+            <td>{{ current_user.email or '未设置' }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted fw-medium">账号角色</td>
+            <td>
+              {% if current_user.role == 'admin' %}
+                <span class="badge bg-danger">{{ role_labels['admin'] }}</span>
+              {% elif current_user.role == 'leader' %}
+                <span class="badge bg-warning text-dark">{{ role_labels['leader'] }}</span>
+              {% else %}
+                <span class="badge bg-secondary">{{ role_labels['employee'] }}</span>
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td class="text-muted fw-medium">界面主题</td>
+            <td>
+              {% if current_user.theme == 'default' %}默认
+              {% elif current_user.theme == 'gov' %}政府风格
+              {% elif current_user.theme == 'indigo' %}靛蓝风格
+              {% elif current_user.theme == 'macaron' %}马卡龙风格
+              {% elif current_user.theme == 'dopamine' %}多巴胺风格
+              {% elif current_user.theme == 'teal' %}青绿风格
+              {% elif current_user.theme == 'uniklo' %}极简风格
+              {% else %}{{ current_user.theme }}{% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td class="text-muted fw-medium">系统通知</td>
+            <td>
+              {% if current_user.notifications_enabled %}
+                <span class="badge bg-success">已开启</span>
+              {% else %}
+                <span class="badge bg-secondary">已关闭</span>
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td class="text-muted fw-medium">账号状态</td>
+            <td>
+              {% if current_user.is_active %}
+                <span class="badge bg-success">正常</span>
+              {% else %}
+                <span class="badge bg-danger">已禁用</span>
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td class="text-muted fw-medium">账号创建时间</td>
+            <td>{{ current_user.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted fw-medium">最后登录时间</td>
+            <td>{{ current_user.last_login_at.strftime('%Y-%m-%d %H:%M:%S') if current_user.last_login_at else '首次登录' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{# includes/footer.html
+   =============================================================================
+   作用：系统页脚统一渲染
+   
+   包含内容：
+   - 版权声明 + 当前年份（自动使用 {{ year }}）
+   - 内部使用说明 + 版本号
+   - 联系提示
+   
+   主题适配原则：
+   - 所有视觉样式（背景色、文字色、边框、圆角、阴影、间距、过渡等）
+     完全由外部主题文件控制（例如 theme-macaron.css）
+   - 不使用任何内联 style 属性
+   - 通过语义 class（如 system-footer）挂钩主题样式
+   - 文字颜色默认使用 muted 类（可被主题覆盖）
+   ============================================================================= #}
+
+<footer class="system-footer">
+    <div class="container text-center py-1">
+        <p class="mb-1 text-muted">
+            {{ system_name }} © {{ year }}
+            <span class="mx-2">·</span>
+            版本 1.0.0
+        </p>
+
+        <p class="mb-0 text-muted">
+            如有问题请联系系统管理员
+        </p>
+    </div>
+</footer>

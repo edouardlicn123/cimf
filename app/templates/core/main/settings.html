@@ -1,0 +1,125 @@
+{% extends "core/frame_myinfo.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'preferences' %}
+
+{% block title %}偏好设置 - {{ system_name }}{% endblock %}
+
+{% block admin_title %}
+  <h1 class="settings-title h2 mb-4" style="display: none;">偏好设置</h1>
+{% endblock %}
+
+{% block extra_head %} 
+<style>
+    .alert, .flash-message, .flashed-messages {
+        display: none !important;
+    }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+{# Toast 消息组件 #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+      {% for category, message in messages %}
+        <div class="toast show" role="alert">
+          <div class="toast-body">
+            {{ message }}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<form method="POST" novalidate>
+  {{ profile_form.hidden_tag() if profile_form else '' }}
+  {{ pref_form.hidden_tag() if pref_form else '' }}
+  {{ pwd_form.hidden_tag() if pwd_form else '' }}
+
+  <!-- 个人信息卡片 -->
+  <div class="card shadow-sm border-0 rounded-3 mb-3">
+          <div class="card-header bg-light">
+            <h5 class="mb-0">个人信息</h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                {{ profile_form.nickname.label(class="form-label fw-medium") if profile_form else '' }}
+                {{ profile_form.nickname(class="form-control", placeholder="用于显示的昵称") if profile_form else '' }}
+              </div>
+              <div class="col-md-6">
+                {{ profile_form.email.label(class="form-label fw-medium") if profile_form else '' }}
+                {{ profile_form.email(class="form-control", placeholder="用于接收通知") if profile_form else '' }}
+              </div>
+              <div class="col-12 text-end">
+                <button type="submit" name="submit_profile" class="btn btn-primary">保存</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 偏好设置卡片 -->
+        <div class="card shadow-sm border-0 rounded-3 mb-3">
+          <div class="card-header bg-light">
+            <h5 class="mb-0">偏好设置</h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-4">
+                {{ pref_form.theme.label(class="form-label fw-medium") if pref_form else '' }}
+                {{ pref_form.theme(class="form-select") if pref_form else '' }}
+              </div>
+              <div class="col-md-4">
+                {{ pref_form.language.label(class="form-label fw-medium") if pref_form else '' }}
+                {{ pref_form.language(class="form-select") if pref_form else '' }}
+              </div>
+              <div class="col-md-4">
+                <div class="form-check form-switch mt-4">
+                  {{ pref_form.notifications(class="form-check-input") if pref_form else '' }}
+                  {{ pref_form.notifications.label(class="form-check-label") if pref_form else '' }}
+                </div>
+              </div>
+              <div class="col-12 text-end">
+                <button type="submit" name="submit_preferences" class="btn btn-primary">保存</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 修改密码卡片 -->
+        <div class="card shadow-sm border-0 rounded-3">
+          <div class="card-header bg-light">
+            <h5 class="mb-0">修改密码</h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-12">
+                <div class="alert alert-warning py-2" role="alert">
+                  <small>修改密码后系统将自动登出，请使用新密码重新登录。</small>
+                </div>
+              </div>
+              <div class="col-md-4">
+                {{ pwd_form.current_password.label(class="form-label fw-medium") if pwd_form else '' }}
+                {{ pwd_form.current_password(class="form-control") if pwd_form else '' }}
+              </div>
+              <div class="col-md-4">
+                {{ pwd_form.new_password.label(class="form-label fw-medium") if pwd_form else '' }}
+                {{ pwd_form.new_password(class="form-control") if pwd_form else '' }}
+              </div>
+              <div class="col-md-4">
+                {{ pwd_form.confirm_password.label(class="form-label fw-medium") if pwd_form else '' }}
+                {{ pwd_form.confirm_password(class="form-control") if pwd_form else '' }}
+              </div>
+              <div class="col-12 text-end">
+                <button type="submit" name="submit_password" class="btn btn-primary">修改密码</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </form>
+{% endblock %}

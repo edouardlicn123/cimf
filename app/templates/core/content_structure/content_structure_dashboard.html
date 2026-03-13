@@ -1,0 +1,54 @@
+{% extends "core/frame_structure.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'dashboard' %}
+
+{% block admin_title %}
+  <h1 class="settings-title h2 mb-4" style="display: none;">内容结构管理</h1>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* 隐藏传统 flash 消息，只显示 toast */
+  .alert, .flash-message, .flashed-messages {
+    display: none !important;
+  }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+{# Toast 消息组件 #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+      {% for category, message in messages %}
+        <div class="toast show" role="alert">
+          <div class="toast-body">
+            {{ message }}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div class="d-flex gap-4 h-100 align-items-center justify-content-center">
+  <a href="{{ url_for('taxonomy.index') }}" class="text-decoration-none text-center p-4 border rounded" style="width: 200px;">
+    <i class="bi bi-tags fs-3 d-block mb-2 text-primary"></i>
+    <h5 class="fw-medium">词汇表管理</h5>
+    <p class="text-muted small mb-0">{{ taxonomies_count|default(0) }} 个词汇表</p>
+  </a>
+  <a href="{{ url_for('taxonomy.field_types') }}" class="text-decoration-none text-center p-4 border rounded" style="width: 200px;">
+    <i class="bi bi-ui-checks fs-3 d-block mb-2 text-success"></i>
+    <h5 class="fw-medium">字段类型</h5>
+    <p class="text-muted small mb-0">{{ field_types_count|default(0) }} 种类型</p>
+  </a>
+  <a href="{{ url_for('node.node_type_admin') }}" class="text-decoration-none text-center p-4 border rounded" style="width: 200px;">
+    <i class="bi bi-diagram-3 fs-3 d-block mb-2 text-info"></i>
+    <h5 class="fw-medium">节点类型管理</h5>
+    <p class="text-muted small mb-0">管理节点类型</p>
+  </a>
+</div>
+{% endblock %}

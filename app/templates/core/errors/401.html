@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}401 - 未授权访问{% endblock %}
+
+{% block extra_head %}
+<style>
+    .error-container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 5rem 1rem;
+        text-align: center;
+    }
+    
+    .error-code {
+        font-size: 8.5rem;
+        font-weight: 700;
+        color: var(--warning);
+        line-height: 0.95;
+        margin: 0 0 1.2rem;
+    }
+    
+    .error-message {
+        font-size: 1.9rem;
+        margin: 1rem 0 1.5rem;
+        color: var(--text-primary);
+    }
+    
+    .error-desc {
+        font-size: 1.125rem;
+        color: var(--text-muted);
+        margin-bottom: 2.5rem;
+        max-width: 580px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .btn-login {
+        min-width: 200px;
+        font-size: 1.125rem;
+        padding: 0.85rem 1.8rem;
+    }
+    
+    .alert-next {
+        max-width: 500px;
+        margin: 2rem auto 0;
+    }
+    
+    @media (max-width: 576px) {
+        .error-code {
+            font-size: 6rem;
+        }
+        .error-message {
+            font-size: 1.5rem;
+        }
+    }
+    
+    /* 隐藏传统 flash 消息，只显示 toast */
+    .alert, .flash-message, .flashed-messages {
+        display: none !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{# Toast 消息组件 #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+      {% for category, message in messages %}
+        <div class="toast show" role="alert">
+          <div class="toast-body">
+            {{ message }}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div class="error-container">
+    <h1 class="error-code">401</h1>
+    <h2 class="error-message">未授权访问</h2>
+    
+    <p class="error-desc">
+        您当前没有权限访问该页面，或者您的登录会话已过期。
+    </p>
+
+    <p class="error-desc mb-4">
+        请登录系统后重试。如果您已经登录，请检查是否拥有相应权限。
+    </p>
+
+    <a href="{{ url_for('auth.login') }}" class="btn btn-warning btn-lg btn-login">
+        前往登录页面
+    </a>
+
+    {% if request.args.get('next') %}
+    <div class="alert alert-info alert-next mt-4" role="alert">
+        <i class="bi bi-info-circle me-2"></i>
+        您尝试访问的页面：{{ request.args.get('next') | safe }}
+    </div>
+    {% endif %}
+
+    <!-- 管理员调试信息（仅管理员可见） -->
+    {% if current_user.is_authenticated and current_user.is_admin %}
+    <div class="mt-5 pt-4 border-top small text-muted">
+        （管理员可见）当前用户：{{ current_user.username }}<br>
+        请求路径：{{ request.path }}<br>
+        如需排查，请检查路由的 @login_required 或权限逻辑。
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

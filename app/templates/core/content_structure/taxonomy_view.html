@@ -1,0 +1,255 @@
+{# app/templates/taxonomy/taxonomy_view.html #}
+{% extends "core/frame_structure.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'taxonomies' %}
+
+{% block admin_title %}
+  <h1 class="settings-title h2 mb-4" style="display: none;">{{ taxonomy.name }}</h1>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* 隐藏传统 flash 消息，只显示 toast */
+  .alert, .flash-message, .flashed-messages {
+    display: none !important;
+  }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+{# Toast 消息组件 #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+      {% for category, message in messages %}
+        <div class="toast show" role="alert">
+          <div class="toast-body">
+            {{ message }}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div class="card shadow-sm border-0 rounded-3" style="height: 100%;">
+  <div class="card-body" style="height: 100%; width: 100%; padding: 1.5rem; box-sizing: border-box;">
+
+    <div class="d-flex justify-content-end mb-4">
+      <a href="{{ url_for('taxonomy.index') }}" class="btn btn-outline-secondary btn-lg">
+        <i class="bi bi-arrow-left me-2"></i>返回词汇表列表
+      </a>
+    </div>
+
+    <!-- 新增词汇项 -->
+    <div class="mb-4">
+      <form id="addItemForm" class="row g-3 align-items-end">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <div class="col-md-4">
+          <label class="form-label fw-medium">名称 *</label>
+          <input type="text" name="name" class="form-control form-control-lg" placeholder="请输入词汇名称" required>
+        </div>
+        <div class="col-md-5">
+          <label class="form-label fw-medium">描述</label>
+          <input type="text" name="description" class="form-control form-control-lg" placeholder="请输入描述（可选）">
+        </div>
+        <div class="col-md-3">
+          <button type="submit" class="btn btn-primary btn-lg w-100">
+            <i class="bi bi-plus-lg me-2"></i>添加
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- 词汇项列表 -->
+    <div class="table-responsive" style="height: calc(100% - 160px); overflow-y: auto;">
+      <table class="table table-hover table-bordered align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 60px;">#</th>
+            <th>名称</th>
+            <th>描述</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="itemsTableBody">
+          {% for item in items %}
+          <tr id="item-row-{{ item.id }}">
+            <td>{{ loop.index }}</td>
+            <td>
+              <span class="item-name">{{ item.name }}</span>
+              <input type="text" name="name" class="form-control form-control-sm d-none" value="{{ item.name }}">
+            </td>
+            <td>
+              <span class="item-description">{{ item.description or '' }}</span>
+              <input type="text" name="description" class="form-control form-control-sm d-none" value="{{ item.description or '' }}">
+            </td>
+            <td>
+              <button class="btn btn-outline-primary btn-sm px-2 py-1 me-2 btn-edit" onclick="editItem({{ item.id }})">
+                <i class="bi bi-pencil me-1"></i> 编辑
+              </button>
+              <button class="btn btn-success btn-sm px-2 py-1 me-2 d-none btn-save" onclick="saveItem({{ item.id }})">
+                <i class="bi bi-check me-1"></i> 保存
+              </button>
+              <button class="btn btn-outline-secondary btn-sm px-2 py-1 me-2 d-none btn-cancel" onclick="cancelEdit({{ item.id }})">
+                取消
+              </button>
+              <button class="btn btn-outline-danger btn-sm px-2 py-1 btn-delete" onclick="deleteItem({{ item.id }})">
+                <i class="bi bi-trash me-1"></i> 删除
+              </button>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="4" class="text-center py-5">
+              <div class="alert alert-info mb-0">
+                暂无词汇项，请在上方添加
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if items %}
+      <div class="text-end text-muted small mt-3">
+        共找到 {{ items|length }} 条记录
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<script>
+let addItemForm = document.getElementById('addItemForm');
+let itemsTableBody = document.getElementById('itemsTableBody');
+
+addItemForm.addEventListener('submit', function(e) {
+  e.preventDefault();
+  const formData = new FormData(addItemForm);
+  
+  fetch(`/nodes/{{ taxonomy.id }}/items`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    body: new URLSearchParams(formData)
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      location.reload();
+    } else {
+      alert(data.message || '添加失败');
+    }
+  })
+  .catch(err => {
+    console.error('添加词汇失败:', err);
+    alert('添加失败，请查看控制台');
+  });
+});
+
+function editItem(itemId) {
+  const row = document.getElementById('item-row-' + itemId);
+  const nameSpan = row.querySelector('.item-name');
+  const descSpan = row.querySelector('.item-description');
+  const nameInput = row.querySelector('input[name="name"]');
+  const descInput = row.querySelector('input[name="description"]');
+  const editBtn = row.querySelector('.btn-edit');
+  const saveBtn = row.querySelector('.btn-save');
+  const cancelBtn = row.querySelector('.btn-cancel');
+  const deleteBtn = row.querySelector('.btn-delete');
+  
+  row.dataset.originalName = nameSpan.textContent;
+  row.dataset.originalDesc = descSpan.textContent;
+  
+  nameSpan.classList.add('d-none');
+  descSpan.classList.add('d-none');
+  nameInput.classList.remove('d-none');
+  descInput.classList.remove('d-none');
+  
+  editBtn.classList.add('d-none');
+  saveBtn.classList.remove('d-none');
+  cancelBtn.classList.remove('d-none');
+  deleteBtn.classList.add('d-none');
+}
+
+function cancelEdit(itemId) {
+  const row = document.getElementById('item-row-' + itemId);
+  const nameSpan = row.querySelector('.item-name');
+  const descSpan = row.querySelector('.item-description');
+  const nameInput = row.querySelector('input[name="name"]');
+  const descInput = row.querySelector('input[name="description"]');
+  const editBtn = row.querySelector('.btn-edit');
+  const saveBtn = row.querySelector('.btn-save');
+  const cancelBtn = row.querySelector('.btn-cancel');
+  const deleteBtn = row.querySelector('.btn-delete');
+  
+  nameInput.value = row.dataset.originalName;
+  descInput.value = row.dataset.originalDesc;
+  
+  nameSpan.classList.remove('d-none');
+  descSpan.classList.remove('d-none');
+  nameInput.classList.add('d-none');
+  descInput.classList.add('d-none');
+  
+  editBtn.classList.remove('d-none');
+  saveBtn.classList.add('d-none');
+  cancelBtn.classList.add('d-none');
+  deleteBtn.classList.remove('d-none');
+}
+
+function saveItem(itemId) {
+  const row = document.getElementById('item-row-' + itemId);
+  const nameInput = row.querySelector('input[name="name"]');
+  const descInput = row.querySelector('input[name="description"]');
+  
+  if (!nameInput.value.trim()) {
+    alert('名称不能为空');
+    return;
+  }
+  
+  const formData = new FormData();
+  formData.append('name', nameInput.value);
+  formData.append('description', descInput.value);
+  formData.append('csrf_token', '{{ csrf_token() }}');
+  
+  fetch(`/nodes/{{ taxonomy.id }}/items/${itemId}`, {
+    method: 'PUT',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    body: new URLSearchParams(formData)
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      location.reload();
+    } else {
+      alert(data.message || '保存失败');
+    }
+  });
+}
+
+function deleteItem(itemId) {
+  if (!confirm('确定要删除此词汇项吗？')) return;
+  
+  const formData = new FormData();
+  formData.append('csrf_token', '{{ csrf_token() }}');
+  
+  fetch(`/nodes/{{ taxonomy.id }}/items/${itemId}`, {
+    method: 'DELETE',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    body: new URLSearchParams(formData)
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      location.reload();
+    } else {
+      alert(data.message || '删除失败');
+    }
+  });
+}
+</script>
+{% endblock %}

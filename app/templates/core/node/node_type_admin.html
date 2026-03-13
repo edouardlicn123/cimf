@@ -1,0 +1,116 @@
+{% extends "core/frame_structure.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'node_types' %}
+
+{% block extra_head %}
+<style>
+  .alert, .flash-message, .flashed-messages {
+    display: none !important;
+  }
+</style>
+{% endblock %}
+
+{% block admin_title %}
+  节点类型管理
+{% endblock %}
+
+{% block admin_content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+      {% for category, message in messages %}
+        <div class="toast show" role="alert">
+          <div class="toast-body">
+            {{ message }}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div class="card shadow-sm border-0 rounded-3">
+  <div class="card-body p-4">
+    <div class="table-responsive">
+      <table class="table table-hover table-bordered align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>节点类型</th>
+            <th>描述</th>
+            <th>节点数量</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if node_types %}
+            {% for node_type in node_types %}
+            <tr>
+              <td>
+                <strong>{{ node_type.name }}</strong>
+                <br>
+                <small class="text-muted">{{ node_type.slug }}</small>
+              </td>
+              <td>{{ node_type.description or '-' }}</td>
+              <td>{{ node_counts[node_type.id] or 0 }} 条</td>
+              <td>
+                {% if node_type.is_active %}
+                  <span class="badge bg-success">已启用</span>
+                {% else %}
+                  <span class="badge bg-secondary">已禁用</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="btn-group" role="group">
+                  {% if node_type.is_active %}
+                    <form method="POST" action="{{ url_for('node.node_type_disable', node_type_id=node_type.id) }}" style="display:inline;">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                      <button type="submit" class="btn btn-outline-warning btn-sm px-2 py-1">禁用</button>
+                    </form>
+                  {% else %}
+                    <form method="POST" action="{{ url_for('node.node_type_enable', node_type_id=node_type.id) }}" style="display:inline;">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                      <button type="submit" class="btn btn-outline-success btn-sm px-2 py-1">启用</button>
+                    </form>
+                  {% endif %}
+                  
+                  <a href="{{ url_for('node.node_type_settings', node_type_id=node_type.id) }}" class="btn btn-outline-primary btn-sm px-2 py-1">
+                    <i class="bi bi-gear"></i> 设置
+                  </a>
+                  
+                  {% if node_type.slug != 'customer' %}
+                  <form method="POST" action="{{ url_for('node.node_type_delete', node_type_id=node_type.id) }}" style="display:inline;" onsubmit="return confirm('确定要删除此节点类型吗？此操作不可恢复。');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <button type="submit" class="btn btn-outline-danger btn-sm px-2 py-1">
+                      <i class="bi bi-trash"></i> 删除
+                    </button>
+                  </form>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="5" class="text-center py-5">
+                <div class="alert alert-info mb-0">
+                  暂无节点类型，请先创建节点类型
+                </div>
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if node_types %}
+      <div class="text-end text-muted small mt-3">
+        共 {{ node_types|length }} 个节点类型
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

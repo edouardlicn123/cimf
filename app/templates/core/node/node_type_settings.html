@@ -1,0 +1,159 @@
+{% extends "core/frame_structure.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'node_types' %}
+
+{% block extra_head %}
+<style>
+  .alert, .flash-message, .flashed-messages {
+    display: none !important;
+  }
+</style>
+{% endblock %}
+
+{% block admin_title %}
+  {{ node_type.name }} - 设置
+{% endblock %}
+
+{% block admin_title_buttons %}
+  <a href="{{ url_for('node.node_type_admin') }}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i> 返回列表
+  </a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="card shadow-sm border-0 rounded-3">
+  <div class="card-body p-4">
+    
+    <h5 class="mb-4">基本信息</h5>
+    <table class="table table-borderless">
+      <tr>
+        <td class="text-muted ps-0" style="width: 150px;"><strong>机器名：</strong></td>
+        <td><code>{{ node_type.slug }}</code></td>
+      </tr>
+      <tr>
+        <td class="text-muted ps-0"><strong>显示名称：</strong></td>
+        <td>{{ node_type.name }}</td>
+      </tr>
+      <tr>
+        <td class="text-muted ps-0"><strong>描述：</strong></td>
+        <td>{{ node_type.description or '-' }}</td>
+      </tr>
+      <tr>
+        <td class="text-muted ps-0"><strong>状态：</strong></td>
+        <td>
+          {% if node_type.is_active %}
+            <span class="badge bg-success">已启用</span>
+          {% else %}
+            <span class="badge bg-secondary">已禁用</span>
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <td class="text-muted ps-0"><strong>节点数量：</strong></td>
+        <td>{{ node_count }} 条</td>
+      </tr>
+    </table>
+    
+    <hr>
+    
+    <h5 class="mb-4">相关文件</h5>
+    <table class="table table-borderless">
+      <tr>
+        <td class="text-muted ps-0" style="width: 150px;"><strong>模型文件：</strong></td>
+        <td><code>app/models/node/{{ node_type.slug }}.py</code></td>
+      </tr>
+      <tr>
+        <td class="text-muted ps-0"><strong>服务文件：</strong></td>
+        <td><code>app/services/node/{{ node_type.slug }}/{{ node_type.slug }}_service.py</code></td>
+      </tr>
+      <tr>
+        <td class="text-muted ps-0"><strong>路由文件：</strong></td>
+        <td><code>app/modules/nodes/{{ node_type.slug }}/routes.py</code></td>
+      </tr>
+      <tr>
+        <td class="text-muted ps-0"><strong>表单文件：</strong></td>
+        <td><code>app/modules/nodes/{{ node_type.slug }}/forms.py</code></td>
+      </tr>
+      <tr>
+        <td class="text-muted ps-0"><strong>模板目录：</strong></td>
+        <td><code>app/templates/nodes/{{ node_type.slug }}/</code></td>
+      </tr>
+    </table>
+    
+    <hr>
+    
+    <h5 class="mb-4">数据库表</h5>
+    <table class="table table-borderless">
+      <tr>
+        <td class="text-muted ps-0" style="width: 150px;"><strong>主表：</strong></td>
+        <td><code>nodes</code> (共用)</td>
+      </tr>
+      <tr>
+        <td class="text-muted ps-0"><strong>字段表：</strong></td>
+        <td><code>{{ node_type.slug }}_fields</code></td>
+      </tr>
+    </table>
+    
+    {% if node_type.fields_config %}
+    <hr>
+    
+    <h5 class="mb-4">字段配置</h5>
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <thead class="table-light">
+          <tr>
+            <th>字段名</th>
+            <th>类型</th>
+            <th>标签</th>
+            <th>必填</th>
+            <th>唯一</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for field in node_type.fields_config %}
+          <tr>
+            <td><code>{{ field.name }}</code></td>
+            <td>{{ field.field_type }}</td>
+            <td>{{ field.label }}</td>
+            <td>{{ '是' if field.required else '否' }}</td>
+            <td>{{ '是' if field.unique else '否' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+    
+    <hr>
+    
+    <div class="d-flex gap-3">
+      {% if node_type.is_active %}
+      <form method="POST" action="{{ url_for('node.node_type_disable', node_type_id=node_type.id) }}" style="display:inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <button type="submit" class="btn btn-warning" {% if node_count > 0 %}disabled title="请先删除所有节点"{% endif %}>
+          <i class="bi bi-x-circle me-1"></i> 禁用
+        </button>
+      </form>
+      {% else %}
+      <form method="POST" action="{{ url_for('node.node_type_enable', node_type_id=node_type.id) }}" style="display:inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <button type="submit" class="btn btn-success">
+          <i class="bi bi-check-circle me-1"></i> 启用
+        </button>
+      </form>
+      {% endif %}
+      
+      <form method="POST" action="{{ url_for('node.node_type_delete', node_type_id=node_type.id) }}" style="display:inline;" onsubmit="return confirm('确定要删除此节点类型吗？此操作不可恢复。');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <button type="submit" class="btn btn-danger" {% if node_count > 0 %}disabled title="请先删除所有节点"{% endif %}>
+          <i class="bi bi-trash me-1"></i> 删除
+        </button>
+      </form>
+    </div>
+    
+  </div>
+</div>
+{% endblock %}

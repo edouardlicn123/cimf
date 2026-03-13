@@ -1,0 +1,157 @@
+{% extends "core/frame_node.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'customer' %}
+
+{% block admin_title %}
+  {% if action == 'create' %}新建客户{% else %}编辑客户{% endif %}
+{% endblock %}
+
+{% block admin_title_buttons %}
+  <a href="{{ url_for('customer.index') }}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i> 返回列表
+  </a>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .alert, .flash-message, .flashed-messages {
+    display: none !important;
+  }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="card shadow-sm border-0 rounded-3">
+  <div class="card-body d-flex flex-column p-4 p-md-5" style="min-height: 60vh;">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+          {% for category, message in messages %}
+            <div class="toast show" role="alert">
+              <div class="toast-body">
+                {{ message }}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% if form and form.errors %}
+      <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+        <strong>表单有 {{ form.errors|length }} 个错误，请检查：</strong>
+        <ul class="mb-0">
+          {% for field_name, field_errors in form.errors.items() %}
+            {% for error in field_errors %}
+              <li><strong>{{ form[field_name].label.text }}：</strong> {{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endif %}
+
+    <form method="POST" novalidate class="flex-grow-1 d-flex flex-column">
+      {{ form.hidden_tag() }}
+
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="mb-3">
+            {{ form.customer_name.label(class="form-label fw-medium") }}
+            {{ form.customer_name(class="form-control form-control-lg" + (" is-invalid" if form.customer_name.errors else ""), autofocus=true) }}
+            {% if form.customer_name.errors %}
+              <div class="invalid-feedback">
+                {% for error in form.customer_name.errors %}{{ error }}{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="mb-3">
+            {{ form.contact_person.label(class="form-label fw-medium") }}
+            {{ form.contact_person(class="form-control form-control-lg" + (" is-invalid" if form.contact_person.errors else "")) }}
+            {% if form.contact_person.errors %}
+              <div class="invalid-feedback">
+                {% for error in form.contact_person.errors %}{{ error }}{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="mb-3">
+            {{ form.phone.label(class="form-label fw-medium") }}
+            {{ form.phone(class="form-control form-control-lg" + (" is-invalid" if form.phone.errors else "")) }}
+            {% if form.phone.errors %}
+              <div class="invalid-feedback">
+                {% for error in form.phone.errors %}{{ error }}{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="mb-3">
+            {{ form.email.label(class="form-label fw-medium") }}
+            {{ form.email(class="form-control form-control-lg" + (" is-invalid" if form.email.errors else "")) }}
+            {% if form.email.errors %}
+              <div class="invalid-feedback">
+                {% for error in form.email.errors %}{{ error }}{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="mb-3">
+            {{ form.address.label(class="form-label fw-medium") }}
+            {{ form.address(class="form-control" + (" is-invalid" if form.address.errors else "")) }}
+            {% if form.address.errors %}
+              <div class="invalid-feedback">
+                {% for error in form.address.errors %}{{ error }}{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="mb-3">
+            {{ form.customer_type.label(class="form-label fw-medium") }}
+            {{ form.customer_type(class="form-select" + (" is-invalid" if form.customer_type.errors else "")) }}
+            {% if form.customer_type.errors %}
+              <div class="invalid-feedback">
+                {% for error in form.customer_type.errors %}{{ error }}{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="mb-3">
+            {{ form.notes.label(class="form-label fw-medium") }}
+            {{ form.notes(class="form-control" + (" is-invalid" if form.notes.errors else ""), rows=4) }}
+            {% if form.notes.errors %}
+              <div class="invalid-feedback">
+                {% for error in form.notes.errors %}{{ error }}{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-auto pt-4 border-top d-flex justify-content-end gap-3">
+        <a href="{{ url_for('customer.index') }}" class="btn btn-outline-secondary btn-lg px-5">
+          取消
+        </a>
+        {{ form.submit(class="btn btn-lg px-5 primary-btn") }}
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock %}

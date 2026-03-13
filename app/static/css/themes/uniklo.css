@@ -1,0 +1,500 @@
+/*
+ * uniqlo.css
+ * FFE 项目跟进系统 - UNIQLO 风格主题（优衣库官网风）
+ * 版本：2026-02-15 v3.1（修复导航高亮 + 按钮 hover 跟随主题）
+ * 
+ * 设计特点：
+ *   - 主色：UNIQLO 经典红 #E4002B
+ *   - 极简、直线条、几乎无圆角（仅按钮微圆）
+ *   - 纯白背景 + 深灰/黑色文字，高对比度
+ *   - navbar 主菜单区使用经典红背景 + 白色文字
+ *   - 个人下拉菜单维持白色背景 + 深色文字
+ *   - 整体干净、专业、可靠，适合 CRM/会员系统
+ * 新增：
+ *   - 左侧导航 .nav-link.active 跟随 --primary
+ *   - .primary-btn / .btn-primary hover 统一为 --primary-hover
+ *   - 彻底修复宽屏下右侧用户下拉菜单被挤压/右移/只显示一小块（v6 方案，与其他主题统一）
+ *   - dashboard 卡片等宽强制修复（card 320px + card-body 100% 撑满）
+ */
+
+:root {
+  /* 主色系 - UNIQLO 经典红 */
+  --primary:           #E4002B;     /* UNIQLO Red - 主导航、按钮、重点高亮 */
+  --primary-hover:     #C60024;
+  --primary-active:    #A5001E;
+  --primary-light:     rgba(228, 0, 43, 0.10);
+  --primary-extra-light: rgba(228, 0, 43, 0.05);
+
+  /* 信息 / 辅助 */
+  --info:              #006699;     /* 深蓝灰 - 辅助按钮、信息提示 */
+  --info-hover:        #005588;
+  --info-active:       #004466;
+  --info-light:        rgba(0, 102, 153, 0.10);
+
+  /* 成功 */
+  --success:           #007A33;     /* 深绿 - 成功/确认 */
+  --success-hover:     #00662A;
+
+  /* 警告 / 强调 */
+  --warning:           #FF9900;
+  --warning-hover:     #E68900;
+  --warning-light:     rgba(255, 153, 0, 0.12);
+
+  /* 危险 */
+  --danger:            #CC0000;
+  --danger-hover:      #B30000;
+  --danger-light:      rgba(204, 0, 0, 0.10);
+
+  /* 背景 */
+  --bg-body:           #FFFFFF;
+  --bg-gradient:       linear-gradient(to bottom, #FFFFFF 0%, #F8F8F8 100%);
+  --bg-surface:        #FFFFFF;
+  --bg-card:           #FFFFFF;
+  --bg-nav:            #E4002B;     /* 主菜单区经典红背景 */
+  --bg-nav-text:       #FFFFFF;     /* 主菜单区白色文字 */
+  --bg-footer:         #F8F8F8;
+
+  /* 文字 */
+  --text-primary:      #000000;     /* 纯黑 - 高对比 */
+  --text-secondary:    #333333;
+  --text-muted:        #666666;
+  --text-inverted:     #FFFFFF;
+  --text-nav:          #FFFFFF;     /* 主菜单文字白色 */
+  --text-nav-active:   #FFFFFF;
+
+  /* 边框 & 分割 */
+  --border:            #E0E0E0;
+  --border-light:      #EEEEEE;
+  --border-focus:      #E4002B;
+
+  /* 阴影 - 极轻微，几乎无感 */
+  --shadow-sm:         0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow:            0 1px 4px rgba(0, 0, 0, 0.06);
+  --shadow-hover:      0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-nav:        0 1px 3px rgba(0, 0, 0, 0.06);
+
+  /* 圆角 - 极小或无圆角 */
+  --radius-sm:         0px;
+  --radius:            2px;
+  --radius-lg:         4px;
+  --radius-xl:         6px;
+  --radius-pill:       9999px;      /* 仅按钮保留 pill 形状 */
+
+  /* 过渡 - 非常克制 */
+  --transition:        all 0.15s ease;
+  --transition-slow:   all 0.20s ease;
+}
+
+/* ──────────────────────────────────────────────
+   全局基础 + 防溢出（与 linkedin/dopamine/macaron/teal 保持一致）
+───────────────────────────────────────────────── */
+* {
+  box-sizing: border-box !important;
+}
+
+html, body, .container, .card, .accordion-body, .navbar, .navbar-collapse, main, .content-area {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  width: 100% !important;
+}
+
+body {
+  background: var(--bg-gradient);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  font-weight: 400;
+  min-height: 100vh;
+}
+
+/* 主要内容区域 - 纯白 + 极细边框 */
+main.container,
+.page-wrapper,
+.content-area,
+.accordion-body,
+.card-body {
+  background-color: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 1.2rem 0.8rem;
+}
+
+/* ──────────────────────────────────────────────
+   导航栏 - UNIQLO 经典红背景 + 白色文字
+───────────────────────────────────────────────── */
+
+.navbar-macaron {
+  background-color: var(--bg-nav) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.15) !important;
+  box-shadow: var(--shadow-nav) !important;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
+  transition: var(--transition) !important;
+}
+
+/* 主菜单区所有文字强制白色 */
+.navbar-macaron,
+.navbar-macaron .navbar-brand,
+.navbar-macaron .nav-link,
+.navbar-macaron .nav-link:hover,
+.navbar-macaron .nav-link.active,
+.navbar-macaron .navbar-toggler-icon {
+  color: var(--text-nav) !important;
+}
+
+/* 展开内容区无额外边框和阴影 */
+.navbar-macaron .collapse.navbar-collapse,
+.navbar-macaron .navbar-collapse.show {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* 个人下拉菜单 - 白色背景 + 深色文字 */
+.navbar-macaron .dropdown-menu {
+  background-color: #ffffff !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.navbar-macaron .dropdown-item {
+  color: var(--text-primary) !important;
+}
+
+.navbar-macaron .dropdown-item:hover,
+.navbar-macaron .dropdown-item:focus {
+  background-color: var(--primary-light) !important;
+  color: var(--primary) !important;
+}
+
+/* 退出链接保持红色 */
+.navbar-macaron .logout-link {
+  color: var(--danger) !important;
+}
+
+/* 未登录“登录”按钮 - 白色边框 + 白色文字（适配红背景） */
+.navbar-macaron .login-btn {
+  border-color: white !important;
+  color: white !important;
+  background: transparent !important;
+  border-radius: var(--radius) !important;
+}
+
+.navbar-macaron .login-btn:hover {
+  background-color: white !important;
+  color: var(--primary) !important;
+}
+
+/* ──────────────────────────────────────────────
+   左侧导航高亮（.nav-link.active）跟随主题主色
+───────────────────────────────────────────────── */
+.admin-sidebar .nav-link.active,
+.admin-sidebar .nav-link.active:hover,
+.admin-sidebar .nav-link.active:focus {
+  background-color: var(--primary-light) !important;
+  color: var(--primary) !important;
+  font-weight: 600 !important;
+  border-radius: var(--radius-sm) !important;
+}
+
+.admin-sidebar .nav-link:hover {
+  background-color: var(--primary-extra-light) !important;
+  color: var(--primary-hover) !important;
+}
+
+/* ──────────────────────────────────────────────
+   彻底修复宽屏下右侧用户菜单被挤压/右移/只显示一小块（v6 最终加强版，与其他主题统一）
+───────────────────────────────────────────────── */
+@media (min-width: 992px) {
+
+  .navbar-expand-lg .navbar-nav.ms-auto {
+    flex: 0 0 auto !important;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    width: auto !important;
+    min-width: 220px !important;
+    margin-left: auto !important;
+  }
+
+  .navbar-expand-lg .navbar-nav.ms-auto .nav-item.dropdown {
+    position: relative !important;
+    flex: 0 0 auto !important;
+    min-width: 200px !important;
+    max-width: 400px !important;
+  }
+
+  .navbar-expand-lg .navbar-nav.ms-auto .dropdown-toggle {
+    display: inline-flex !important;
+    align-items: center !important;
+    min-width: 180px !important;
+    max-width: 360px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    padding: 0.5rem 1rem 0.5rem 1.5rem !important;
+    margin: 0 !important;
+  }
+
+  .navbar-expand-lg .navbar .dropdown-menu {
+    position: absolute !important;
+    right: 0 !important;
+    left: auto !important;
+    min-width: 240px !important;
+    max-width: 380px !important;
+    margin-top: 0.5rem !important;
+    transform: none !important;
+    inset: 100% auto auto 0 !important;
+    will-change: transform !important;
+    overflow: visible !important;
+    clip-path: none !important;
+  }
+
+  .navbar .dropdown-menu.show {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  .navbar-expand-lg .navbar-collapse {
+    overflow: visible !important;
+  }
+}
+
+/* 全局保险措施 */
+.dropdown {
+  overflow: visible !important;
+  position: relative !important;
+}
+
+.navbar {
+  overflow: visible !important;
+}
+
+/* ──────────────────────────────────────────────
+   Accordion & 按钮
+───────────────────────────────────────────────── */
+
+.accordion-button {
+  font-weight: 500;
+  transition: var(--transition);
+  border-radius: var(--radius) !important;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: var(--primary) !important;
+  color: white !important;
+}
+
+.accordion-button.collapsed {
+  background-color: #f8f9fa !important;
+  color: var(--text-primary) !important;
+}
+
+.accordion-button::after {
+  filter: brightness(0) invert(1);
+}
+
+.btn-info,
+.settings-btn,
+.edit-btn {
+  background-color: var(--info) !important;
+  border-color: var(--info) !important;
+  color: white !important;
+  border-radius: var(--radius) !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: var(--transition) !important;
+}
+
+.btn-info:hover,
+.settings-btn:hover,
+.edit-btn:hover {
+  background-color: var(--info-hover) !important;
+  border-color: var(--info-hover) !important;
+  box-shadow: var(--shadow-hover) !important;
+}
+
+/* ──────────────────────────────────────────────
+   Dashboard 调整
+───────────────────────────────────────────────── */
+
+.welcome-title {
+  color: var(--primary);
+  font-size: 1.8rem;
+}
+
+.card-entry {
+  border-radius: var(--radius-lg);
+  transition: var(--transition);
+}
+
+.card-entry:hover {
+  box-shadow: var(--shadow-hover);
+}
+
+.card-icon {
+  color: var(--primary);
+}
+
+/* ──────────────────────────────────────────────
+   其他通用
+───────────────────────────────────────────────── */
+
+.avatar-placeholder {
+  border: 2px solid var(--border);
+  border-radius: 50%;
+}
+
+.avatar-placeholder:hover {
+  border-color: var(--primary);
+}
+
+.alert-warning {
+  background-color: var(--warning-light);
+  border-color: var(--warning);
+}
+
+.badge {
+  border-radius: var(--radius-sm);
+}
+
+/* ──────────────────────────────────────────────
+   最终强制修复 dashboard 卡片等宽（card-body 100% 宽度 + card 320px）
+   放在最末尾，优先级最高，同步所有主题
+───────────────────────────────────────────────── */
+.dashboard-cards .card,
+.dashboard-cards .card-entry {
+  width: 320px !important;
+  max-width: 320px !important;
+  min-width: 320px !important;
+  flex: 0 0 320px !important;
+}
+
+.dashboard-cards .card-body {
+  width: 100% !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+  padding: 2rem 1.5rem !important;
+}
+
+.dashboard-cards {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  gap: 1.5rem !important;
+  max-width: none !important;
+  width: auto !important;
+  margin: 0 auto !important;
+}
+
+/* 确保按钮贴底 */
+.dashboard-cards .card-btn {
+  margin-top: auto !important;
+}
+
+/* 大屏适配 */
+@media (min-width: 992px) {
+  .dashboard-cards {
+    padding: 0 2rem !important;
+  }
+}
+
+/* ──────────────────────────────────────────────
+   通用卡片按钮跟随主题颜色（放在每个主题 CSS 最末尾，优先级最高）
+───────────────────────────────────────────────── */
+.card-btn {
+  font-weight: 500;
+  transition: var(--transition);
+  border-radius: var(--radius-pill) !important;
+  padding: 0.5rem 1.2rem !important;
+  border: 1px solid transparent !important;
+}
+
+.card-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-hover) !important;
+}
+
+/* 主色按钮 */
+.primary-btn {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: white !important;
+}
+
+.primary-btn:hover {
+  background-color: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
+}
+
+/* 成功色按钮 */
+.success-btn {
+  background-color: var(--success) !important;
+  border-color: var(--success) !important;
+  color: white !important;
+}
+
+.success-btn:hover {
+  background-color: var(--success-hover) !important;
+  border-color: var(--success-hover) !important;
+}
+
+/* 信息色按钮 */
+.info-btn {
+  background-color: var(--info) !important;
+  border-color: var(--info) !important;
+  color: white !important;
+}
+
+.info-btn:hover {
+  background-color: var(--info-hover) !important;
+  border-color: var(--info-hover) !important;
+}
+
+/* 次要按钮 */
+.secondary-btn {
+  background-color: transparent !important;
+  border-color: var(--text-muted) !important;
+  color: var(--text-primary) !important;
+}
+
+.secondary-btn:hover {
+  background-color: var(--primary-light) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+}
+
+/* 修复 btn-primary 跟随主题 - 使用 CSS 变量 */
+.btn-primary,
+.primary-btn {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: white !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary.focus,
+.primary-btn:hover,
+.primary-btn:focus {
+  background-color: var(--primary-hover) !important;
+  border-color: #C60024 !important;
+  color: white !important;
+  box-shadow: 0 0 0 0.25rem rgba(228, 0, 43, 0.25) !important;
+}
+
+.btn-primary:active,
+.btn-primary.active,
+.primary-btn:active,
+.primary-btn.active {
+  background-color: #A5001E !important;
+  border-color: #A5001E !important;
+  color: white !important;
+}
+
+/* 最终保险：防止其他地方覆盖成不协调色 */
+.btn-primary:hover:not(.disabled):not(:disabled),
+.primary-btn:hover:not(.disabled):not(:disabled) {
+  background-color: #C60024 !important;
+  color: white !important;
+}

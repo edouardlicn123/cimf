@@ -1,0 +1,42 @@
+{# includes/flash_messages.html
+   =============================================================================
+   作用：统一渲染 Flask 的 flash 消息（使用 Bootstrap alert 样式）
+   
+   更新说明（2026-02-13 v2）：
+   - 间距优化为 mt-3 mb-4，与页面 py-4/py-md-5 协调
+   - 增加更多类别映射，兼容常见写法
+   - 添加防溢出类 overflow-hidden-x + white-space: pre-wrap
+   - 保持可关闭功能，aria-label 标准化
+   - 仅在有消息时渲染容器，避免空 div
+   - 兼容 Flask 默认 flash() 和带类别的 flash()
+   ============================================================================= #}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="container-fluid mt-3 mb-4 overflow-hidden-x">
+            {% for category, message in messages %}
+                {# 更全面的类别映射，兼容各种常见写法 #}
+                {% set alert_category = {
+                    'error':     'danger',
+                    'danger':    'danger',
+                    'err':       'danger',
+                    'success':   'success',
+                    'ok':        'success',
+                    'warning':   'warning',
+                    'warn':      'warning',
+                    'info':      'info',
+                    'message':   'info',
+                    'primary':   'primary',
+                    'secondary': 'secondary',
+                    'dark':      'dark',
+                    'light':     'light'
+                }.get(category.lower(), 'info') %}
+
+                <div class="alert alert-{{ alert_category }} alert-dismissible fade show overflow-hidden-x" role="alert">
+                    <div class="white-space-pre-wrap">{{ message }}</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}

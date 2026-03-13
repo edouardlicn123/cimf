@@ -1,0 +1,43 @@
+{% extends "core/frame_node.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'dashboard' %}
+
+{% block admin_title %}
+  事务总览
+{% endblock %}
+
+{% block admin_content %}
+<div class="row g-4">
+  {% if node_types %}
+    {% for node_type in node_types %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card shadow-sm border-0 rounded-3 h-100">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="bi bi-folder me-2"></i>
+            {{ node_type.name }}
+          </h5>
+          <p class="card-text text-muted small">
+            {{ node_type.description or '暂无描述' }}
+          </p>
+          <a href="{{ url_for('customer.index') }}" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-arrow-right me-1"></i> 管理
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="col-12">
+      <div class="alert alert-info">
+        暂无启用的节点类型，请在 
+        <a href="{{ url_for('node.node_type_admin') }}">节点类型管理</a> 
+        中创建或启用节点类型。
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
