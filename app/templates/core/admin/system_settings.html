@@ -148,14 +148,6 @@
             当前状态：{{ '已启用' if settings.enable_watermark_shortcut_block is sameas true or settings.enable_watermark_shortcut_block == 'true' else '已禁用' }}
           </small>
         </div>
-
-        <div class="col-12">
-          {{ form.report_watermark_text.label(class="form-label fw-medium") }}
-          {{ form.report_watermark_text(class="form-control", placeholder="例如：内部保密 - 请勿外传") }}
-          <small class="form-text text-muted">
-            当前水印：{{ settings.report_watermark_text or '（无水印）' }}
-          </small>
-        </div>
       </div>
     </div>
   </div>
@@ -205,6 +197,39 @@
           <small class="form-text text-muted mt-1">
             当前状态：{{ '已启用（推荐）' if settings.enable_audit_log else '已禁用' }}
           </small>
+        </div>
+      </div>
+
+      <hr>
+      <h5 class="mb-3">时间管理</h5>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-check form-switch form-switch-lg mt-4">
+            <input type="checkbox" class="form-check-input" name="enable_time_sync" id="enable_time_sync" value="true"
+              {% if settings.get('enable_time_sync') != False and settings.get('enable_time_sync') != 'false' %}checked{% endif %}>
+            <label class="form-check-label fw-medium" for="enable_time_sync">启用时间同步</label>
+          </div>
+          <small class="form-text text-muted d-block">
+            关闭后首页和水印将使用服务器本地时间
+          </small>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-medium">时间服务器URL</label>
+          <input type="text" class="form-control" name="time_server_url" 
+            value="{{ settings.get('time_server_url', 'https://api.uuni.cn/api/time') }}">
+          <small class="form-text text-muted">
+            常用服务器：https://api.uuni.cn/api/time
+          </small>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-medium">时区</label>
+          <select class="form-select" name="time_zone">
+            <option value="Asia/Shanghai" {% if settings.get('time_zone', 'Asia/Shanghai') == 'Asia/Shanghai' %}selected{% endif %}>中国标准时间 (UTC+8)</option>
+            <option value="Asia/Tokyo" {% if settings.get('time_zone') == 'Asia/Tokyo' %}selected{% endif %}>日本标准时间 (UTC+9)</option>
+            <option value="Asia/Seoul" {% if settings.get('time_zone') == 'Asia/Seoul' %}selected{% endif %}>韩国标准时间 (UTC+9)</option>
+            <option value="UTC" {% if settings.get('time_zone') == 'UTC' %}selected{% endif %}>UTC 世界标准时间</option>
+            <option value="America/New_York" {% if settings.get('time_zone') == 'America/New_York' %}selected{% endif %}>美国东部时间 (UTC-5)</option>
+          </select>
         </div>
       </div>
     </div>

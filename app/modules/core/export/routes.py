@@ -30,7 +30,7 @@ def require_login():
 
 
 def get_watermark_info() -> Optional[str]:
-    """获取导出文件水印信息"""
+    """获取导出文件水印信息（使用统一的水印显示内容配置）"""
     try:
         enable_watermark = SettingsService.get_setting('enable_export_watermark')
         if enable_watermark is True or enable_watermark == 'true':
@@ -38,11 +38,31 @@ def get_watermark_info() -> Optional[str]:
         else:
             return None
         
-        watermark_text = SettingsService.get_setting('report_watermark_text') or '内部管理系统'
-        export_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        user_info = current_user.username
+        # 获取水印显示内容配置（与网页水印一致）
+        wm_content_str = SettingsService.get_setting('web_watermark_content') or 'username,system_name,datetime'
+        wm_content_list = wm_content_str.split(',')
         
-        return f"# 水印: {watermark_text} | 导出者: {user_info} | 导出时间: {export_time}"
+        watermark_parts = []
+        
+        # 用户名
+        if 'username' in wm_content_list:
+            watermark_parts.append(current_user.username)
+        
+        # 系统名
+        if 'system_name' in wm_content_list:
+            system_name = SettingsService.get_setting('system_name') or 'CIMF'
+            watermark_parts.append(system_name)
+        
+        # 时间
+        if 'datetime' in wm_content_list:
+            from app.services.core.time_service import TimeService
+            watermark_parts.append(TimeService.get_current_time())
+        
+        if not watermark_parts:
+            return None
+        
+        return "# 水印: " + " | ".join(watermark_parts)
+        
     except Exception as e:
         current_app.logger.error(f"获取水印信息失败: {e}")
         return None

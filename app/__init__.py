@@ -178,7 +178,14 @@ def create_app(config_name='default'):
         except Exception:
             node_types = []
         
-        return dict(role_labels=role_labels, system_name=system_name, settings=all_settings, timestamp=timestamp, node_types=node_types, now=now)
+        # 获取当前时间（统一时间服务）
+        try:
+            from app.services.core.time_service import TimeService
+            current_time = TimeService.get_current_time()
+        except Exception:
+            current_time = now.strftime('%Y-%m-%d %H:%M:%S')
+        
+        return dict(role_labels=role_labels, system_name=system_name, settings=all_settings, timestamp=timestamp, node_types=node_types, now=now, current_time=current_time)
 
     # ── 10. 数据库初始化（根据配置模式） ─────────────────────────────────────────────
     init_database(app)

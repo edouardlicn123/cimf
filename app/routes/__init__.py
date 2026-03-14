@@ -11,6 +11,7 @@ from app.modules.core.profile import profile_bp
 from app.modules.core.export import export_bp
 from app.modules.core.taxonomy import taxonomy_bp
 from app.modules.core.node import node_bp
+from app.modules.core.time import time_bp
 from app.modules.nodes.customer import customer_bp
 
 
@@ -41,4 +42,7 @@ def register_blueprints(app):
     # 客户节点
     app.register_blueprint(customer_bp, url_prefix='/nodes/customer')
 
-    app.logger.info("所有蓝图注册完成：workspace, auth, profile, admin, export, taxonomy, node, customer 已加载")
+    # 时间API模块
+    app.register_blueprint(time_bp)
+
+    app.logger.info("所有蓝图注册完成：workspace, auth, profile, admin, export, taxonomy, node, customer, time 已加载")

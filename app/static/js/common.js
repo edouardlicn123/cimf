@@ -116,16 +116,17 @@
         const timeElement = document.getElementById('current-beijing-time');
         if (!timeElement) return;
 
-        fetch('https://api.uuni.cn//api/time')
+        // 从后端API获取时间
+        fetch('/api/time/current')
             .then(response => response.json())
             .then(data => {
-                if (data.date) {
-                    timeElement.textContent = data.date;
+                if (data.time) {
+                    timeElement.textContent = data.time;
                 }
             })
             .catch(error => {
-                console.error('获取北京时间失败:', error);
-                // 失败时使用本地时间
+                console.error('获取时间失败:', error);
+                // 降级使用本地时间
                 const now = new Date();
                 const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
                 const year = now.getFullYear();

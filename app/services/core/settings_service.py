@@ -44,9 +44,10 @@ class SettingsService:
         # 导出文件水印
         'enable_export_watermark': 'false',    # 导出文件是否加水印
 
-        # ========== 导出报表水印(原有) ==========
-        'report_watermark_text': 'CIMF - 内部使用',
-        'report_watermark_opacity': '0.3',
+        # ========== 时间管理 ==========
+        'enable_time_sync': 'true',        # 是否启用时间同步
+        'time_server_url': 'https://api.uuni.cn/api/time',  # 时间服务器URL
+        'time_zone': 'Asia/Shanghai',     # 时区设置
 
         # 其他全局开关
         'maintenance_mode': 'false',
