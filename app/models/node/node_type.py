@@ -10,6 +10,7 @@ class NodeType(db.Model):
     name = db.Column(db.String(100), nullable=False)
     slug = db.Column(db.String(50), unique=True)
     description = db.Column(db.String(500))
+    icon = db.Column(db.String(50), default='bi-folder')
     fields_config = db.Column(db.JSON)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

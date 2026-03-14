@@ -17,7 +17,7 @@ class SettingsService:
 
     DEFAULT_SETTINGS = {
         # 系统基本信息
-        'system_name': '内部管理系统',
+        'system_name': 'CIMF',
 
         # 上传相关
         'upload_max_size_mb': '50',          # MB
@@ -36,7 +36,7 @@ class SettingsService:
         # ========== 网页水印设置 ==========
         # 基础设置
         'enable_web_watermark': 'false',        # 是否启用网页水印
-        'web_watermark_content': 'username',  # 显示内容: username/nickname/email
+        'web_watermark_content': 'username,system_name,datetime',  # 显示内容: username/system_name/datetime (多选用逗号分隔)
         'web_watermark_opacity': '0.15',     # 透明度: 0.1-0.5
         # 防护设置
         'enable_watermark_console_detection': 'false',  # 检测控制台打开
@@ -45,7 +45,7 @@ class SettingsService:
         'enable_export_watermark': 'false',    # 导出文件是否加水印
 
         # ========== 导出报表水印(原有) ==========
-        'report_watermark_text': '内部管理系统 - 内部使用',
+        'report_watermark_text': 'CIMF - 内部使用',
         'report_watermark_opacity': '0.3',
 
         # 其他全局开关

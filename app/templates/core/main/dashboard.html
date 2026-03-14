@@ -44,7 +44,6 @@
             <div class="text-muted small welcome-info">
                 {% if current_user.is_authenticated %}
                     <span id="current-beijing-time">加载中...</span>　｜　
-                    账号：{{ current_user.username }}　｜　
                     最后登录：{{ current_user.last_login_at.strftime('%Y-%m-%d %H:%M') if current_user.last_login_at else '首次登录' }}
                 {% else %}
                     <span class="text-warning">当前为未登录状态（开发/测试模式）</span>

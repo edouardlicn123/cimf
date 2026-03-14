@@ -159,7 +159,7 @@ def create_app(config_name='default'):
             role_labels[UserRole.EMPLOYEE] = custom_employee
         
         # 获取系统名称（带默认值）
-        system_name = SettingsService.get_setting('system_name') or '内部管理系统'
+        system_name = SettingsService.get_setting('system_name') or 'CIMF'
         
         # 获取所有设置（用于水印等功能）
         all_settings = SettingsService.get_all_settings()
@@ -167,9 +167,18 @@ def create_app(config_name='default'):
         # 提供时间戳用于静态资源缓存刷新（使用随机数确保每次不同）
         import time
         import random
+        from datetime import datetime
         timestamp = str(int(time.time())) + str(random.randint(0, 999))
+        now = datetime.now()
         
-        return dict(role_labels=role_labels, system_name=system_name, settings=all_settings, timestamp=timestamp)
+        # 获取已启用的节点类型列表（用于动态菜单）
+        try:
+            from app.services.node.node_type_service import NodeTypeService
+            node_types = NodeTypeService.get_all()
+        except Exception:
+            node_types = []
+        
+        return dict(role_labels=role_labels, system_name=system_name, settings=all_settings, timestamp=timestamp, node_types=node_types, now=now)
 
     # ── 10. 数据库初始化（根据配置模式） ─────────────────────────────────────────────
     init_database(app)

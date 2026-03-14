@@ -100,10 +100,24 @@
         </div>
 
         <div class="col-md-6">
-          {{ form.web_watermark_content.label(class="form-label fw-medium") }}
-          {{ form.web_watermark_content(class="form-select") }}
+          <label class="form-label fw-medium">水印显示内容</label>
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" name="web_watermark_content" value="username" id="wm_username"
+              {% if 'username' in (settings.get('web_watermark_content', 'username,system_name,datetime') or '').split(',') %}checked{% endif %}>
+            <label class="form-check-label" for="wm_username">用户名</label>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" name="web_watermark_content" value="system_name" id="wm_system_name"
+              {% if 'system_name' in (settings.get('web_watermark_content', 'username,system_name,datetime') or '').split(',') %}checked{% endif %}>
+            <label class="form-check-label" for="wm_system_name">系统名</label>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" name="web_watermark_content" value="datetime" id="wm_datetime"
+              {% if 'datetime' in (settings.get('web_watermark_content', 'username,system_name,datetime') or '').split(',') %}checked{% endif %}>
+            <label class="form-check-label" for="wm_datetime">时间</label>
+          </div>
           <small class="form-text text-muted">
-            当前内容：{{ settings.web_watermark_content or 'username' }}
+            当前内容：{{ settings.get('web_watermark_content', 'username,system_name,datetime') or 'username,system_name,datetime' }}
           </small>
         </div>
 

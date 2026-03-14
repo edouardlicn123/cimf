@@ -17,13 +17,13 @@
       <div class="card shadow-sm border-0 rounded-3 h-100">
         <div class="card-body">
           <h5 class="card-title">
-            <i class="bi bi-folder me-2"></i>
+            <i class="bi {{ node_type.icon or 'bi-folder' }} me-2"></i>
             {{ node_type.name }}
           </h5>
           <p class="card-text text-muted small">
             {{ node_type.description or '暂无描述' }}
           </p>
-          <a href="{{ url_for('customer.index') }}" class="btn btn-outline-primary btn-sm">
+          <a href="{{ url_for(node_type.slug + '.index') }}" class="btn btn-outline-primary btn-sm">
             <i class="bi bi-arrow-right me-1"></i> 管理
           </a>
         </div>

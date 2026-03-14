@@ -170,11 +170,14 @@ class NodeType(db.Model):
     name = db.Column(db.String(100), nullable=False)
     slug = db.Column(db.String(50), unique=True)
     description = db.Column(db.String(500))
+    icon = db.Column(db.String(50), default='bi-folder')  # Bootstrap Icons 图标类
     fields_config = db.Column(db.JSON)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 ```
+
+> **图标字段说明**：`icon` 字段存储 Bootstrap Icons 图标类，如 `bi-people`、`bi-folder`、`bi-cart` 等。默认值 `bi-folder`。
 
 #### 2.1.2 节点主表模型 `app/models/node/node.py`
 
@@ -224,21 +227,90 @@ class Node(db.Model):
 | `/nodes/admin/node-types/<id>/delete` | `node.node_type_delete` | 删除 |
 | `/nodes/admin/node-types/<id>/settings` | `node.node_type_settings` | 设置 |
 
-### 2.4 框架入口
+### 2.4 动态加载机制
 
-- **节点类型管理**：使用 `frame_structure.html` 框架（与词汇表管理并列）
-- **数据管理**：使用 `frame_node.html` 框架
+系统支持在节点类型启用/禁用时自动更新以下位置的显示：
 
-在 `frame_node.html` 侧边栏添加节点入口：
-```html
-<li class="nav-item">
-  <a class="nav-link ... {{ 'active' if active_section == '{node_slug}' else '' }}" 
-     href="{{ url_for('{node_slug}.index') }}">
-    <i class="bi bi-..."></i>
-    {节点名称}
-  </a>
-</li>
+#### 2.4.1 上下文处理器
+
+在 `app/__init__.py` 中添加节点类型上下文处理器：
+
+```python
+@app.context_processor
+def inject_node_types():
+    from app.services.node.node_type_service import NodeTypeService
+    node_types = NodeTypeService.get_all()  # 只获取已启用的
+    return dict(node_types=node_types)
 ```
+
+#### 2.4.2 frame_node.html 侧边栏动态加载
+
+`templates/core/frame_node.html` 侧边栏自动加载已启用的节点类型入口：
+
+```html
+<ul class="nav flex-column mb-auto">
+  <!-- 固定：事务总览 -->
+  <li class="nav-item">
+    <a class="nav-link d-flex align-items-center py-2 px-2 rounded {{ 'active' if active_section == 'dashboard' else '' }}" 
+       href="{{ url_for('node.dashboard') }}">
+      <i class="bi bi-grid me-2 fs-6"></i>
+      事务总览
+    </a>
+  </li>
+  
+  <!-- 动态：已启用的节点入口 -->
+  {% for node_type in node_types %}
+  <li class="nav-item">
+    <a class="nav-link d-flex align-items-center py-2 px-2 rounded {{ 'active' if active_section == node_type.slug else '' }}" 
+       href="{{ url_for(node_type.slug + '.index') }}">
+      <i class="bi {{ node_type.icon or 'bi-folder' }} me-2 fs-6"></i>
+      {{ node_type.name }}
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+```
+
+- **启用时**：节点入口自动显示在侧边栏
+- **禁用时**：节点入口自动隐藏
+
+#### 2.4.3 事务总览 Dashboard 动态加载
+
+`templates/core/node/dashboard.html` 自动加载已启用的节点类型卡片：
+
+```html
+<div class="row g-4">
+  {% for node_type in node_types %}
+  <div class="col-md-6 col-lg-4">
+    <div class="card shadow-sm border-0 rounded-3 h-100">
+      <div class="card-body">
+        <h5 class="card-title">
+          <i class="bi {{ node_type.icon or 'bi-folder' }} me-2"></i>
+          {{ node_type.name }}
+        </h5>
+        <p class="card-text text-muted small">
+          {{ node_type.description or '暂无描述' }}
+        </p>
+        <a href="{{ url_for(node_type.slug + '.index') }}" class="btn btn-outline-primary btn-sm">
+          <i class="bi bi-arrow-right me-1"></i> 管理
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+```
+
+- **启用时**：卡片显示在事务总览页面
+- **禁用时**：卡片不显示
+
+#### 2.4.4 图标与名称统一
+
+所有动态加载的位置（侧边栏、Dashboard、权限管理页面）使用 NodeType 模型的统一字段：
+- `name` - 节点名称
+- `icon` - Bootstrap Icons 图标类
+
+确保在创建或编辑节点类型时正确设置这两个字段。
 
 ---
 
@@ -481,9 +553,17 @@ from app.modules.nodes.{node_slug} import {NODE}_bp
 app.register_blueprint({NODE}_bp, url_prefix='/nodes/{node_slug}')
 ```
 
-### 步骤 8：添加侧边栏入口
+### 步骤 8：启用节点类型
 
-在 `app/templates/core/frame_node.html` 中添加链接。
+完成上述步骤后，在管理后台启用节点类型：
+
+1. 访问 `/nodes/admin/node-types`
+2. 找到对应的节点类型，点击"启用"按钮
+
+启用后，系统会自动：
+- 在 frame_node.html 侧边栏显示节点入口
+- 在事务总览 Dashboard 显示节点卡片
+- 在权限管理页面加载该节点的 CRUD 权限选项
 
 ---
 
@@ -517,14 +597,145 @@ app.register_blueprint({NODE}_bp, url_prefix='/nodes/{node_slug}')
 
 ## 五、权限配置
 
-每个节点类型应配置以下权限：
+### 5.1 权限命名规范
 
-| 权限 | 说明 |
-|------|------|
-| `node.{node_slug}.create` | 创建 |
-| `node.{node_slug}.read` | 查看 |
-| `node.{node_slug}.update` | 编辑 |
-| `node.{node_slug}.delete` | 删除 |
+每个节点类型自动拥有以下 CRUD 权限：
+
+| 权限键 | 说明 |
+|--------|------|
+| `node.{node_slug}.create` | {节点名称} - 创建 |
+| `node.{node_slug}.read` | {节点名称} - 查看 |
+| `node.{node_slug}.update` | {节点名称} - 编辑 |
+| `node.{node_slug}.delete` | {节点名称} - 删除 |
+
+### 5.2 动态加载机制
+
+权限管理页面会自动加载已启用节点类型的 CRUD 权限：
+
+1. **自动加载**：每次访问权限页面时，自动从 `NodeTypeService.get_all()` 获取已启用的节点类型
+2. **按卡片分组**：每个节点类型显示为一个卡片，卡片标题为节点名称（带图标）
+3. **禁用不加载**：禁用的节点类型不会显示在权限管理页面
+4. **两列角色**：每个节点类型的 CRUD 权限按 leader 和 employee 两列显示，与系统权限表格一致
+5. **保存逻辑不变**：保存时通过 `getlist` 获取所有勾选的权限，保存到数据库
+
+#### 5.2.1 PermissionService 方法
+
+在 `app/services/core/permission_service.py` 中添加两个方法：
+
+```python
+@staticmethod
+def get_system_permissions() -> List[tuple]:
+    """获取系统固定权限"""
+    return PERMISSIONS
+
+@staticmethod
+def get_node_permissions() -> Dict[str, Dict]:
+    """获取已启用Node的CRUD权限，按node分组"""
+    from app.services.node.node_type_service import NodeTypeService
+    
+    node_permissions = {}
+    active_node_types = NodeTypeService.get_all()  # 只获取已启用的
+    
+    for node_type in active_node_types:
+        slug = node_type.slug
+        name = node_type.name
+        icon = node_type.icon or 'bi-folder'
+        node_permissions[slug] = {
+            'name': name,
+            'icon': icon,
+            'permissions': [
+                (f'node.{slug}.create', f'{name} - 创建'),
+                (f'node.{slug}.read', f'{name} - 查看'),
+                (f'node.{slug}.update', f'{name} - 编辑'),
+                (f'node.{slug}.delete', f'{name} - 删除'),
+            ]
+        }
+    
+    return node_permissions
+```
+
+#### 5.2.2 权限管理路由修改
+
+在 `app/modules/core/admin/routes.py` 的 `permissions_edit` 函数中：
+
+```python
+# 获取系统权限
+system_permissions = PermissionService.get_system_permissions()
+# 获取Node权限
+node_permissions = PermissionService.get_node_permissions()
+
+return render_template(
+    'core/admin/system_permissions.html',
+    form=form,
+    role_name_form=role_name_form,
+    system_permissions=system_permissions,
+    node_permissions=node_permissions,
+    all_permissions=system_permissions + [p for data in node_permissions.values() for p in data['permissions']],
+    role_permissions=role_permissions,
+    role_labels=role_labels,
+    active_section='permissions'
+)
+```
+
+#### 5.2.3 权限管理页面模板
+
+在 `app/templates/core/admin/system_permissions.html` 中，保留系统权限表格，添加 Node 权限卡片：
+
+```html
+<!-- 系统权限表格（保留原样，使用 system_permissions） -->
+<div class="table-responsive mb-4">
+  <table class="table table-bordered table-hover">
+    <thead class="table-light">
+      <tr>
+        <th scope="col" style="min-width: 200px;">权限名称</th>
+        <th scope="col" class="text-center" style="width: 120px;">{{ role_labels['leader'] }}</th>
+        <th scope="col" class="text-center" style="width: 120px;">{{ role_labels['employee'] }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for perm_key, perm_label in system_permissions %}
+      <tr>
+        <td><label class="form-check-label">{{ perm_label }}</label></td>
+        <td class="text-center">
+          <input type="checkbox" class="form-check-input" name="permissions_leader" value="{{ perm_key }}" {% if perm_key in role_permissions['leader'] %}checked{% endif %}>
+        </td>
+        <td class="text-center">
+          <input type="checkbox" class="form-check-input" name="permissions_employee" value="{{ perm_key }}" {% if perm_key in role_permissions['employee'] %}checked{% endif %}>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Node权限卡片 -->
+{% for slug, data in node_permissions.items() %}
+<div class="card mb-3">
+  <div class="card-header bg-light">
+    <i class="bi {{ data.icon }} me-2"></i>{{ data.name }}
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-bordered table-hover mb-0">
+      <tbody>
+        {% for perm_key, perm_label in data.permissions %}
+        <tr>
+          <td style="min-width: 200px;"><label class="form-check-label">{{ perm_label }}</label></td>
+          <td class="text-center" style="width: 120px;">
+            <input type="checkbox" class="form-check-input" name="permissions_leader" value="{{ perm_key }}" {% if perm_key in role_permissions['leader'] %}checked{% endif %}>
+          </td>
+          <td class="text-center" style="width: 120px;">
+            <input type="checkbox" class="form-check-input" name="permissions_employee" value="{{ perm_key }}" {% if perm_key in role_permissions['employee'] %}checked{% endif %}>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endfor %}
+```
+
+> **说明**：Node 权限卡片使用与系统权限表格相同的两列布局（leader 和 employee），保持界面一致性。卡片标题显示节点名称和图标（从 `data.icon` 获取）。
 
 ---
 
@@ -533,3 +744,5 @@ app.register_blueprint({NODE}_bp, url_prefix='/nodes/{node_slug}')
 | 版本 | 日期 | 说明 |
 |------|------|------|
 | 1.0 | 2026-03-13 | 初始版本 |
+| 1.1 | 2026-03-13 | 新增动态加载机制：上下文处理器、侧边栏动态菜单、事务总览Dashboard卡片、权限管理页面CRUD权限自动加载；新增NodeType.icon字段用于统一图标显示 |
+| 1.2 | 2026-03-14 | 更新权限管理页面模板示例：添加图标支持、两列角色布局（leader/employee）、保留系统权限表格、完整的路由和Service代码示例 |

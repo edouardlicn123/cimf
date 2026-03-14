@@ -58,49 +58,78 @@
           </div>
         </div>
 
-        <div class="table-responsive mb-4">
-          <table class="table table-bordered table-hover">
-            <thead class="table-light">
-              <tr>
-                <th scope="col" style="min-width: 200px;">权限名称</th>
-                <th scope="col" class="text-center" style="width: 120px;">{{ role_labels['leader'] }}</th>
-                <th scope="col" class="text-center" style="width: 120px;">{{ role_labels['employee'] }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for perm_key, perm_label in all_permissions %}
-              <tr>
-                <td>
-                  <label class="form-check-label" for="perm_{{ perm_key }}">
-                    {{ perm_label }}
-                  </label>
-                </td>
-                <td class="text-center">
-                  <input type="checkbox" 
-                         class="form-check-input" 
-                         name="permissions_leader" 
-                         value="{{ perm_key }}"
-                         {% if perm_key in role_permissions['leader'] %}checked{% endif %}>
-                </td>
-                <td class="text-center">
-                  <input type="checkbox" 
-                         class="form-check-input" 
-                         name="permissions_employee" 
-                         value="{{ perm_key }}"
-                         {% if perm_key in role_permissions['employee'] %}checked{% endif %}>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+        <!-- 系统权限卡片 -->
+        {% for slug, data in system_permissions.items() %}
+        <div class="card mb-3">
+          <div class="card-header bg-light">
+            <i class="bi {{ data.icon }} me-2"></i>{{ data.name }}
+          </div>
+          <div class="card-body p-0">
+            <table class="table table-bordered table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col" style="min-width: 200px;">权限名称</th>
+                  <th scope="col" class="text-center" style="width: 120px;">{{ role_labels['leader'] }}</th>
+                  <th scope="col" class="text-center" style="width: 120px;">{{ role_labels['employee'] }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for perm_key, perm_label in data.permissions %}
+                <tr>
+                  <td style="min-width: 200px;"><label class="form-check-label">{{ perm_label }}</label></td>
+                  <td class="text-center" style="width: 120px;">
+                    <input type="checkbox" class="form-check-input" name="permissions_leader" value="{{ perm_key }}" {% if perm_key in role_permissions['leader'] %}checked{% endif %}>
+                  </td>
+                  <td class="text-center" style="width: 120px;">
+                    <input type="checkbox" class="form-check-input" name="permissions_employee" value="{{ perm_key }}" {% if perm_key in role_permissions['employee'] %}checked{% endif %}>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
+        {% endfor %}
+
+        <!-- Node权限卡片 -->
+        {% for slug, data in node_permissions.items() %}
+        <div class="card mb-3">
+          <div class="card-header bg-light">
+            <i class="bi {{ data.icon }} me-2"></i>{{ data.name }}
+          </div>
+          <div class="card-body p-0">
+            <table class="table table-bordered table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col" style="min-width: 200px;">权限名称</th>
+                  <th scope="col" class="text-center" style="width: 120px;">{{ role_labels['leader'] }}</th>
+                  <th scope="col" class="text-center" style="width: 120px;">{{ role_labels['employee'] }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for perm_key, perm_label in data.permissions %}
+                <tr>
+                  <td style="min-width: 200px;"><label class="form-check-label">{{ perm_label }}</label></td>
+                  <td class="text-center" style="width: 120px;">
+                    <input type="checkbox" class="form-check-input" name="permissions_leader" value="{{ perm_key }}" {% if perm_key in role_permissions['leader'] %}checked{% endif %}>
+                  </td>
+                  <td class="text-center" style="width: 120px;">
+                    <input type="checkbox" class="form-check-input" name="permissions_employee" value="{{ perm_key }}" {% if perm_key in role_permissions['employee'] %}checked{% endif %}>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {% endfor %}
 
         <div class="alert alert-info mb-0" role="alert">
-          <strong>说明：</strong>
-          <ul class="mb-0">
-            <li><strong>{{ role_labels['leader'] }}</strong>：可分配权限，默认拥有系统管理权限</li>
-            <li><strong>{{ role_labels['employee'] }}</strong>：可分配权限，默认无额外权限</li>
-          </ul>
+          <ol class="mb-0">
+            <li>本页可修改各项权限</li>
+            <li>勾选后点击保存即全部保存</li>
+            <li>未启用的节点的权限设置不显示</li>
+          </ol>
         </div>
 
       </form>
