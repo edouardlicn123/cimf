@@ -36,7 +36,8 @@ class SettingsService:
         # ========== 网页水印设置 ==========
         # 基础设置
         'enable_web_watermark': 'false',        # 是否启用网页水印
-        'web_watermark_content': 'username,system_name,datetime',  # 显示内容: username/system_name/datetime (多选用逗号分隔)
+        'web_watermark_content': 'username,system_name,datetime',  # 显示内容: username/system_name/datetime/custom (多选用逗号分隔)
+        'web_watermark_custom_text': '',         # 自定义文字内容
         'web_watermark_opacity': '0.15',     # 透明度: 0.1-0.5
         # 防护设置
         'enable_watermark_console_detection': 'false',  # 检测控制台打开

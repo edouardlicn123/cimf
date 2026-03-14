@@ -58,6 +58,12 @@ def get_watermark_info() -> Optional[str]:
             from app.services.core.time_service import TimeService
             watermark_parts.append(TimeService.get_current_time())
         
+        # 自定义文字
+        if 'custom' in wm_content_list:
+            custom_text = SettingsService.get_setting('web_watermark_custom_text')
+            if custom_text:
+                watermark_parts.append(custom_text)
+        
         if not watermark_parts:
             return None
         

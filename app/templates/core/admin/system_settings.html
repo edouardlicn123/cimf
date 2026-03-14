@@ -116,7 +116,18 @@
               {% if 'datetime' in (settings.get('web_watermark_content', 'username,system_name,datetime') or '').split(',') %}checked{% endif %}>
             <label class="form-check-label" for="wm_datetime">时间</label>
           </div>
-          <small class="form-text text-muted">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" name="web_watermark_content" value="custom" id="wm_custom"
+              {% if 'custom' in (settings.get('web_watermark_content', 'username,system_name,datetime') or '').split(',') %}checked{% endif %}
+              onchange="document.getElementById('custom_text_container').style.display = this.checked ? 'block' : 'none'">
+            <label class="form-check-label" for="wm_custom">自定义文字</label>
+          </div>
+          <div class="mt-2" id="custom_text_container" style="{% if 'custom' not in (settings.get('web_watermark_content', '') or '').split(',') %}display:none;{% endif %}">
+            <input type="text" class="form-control" name="web_watermark_custom_text" 
+              value="{{ settings.get('web_watermark_custom_text', '') }}" 
+              placeholder="输入自定义文字">
+          </div>
+          <small class="form-text text-muted d-block mt-1">
             当前内容：{{ settings.get('web_watermark_content', 'username,system_name,datetime') or 'username,system_name,datetime' }}
           </small>
         </div>

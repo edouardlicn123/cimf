@@ -28,6 +28,12 @@
 {% if 'datetime' in wm_content_list %}
     {% set watermark_parts = watermark_parts + [now.strftime('%Y-%m-%d %H:%M')] %}
 {% endif %}
+{% if 'custom' in wm_content_list %}
+    {% set custom_text = settings.get('web_watermark_custom_text', '') %}
+    {% if custom_text %}
+        {% set watermark_parts = watermark_parts + [custom_text] %}
+    {% endif %}
+{% endif %}
 
 {% set watermark_text = watermark_parts|join(' | ') %}
 
