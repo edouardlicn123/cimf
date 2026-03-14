@@ -58,10 +58,10 @@
     {{ form.submit(class="btn btn-primary", value="保存设置") }}
   </div>
 
-  <!-- 系统基本信息 -->
+  <!-- 系统信息 -->
   <div class="card shadow-sm border-0 rounded-3 mb-3">
     <div class="card-header bg-light">
-      <h5 class="mb-0">系统基本信息</h5>
+      <h5 class="mb-0">系统信息</h5>
     </div>
     <div class="card-body">
       <div class="row g-3">
@@ -101,6 +101,56 @@
           </div>
           <small class="form-text text-muted d-block">
             关闭后首页和水印将使用服务器本地时间
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 基础设置 -->
+  <div class="card shadow-sm border-0 rounded-3 mb-3">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">基础设置</h5>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          {{ form.upload_max_size_mb.label(class="form-label fw-medium") }}
+          <div class="input-group">
+            {{ form.upload_max_size_mb(class="form-control") }}
+            <span class="input-group-text">MB</span>
+          </div>
+          <small class="form-text text-muted">
+            当前限制：{{ settings.upload_max_size_mb or 50 }} MB
+          </small>
+        </div>
+
+        <div class="col-md-6">
+          {{ form.upload_max_files.label(class="form-label fw-medium") }}
+          {{ form.upload_max_files(class="form-control") }}
+          <small class="form-text text-muted">
+            当前限制：{{ settings.upload_max_files or 20 }} 个文件/项目
+          </small>
+        </div>
+
+        <div class="col-md-6">
+          {{ form.session_timeout_minutes.label(class="form-label fw-medium") }}
+          <div class="input-group">
+            {{ form.session_timeout_minutes(class="form-control") }}
+            <span class="input-group-text">分钟</span>
+          </div>
+          <small class="form-text text-muted">
+            当前设置：{{ settings.session_timeout_minutes or 30 }} 分钟
+          </small>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-check form-switch form-switch-lg mt-4">
+            {{ form.enable_audit_log(class="form-check-input") }}
+            {{ form.enable_audit_log.label(class="form-check-label fw-medium") }}
+          </div>
+          <small class="form-text text-muted mt-1">
+            当前状态：{{ '已启用（推荐）' if settings.enable_audit_log else '已禁用' }}
           </small>
         </div>
       </div>
@@ -192,57 +242,6 @@
           <small class="form-text text-muted mt-1">
             当前状态：{{ '已启用' if settings.enable_watermark_shortcut_block is sameas true or settings.enable_watermark_shortcut_block == 'true' else '已禁用' }}
           </small>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 其他设置 -->
-  <div class="card shadow-sm border-0 rounded-3">
-    <div class="card-header bg-light">
-      <h5 class="mb-0">其他设置</h5>
-    </div>
-    <div class="card-body">
-      <div class="row g-3">
-        <div class="col-md-6">
-          {{ form.upload_max_size_mb.label(class="form-label fw-medium") }}
-          <div class="input-group">
-            {{ form.upload_max_size_mb(class="form-control") }}
-            <span class="input-group-text">MB</span>
-          </div>
-          <small class="form-text text-muted">
-            当前限制：{{ settings.upload_max_size_mb or 50 }} MB
-          </small>
-        </div>
-
-        <div class="col-md-6">
-          {{ form.upload_max_files.label(class="form-label fw-medium") }}
-          {{ form.upload_max_files(class="form-control") }}
-          <small class="form-text text-muted">
-            当前限制：{{ settings.upload_max_files or 20 }} 个文件/项目
-          </small>
-        </div>
-
-        <div class="col-md-6">
-          {{ form.session_timeout_minutes.label(class="form-label fw-medium") }}
-          <div class="input-group">
-            {{ form.session_timeout_minutes(class="form-control") }}
-            <span class="input-group-text">分钟</span>
-          </div>
-          <small class="form-text text-muted">
-            当前设置：{{ settings.session_timeout_minutes or 30 }} 分钟
-          </small>
-        </div>
-
-        <div class="col-md-6">
-          <div class="form-check form-switch form-switch-lg mt-4">
-            {{ form.enable_audit_log(class="form-check-input") }}
-            {{ form.enable_audit_log.label(class="form-check-label fw-medium") }}
-          </div>
-          <small class="form-text text-muted mt-1">
-            当前状态：{{ '已启用（推荐）' if settings.enable_audit_log else '已禁用' }}
-          </small>
-        </div>
         </div>
       </div>
     </div>

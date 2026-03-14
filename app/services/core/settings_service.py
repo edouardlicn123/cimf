@@ -20,7 +20,7 @@ class SettingsService:
         'system_name': 'CIMF',
 
         # 上传相关
-        'upload_max_size_mb': '50',          # MB
+        'upload_max_size_mb': '12',           # MB
         'upload_max_files': '20',            # 个
         'upload_allowed_extensions': 'pdf,doc,docx,xls,xlsx,jpg,png,jpeg,zip,rar',
 
