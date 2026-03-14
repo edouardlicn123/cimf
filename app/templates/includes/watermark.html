@@ -15,14 +15,21 @@
 
 {# 获取水印显示内容 #}
 {% set watermark_text = '' %}
-{% set wm_content = settings.get('web_watermark_content', 'username') %}
-{% if wm_content == 'username' %}
-    {% set watermark_text = current_user.username %}
-{% elif wm_content == 'nickname' %}
-    {% set watermark_text = current_user.nickname or current_user.username %}
-{% else %}
-    {% set watermark_text = current_user.email or current_user.username %}
+{% set wm_content_str = settings.get('web_watermark_content', 'username,system_name,datetime') %}
+{% set wm_content_list = wm_content_str.split(',') %}
+
+{% set watermark_parts = [] %}
+{% if 'username' in wm_content_list %}
+    {% set watermark_parts = watermark_parts + [current_user.username] %}
 {% endif %}
+{% if 'system_name' in wm_content_list %}
+    {% set watermark_parts = watermark_parts + [settings.get('system_name', 'CIMF')] %}
+{% endif %}
+{% if 'datetime' in wm_content_list %}
+    {% set watermark_parts = watermark_parts + [now.strftime('%Y-%m-%d %H:%M')] %}
+{% endif %}
+
+{% set watermark_text = watermark_parts|join(' | ') %}
 
 {# 获取透明度 #}
 {% set watermark_opacity = settings.get('web_watermark_opacity', 0.15) %}

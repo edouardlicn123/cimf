@@ -55,3 +55,10 @@
 53. 在 frame_structure 中添加了"仪表盘"链接
 54. 将内容结构相关页面设置为仅管理员可见 - 更新了 frame_structure.html 侧边栏、taxonomy 路由、node 路由
 55. 迁移了 routes modules 目录下的 HTML 模板到 app/templates/core/ - 删除了 taxonomy、admin、workspace、auth 下的 templates 目录
+56. 更新了 06_node模块建立指引.md - 添加了 NodeType.icon 字段用于图标显示，添加了动态加载机制说明（上下文处理器、frame_node侧边栏、事务总览Dashboard）、权限管理页面CRUD权限自动加载、图标与名称统一方案
+57. 执行了06文档的代码修改 - 添加了NodeType.icon字段、初始化默认图标'bi-people'、上下文处理器添加node_types、frame_node.html和dashboard.html改为动态加载
+58. 执行了权限管理页面动态加载Node模块CRUD权限 - PermissionService添加get_system_permissions和get_node_permissions方法、路由添加传递变量、模板添加Node权限卡片显示
+59. 更新了05_客户信息范例.md文档 - 添加了NodeType.icon字段、动态加载机制说明（上下文处理器、frame_node侧边栏、事务总览Dashboard、权限管理页面）、更新了数据结构示例、更新了版本历史
+60. 创建了07_系统权限重构指引.md文档 - 描述了系统权限细化（系统设置/权限管理/人员管理细分为9个权限）、卡片化显示方案、代码修改指引
+61. 执行了07文档的代码修改 - 系统权限细化为9个（系统设置2个、权限管理2个、人员管理4个）、系统权限改为卡片样式显示
+62. 创建了08_时间管理模块指引.md文档 - 描述了时间服务模块设计（TimeService）、API路由、前端JS改造、水印改造、系统设置页面、时间服务器推荐列表

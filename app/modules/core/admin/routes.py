@@ -173,7 +173,18 @@ def permissions_edit():
     """角色权限编辑页面"""
     form = PermissionForm()
     role_name_form = RoleNameForm()
-    all_permissions = PermissionService.get_all_permissions()
+    
+    # 获取系统权限（分组）
+    system_permissions = PermissionService.get_system_permissions()
+    # 获取Node权限（分组）
+    node_permissions = PermissionService.get_node_permissions()
+    
+    # 构建扁平权限列表用于兼容性
+    all_perms_list = []
+    for data in system_permissions.values():
+        all_perms_list.extend(data['permissions'])
+    for data in node_permissions.values():
+        all_perms_list.extend(data['permissions'])
     
     role_permissions = {}
     for role in [UserRole.ADMIN, UserRole.LEADER, UserRole.EMPLOYEE]:
@@ -228,7 +239,9 @@ def permissions_edit():
         'core/admin/system_permissions.html',
         form=form,
         role_name_form=role_name_form,
-        all_permissions=all_permissions,
+        system_permissions=system_permissions,
+        node_permissions=node_permissions,
+        all_permissions=all_perms_list,
         role_permissions=role_permissions,
         role_labels=role_labels,
         active_section='permissions'

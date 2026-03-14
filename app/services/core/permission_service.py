@@ -29,22 +29,26 @@ class UserRole:
 
 # 可用权限列表（可扩展）
 PERMISSIONS = [
-    ('system.settings', '修改系统基本设置'),
-    ('user.manage', '人员管理（新增及删改）'),
-    ('permissions.manage', '权限管理'),
-    # 未来可扩展：
-    # ('project.view', '项目 - 查看'),
-    # ('project.create', '项目 - 创建'),
-    # ('project.edit', '项目 - 编辑'),
-    # ('project.delete', '项目 - 删除'),
-    # ('report.export', '报表 - 导出'),
+    # 系统设置 - 细化为查看和修改
+    ('system.settings.view', '系统设置 - 查看'),
+    ('system.settings.modify', '系统设置 - 修改'),
+    
+    # 权限管理 - 细化为查看和修改
+    ('permissions.view', '权限管理 - 查看'),
+    ('permissions.modify', '权限管理 - 修改'),
+    
+    # 人员管理 - 细化为 CRUD
+    ('user.create', '人员管理 - 创建'),
+    ('user.read', '人员管理 - 查看'),
+    ('user.update', '人员管理 - 修改'),
+    ('user.delete', '人员管理 - 删除'),
 ]
 
 
 # 角色默认权限（leader 和 employee 可编辑）
 ROLE_DEFAULT_PERMISSIONS: Dict[str, List[str]] = {
     UserRole.ADMIN: ['*'],  # 全部权限
-    UserRole.LEADER: ['system.settings', 'user.manage', 'permissions.manage'],
+    UserRole.LEADER: ['system.settings.view', 'system.settings.modify', 'permissions.view', 'permissions.modify', 'user.create', 'user.read', 'user.update', 'user.delete'],
     UserRole.EMPLOYEE: [],
 }
 
@@ -59,6 +63,63 @@ class PermissionService:
     def get_all_permissions() -> List[tuple]:
         """获取所有可用权限列表"""
         return PERMISSIONS
+
+    @staticmethod
+    def get_system_permissions() -> Dict[str, Dict]:
+        """获取系统权限，按模块分组"""
+        return {
+            'system_settings': {
+                'name': '系统设置',
+                'icon': 'bi-gear',
+                'permissions': [
+                    ('system.settings.view', '系统设置 - 查看'),
+                    ('system.settings.modify', '系统设置 - 修改'),
+                ]
+            },
+            'permissions': {
+                'name': '权限管理',
+                'icon': 'bi-shield-lock',
+                'permissions': [
+                    ('permissions.view', '权限管理 - 查看'),
+                    ('permissions.modify', '权限管理 - 修改'),
+                ]
+            },
+            'user': {
+                'name': '人员管理',
+                'icon': 'bi-people',
+                'permissions': [
+                    ('user.create', '人员管理 - 创建'),
+                    ('user.read', '人员管理 - 查看'),
+                    ('user.update', '人员管理 - 修改'),
+                    ('user.delete', '人员管理 - 删除'),
+                ]
+            },
+        }
+
+    @staticmethod
+    def get_node_permissions() -> Dict[str, Dict]:
+        """获取已启用Node的CRUD权限，按node分组"""
+        from app.services.node.node_type_service import NodeTypeService
+        
+        node_permissions = {}
+        active_node_types = NodeTypeService.get_all()
+        
+        for node_type in active_node_types:
+            slug = node_type.slug
+            name = node_type.name
+            icon = node_type.icon or 'bi-folder'
+            node_permissions[slug] = {
+                'name': name,
+                'icon': icon,
+                'permissions': [
+                    (f'node.{slug}.create', f'{name} - 创建'),
+                    (f'node.{slug}.read', f'{name} - 查看'),
+                    (f'node.{slug}.update', f'{name} - 编辑'),
+                    (f'node.{slug}.delete', f'{name} - 删除'),
+                ]
+            }
+        
+        return node_permissions
 
     @staticmethod
     def get_role_permissions(role: str) -> List[str]:

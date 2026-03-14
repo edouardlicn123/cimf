@@ -25,15 +25,16 @@
               </a>
             </li>
             
-            <!-- 客户管理入口 -->
+            <!-- 动态加载已启用的节点入口 -->
+            {% for node_type in node_types %}
             <li class="nav-item">
-              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {{ 'active' if active_section == 'customer' else '' }}" 
-                 href="{{ url_for('customer.index') }}">
-                <i class="bi bi-people me-2 fs-6"></i>
-                客户管理
+              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {{ 'active' if active_section == node_type.slug else '' }}" 
+                 href="{{ url_for(node_type.slug + '.index') }}">
+                <i class="bi {{ node_type.icon or 'bi-folder' }} me-2 fs-6"></i>
+                {{ node_type.name }}
               </a>
             </li>
-            <!-- 后续节点类型可在此继续添加 -->
+            {% endfor %}
           </ul>
         </div>
       </div>

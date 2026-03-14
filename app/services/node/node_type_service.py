@@ -78,6 +78,7 @@ class NodeTypeService:
                 'name': '客户信息',
                 'slug': 'customer',
                 'description': '记录客户基本信息',
+                'icon': 'bi-people',
                 'fields_config': [
                     {'field_type': 'string', 'name': 'customer_name', 'label': '客户名称', 'required': True, 'unique': True},
                     {'field_type': 'string', 'name': 'contact_person', 'label': '联系人', 'required': False},
@@ -101,6 +102,7 @@ class NodeTypeService:
                 name=nt_data['name'],
                 slug=nt_data['slug'],
                 description=nt_data.get('description', ''),
+                icon=nt_data.get('icon', 'bi-folder'),
                 fields_config=nt_data.get('fields_config', []),
                 is_active=nt_data.get('is_active', True)
             )

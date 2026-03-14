@@ -3,7 +3,7 @@
 # 功能说明：后台管理相关 WTForms 表单定义，包括用户搜索表单、用户新建/编辑表单、权限编辑表单、系统设置批量编辑表单；所有表单均严格校验唯一性、密码强度、权限保护等规则
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, SelectField, FloatField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, SelectField, FloatField, SelectMultipleField
 from wtforms.validators import DataRequired, Length, Email, Optional, ValidationError, NumberRange
 from flask_login import current_user
 from app.models import User
@@ -259,15 +259,17 @@ class SystemSettingsForm(FlaskForm):
         }
     )
 
-    web_watermark_content = SelectField(
+    web_watermark_content = SelectMultipleField(
         '水印显示内容',
         choices=[
             ('username', '用户名'),
-            ('nickname', '昵称'),
-            ('email', '邮箱')
+            ('system_name', '系统名'),
+            ('datetime', '时间')
         ],
         render_kw={
-            'class': 'form-select form-select-lg'
+            'class': 'form-select form-select-lg',
+            'multiple': 'multiple',
+            'data-placeholder': '选择显示内容'
         }
     )
 
