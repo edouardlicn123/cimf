@@ -64,11 +64,46 @@
       <h5 class="mb-0">系统基本信息</h5>
     </div>
     <div class="card-body">
-      {{ form.system_name.label(class="form-label fw-medium") }}
-      {{ form.system_name(class="form-control form-control-lg w-100") }}
-      <small class="form-text text-muted">
-        当前名称：{{ settings.system_name or '内部管理系统' }}
-      </small>
+      <div class="row g-3">
+        <div class="col-md-6">
+          {{ form.system_name.label(class="form-label fw-medium") }}
+          {{ form.system_name(class="form-control form-control-lg w-100") }}
+          <small class="form-text text-muted">
+            当前名称：{{ settings.system_name or 'CIMF' }}
+          </small>
+        </div>
+        
+        <div class="col-md-6">
+          <label class="form-label fw-medium">时间服务器URL</label>
+          <input type="text" class="form-control" name="time_server_url" 
+            value="{{ settings.get('time_server_url', 'https://api.uuni.cn/api/time') }}">
+          <small class="form-text text-muted">
+            常用服务器：https://api.uuni.cn/api/time
+          </small>
+        </div>
+        
+        <div class="col-md-6">
+          <label class="form-label fw-medium">时区</label>
+          <select class="form-select" name="time_zone">
+            <option value="Asia/Shanghai" {% if settings.get('time_zone', 'Asia/Shanghai') == 'Asia/Shanghai' %}selected{% endif %}>中国标准时间 (UTC+8)</option>
+            <option value="Asia/Tokyo" {% if settings.get('time_zone') == 'Asia/Tokyo' %}selected{% endif %}>日本标准时间 (UTC+9)</option>
+            <option value="Asia/Seoul" {% if settings.get('time_zone') == 'Asia/Seoul' %}selected{% endif %}>韩国标准时间 (UTC+9)</option>
+            <option value="UTC" {% if settings.get('time_zone') == 'UTC' %}selected{% endif %}>UTC 世界标准时间</option>
+            <option value="America/New_York" {% if settings.get('time_zone') == 'America/New_York' %}selected{% endif %}>美国东部时间 (UTC-5)</option>
+          </select>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="form-check form-switch form-switch-lg mt-4">
+            <input type="checkbox" class="form-check-input" name="enable_time_sync" id="enable_time_sync" value="true"
+              {% if settings.get('enable_time_sync') != False and settings.get('enable_time_sync') != 'false' %}checked{% endif %}>
+            <label class="form-check-label fw-medium" for="enable_time_sync">启用时间同步</label>
+          </div>
+          <small class="form-text text-muted d-block">
+            关闭后首页和水印将使用服务器本地时间
+          </small>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -101,32 +136,31 @@
 
         <div class="col-md-6">
           <label class="form-label fw-medium">水印显示内容</label>
-          <div class="form-check">
-            <input type="checkbox" class="form-check-input" name="web_watermark_content" value="username" id="wm_username"
-              {% if 'username' in (settings.get('web_watermark_content', 'username,system_name,datetime') or '').split(',') %}checked{% endif %}>
-            <label class="form-check-label" for="wm_username">用户名</label>
+          <div class="d-flex flex-wrap gap-2 mb-2">
+            <div class="form-check form-check-inline">
+              <input type="checkbox" class="form-check-input" name="web_watermark_content" value="username" id="wm_username"
+                {% if 'username' in (settings.get('web_watermark_content', 'username,system_name,datetime') or '').split(',') %}checked{% endif %}>
+              <label class="form-check-label" for="wm_username">用户名</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input type="checkbox" class="form-check-input" name="web_watermark_content" value="system_name" id="wm_system_name"
+                {% if 'system_name' in (settings.get('web_watermark_content', 'username,system_name,datetime') or '').split(',') %}checked{% endif %}>
+              <label class="form-check-label" for="wm_system_name">系统名</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input type="checkbox" class="form-check-input" name="web_watermark_content" value="datetime" id="wm_datetime"
+                {% if 'datetime' in (settings.get('web_watermark_content', 'username,system_name,datetime') or '').split(',') %}checked{% endif %}>
+              <label class="form-check-label" for="wm_datetime">时间</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input type="checkbox" class="form-check-input" name="web_watermark_content" value="custom" id="wm_custom"
+                {% if 'custom' in (settings.get('web_watermark_content', 'username,system_name,datetime') or '').split(',') %}checked{% endif %}>
+              <label class="form-check-label" for="wm_custom">自定义文字</label>
+            </div>
           </div>
-          <div class="form-check">
-            <input type="checkbox" class="form-check-input" name="web_watermark_content" value="system_name" id="wm_system_name"
-              {% if 'system_name' in (settings.get('web_watermark_content', 'username,system_name,datetime') or '').split(',') %}checked{% endif %}>
-            <label class="form-check-label" for="wm_system_name">系统名</label>
-          </div>
-          <div class="form-check">
-            <input type="checkbox" class="form-check-input" name="web_watermark_content" value="datetime" id="wm_datetime"
-              {% if 'datetime' in (settings.get('web_watermark_content', 'username,system_name,datetime') or '').split(',') %}checked{% endif %}>
-            <label class="form-check-label" for="wm_datetime">时间</label>
-          </div>
-          <div class="form-check">
-            <input type="checkbox" class="form-check-input" name="web_watermark_content" value="custom" id="wm_custom"
-              {% if 'custom' in (settings.get('web_watermark_content', 'username,system_name,datetime') or '').split(',') %}checked{% endif %}
-              onchange="document.getElementById('custom_text_container').style.display = this.checked ? 'block' : 'none'">
-            <label class="form-check-label" for="wm_custom">自定义文字</label>
-          </div>
-          <div class="mt-2" id="custom_text_container" style="{% if 'custom' not in (settings.get('web_watermark_content', '') or '').split(',') %}display:none;{% endif %}">
-            <input type="text" class="form-control" name="web_watermark_custom_text" 
-              value="{{ settings.get('web_watermark_custom_text', '') }}" 
-              placeholder="输入自定义文字">
-          </div>
+          <input type="text" class="form-control form-control-sm" name="web_watermark_custom_text" 
+            value="{{ settings.get('web_watermark_custom_text', '') }}" 
+            placeholder="自定义文字内容">
           <small class="form-text text-muted d-block mt-1">
             当前内容：{{ settings.get('web_watermark_content', 'username,system_name,datetime') or 'username,system_name,datetime' }}
           </small>
@@ -141,7 +175,7 @@
         </div>
 
         <div class="col-md-6">
-          <div class="form-check form-switch form-switch-lg">
+          <div class="form-check form-switch form-switch-lg mt-4">
             {{ form.enable_watermark_console_detection(class="form-check-input") }}
             {{ form.enable_watermark_console_detection.label(class="form-check-label fw-medium") }}
           </div>
@@ -151,7 +185,7 @@
         </div>
 
         <div class="col-md-6">
-          <div class="form-check form-switch form-switch-lg">
+          <div class="form-check form-switch form-switch-lg mt-4">
             {{ form.enable_watermark_shortcut_block(class="form-check-input") }}
             {{ form.enable_watermark_shortcut_block.label(class="form-check-label fw-medium") }}
           </div>
@@ -209,38 +243,6 @@
             当前状态：{{ '已启用（推荐）' if settings.enable_audit_log else '已禁用' }}
           </small>
         </div>
-      </div>
-
-      <hr>
-      <h5 class="mb-3">时间管理</h5>
-      <div class="row">
-        <div class="col-md-6">
-          <div class="form-check form-switch form-switch-lg mt-4">
-            <input type="checkbox" class="form-check-input" name="enable_time_sync" id="enable_time_sync" value="true"
-              {% if settings.get('enable_time_sync') != False and settings.get('enable_time_sync') != 'false' %}checked{% endif %}>
-            <label class="form-check-label fw-medium" for="enable_time_sync">启用时间同步</label>
-          </div>
-          <small class="form-text text-muted d-block">
-            关闭后首页和水印将使用服务器本地时间
-          </small>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label fw-medium">时间服务器URL</label>
-          <input type="text" class="form-control" name="time_server_url" 
-            value="{{ settings.get('time_server_url', 'https://api.uuni.cn/api/time') }}">
-          <small class="form-text text-muted">
-            常用服务器：https://api.uuni.cn/api/time
-          </small>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label fw-medium">时区</label>
-          <select class="form-select" name="time_zone">
-            <option value="Asia/Shanghai" {% if settings.get('time_zone', 'Asia/Shanghai') == 'Asia/Shanghai' %}selected{% endif %}>中国标准时间 (UTC+8)</option>
-            <option value="Asia/Tokyo" {% if settings.get('time_zone') == 'Asia/Tokyo' %}selected{% endif %}>日本标准时间 (UTC+9)</option>
-            <option value="Asia/Seoul" {% if settings.get('time_zone') == 'Asia/Seoul' %}selected{% endif %}>韩国标准时间 (UTC+9)</option>
-            <option value="UTC" {% if settings.get('time_zone') == 'UTC' %}selected{% endif %}>UTC 世界标准时间</option>
-            <option value="America/New_York" {% if settings.get('time_zone') == 'America/New_York' %}selected{% endif %}>美国东部时间 (UTC-5)</option>
-          </select>
         </div>
       </div>
     </div>
