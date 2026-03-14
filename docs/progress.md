@@ -1,3 +1,11 @@
+# 2026-03-14 修改记录
+
+1. 创建了08_时间管理模块指引.md文档 - 描述了时间服务模块设计（TimeService）、API路由、前端JS改造、水印改造、系统设置页面、时间服务器推荐列表
+2. 执行了08文档的代码修改 - 添加了时间相关系统设置（enable_time_sync/time_server_url/time_zone）、创建了TimeService服务、创建了时间API路由（/api/time/current和/api/time/test）、注册了time蓝图、修改了前端JS从后端API获取时间、添加了current_time到上下文处理器、添加了时间管理配置区块到系统设置页面
+3. 调整了系统设置页面卡片间距 - 为三个卡片统一添加 mb-3 class
+4. 验证了基础设置选项功能 - upload_max_size_mb、upload_max_files、session_timeout_minutes、enable_audit_log 均已实现
+5. 将单文件最大上传大小默认值从 50MB 改为 12MB
+
 # 2026-03-13 修改记录
 
 1. 修复了表单无法完全占满卡片的问题 - 修改了5个主题文件（default.css, dopamine.css, macaron.css, teal.css, uniklo.css）中的 .card-body 样式，移除了 margin: auto 和 max-width 限制
