@@ -124,3 +124,25 @@ app/
   display: none !important;
 }
 ```
+
+## 页面模板变量规范
+
+### 要求
+
+所有新创建的页面模板（即**内容模板**，非框架模板），**必须**在模板开头添加以下变量声明：
+
+```html
+{% set show_nav = true %}
+{% set show_header = false %}
+```
+
+### 变量说明
+
+| 变量 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| show_nav | bool | true | 是否显示顶部导航栏 |
+| show_header | bool | true | 是否显示页面标题栏 |
+
+**注意**：这些变量写在**内容模板**中（如 system_settings.html），不是框架模板（如base.html frame_admin.html）。框架模板通过 Jinja2 的 set 标签接收这些变量。
+
+

@@ -149,7 +149,8 @@ def create_app(config_name='default'):
     @app.context_processor
     def inject_role_labels():
         from app.services import SettingsService, UserRole
-        from datetime import datetime
+        import time
+        import random
         role_labels = dict(UserRole.LABELS)
         custom_leader = SettingsService.get_setting('role_name_leader')
         custom_employee = SettingsService.get_setting('role_name_employee')
@@ -158,27 +159,18 @@ def create_app(config_name='default'):
         if custom_employee:
             role_labels[UserRole.EMPLOYEE] = custom_employee
         
-        # 获取系统名称（带默认值）
         system_name = SettingsService.get_setting('system_name') or 'CIMF'
-        
-        # 获取所有设置（用于水印等功能）
         all_settings = SettingsService.get_all_settings()
         
-        # 提供时间戳用于静态资源缓存刷新（使用随机数确保每次不同）
-        import time
-        import random
-        from datetime import datetime
         timestamp = str(int(time.time())) + str(random.randint(0, 999))
         now = datetime.now()
         
-        # 获取已启用的节点类型列表（用于动态菜单）
         try:
             from app.services.node.node_type_service import NodeTypeService
             node_types = NodeTypeService.get_all()
         except Exception:
             node_types = []
         
-        # 获取当前时间（统一时间服务）
         try:
             from app.services.core.time_service import TimeService
             current_time = TimeService.get_current_time()
@@ -189,6 +181,18 @@ def create_app(config_name='default'):
 
     # ── 10. 数据库初始化（根据配置模式） ─────────────────────────────────────────────
     init_database(app)
+
+    # ── 11. 初始化 Cron 调度服务 ─────────────────────────────────────────────
+    from app.services.core.cron_service import get_cron_service
+    from app.services.core.tasks import TimeSyncTask, CacheCleanupTask
+    
+    cron = get_cron_service()
+    cron.init_app(app)  # 传入 app 以便在后台线程中使用 app context
+    cron.register(TimeSyncTask())
+    cron.register(CacheCleanupTask())
+    cron.start()
+    cron.set_app_ready(True)  # 立即启用任务
+    app.logger.info("Cron 调度服务已启动")
 
     app.logger.info("FFE 项目跟进系统 - 应用初始化完成")
     return app

@@ -114,6 +114,13 @@ class User(db.Model, UserMixin):
         nullable=True,
         comment="最后一次成功登录时间（UTC）"
     )
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False,
+        comment="最后更新时间（UTC）"
+    )
 
     def __repr__(self):
         display_name = self.nickname or self.username

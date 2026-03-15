@@ -264,7 +264,8 @@ class SystemSettingsForm(FlaskForm):
         choices=[
             ('username', '用户名'),
             ('system_name', '系统名'),
-            ('datetime', '时间')
+            ('datetime', '时间'),
+            ('custom', '自定义文字')
         ],
         render_kw={
             'class': 'form-select form-select-lg',
@@ -303,6 +304,24 @@ class SystemSettingsForm(FlaskForm):
         render_kw={
             'class': 'form-check-input',
             'role': 'switch'
+        }
+    )
+
+    # ========== Cron 调度任务设置 ==========
+    cron_cache_cleanup_enabled = BooleanField(
+        '启用缓存清理任务',
+        render_kw={
+            'class': 'form-check-input',
+            'role': 'switch'
+        }
+    )
+
+    cron_cache_cleanup_interval = IntegerField(
+        '缓存清理间隔（秒）',
+        validators=[Optional(), NumberRange(min=60, max=86400)],
+        render_kw={
+            'class': 'form-control form-control-lg',
+            'placeholder': '10800 = 3小时'
         }
     )
 
