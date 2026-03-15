@@ -145,4 +145,79 @@ app/
 
 **注意**：这些变量写在**内容模板**中（如 system_settings.html），不是框架模板（如base.html frame_admin.html）。框架模板通过 Jinja2 的 set 标签接收这些变量。
 
+## Python 文件注释规范
+
+### 要求
+
+所有新创建的 Python 文件，**必须**在文件开头添加详细的注释，包括：
+
+1. **文件头部注释**：包含文件名、路径、功能说明、用法示例、版本历史
+2. **模块级注释**：导入说明、模块导出清单
+3. **类和函数注释**：参数说明、返回值说明、功能描述
+
+### 文件头部注释模板
+
+```python
+# -*- coding: utf-8 -*-
+"""
+================================================================================
+文件：app/services/core/example_service.py
+路径：/home/edo/cimf-v2/app/services/core/example_service.py
+================================================================================
+
+功能说明：
+    简短描述服务的主要功能。
+    
+    主要功能：
+    - 功能点1
+    - 功能点2
+    
+    设计说明（可选）：
+    - 重要设计决策
+
+用法：
+    1. 基本用法：
+        from app.services.core.example_service import ExampleService
+        result = ExampleService.do_something()
+    
+    2. 配置说明：
+        - setting_key: 设置项说明
+
+版本：
+    - 1.0: 初始版本
+
+依赖：
+    - 模块1: 依赖说明
+    - 模块2: 依赖说明
+"""
+```
+
+### 函数/方法注释模板
+
+```python
+def function_name(param1: str, param2: int) -> bool:
+    """
+    函数功能描述
+    
+    详细说明函数的作用、用途等。
+    
+    参数：
+        param1: 参数1的说明
+        param2: 参数2的说明
+        
+    返回：
+        返回值的说明
+        
+    异常：
+        可能抛出的异常说明
+    """
+    pass
+```
+
+### 示例
+
+参考现有文件的注释风格：
+- `app/services/core/cron_service.py` - 服务层
+- `app/services/core/tasks/base.py` - 基类
+- `app/modules/core/cron/routes.py` - 路由层
 
