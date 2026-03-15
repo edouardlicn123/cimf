@@ -144,7 +144,13 @@ def system_settings():
     if request.method == 'POST':
         if form.validate_on_submit():
             try:
-                updated_count = SettingsService.save_settings_bulk(form.data)
+                # 合并 form.data 和 request.form，处理模板中额外的 HTML 输入框
+                all_data = dict(form.data)
+                for key in request.form:
+                    if key not in all_data:
+                        all_data[key] = request.form.get(key)
+                
+                updated_count = SettingsService.save_settings_bulk(all_data)
                 flash(f'设置保存成功（共更新 {updated_count} 项）', 'success')
                 return redirect(url_for('admin.system_settings'))
             except Exception as e:

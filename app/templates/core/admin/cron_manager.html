@@ -1,0 +1,144 @@
+{% extends "core/frame_admin.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% block admin_title %}
+  <title>Cron 调度管理</title>
+{% endblock %}
+
+{% block admin_content %}
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+<div class="container-fluid">
+    <h2 class="mb-4">Cron 调度管理</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>任务名称</th>
+                        <th>描述</th>
+                        <th>启用状态</th>
+                        <th>运行间隔</th>
+                        <th>上次运行</th>
+                        <th>下次运行</th>
+                        <th>运行状态</th>
+                        <th>运行次数</th>
+                        <th>错误信息</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for name, task in cron_status.tasks.items() %}
+                    <tr>
+                        <td><strong>{{ task.name }}</strong></td>
+                        <td>{{ task.description }}</td>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input toggle-enabled" 
+                                       type="checkbox" 
+                                       data-task="{{ task.name }}"
+                                       {% if task.enabled %}checked{% endif %}>
+                            </div>
+                        </td>
+                        <td>{{ task.interval }} 秒</td>
+                        <td>{{ task.last_run or '从未运行' }}</td>
+                        <td>{{ task.next_run or '未计划' }}</td>
+                        <td>
+                            {% if task.last_status == 'success' %}
+                            <span class="badge bg-success">成功</span>
+                            {% elif task.last_status == 'failed' %}
+                            <span class="badge bg-danger">失败</span>
+                            {% else %}
+                            <span class="badge bg-secondary">从未运行</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ task.run_count }}</td>
+                        <td>{{ task.last_error or '-' }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary btn-run" data-task="{{ task.name }}">
+                                立即执行
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+    console.log('CSRF Token:', csrfToken);
+    
+    const runButtons = document.querySelectorAll('.btn-run');
+    console.log('Found run buttons:', runButtons.length);
+    
+    runButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const taskName = this.dataset.task;
+            console.log('Clicked run:', taskName);
+            
+            fetch(`/api/cron/run/${taskName}`, { 
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken || ''
+                }
+            })
+            .then(resp => {
+                console.log('Status:', resp.status);
+                return resp.json();
+            })
+            .then(data => {
+                console.log('Data:', data);
+                if (data.success) {
+                    alert('任务执行成功');
+                    location.reload();
+                } else {
+                    alert('失败: ' + data.error);
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                alert('请求失败: ' + err.message);
+            });
+        });
+    });
+    
+    const toggles = document.querySelectorAll('.toggle-enabled');
+    console.log('Found toggles:', toggles.length);
+    
+    toggles.forEach(toggle => {
+        toggle.addEventListener('change', function() {
+            const taskName = this.dataset.task;
+            const enabled = this.checked;
+            console.log('Toggle:', taskName, enabled);
+            
+            fetch(`/api/cron/toggle/${taskName}`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken || ''
+                },
+                body: JSON.stringify({ enabled })
+            })
+            .then(resp => resp.json())
+            .then(data => {
+                if (!data.success) {
+                    alert('切换失败: ' + data.error);
+                    this.checked = !enabled;
+                }
+            })
+            .catch(err => {
+                alert('请求失败: ' + err.message);
+                this.checked = !enabled;
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

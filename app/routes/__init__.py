@@ -12,6 +12,8 @@ from app.modules.core.export import export_bp
 from app.modules.core.taxonomy import taxonomy_bp
 from app.modules.core.node import node_bp
 from app.modules.core.time import time_bp
+from app.modules.core.cron import cron_bp
+from app.modules.core.cron.admin_routes import admin_cron_bp
 from app.modules.nodes.customer import customer_bp
 
 
@@ -45,4 +47,10 @@ def register_blueprints(app):
     # 时间API模块
     app.register_blueprint(time_bp)
 
-    app.logger.info("所有蓝图注册完成：workspace, auth, profile, admin, export, taxonomy, node, customer, time 已加载")
+    # Cron调度模块
+    app.register_blueprint(cron_bp)
+
+    # Cron管理后台
+    app.register_blueprint(admin_cron_bp, url_prefix='/admin')
+
+    app.logger.info("所有蓝图注册完成：workspace, auth, profile, admin, export, taxonomy, node, customer, time, cron, admin_cron 已加载")

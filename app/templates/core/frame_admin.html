@@ -38,6 +38,13 @@
                 权限管理
               </a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {{ 'active' if active_section == 'cron' else '' }}" 
+                 href="{{ url_for('admin_cron.cron_manager') }}">
+                <i class="bi bi-clock me-2 fs-6"></i>
+                Cron 调度
+              </a>
+            </li>
             <!-- 后续模块可在此继续添加 -->
           </ul>
         </div>

@@ -5,6 +5,26 @@
 3. 调整了系统设置页面卡片间距 - 为三个卡片统一添加 mb-3 class
 4. 验证了基础设置选项功能 - upload_max_size_mb、upload_max_files、session_timeout_minutes、enable_audit_log 均已实现
 5. 将单文件最大上传大小默认值从 50MB 改为 12MB
+6. 创建了09_系统性能优化与时钟同步服务指引.md文档 - 整合了代码性能优化方案（上下文处理器缓存、SettingsService缓存、移除重复导入、User模型添加updated_at字段）和时钟同步服务设计（TimeSyncService后台线程、失败重试5次、统一时间查询接口）
+7. 执行了09文档的代码修改 - 创建了cache_utils.py缓存工具、time_sync_service.py时钟同步服务、修改TimeService调用同步服务、SettingsService添加60秒缓存、移除app/__init__.py重复导入、User模型添加updated_at字段、扩展时间API添加status端点、更新系统设置页面添加同步间隔和重试次数配置
+8. 创建了10_统一Cron调度服务指引.md文档 - 设计统一任务调度框架，包含CronService调度器、CronTask基类、TimeSyncTask时间同步任务、CacheCleanupTask缓存清理任务、系统设置配置、API端点设计
+9. 执行了10文档的代码修改 - 创建了CronService统一调度服务、CronTask任务基类、TimeSyncTask时间同步任务、CacheCleanupTask缓存清理任务、cron API路由，移除了TimeSyncService内部线程管理，由Cron服务统一调度
+10. 修复了10文档实现的Bug - TimeSyncTask设置键改为与TimeSyncService一致、添加间隔分钟到秒的转换、添加CacheCleanupTask缺少的设置项
+11. 更新了10_统一Cron调度服务指引.md文档 - 添加了Flask app context处理、_app_ready就绪标志、init_app方法、任务在context中执行、技术要点说明
+12. 更新了AGENTS.md - 添加了页面模板变量规范，要求所有新页面模板必须添加show_nav和show_header变量声明
+13. 更新了AGENTS.md - 明确show_nav和show_header变量写在内容模板中（extends之后），不是框架模板
+14. 更新了AGENTS.md - 简化了页面模板变量规范的示例代码，去掉了extends行
+15. 更新了10_统一Cron调度服务指引.md - 添加了后台管理界面设计，包含cron_manager模板、admin_routes路由、任务表格展示、手动触发按钮
+16. 执行了10文档后台管理界面代码 - 创建了cron_manager.html模板、admin_routes.py路由、在frame_admin侧边栏添加了Cron调度入口
+17. 完成了10文档未完成的内容 - 添加了任务启用/禁用功能：
+    - 在 CronTask 基类添加 toggle 方法，用于切换任务启用状态
+    - 在 CronService 添加 toggle 方法，用于切换任务启用状态
+    - 在 cron API 路由添加 POST /api/cron/toggle/<task_name> 端点
+    - 在 cron_manager.html 添加开关切换 JavaScript 事件处理
+18. 修复了 CronService 的 Bug - trigger 和 toggle 方法需要在 app.app_context() 中执行才能正常访问数据库
+19. 添加了"Cron 调度任务设置"区块到系统设置页面 - 包含缓存清理任务的启用开关和间隔配置
+20. 修复了 SettingsService 的 Bug - save_settings_bulk 每次循环都清理缓存，导致启动时多次执行缓存清理任务
+21. 修复了缓存任务重复执行的 Bug - 在 CronTask 基类和 CacheCleanupTask 中添加了5-10秒的防重复执行检查
 
 # 2026-03-13 修改记录
 
