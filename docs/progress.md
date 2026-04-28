@@ -714,4 +714,5 @@
 20. 从模块市场移除 whatsapp 模块
 21. 确保模块初始化时完成词汇表初始化：修改 scan_and_register_modules 移除静默异常、增强 create_module_taxonomies 验证、修改 install_module 检查创建结果、init_db.py 添加验证步骤
 22. 方案B测试通过：词汇表全部创建成功（10个表102项），导入功能验证通过（关系栏正确导入）
+23. 修复居民信息导入预览问题：将relation字段verbose_name从'与其他人员关系'改为'与户主关系'，确保导入模板列名与字段标签一致
 
