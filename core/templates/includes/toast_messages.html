@@ -1,0 +1,135 @@
+<!-- 自定义右下角 Toast 容器 + 样式 + 脚本 -->
+
+<!-- 右下角 Toast 容器 -->
+<div id="customToastContainer" style="position: fixed; right: 20px; bottom: 20px; z-index: 9999; max-width: 380px; pointer-events: none;"></div>
+
+<!-- Toast 样式 -->
+<style>
+.alert, .flash-message, .flashed-messages, [data-django-messages] {
+    display: none !important;
+}
+.custom-toast {
+    min-width: 300px;
+    max-width: 380px;
+    margin-top: 10px;
+    padding: 14px 18px;
+    border-radius: 8px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+    color: white;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.95rem;
+}
+.custom-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+.custom-toast.success { background-color: #28a745; }
+.custom-toast.info { background-color: #17a2b8; }
+.custom-toast.warning { background-color: #ffc107; color: #212529; }
+.custom-toast.danger { background-color: #dc3545; }
+.custom-toast .close-btn {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 1.6rem;
+    cursor: pointer;
+    margin-left: 15px;
+    opacity: 0.8;
+    line-height: 1;
+}
+.custom-toast .close-btn:hover {
+    opacity: 1;
+}
+</style>
+
+<!-- 自定义 Toast 脚本 -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const container = document.getElementById('customToastContainer');
+
+    // 处理 Django messages 框架的消息
+    {% if messages %}
+    (function() {
+        const djangoMessages = [
+            {% for message in messages %}
+            {
+                level: {{ message.level }},
+                message: {{ message.message|tojson }}
+            },
+            {% endfor %}
+        ];
+        
+        djangoMessages.forEach(function(msg) {
+            let type = 'info';
+            if (msg.level === 25) type = 'success';
+            else if (msg.level === 30) type = 'warning';
+            else if (msg.level === 40 || msg.level === 50) type = 'danger';
+            
+            createCustomToast(msg.message, type);
+        });
+    })();
+    {% endif %}
+
+    // 处理页面上的传统 flash 元素
+    setTimeout(() => {
+        const selectors = ['.alert', '.flash-message', '.alert-dismissible', '[role="alert"]', '.flash', '.message'];
+        let flashElements = [];
+
+        for (const sel of selectors) {
+            const els = document.querySelectorAll(sel);
+            if (els.length > 0) {
+                flashElements = Array.from(els);
+                break;
+            }
+        }
+
+        if (flashElements.length === 0) {
+            return;
+        }
+
+        flashElements.forEach(el => {
+            let type = 'info';
+            if (el.classList.contains('alert-success')) type = 'success';
+            else if (el.classList.contains('alert-warning')) type = 'warning';
+            else if (el.classList.contains('alert-danger') || el.classList.contains('alert-error')) type = 'danger';
+
+            const messageText = el.textContent.trim();
+            createCustomToast(messageText, type);
+        });
+    }, 300);
+
+    function createCustomToast(message, type = 'info', delay = 3000) {
+        const toast = document.createElement('div');
+        toast.className = `custom-toast ${type}`;
+        const span = document.createElement('span');
+        span.className = 'fw-medium';
+        span.textContent = message;
+        toast.appendChild(span);
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'close-btn';
+        closeBtn.setAttribute('aria-label', '关闭');
+        closeBtn.textContent = '×';
+        toast.appendChild(closeBtn);
+
+        container.appendChild(toast);
+
+        setTimeout(() => toast.classList.add('show'), 100);
+
+        toast.querySelector('.close-btn').addEventListener('click', () => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        });
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, delay);
+    }
+});
+</script>

@@ -1,0 +1,223 @@
+{% extends "frames/frame_admin.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% block title %}系统设置 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}系统设置{% endblock %}
+
+{% block admin_buttons_content %}
+<button type="button" class="btn btn-primary" onclick="document.getElementById('settingsForm').submit()">
+    <i class="bi bi-check-lg"></i> 保存设置
+</button>
+{% endblock %}
+
+{% block admin_content %}
+<form method="post" id="settingsForm" enctype="multipart/form-data">
+    {% include "includes/csrf.html" %}
+    
+    <!-- 基本设置 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">基本设置</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">系统名称</label>
+                    <input type="text" name="system_name" class="form-control" value="{{ settings.system_name|default('仙芙CIMF') }}">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">时区</label>
+                    <select name="time_zone" class="form-select">
+                        <option value="Asia/Shanghai" {% if settings.time_zone == 'Asia/Shanghai' %}selected{% endif %}>Asia/Shanghai</option>
+                    </select>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">欢迎标题</label>
+                    <input type="text" name="welcome_title" class="form-control" value="{{ settings.welcome_title|default('欢迎！') }}">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">欢迎副标题</label>
+                    <input type="text" name="welcome_subtitle" class="form-control" value="{{ settings.welcome_subtitle|default('让我们一起把项目完善吧。') }}">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">介绍信息</label>
+                <input type="text" name="welcome_intro" class="form-control" value="{{ settings.welcome_intro|default('初始用户名：admin 初始密码：admin123') }}">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Logo 设置 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Logo 设置</h5>
+        </div>
+        <div class="card-body">
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" name="site_logo_enabled" id="site_logo_enabled" {% if settings.get('site_logo_enabled', true) %}checked{% endif %}>
+                <label class="form-check-label" for="site_logo_enabled">启用 Logo 显示</label>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">当前 Logo 预览</label>
+                <div class="border rounded p-3 text-center" style="background: #f8f9fa;">
+                    {% if settings.get('site_logo_path') %}
+                        <img src="{{ media(settings.site_logo_path) }}" alt="当前 Logo" style="max-height: 60px;">
+                        <div class="small text-muted mt-2">已上传的自定义 Logo</div>
+                    {% else %}
+                        <img src="{{ static('sitelogo_white.png') }}" alt="默认 Logo" style="max-height: 60px; background: #333; padding: 8px; border-radius: 4px;">
+                        <div class="small text-muted mt-2">默认 Logo</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">上传新 Logo</label>
+                <input type="file" name="site_logo_upload" class="form-control" accept="image/png,image/jpeg,image/jpg">
+                <small class="text-muted">支持 PNG、JPG 格式，建议尺寸与默认 Logo 一致</small>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 上传设置 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">上传设置</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">单个文件最大上传大小 (MB)</label>
+                    <input type="number" name="upload_max_size_mb" class="form-control" value="{{ settings.upload_max_size_mb|default('12') }}">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">每个项目允许上传的最大文件数</label>
+                    <input type="number" name="upload_max_files" class="form-control" value="{{ settings.upload_max_files|default('20') }}">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">允许上传的文件类型</label>
+                <input type="text" name="upload_allowed_extensions" class="form-control" value="{{ settings.upload_allowed_extensions|default('pdf,doc,docx,xls,xlsx,jpg,png,jpeg,zip,rar') }}">
+            </div>
+        </div>
+    </div>
+    
+    <!-- 安全设置 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">安全设置</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">会话超时时间 (分钟)</label>
+                    <input type="number" name="session_timeout_minutes" class="form-control" value="{{ settings.session_timeout_minutes|default('30') }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">登录失败锁定次数</label>
+                    <input type="number" name="login_max_failures" class="form-control" value="{{ settings.login_max_failures|default('5') }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">登录锁定时长 (分钟)</label>
+                    <input type="number" name="login_lock_minutes" class="form-control" value="{{ settings.login_lock_minutes|default('30') }}">
+                </div>
+            </div>
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" name="enable_audit_log" id="enable_audit_log" {% if settings.enable_audit_log %}checked{% endif %}>
+                <label class="form-check-label" for="enable_audit_log">启用操作审计日志（记录用户修改历史）</label>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 水印设置 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">水印设置</h5>
+        </div>
+        <div class="card-body">
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" name="enable_web_watermark" id="enable_web_watermark" {% if settings.enable_web_watermark %}checked{% endif %}>
+                <label class="form-check-label" for="enable_web_watermark">启用网页水印（登录用户名前景显示）</label>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label d-block">水印显示内容</label>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="web_watermark_content" id="wm_username" value="username" {% if 'username' in (settings.web_watermark_content|default('username,system_name,datetime')).split(',') %}checked{% endif %}>
+                    <label class="form-check-label" for="wm_username">用户名</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="web_watermark_content" id="wm_system_name" value="system_name" {% if 'system_name' in (settings.web_watermark_content|default('username,system_name,datetime')).split(',') %}checked{% endif %}>
+                    <label class="form-check-label" for="wm_system_name">系统名</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="web_watermark_content" id="wm_datetime" value="datetime" {% if 'datetime' in (settings.web_watermark_content|default('username,system_name,datetime')).split(',') %}checked{% endif %}>
+                    <label class="form-check-label" for="wm_datetime">时间</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="web_watermark_content" id="wm_custom" value="custom" {% if 'custom' in (settings.web_watermark_content|default('username,system_name,datetime')).split(',') %}checked{% endif %}>
+                    <label class="form-check-label" for="wm_custom">自定义文字</label>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">自定义水印文字</label>
+                    <input type="text" name="web_watermark_custom_text" class="form-control" value="{{ settings.web_watermark_custom_text|default('') }}">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">水印透明度 (0.05-0.5)</label>
+                    <input type="number" name="web_watermark_opacity" class="form-control" step="0.01" min="0.05" max="0.5" value="{{ settings.web_watermark_opacity|default('0.15') }}">
+                </div>
+            </div>
+            
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" name="enable_watermark_console_detection" id="enable_watermark_console_detection" {% if settings.enable_watermark_console_detection %}checked{% endif %}>
+                <label class="form-check-label" for="enable_watermark_console_detection">检测控制台打开并警告</label>
+            </div>
+            
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" name="enable_watermark_shortcut_block" id="enable_watermark_shortcut_block" {% if settings.enable_watermark_shortcut_block %}checked{% endif %}>
+                <label class="form-check-label" for="enable_watermark_shortcut_block">禁用F12等快捷键</label>
+            </div>
+            
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" name="enable_export_watermark" id="enable_export_watermark" {% if settings.enable_export_watermark %}checked{% endif %}>
+                <label class="form-check-label" for="enable_export_watermark">导出文件添加水印（CSV/Excel）</label>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cron 调度任务设置 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">定时任务设置</h5>
+        </div>
+        <div class="card-body">
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" name="cron_time_sync_enabled" id="cron_time_sync_enabled" {% if settings.cron_time_sync_enabled %}checked{% endif %}>
+                <label class="form-check-label" for="cron_time_sync_enabled">启用时间同步任务</label>
+            </div>
+            
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" name="cron_cache_cleanup_enabled" id="cron_cache_cleanup_enabled" {% if settings.cron_cache_cleanup_enabled %}checked{% endif %}>
+                <label class="form-check-label" for="cron_cache_cleanup_enabled">启用缓存清理任务</label>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">缓存清理间隔（秒）</label>
+                    <input type="number" name="cron_cache_cleanup_interval" class="form-control" value="{{ settings.cron_cache_cleanup_interval|default('10800') }}">
+                    <small class="text-muted">10800 = 3小时</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "frames/frame_structure.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% block title %}{% if taxonomy %}编辑{% else %}新建{% endif %}词汇表 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}{% if taxonomy %}编辑{% else %}新建{% endif %}词汇表{% endblock %}
+
+{% block admin_content %}
+<form method="post">
+    {% include "includes/csrf.html" %}
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label">名称 *</label>
+                <input type="text" name="name" class="form-control" value="{{ taxonomy.name|default('') if taxonomy else '' }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">标识符 *</label>
+                <input type="text" name="slug" class="form-control" value="{{ taxonomy.slug|default('') if taxonomy else '' }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">描述</label>
+                <textarea name="description" class="form-control">{{ taxonomy.description|default('') if taxonomy else '' }}</textarea>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-end">
+        <a href="{{ url('core:taxonomies') }}" class="btn btn-secondary">取消</a>
+        <button type="submit" class="btn btn-primary">保存</button>
+    </div>
+</form>
+{% endblock %}

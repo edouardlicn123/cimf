@@ -1,0 +1,66 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Flask / 项目运行相关
+instance/
+*.db
+*.sqlite3
+*.log
+
+# 环境配置文件
+config.env
+
+# 上传文件目录（后续会用到）
+instance/uploads/*
+
+# macOS / Windows 常见垃圾文件
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# 编辑器临时文件
+*.swp
+*.swo
+*~
+.#*
+
+# 其他可能出现的
+.mypy_cache/
+.pytest_cache/
+coverage.xml
+htmlcov/
+
+# 模块排除（开发中的模块）
+modules/resident_info/
+modules/customer_cn/
+modules/whatsapp/
+
+# 开发阶段文档
+docs/stage3/
+docs/stage4/
+
+# 字体压缩包和冗余格式
+static/fonts/**/*.zip
+storage/staticfiles/fonts/**/*.zip
+static/fonts/**/extras/
+storage/staticfiles/fonts/**/extras/
+
+# Python 缓存
+__pycache__/
+*.pyc
+
+# 日志文件
+storage/logs/*.log
+
+# 静态文件收集目录
+storage/staticfiles/

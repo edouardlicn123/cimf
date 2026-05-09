@@ -1,0 +1,55 @@
+{% extends "frames/frame_importexport.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'import' %}
+
+{% block title %}导入结果 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}
+  导入结果
+{% endblock %}
+
+{% block admin_content %}
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">导入完成</h5>
+        
+        <table class="table">
+            <tr>
+                <th>总行数：</th>
+                <td>{{ result.total_count }}</td>
+            </tr>
+            <tr>
+                <th>成功导入：</th>
+                <td class="text-success">{{ result.success_count }}</td>
+            </tr>
+            <tr>
+                <th>跳过（重复）：</th>
+                <td class="text-warning">{{ result.skipped_count }}</td>
+            </tr>
+            <tr>
+                <th>失败：</th>
+                <td class="text-danger">{{ result.failed_count }}</td>
+            </tr>
+        </table>
+        
+        {% if result.errors %}
+        <div class="mt-3">
+            <h6>错误详情：</h6>
+            <ul class="text-danger">
+                {% for error in result.errors %}
+                <li>第{{ error.row }}行: {{ error.message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        
+        <div class="mt-3">
+            <a href="{{ url('importexport:import_list') }}" class="btn btn-primary">返回导入列表</a>
+            <a href="{{ url('importexport:import_page', node_type.slug) }}" class="btn btn-secondary">继续导入</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

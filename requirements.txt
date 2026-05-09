@@ -1,0 +1,30 @@
+# Django 核心
+django>=6.0,<6.1
+djangorestframework>=3.17,<3.18
+
+# 环境变量加载
+python-dotenv>=1.0,<2.0
+
+# 模板引擎
+jinja2>=3.1.6,<4.0
+
+# 数据库
+# sqlite3 (built-in)
+# pymysql (可选，使用 MySQL 时安装: pip install pymysql)
+
+# HTTP 请求
+requests>=2.33,<3.0
+
+# 数据导出
+openpyxl>=3.1.5,<4.0
+
+# 可选：生产环境
+gunicorn>=23.0,<24.0
+
+# 可选：水印功能
+pillow>=12.0,<13.0
+pypdf>=4.0,<5.0
+
+# 可选：开发工具
+# pytest>=8.0,<9.0
+# pytest-django>=4.8,<5.0

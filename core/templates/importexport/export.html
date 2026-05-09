@@ -1,0 +1,37 @@
+{% extends "frames/frame_importexport.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'export' %}
+
+{% block title %}导出数据 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}
+  导出数据
+{% endblock %}
+
+{% block admin_content %}
+<p>选择一个模块类型开始导出数据</p>
+
+<div class="row">
+    {% for node_type in node_types %}
+    <div class="col-md-4 mb-3">
+        <div class="entry-card h-100">
+            <div class="entry-card-figure">
+                <i class="bi {{ node_type.icon|default('bi-folder') }}"></i>
+                <h5 class="entry-card-title">{{ node_type.name }}</h5>
+            </div>
+            <div class="entry-card-body">
+                <p class="entry-card-desc">{{ node_type.description|default('暂无描述') }}</p>
+                <div class="entry-card-actions">
+                    <a href="{{ url('importexport:export_select_fields', node_type.slug) }}" class="btn btn-primary btn-sm">
+                        导出 {{ node_type.name }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

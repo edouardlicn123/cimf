@@ -1,0 +1,271 @@
+{% extends "frames/frame_module.html" %}
+
+{% set show_header = false %}
+
+{% block title %}模块市场 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}模块市场{% endblock %}
+
+{% block admin_content %}
+<!-- 筛选栏 -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <!-- 类型筛选 -->
+            <div class="col-md-4">
+                <label class="form-label small text-muted">模块类型</label>
+                <select name="type" class="form-select">
+                    <option value="">全部类型</option>
+                    <option value="node" {% if type_filter == 'node' %}selected{% endif %}>Node（事务节点）</option>
+                    <option value="system" {% if type_filter == 'system' %}selected{% endif %}>System（系统模块）</option>
+                    <option value="tool" {% if type_filter == 'tool' %}selected{% endif %}>Tool（协作工具）</option>
+                </select>
+            </div>
+            
+            <!-- 按钮和清除筛选 -->
+            <div class="col-md-6">
+                <button type="submit" class="btn btn-primary btn-circle">
+                    <i class="bi bi-search"></i>
+                </button>
+                {% if type_filter %}
+                <a href="{{ url('market:index') }}" class="btn btn-sm btn-outline-secondary ms-2">
+                    <i class="bi bi-x-circle"></i> 清除筛选
+                </a>
+                <span class="text-muted small ms-2">
+                    找到 {{ page_obj.paginator.count }} 个模块
+                </span>
+                {% endif %}
+            </div>
+            
+            <!-- 提示信息 -->
+            <div class="col-md-12">
+                <div class="border rounded p-2 mt-2 bg-light small">
+                    <i class="bi bi-info-circle text-primary me-1"></i>
+                    从市场下载模块后，需要在模块管理页面进行安装和启用操作。更新模块后需要重启服务器。
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 模块卡片列表 -->
+{% if not modules %}
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i> 暂无可用的模块
+</div>
+{% else %}
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+    {% for module in modules %}
+    {% set mod_id = module.id %}
+    {% set mod_name = module.name %}
+    {% set mod_icon = module.icon|default('bi-box-seam') %}
+    {% set mod_version = module.market_version|default('') %}
+    {% set mod_description = module.description|default('暂无描述') %}
+    {% set mod_type = module.type|default('node') %}
+    {% set is_installed = module.installed %}
+    {% set has_update = module.has_update %}
+    
+    <div class="col">
+        {% if has_update %}
+        <div class="entry-card h-100 border-warning">
+            <div class="entry-card-figure bg-warning text-dark">
+                <i class="bi {{ mod_icon }}"></i>
+                <h5 class="entry-card-title">{{ mod_name }}</h5>
+            </div>
+            <div class="entry-card-body d-flex flex-column">
+                <div class="mb-2 small">
+                    <code>{{ mod_id }}</code>
+                    <span class="badge bg-primary ms-1">{{ mod_type }}</span>
+                    <span class="badge bg-warning ms-1">有更新</span>
+                    {% if mod_version %}
+                    <span class="badge bg-info ms-1">v{{ mod_version }}</span>
+                    {% endif %}
+                </div>
+                <p class="entry-card-desc small text-muted mb-3 flex-grow-1">
+                    {{ mod_description|truncatechars(60) }}
+                </p>
+                {% if module.installed_version %}
+                <div class="small text-muted mb-2">
+                    当前版本: {{ module.installed_version }} → 市场版本: {{ mod_version }}
+                </div>
+                {% endif %}
+                <div class="entry-card-actions mt-auto">
+                    <button type="button" 
+                            class="btn btn-sm btn-warning btn-download"
+                            data-module-id="{{ mod_id }}"
+                            data-action="upgrade">
+                        <i class="bi bi-arrow-up-circle"></i> 升级
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% elif is_installed %}
+        <div class="entry-card h-100 border-success">
+            <div class="entry-card-figure bg-success text-white">
+                <i class="bi {{ mod_icon }}"></i>
+                <h5 class="entry-card-title">{{ mod_name }}</h5>
+            </div>
+            <div class="entry-card-body d-flex flex-column">
+                <div class="mb-2 small">
+                    <code>{{ mod_id }}</code>
+                    <span class="badge bg-primary ms-1">{{ mod_type }}</span>
+                    <span class="badge bg-success ms-1">已安装</span>
+                    {% if module.installed_version %}
+                    <span class="badge bg-info ms-1">v{{ module.installed_version }}</span>
+                    {% endif %}
+                </div>
+                <p class="entry-card-desc small text-muted mb-3 flex-grow-1">
+                    {{ mod_description|truncatechars(60) }}
+                </p>
+                <div class="entry-card-actions mt-auto">
+                    <button type="button" class="btn btn-sm btn-secondary" disabled>
+                        <i class="bi bi-check-lg"></i> 已是最新
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="entry-card h-100 border-dashed">
+            <div class="entry-card-figure bg-light text-dark">
+                <i class="bi {{ mod_icon }}"></i>
+                <h5 class="entry-card-title" style="opacity: 0.5;">{{ mod_name }}</h5>
+            </div>
+            <div class="entry-card-body d-flex flex-column">
+                <div class="mb-2 small">
+                    <code>{{ mod_id }}</code>
+                    <span class="badge bg-primary ms-1">{{ mod_type }}</span>
+                    <span class="badge bg-warning ms-1">未安装</span>
+                    {% if mod_version %}
+                    <span class="badge bg-info ms-1">v{{ mod_version }}</span>
+                    {% endif %}
+                </div>
+                <p class="entry-card-desc small text-muted mb-3 flex-grow-1">
+                    {{ mod_description|truncatechars(60) }}
+                </p>
+                <div class="entry-card-actions mt-auto">
+                    <button type="button" 
+                            class="btn btn-sm btn-primary btn-download"
+                            data-module-id="{{ mod_id }}"
+                            data-action="install">
+                        <i class="bi bi-download"></i> 下载
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+
+<!-- 分页控件 -->
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+<nav aria-label="模块分页" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous() %}
+        <li class="page-item">
+            <a class="page-link" href="{{ base_query }}page={{ page_obj.previous_page_number() }}">
+                上一页
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">上一页</span>
+        </li>
+        {% endif %}
+        
+        {% for p in page_range %}
+        <li class="page-item {% if p == current_page %}active{% endif %}">
+            <a class="page-link" href="{{ base_query }}page={{ p }}">
+                {{ p }}
+            </a>
+        </li>
+        {% endfor %}
+        
+        {% if page_obj.has_next() %}
+        <li class="page-item">
+            <a class="page-link" href="{{ base_query }}page={{ page_obj.next_page_number() }}">
+                下一页
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">下一页</span>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+(function() {
+    document.querySelectorAll('.btn-download').forEach(function(btn) {
+        if (btn.dataset.bound) return;
+        btn.dataset.bound = 'true';
+        
+        btn.addEventListener('click', function() {
+            const moduleId = this.dataset.moduleId;
+            const action = this.dataset.action || 'install';
+            const originalHtml = this.innerHTML;
+            const isUpgrade = action === 'upgrade';
+            
+            this.disabled = true;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> ' + (isUpgrade ? '升级中...' : '下载中...');
+            
+            fetch('/market/install/' + moduleId + '/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token_value }}',
+                },
+                body: 'module_id=' + encodeURIComponent(moduleId),
+            })
+            .then(function(response) {
+                if (response.redirected) {
+                    alert('请先登录');
+                    return { success: false, error: '请先登录' };
+                }
+                return response.json();
+            })
+            .then(function(data) {
+                if (data.success) {
+                    btn.innerHTML = '<i class="bi bi-check-lg"></i> ' + (isUpgrade ? '升级成功' : '下载成功');
+                    btn.classList.remove(isUpgrade ? 'btn-warning' : 'btn-primary');
+                    btn.classList.add('btn-success');
+                    
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    btn.innerHTML = '<i class="bi bi-x-lg"></i> 失败';
+                    btn.classList.remove(isUpgrade ? 'btn-warning' : 'btn-primary');
+                    btn.classList.add('btn-danger');
+                    alert((isUpgrade ? '升级' : '下载') + '失败: ' + (data.error || '未知错误'));
+                    setTimeout(function() {
+                        btn.disabled = false;
+                        btn.innerHTML = originalHtml;
+                        btn.classList.remove('btn-danger');
+                        btn.classList.add(isUpgrade ? 'btn-warning' : 'btn-primary');
+                    }, 2000);
+                }
+            })
+            .catch(function(error) {
+                btn.innerHTML = '<i class="bi bi-x-lg"></i> 失败';
+                btn.classList.remove(isUpgrade ? 'btn-warning' : 'btn-primary');
+                btn.classList.add('btn-danger');
+                alert((isUpgrade ? '升级' : '下载') + '失败: ' + error);
+                setTimeout(function() {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                    btn.classList.remove('btn-danger');
+                    btn.classList.add(isUpgrade ? 'btn-warning' : 'btn-primary');
+                }, 2000);
+            });
+        });
+    });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,134 @@
+{% extends "frames/frame_admin.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+{% set active_section = 'logs' %}
+
+{% block title %}日志管理 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}日志管理{% endblock %}
+
+{% block admin_buttons_content %}{% endblock %}
+
+{% block admin_content %}
+
+<!-- 日志卡片（合并过滤 + 列表） -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="bi bi-terminal me-2"></i>
+            {% set log_names = {'cimf': '系统日志', 'error': '错误日志', 'security': '安全日志'} %}
+            {{ log_names[log_type] if log_type and log_type in log_names else '日志内容' }}
+        </h5>
+    </div>
+    <div class="card-body">
+        <!-- 过滤栏：文件 pills + 级别筛选 -->
+        <div class="d-flex align-items-end gap-2" style="margin-bottom:-1px">
+            <ul class="nav nav-pills nav-pills-outline flex-wrap gap-2 mb-0">
+                {% for log_file in log_files %}
+                <li class="nav-item">
+                    <a class="nav-link {% if log_type == log_file.key or (not log_type and log_file.key == 'cimf') %}active{% endif %} d-flex align-items-center" 
+                       href="{{ url('core:logs_view', log_type=log_file.key) }}">
+                        <i class="bi bi-file-earmark me-1"></i>
+                        {{ log_file.name }}
+                        {% if log_file.exists %}
+                        <span class="badge ms-2" style="background:#f57c00;color:#fff">{{ (log_file.size // 1024) }}KB</span>
+                        {% else %}
+                        <span class="badge bg-warning ms-2">不存在</span>
+                        {% endif %}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% if log_data %}
+            {% set current_stats = stats[log_type] if log_type and stats[log_type] else (stats.cimf if stats.cimf else {}) %}
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                {% if current_stats and current_stats.get('levels') %}
+                {% for level, count in current_stats.levels.items() %}
+                <span class="badge {% if level == 'ERROR' %}bg-danger{% elif level == 'WARNING' %}bg-warning{% elif level == 'INFO' %}bg-info{% else %}bg-secondary{% endif %}">
+                    {{ level }}: {{ count }}
+                </span>
+                {% endfor %}
+                {% endif %}
+                <select class="form-select form-select-sm" style="width: auto;" onchange="filterByLevel(this.value)">
+                    <option value="all" {% if current_level == 'all' %}selected{% endif %}>全部级别</option>
+                    <option value="DEBUG" {% if current_level == 'DEBUG' %}selected{% endif %}>DEBUG</option>
+                    <option value="INFO" {% if current_level == 'INFO' %}selected{% endif %}>INFO</option>
+                    <option value="WARNING" {% if current_level == 'WARNING' %}selected{% endif %}>WARNING</option>
+                    <option value="ERROR" {% if current_level == 'ERROR' %}selected{% endif %}>ERROR</option>
+                </select>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if log_data %}
+        <div class="log-table-wrap table-responsive">
+            <table class="table table-hover mb-0" style="font-size: 0.9rem;">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 80px;">行号</th>
+                        <th>日志内容</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for line in log_data.lines %}
+                    <tr>
+                        <td class="text-muted fw-medium">{{ line.line_num }}</td>
+                        <td style="word-break: break-all; white-space: pre-wrap; font-family: var(--bs-font-monospace, monospace);">{{ line.content }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center text-muted py-4">
+            {% if log_type %}
+            暂无日志内容
+            {% else %}
+            选择上方日志文件查看内容
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    {% if log_data and log_data.total_pages > 1 %}
+    <div class="card-footer">
+        <nav>
+            <ul class="pagination justify-content-center mb-0">
+                {% if log_data.page > 1 %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ log_data.page - 1 }}&level={{ current_level }}">上一页</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">上一页</span>
+                </li>
+                {% endif %}
+                
+                <li class="page-item active">
+                    <span class="page-link">第 {{ log_data.page }} / {{ log_data.total_pages }} 页 (共 {{ log_data.total }} 条)</span>
+                </li>
+                
+                {% if log_data.page < log_data.total_pages %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ log_data.page + 1 }}&level={{ current_level }}">下一页</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">下一页</span>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function filterByLevel(level) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('level', level);
+    url.searchParams.set('page', '1');
+    window.location.href = url.toString();
+}
+</script>
+{% endblock %}

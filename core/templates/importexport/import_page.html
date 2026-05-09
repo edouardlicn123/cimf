@@ -1,0 +1,173 @@
+{% extends "frames/frame_importexport.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'import' %}
+
+{% block title %}导入 {{ node_type.name }} - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}
+  导入 {{ node_type.name }}
+{% endblock %}
+
+{% block admin_content %}
+<div class="card mb-4">
+    <div class="card-body">
+        <h5>步骤 1：下载模板</h5>
+        <p>请先下载导入模板，填写数据后再上传</p>
+        <a href="{{ url('importexport:download_template', node_type.slug) }}" class="btn btn-success">
+            <i class="bi bi-download"></i> 下载模板
+        </a>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5>步骤 2：上传文件</h5>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <div class="mb-3">
+                <input type="file" name="file" id="fileInput" accept=".xlsx,.xls,.csv" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">上传并预览</button>
+        </form>
+        
+        <div id="uploadResult" class="mt-3" style="display: none;">
+            <div class="alert alert-info">
+                <p>文件名：<span id="filename"></span></p>
+                <p>总行数：<span id="totalRows"></span></p>
+                <p>有效行数：<span id="validCount" class="text-success"></span></p>
+                <p>错误行数：<span id="errorCount" class="text-danger"></span></p>
+            </div>
+            
+            <div id="previewSection" class="mb-3" style="display: none;">
+                <h6>数据预览（前10行）：</h6>
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table id="previewTable" class="table table-sm table-bordered table-striped">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="errorList" class="mb-3" style="display: none;">
+                <h6>错误列表：</h6>
+                <ul class="text-danger" style="max-height: 200px; overflow-y: auto;"></ul>
+            </div>
+            
+            <form action="{{ url('importexport:do_import', node_type.slug) }}" method="post">
+                {% include "includes/csrf.html" %}
+                <button type="submit" class="btn btn-success">确认导入</button>
+                <a href="{{ url('importexport:import_page', node_type.slug) }}" class="btn btn-secondary">重新上传</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<a href="{{ url('importexport:import_list') }}" class="btn btn-link">&larr; 返回导入列表</a>
+
+<script>
+document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+    if (!file) {
+        alert('请选择文件');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+        const response = await fetch("{{ url('importexport:upload_preview', node_type.slug) }}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            document.getElementById('uploadResult').style.display = 'block';
+            document.getElementById('filename').textContent = result.data.filename;
+            document.getElementById('totalRows').textContent = result.data.total_rows;
+            document.getElementById('validCount').textContent = result.data.valid_count;
+            document.getElementById('errorCount').textContent = result.data.error_count;
+            
+            const previewSection = document.getElementById('previewSection');
+            const previewTable = document.getElementById('previewTable');
+            const thead = previewTable.querySelector('thead');
+            const tbody = previewTable.querySelector('tbody');
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+            
+            if (result.data.preview && result.data.preview.length > 0) {
+                previewSection.style.display = 'block';
+                
+                const headerRow = document.createElement('tr');
+                result.data.headers.forEach(function(h) {
+                    const th = document.createElement('th');
+                    th.textContent = h;
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                
+                result.data.preview.forEach(function(row) {
+                    const tr = document.createElement('tr');
+                    result.data.headers.forEach(function(h) {
+                        const td = document.createElement('td');
+                        td.textContent = row[h] || '';
+                        td.style.maxWidth = '200px';
+                        td.style.overflow = 'hidden';
+                        td.style.textOverflow = 'ellipsis';
+                        td.style.whiteSpace = 'nowrap';
+                        tr.appendChild(td);
+                    });
+                    tbody.appendChild(tr);
+                });
+            } else {
+                previewSection.style.display = 'none';
+            }
+            
+            const errorList = document.getElementById('errorList');
+            const errorUl = errorList.querySelector('ul');
+            errorUl.innerHTML = '';
+            
+            if (result.data.errors && result.data.errors.length > 0) {
+                errorList.style.display = 'block';
+                result.data.errors.forEach(function(err) {
+                    const li = document.createElement('li');
+                    li.textContent = '第' + err.row + '行: ' + err.message;
+                    errorUl.appendChild(li);
+                });
+            } else {
+                errorList.style.display = 'none';
+            }
+        } else {
+            alert('上传失败: ' + result.error);
+        }
+    } catch (error) {
+        alert('上传出错: ' + error.message);
+    }
+});
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends "frames/frame_myinfo.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'profile' %}
+
+{% block title %}个人信息 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}个人信息{% endblock %}
+
+{% block admin_buttons_content %}{% endblock %}
+
+{% block admin_content %}
+
+<div class="row g-4">
+  <div class="col-md-6">
+    <div class="card mb-3">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-person me-2"></i>基本信息</h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label fw-medium text-muted mb-1">登录账号</label>
+            <div>{{ user.username }}</div>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-medium text-muted mb-1">显示昵称</label>
+            <div>{{ user.nickname|default('未设置') }}</div>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-medium text-muted mb-1">邮箱地址</label>
+            <div>{{ user.email|default('未设置') }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card mb-3">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-shield-lock me-2"></i>账号信息</h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label fw-medium text-muted mb-1">账号角色</label>
+            <div>
+              {% set role = user.role %}
+              {% set role_labels = role_labels %}
+              {% include "includes/role_badge.html" %}
+            </div>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-medium text-muted mb-1">账号状态</label>
+            <div>
+              {% if user.is_active %}
+                <span class="badge bg-success">正常</span>
+              {% else %}
+                <span class="badge bg-danger">已禁用</span>
+              {% endif %}
+            </div>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-medium text-muted mb-1">账号创建时间</label>
+            <div>{{ user.created_at|date('Y-m-d H:i') }}</div>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-medium text-muted mb-1">最后登录时间</label>
+            <div>{% if user.last_login_at %}{{ user.last_login_at|date('Y-m-d H:i:s') }}{% else %}首次登录{% endif %}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card mb-3">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-palette me-2"></i>系统偏好</h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label fw-medium text-muted mb-1">界面主题</label>
+            <div>{{ theme_labels.get(user.theme, user.theme) }}</div>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-medium text-muted mb-1">系统通知</label>
+            <div>
+              {% if user.notifications_enabled %}
+                <span class="badge bg-success">已开启</span>
+              {% else %}
+                <span class="badge bg-secondary">已关闭</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

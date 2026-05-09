@@ -1,0 +1,67 @@
+{% extends "frames/frame_structure.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'dashboard' %}
+
+{% block title %}内容结构 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}
+  内容结构
+{% endblock %}
+
+{% block admin_content %}
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+  <div class="col d-flex">
+    <div class="card shadow-sm border-0 rounded-3 h-100 w-100">
+      <div class="card-body d-flex flex-column">
+        <h5 class="card-title">
+          <i class="bi bi-box-seam me-2 text-primary"></i>
+          节点类型管理
+        </h5>
+        <p class="card-text text-muted small flex-grow-1">
+          管理业务节点的类型定义，如客户、会员、项目等
+        </p>
+        <a href="{{ url('module:list') }}" class="btn btn-primary">
+          <i class="bi bi-arrow-right me-1"></i> 管理
+        </a>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col d-flex">
+    <div class="card shadow-sm border-0 rounded-3 h-100 w-100">
+      <div class="card-body d-flex flex-column">
+        <h5 class="card-title">
+          <i class="bi bi-tags me-2 text-primary"></i>
+          词汇表管理
+        </h5>
+        <p class="card-text text-muted small flex-grow-1">
+          管理分类词汇，如国家、客户类型、行业等
+        </p>
+        <a href="{{ url('core:taxonomies') }}" class="btn btn-primary">
+          <i class="bi bi-arrow-right me-1"></i> 管理
+        </a>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col d-flex">
+    <div class="card shadow-sm border-0 rounded-3 h-100 w-100">
+      <div class="card-body d-flex flex-column">
+        <h5 class="card-title">
+          <i class="bi bi-ui-checks me-2 text-primary"></i>
+          字段类型
+        </h5>
+        <p class="card-text text-muted small flex-grow-1">
+          查看系统支持的字段类型，如字符串、数字、日期等
+        </p>
+        <a href="{{ url('core:field_types') }}" class="btn btn-primary">
+          <i class="bi bi-arrow-right me-1"></i> 查看
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

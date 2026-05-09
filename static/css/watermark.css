@@ -1,0 +1,61 @@
+/*
+ * watermark.css
+ * 网页水印样式
+ * 用于防止用户截图泄露信息
+ */
+
+/* 水印容器 - 固定定位全屏，放在最上层 */
+.watermark-container {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    pointer-events: none !important;
+    z-index: 99999 !important;
+    overflow: hidden;
+    background: transparent !important;
+}
+
+/* 水印项 */
+.watermark-item {
+    font-size: 20px;
+    font-weight: bold;
+    color: #aaa;
+    white-space: nowrap;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+}
+
+/* 控制台警告弹窗 */
+.watermark-warning {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    background: #ffc107 !important;
+    color: #000 !important;
+    padding: 20px 40px !important;
+    border-radius: 8px !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    z-index: 999999 !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3) !important;
+    display: none;
+}
+
+/* 水印被移除警告 */
+.watermark-removed-warning {
+    position: fixed !important;
+    top: 10px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    background: #dc3545 !important;
+    color: #fff !important;
+    padding: 10px 20px !important;
+    border-radius: 4px !important;
+    font-size: 14px !important;
+    z-index: 999999 !important;
+    display: none;
+}
