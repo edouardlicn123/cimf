@@ -949,4 +949,35 @@
 52. 修正 getLunarDate() 中 month-finding 循环 regM 计算：添加 leap>0 守卫避免非闰年时错位一位，消除 undefined 月名
 53. 修复 lunarInfo[59] 数据错误：0x6aa6→0x6aa0（1959年误设闰月导致所有后续日期偏移29天），现已与 lunardate 权威数据一致
 54. 农历年份后增加生肖显示
+55. 新增鹿島ノ森主题(kajima)和鹿島ノ森暖色主题(kajima_warm)：基于kajimanomori.co.jp配色，kajima使用深森林绿+暖灰+赭褐，kajima_warm完全去除绿色使用赭褐+暖灰+近黑
+56. 调浅kajima主题绿色：主色#222f25→#4a6b50，辅助绿相应调浅，阴影/文字色同步更新
+57. 调浅kajima主题绿色至中间值#364d3b（介于原#222f25与#4a6b50之间）
+58. kajima_warm主题navbar背景色改为#364d3b（取自kajima主题主色）
+59. 删除绿色kajima主题，将kajima_warm重命名为kajima作为唯一的鹿島ノ森主题
+60. 将鹿島ノ森主题改名为绿岛森林
+61. 删除uniklo主题
+62. 更新savawoku主题：精调配色+红橙渐变navbar+按钮渐变动画+entry-card渐变
+63. 新增踊主题(odoru)：基于fukunagaazusa.jp配色，青绿+奶油暖白+暖褐，温暖文艺风
+64. 删除青绿主题(teal)，savawoku改名为橙红
+
+# 2026-05-10 修改记录
+
+1. 创建 tais（大正紫）主题，基于 www.tais.ac.jp 配色：主色 #514068 紫 + 强调 #ef8bae 粉
+2. 大正紫 → 梵紫 改名
+3. tais（梵紫）主题颜色丰富化：添加学部多彩色、渐变 navbar、Bootstrap 变量映射、多种组件样式
+4. 修复 tais 主题中 .card-body 独立边框问题，卡片遵守基本卡片规则
+5. 修复 tais 主题卡片底部圆角被 card-footer 背景遮挡的问题
+6. 修复 tais 主题卡片圆角：header/footer 各自设置 border-radius，不再依赖 overflow 裁剪
+7. tais 主题：card-header 背景透明 + 粉色底边 accent 线
+8. tais 主题多处添加粉色 accent 线条：表头/分页/tabs/列表组/模态框/分割线/链接悬停/表单焦点/card-icon/卡片悬停等
+9. tais 主题卡片右上角改为直角
+10. tais 主题卡片右上角改为直角：移除 frame.css 中 !important border-radius 限制，tais.css 接管控制
+11. 所有主题：卡片内容区左上角改为直角，frame.css 设 border-radius: 0 var(--radius-sm) var(--radius-sm) var(--radius-sm)
+12. 马卡龙主题 navbar 背景加深为 #6A5C8A，菜单文字改为白色
+13. 马卡龙 navbar 背景微调 #6A5C8A → #7D71A0 变浅
+14. 马卡龙 navbar 改为直角
+15. 马卡龙主题：左侧菜单选中文字白色，非选中文字外发光 1px
+16. 马卡龙主题：选中菜单白色文字 + 1px 绿色外发光
+17. 马卡龙主题：恢复选中菜单原始样式
+18. 大正紫主题：卡片内容区右上角改为直角
 

@@ -23,7 +23,7 @@
 # ============================================================
 
 VERSION_MAJOR = '1'
-VERSION_MINOR = 766
+VERSION_MINOR = 794
 
 def get_version_display():
     return f"v{VERSION_MAJOR}.{VERSION_MINOR:03d}"
@@ -68,18 +68,20 @@ class UserTheme:
     GOV = 'gov'
     INDIGO = 'indigo'
     MACARON = 'macaron'
-    TEAL = 'teal'
-    UNIKLO = 'uniklo'
     SAVAWOKU = 'savawoku'
+    KAJIMA = 'kajima'
+    ODOGU = 'odoru'
+    TAIS = 'tais'
     
     CHOICES = [
         (DEFAULT, '默认'),
         (GOV, '浓重红色'),
         (INDIGO, '靛蓝'),
         (MACARON, '马卡龙'),
-        (TEAL, '青绿'),
-        (UNIKLO, 'uniklo'),
-        (SAVAWOKU, 'Savawoku'),
+        (SAVAWOKU, '橙红'),
+        (KAJIMA, '绿岛森林'),
+        (ODOGU, '踊'),
+        (TAIS, '梵紫'),
     ]
     
     LABELS = {
@@ -87,9 +89,10 @@ class UserTheme:
         GOV: '浓重红色',
         INDIGO: '靛蓝',
         MACARON: '马卡龙',
-        TEAL: '青绿',
-        UNIKLO: 'uniklo',
-        SAVAWOKU: 'Savawoku',
+        SAVAWOKU: '橙红',
+        KAJIMA: '绿岛森林',
+        ODOGU: '踊',
+        TAIS: '梵紫',
     }
     
     DISPLAY_LABELS = LABELS.copy()

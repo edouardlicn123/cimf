@@ -76,9 +76,10 @@ class User(AbstractUser):
         GOV = UserTheme.GOV, UserTheme.LABELS[UserTheme.GOV]
         INDIGO = UserTheme.INDIGO, UserTheme.LABELS[UserTheme.INDIGO]
         MACARON = UserTheme.MACARON, UserTheme.LABELS[UserTheme.MACARON]
-        TEAL = UserTheme.TEAL, UserTheme.LABELS[UserTheme.TEAL]
-        UNIKLO = UserTheme.UNIKLO, UserTheme.LABELS[UserTheme.UNIKLO]
         SAVAWOKU = UserTheme.SAVAWOKU, UserTheme.LABELS[UserTheme.SAVAWOKU]
+        KAJIMA = UserTheme.KAJIMA, UserTheme.LABELS[UserTheme.KAJIMA]
+        ODOGU = UserTheme.ODOGU, UserTheme.LABELS[UserTheme.ODOGU]
+        TAIS = UserTheme.TAIS, UserTheme.LABELS[UserTheme.TAIS]
     
     nickname = models.CharField(
         max_length=64,

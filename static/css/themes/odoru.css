@@ -1,92 +1,87 @@
 /*
- * teal.css
- * FFE 项目跟进系统 - Teal 青绿专业主题（适合医院/医疗/环保机构）
- * 版本：2026-02-17 v3.2（取消左侧导航菜单圆角 + 统一修复）
- * 
- * 配色灵感：Teal 青绿（医院/健康/环保常见色调），参考 LinkedIn 专业结构
- * 主色       #006D5B   深鸭绿（主蓝替代）
- * 辅助/信息  #009688   中青绿
- * 强调/警告  #FFB74D   柔和橙（少用）
- * 危险       #E53935   专业红
- * 背景基调   #F5F8FA → #FFFFFF  浅蓝灰白到纯白
- * 圆角：全局保持小圆角（4-8px），但左侧导航菜单已取消圆角（0px）
- * 新增/变更：
- *   - 左侧导航 .nav-link、.nav-item、.admin-sidebar 等所有圆角设为 0px
- *   - 修复导航高亮 + 按钮 hover 跟随主题（v3.1 延续）
- *   - 彻底修复宽屏下右侧用户下拉菜单被挤压/右移/只显示一小块（v6 方案，与其他主题统一）
- *   - dashboard 卡片等宽强制修复（card 320px + card-body 100% 撑满）
+ * odoru.css
+ * CIMF - 踊主题（温暖文艺风）
+ * 版本：2026-05-09 v1.0
+ *
+ * 配色灵感：福永あずさ「踊」 https://fukunagaazusa.jp/
+ * 主色       #0ba29a   青绿（唯一高饱和色）
+ * 背景       #fdfbef   奶油暖白
+ * 文字       #493c33   深褐色
+ * 点缀       #f5a96e   暖橙
  */
 
 :root {
-  /* 主色系 - Teal 青绿 */
-  --primary:           #006D5B;     /* 深鸭绿 - 主导航、按钮 */
-  --primary-hover:     #00554A;
-  --primary-active:    #003D35;
-  --primary-light:     rgba(0, 109, 91, 0.10);
-  --primary-extra-light: rgba(0, 109, 91, 0.05);
+  /* 主色系 - 青绿 */
+  --primary:           #0ba29a;
+  --primary-hover:     #098a82;
+  --primary-active:    #07726b;
+  --primary-light:     rgba(11, 162, 154, 0.10);
+  --primary-extra-light: rgba(11, 162, 154, 0.05);
 
-  /* 信息 / 辅助 */
-  --info:              #009688;
-  --info-hover:        #00796B;
-  --info-active:       #00695C;
-  --info-light:        rgba(0, 150, 136, 0.10);
+  /* 信息 / 辅助 - 青绿 */
+  --info:              #0ba29a;
+  --info-hover:        #098a82;
+  --info-light:        rgba(11, 162, 154, 0.10);
 
-  /* 成功 */
-  --success:           #388E3C;
-  --success-hover:     #2E7D32;
+  /* 成功 - 柔和绿 */
+  --success:           #5a9e6a;
+  --success-hover:     #4a8a5a;
 
-  /* 警告 / 强调 */
-  --warning:           #FFB74D;
-  --warning-hover:     #FFA726;
-  --warning-light:     rgba(255, 183, 77, 0.12);
+  /* 警告 / 强调 - 暖橙 */
+  --warning:           #f5a96e;
+  --warning-hover:     #e09050;
+  --warning-light:     rgba(245, 169, 110, 0.15);
 
-  /* 危险 */
-  --danger:            #E53935;
-  --danger-hover:      #C62828;
-  --danger-light:      rgba(229, 57, 53, 0.10);
+  /* 危险 - 暖红 */
+  --danger:            #c0392b;
+  --danger-hover:      #a33226;
+  --danger-light:      rgba(192, 57, 43, 0.10);
 
-  /* 背景 */
-  --bg-body:           #F5F8FA;     /* 极浅蓝灰白 - 医疗/环保常用 */
-  --bg-gradient:       linear-gradient(to bottom, #F5F8FA 0%, #FFFFFF 100%);
-  --bg-surface:        #FFFFFF;
-  --bg-card:           #FFFFFF;
-  --bg-nav:            #006D5B;     /* 主菜单区深鸭绿背景 */
-  --bg-nav-text:       #FFFFFF;     /* 主菜单区白色文字 */
-  --bg-footer:         #F5F8FA;
+  /* 背景 - 奶油暖白 */
+  --bg-body:           #fdfbef;
+  --bg-gradient:       linear-gradient(to bottom, #fdfbef 0%, #ffffff 100%);
+  --bg-surface:        #ffffff;
+  --bg-card:           #ffffff;
+  --bg-nav:            #0ba29a;
+  --bg-nav-text:       #ffffff;
+  --bg-footer:         #493c33;
 
-  /* 文字 */
-  --text-primary:      #0D1B2A;     /* 深蓝灰 - 高对比 */
-  --text-secondary:    #334155;
-  --text-muted:        #64748B;
-  --text-inverted:     #FFFFFF;
-  --text-nav:          #FFFFFF;     /* 主菜单文字白色 */
-  --text-nav-active:   #FFFFFF;
+  /* 文字 - 暖褐色系 */
+  --text-primary:      #493c33;
+  --text-secondary:    #5a4f48;
+  --text-muted:        #8a8078;
+  --text-inverted:     #ffffff;
+  --text-nav:          #ffffff;
+  --text-nav-active:   #ffffff;
 
   /* 边框 & 分割 */
-  --border:            #CBD5E1;
-  --border-light:      #E2E8F0;
-  --border-focus:      #006D5B;
+  --border:            #e7e7e7;
+  --border-light:      #f0ece0;
+  --border-focus:      #0ba29a;
 
-  /* 阴影 - 极克制 */
-  --shadow-sm:         0 1px 3px rgba(0, 0, 0, 0.06);
-  --shadow:            0 2px 6px rgba(0, 0, 0, 0.08);
-  --shadow-hover:      0 4px 12px rgba(0, 0, 0, 0.10);
-  --shadow-nav:        0 2px 4px rgba(0, 0, 0, 0.06);
+  /* 阴影 - 柔和暖调 */
+  --shadow-sm:         0 1px 3px rgba(73, 60, 51, 0.06);
+  --shadow:            0 2px 6px rgba(73, 60, 51, 0.08);
+  --shadow-hover:      0 4px 12px rgba(73, 60, 51, 0.10);
+  --shadow-nav:        0 2px 4px rgba(73, 60, 51, 0.06);
 
-  /* 圆角 - 全局保持小圆角，但导航菜单已取消 */
-  --radius-sm:         0px;         /* 导航菜单专用：取消圆角 */
-  --radius:            4px;
-  --radius-lg:         6px;
-  --radius-xl:         8px;
+  /* 圆角 - 偏圆润，呼应手绘感 */
+  --radius-sm:         4px;
+  --radius:            6px;
+  --radius-lg:         10px;
+  --radius-xl:         12px;
   --radius-pill:       9999px;
 
   /* 过渡 */
   --transition:        all 0.18s ease;
   --transition-slow:   all 0.25s ease;
+
+  /* 卡片渐变 */
+  --entry-card-gradient: linear-gradient(135deg, #0ba29a 0%, #5a9e6a 100%);
 }
 
 /* ──────────────────────────────────────────────
-   全局基础 + 防溢出（与 linkedin/dopamine/macaron/uniklo 保持一致）
+   全局基础 + 防溢出
 ───────────────────────────────────────────────── */
 * {
   box-sizing: border-box !important;
@@ -120,73 +115,67 @@ main.container,
 }
 
 /* ──────────────────────────────────────────────
-   导航栏 - 主菜单区深鸭绿背景 + 白色文字
+   导航栏 - 青绿背景 + 白色文字
 ───────────────────────────────────────────────── */
 
-.navbar-teal {
+.navbar-odoru {
   background-color: var(--bg-nav) !important;
   border-bottom: 1px solid rgba(255,255,255,0.12) !important;
   box-shadow: var(--shadow-nav) !important;
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
+  border-radius: 0 !important;
   transition: var(--transition) !important;
 }
 
-/* 主菜单区所有文字强制白色 */
-.navbar-teal,
-.navbar-teal .navbar-brand,
-.navbar-teal .nav-link,
-.navbar-teal .nav-link:hover,
-.navbar-teal .nav-link.active,
-.navbar-teal .navbar-toggler-icon {
+.navbar-odoru,
+.navbar-odoru .navbar-brand,
+.navbar-odoru .nav-link,
+.navbar-odoru .nav-link:hover,
+.navbar-odoru .nav-link.active,
+.navbar-odoru .navbar-toggler-icon {
   color: var(--text-nav) !important;
 }
 
-/* 展开内容区无额外边框和阴影 */
-.navbar-teal .collapse.navbar-collapse,
-.navbar-teal .navbar-collapse.show {
+.navbar-odoru .collapse.navbar-collapse,
+.navbar-odoru .navbar-collapse.show {
   border: none !important;
   box-shadow: none !important;
   background: transparent !important;
 }
 
-/* 个人下拉菜单 - 维持白色背景 + 深色文字 */
-.navbar-teal .dropdown-menu {
+.navbar-odoru .dropdown-menu {
   background-color: #ffffff !important;
   border: 1px solid var(--border-light) !important;
   border-radius: var(--radius) !important;
   box-shadow: var(--shadow-sm) !important;
 }
 
-.navbar-teal .dropdown-item {
+.navbar-odoru .dropdown-item {
   color: var(--text-primary) !important;
 }
 
-.navbar-teal .dropdown-item:hover,
-.navbar-teal .dropdown-item:focus {
+.navbar-odoru .dropdown-item:hover,
+.navbar-odoru .dropdown-item:focus {
   background-color: var(--primary-light) !important;
   color: var(--primary) !important;
 }
 
-/* 退出链接保持红色 */
-.navbar-teal .logout-link {
+.navbar-odoru .logout-link {
   color: var(--danger) !important;
 }
 
-/* 未登录“登录”按钮 - 白色边框 + 白色文字（适配深色背景） */
-.navbar-teal .login-btn {
+.navbar-odoru .login-btn {
   border-color: white !important;
   color: white !important;
   background: transparent !important;
 }
 
-.navbar-teal .login-btn:hover {
+.navbar-odoru .login-btn:hover {
   background-color: white !important;
   color: var(--primary) !important;
 }
 
 /* ──────────────────────────────────────────────
-   左侧导航高亮（.nav-link.active）跟随主题主色
-   导航菜单圆角已全部取消（0px）
+   左侧导航高亮
 ───────────────────────────────────────────────── */
 .admin-sidebar .nav-link,
 .admin-sidebar .nav-item,
@@ -195,7 +184,7 @@ main.container,
 .admin-sidebar .nav-link.active:focus,
 .admin-sidebar .nav-link:hover,
 .admin-sidebar .nav-link:focus {
-  border-radius: 0 !important; /* 彻底取消导航菜单圆角 */
+  border-radius: 0 !important;
 }
 
 .admin-sidebar .nav-link.active,
@@ -212,10 +201,9 @@ main.container,
 }
 
 /* ──────────────────────────────────────────────
-   彻底修复宽屏下右侧用户菜单被挤压/右移/只显示一小块（v6 最终加强版，与其他主题统一）
+   宽屏右侧用户菜单
 ───────────────────────────────────────────────── */
 @media (min-width: 992px) {
-
   .navbar-expand-lg .navbar-nav.ms-auto {
     flex: 0 0 auto !important;
     flex-shrink: 0 !important;
@@ -270,7 +258,6 @@ main.container,
   }
 }
 
-/* 全局保险措施 */
 .dropdown {
   overflow: visible !important;
   position: relative !important;
@@ -324,7 +311,7 @@ main.container,
 }
 
 /* ──────────────────────────────────────────────
-   Dashboard 调整
+   Dashboard
 ───────────────────────────────────────────────── */
 
 .welcome-title {
@@ -343,64 +330,6 @@ main.container,
 
 .card-icon {
   color: var(--primary);
-}
-
-/* daisyUI 风格卡片样式 - 带图片区域 */
-.entry-card {
-  background-color: var(--bg-surface);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-light);
-  transition: var(--transition);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.entry-card:hover {
-  box-shadow: var(--shadow-hover);
-  transform: translateY(-2px);
-}
-
-.entry-card-figure {
-  height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--info) 100%);
-}
-
-.entry-card-figure .bi {
-  font-size: 3.5rem;
-  color: white;
-  opacity: 0.9;
-}
-
-.entry-card-body {
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.entry-card-title {
-  font-weight: 600;
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-}
-
-.entry-card-desc {
-  color: var(--text-muted);
-  font-size: 0.875rem;
-  margin-bottom: 1rem;
-  flex: 1;
-}
-
-.entry-card-actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
-  margin-top: auto;
 }
 
 /* ──────────────────────────────────────────────
@@ -426,8 +355,7 @@ main.container,
 }
 
 /* ──────────────────────────────────────────────
-   最终强制修复 dashboard 卡片等宽（card-body 100% 宽度 + card 320px）
-   放在最末尾，优先级最高，同步所有主题
+   Dashboard 卡片等宽
 ───────────────────────────────────────────────── */
 .dashboard-cards .card,
 .dashboard-cards .card-entry {
@@ -454,12 +382,10 @@ main.container,
   margin: 0 auto !important;
 }
 
-/* 确保按钮贴底 */
 .dashboard-cards .card-btn {
   margin-top: auto !important;
 }
 
-/* 大屏适配 */
 @media (min-width: 992px) {
   .dashboard-cards {
     padding: 0 2rem !important;
@@ -467,7 +393,7 @@ main.container,
 }
 
 /* ──────────────────────────────────────────────
-   通用卡片按钮跟随主题颜色（放在每个主题 CSS 最末尾，优先级最高）
+   通用卡片按钮
 ───────────────────────────────────────────────── */
 .card-btn {
   font-weight: 500;
@@ -482,7 +408,6 @@ main.container,
   box-shadow: var(--shadow-hover) !important;
 }
 
-/* 主色按钮 */
 .primary-btn {
   background-color: var(--primary) !important;
   border-color: var(--primary) !important;
@@ -494,7 +419,6 @@ main.container,
   border-color: var(--primary-hover) !important;
 }
 
-/* 成功色按钮 */
 .success-btn {
   background-color: var(--success) !important;
   border-color: var(--success) !important;
@@ -506,7 +430,6 @@ main.container,
   border-color: var(--success-hover) !important;
 }
 
-/* 信息色按钮 */
 .info-btn {
   background-color: var(--info) !important;
   border-color: var(--info) !important;
@@ -518,7 +441,6 @@ main.container,
   border-color: var(--info-hover) !important;
 }
 
-/* 次要按钮 */
 .secondary-btn {
   background-color: transparent !important;
   border-color: var(--text-muted) !important;
@@ -531,7 +453,6 @@ main.container,
   color: var(--primary) !important;
 }
 
-/* 修复 btn-primary 跟随主题 - 使用 CSS 变量 */
 .btn-primary,
 .primary-btn {
   background-color: var(--primary) !important;
@@ -547,21 +468,20 @@ main.container,
   background-color: var(--primary-hover) !important;
   border-color: var(--primary-hover) !important;
   color: white !important;
-  box-shadow: 0 0 0 0.25rem rgba(0, 109, 91, 0.25) !important;
+  box-shadow: 0 0 0 0.25rem rgba(11, 162, 154, 0.25) !important;
 }
 
 .btn-primary:active,
 .btn-primary.active,
 .primary-btn:active,
 .primary-btn.active {
-  background-color: #003D35 !important;
-  border-color: #003D35 !important;
+  background-color: #07726b !important;
+  border-color: #07726b !important;
   color: white !important;
 }
 
-/* 最终保险：防止其他地方覆盖成不协调色 */
 .btn-primary:hover:not(.disabled):not(:disabled),
 .primary-btn:hover:not(.disabled):not(:disabled) {
-  background-color: #00554A !important;
+  background-color: #098a82 !important;
   color: white !important;
 }

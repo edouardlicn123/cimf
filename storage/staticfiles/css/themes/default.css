@@ -124,7 +124,7 @@ main.container,
 /* ──────────────────────────────────────────────
    导航栏 - 主菜单区蓝色背景 + 白色文字
 ───────────────────────────────────────────────── */
-.navbar-macaron {
+.navbar-default {
   background-color: var(--bg-nav) !important;
   border-bottom: 1px solid rgba(255,255,255,0.15) !important;
   box-shadow: var(--shadow-nav) !important;
@@ -133,54 +133,54 @@ main.container,
 }
 
 /* 主菜单区所有文字强制白色 */
-.navbar-macaron,
-.navbar-macaron .navbar-brand,
-.navbar-macaron .nav-link,
-.navbar-macaron .nav-link:hover,
-.navbar-macaron .nav-link.active,
-.navbar-macaron .navbar-toggler-icon {
+.navbar-default,
+.navbar-default .navbar-brand,
+.navbar-default .nav-link,
+.navbar-default .nav-link:hover,
+.navbar-default .nav-link.active,
+.navbar-default .navbar-toggler-icon {
   color: var(--text-nav) !important;
 }
 
 /* 展开内容区无额外边框和阴影 */
-.navbar-macaron .collapse.navbar-collapse,
-.navbar-macaron .navbar-collapse.show {
+.navbar-default .collapse.navbar-collapse,
+.navbar-default .navbar-collapse.show {
   border: none !important;
   box-shadow: none !important;
   background: transparent !important;
 }
 
 /* 个人下拉菜单 - 维持白色背景 + 深色文字 */
-.navbar-macaron .dropdown-menu {
+.navbar-default .dropdown-menu {
   background-color: #ffffff !important;
   border: 1px solid var(--border-light) !important;
   border-radius: var(--radius) !important;
   box-shadow: var(--shadow-sm) !important;
 }
 
-.navbar-macaron .dropdown-item {
+.navbar-default .dropdown-item {
   color: var(--text-primary) !important;
 }
 
-.navbar-macaron .dropdown-item:hover,
-.navbar-macaron .dropdown-item:focus {
+.navbar-default .dropdown-item:hover,
+.navbar-default .dropdown-item:focus {
   background-color: var(--primary-light) !important;
   color: var(--primary) !important;
 }
 
 /* 退出链接保持红色 */
-.navbar-macaron .logout-link {
+.navbar-default .logout-link {
   color: var(--danger) !important;
 }
 
 /* 未登录“登录”按钮 - 白色边框 + 白色文字 */
-.navbar-macaron .login-btn {
+.navbar-default .login-btn {
   border-color: white !important;
   color: white !important;
   background: transparent !important;
 }
 
-.navbar-macaron .login-btn:hover {
+.navbar-default .login-btn:hover {
   background-color: white !important;
   color: var(--primary) !important;
 }
@@ -340,72 +340,7 @@ main.container,
   color: var(--primary);
 }
 
-/* daisyUI 风格卡片样式 - 带图片区域 */
-.entry-card {
-  background-color: var(--bg-surface);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-light);
-  transition: var(--transition);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
 
-.entry-card:hover {
-  box-shadow: var(--shadow-hover);
-  transform: translateY(-2px);
-}
-
-.entry-card-figure {
-  height: 120px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--info) 100%);
-}
-
-.entry-card-figure .entry-card-title {
-  color: white;
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-top: 0.5rem;
-  text-align: center;
-}
-
-.entry-card-figure .bi {
-  font-size: 3.5rem;
-  color: white;
-  opacity: 0.7;
-}
-
-.entry-card-body {
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.entry-card-title {
-  font-weight: 600;
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-}
-
-.entry-card-desc {
-  color: var(--text-muted);
-  font-size: 0.875rem;
-  margin-bottom: 1rem;
-  flex: 1;
-}
-
-.entry-card-actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
-  margin-top: auto;
-}
 
 /* ──────────────────────────────────────────────
    其他通用
