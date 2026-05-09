@@ -932,4 +932,10 @@
 35. 偏好设置页(settings.html)和个人信息页(profile.html)改用基本卡片：移除 shadow-sm border-0 rounded-3 bg-light
 36. 全面 Bug 排查：修复 2 处 block 名称不匹配（admin_title → admin_title_content），确认无 datetime.now() 误用、无 .first() 链式调用、无 CSRF 泄露、无 Jinja2 语法错误
 37. 全面 Bug 排查(第2轮)：所有自动检查和手动检查均通过，无新增 bug 需修复
+38. 马卡龙主题配色更新：5 色均衡马卡龙调色板（开心果绿/蓝莓紫/抹茶绿/柠檬黄/草莓粉），fix success=primary 同色问题
+39. teal 主题冲突色升级：参考 izmd.com 配色，info=钢蓝#6790B7/success=青柠绿#A8C84A/warning=暖金#D7A761/danger=玫瑰粉#CF727C，背景改为暖白#F4F5EE
+40. 添加 HITOBA 主题：新建 hitoba.css（暖灰基底、零圆角、近黑主色）、注册 constants.py/models.py、创建迁移 0008
+41. HITOBA 主题中文名改为「日系简约」
+42. HITOBA 主题中文名改为「黑色简约」
+43. 更新 README：补充技术栈、8主题一览、CSS设计套件、SMTP、模块市场、模块列表精简
 

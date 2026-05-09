@@ -1,85 +1,88 @@
 /*
- * macaron.css
- * FFE 项目跟进系统 - 马卡龙主题（Macaron Theme）
- * 版本：2026-02-15 v7.1（修复导航高亮 + 按钮 hover 跟随主题）
- * 
- * 调整内容：
- *   - 除文字外整体颜色加深（主色饱和/明度降低 10-20%，背景轻微加灰调）
- *   - 保持马卡龙柔和软萌感，但更沉稳耐看
- *   - 强制 navbar 不透明背景 + 轻微磨砂
- *   - 统一圆角、阴影、过渡
- *   - 彻底修复宽屏下右侧用户下拉菜单被挤压/右移/只显示一小块（v6 方案）
- *   - dashboard 卡片等宽强制修复（card 320px + card-body 100% 撑满）
- *   - 参考 uniqlo 极简风格优化卡片（圆角收窄、阴影轻微、hover 克制、过渡极简）
- *   - 新增：左侧导航 .nav-link.active 跟随 --primary
- *   - 新增：.primary-btn / .btn-primary hover 统一为 --primary-hover
+ * hitoba.css
+ * FFE 项目跟进系统 - HITOBA 极致简约主题（Hitoba Theme）
+ * 版本：2026-05-09 v1.0
+ *
+ * 设计灵感：hitoba-office.com（日本办公设计公司）
+ * - 近无彩色 palette，暖灰基底
+ * - 零圆角（clip-path 哲学）
+ * - 暖灰边框 #D6D6C9（标志色）
+ * - 近黑主色 #181818
+ * - 摄影/内容主导，UI 不抢戏
  */
 
 :root {
-  /* 主色系 - 开心果绿 */
-  --primary:           #7ACBB8;
-  --primary-hover:     #65B3A0;
-  --primary-active:    #4E9A88;
-  --primary-light:     rgba(122, 203, 184, 0.18);
-  --primary-extra-light: rgba(122, 203, 184, 0.08);
+  /* 主色系 - 近黑（极致简约） */
+  --primary:           #181818;
+  --primary-hover:     #000000;
+  --primary-active:    #000000;
+  --primary-light:     rgba(24, 24, 24, 0.08);
+  --primary-extra-light: rgba(24, 24, 24, 0.04);
 
-  /* 信息 / 辅助 - 蓝莓紫 */
-  --info:              #89A9E8;
-  --info-hover:        #7295D0;
-  --info-light:        rgba(137, 169, 232, 0.18);
+  /* 信息 / 辅助 - 柔和灰蓝 */
+  --info:              #6B7280;
+  --info-hover:        #4B5563;
+  --info-light:        rgba(107, 114, 128, 0.10);
 
-  /* 成功 - 抹茶绿 */
-  --success:           #A8C88A;
-  --success-hover:     #8FB37A;
+  /* 成功 - 祖母绿（唯一有饱和度的颜色） */
+  --success:           #059669;
+  --success-hover:     #047857;
 
-  /* 警告 / 强调 - 柠檬黄 */
-  --warning:           #E8CC78;
-  --warning-hover:     #D1B566;
-  --warning-light:     rgba(232, 204, 120, 0.20);
+  /* 警告 / 强调 - 琥珀 */
+  --warning:           #D97706;
+  --warning-hover:     #B45309;
+  --warning-light:     rgba(217, 119, 6, 0.10);
 
-  /* 危险 - 草莓粉 */
-  --danger:            #E8889E;
-  --danger-hover:      #D17A8E;
-  --danger-light:      rgba(232, 136, 158, 0.18);
+  /* 危险 - 红 */
+  --danger:            #DC2626;
+  --danger-hover:      #B91C1C;
+  --danger-light:      rgba(220, 38, 38, 0.10);
 
-  /* 背景 - 整体加深（从极浅 → 浅灰调） */
-  --bg-body:           #F8F4EE;     /* 原 #FFF8E7 → 轻微加灰 */
-  --bg-gradient:       linear-gradient(135deg, #F8F4EE 0%, #F0F4F8 100%);
-  --bg-surface:        #F5F3F0;
+  /* 背景 - 暖灰 */
+  --bg-body:           #F4F4F4;
+  --bg-gradient:       linear-gradient(to bottom, #F4F4F4 0%, #FAFAFA 100%);
+  --bg-surface:        #FFFFFF;
   --bg-card:           #FFFFFF;
-  --bg-nav:            #EDE8F5;     /* 原 #F5F0FF → 加深浅紫灰 */
-  --bg-nav-fallback:   rgba(237, 232, 245, 0.96);
-  --bg-footer:         #F5F3F0;
+  --bg-nav:            #181818;
+  --bg-footer:         #F0F0F0;
 
-  /* 文字 - 不动，保持柔和深灰 */
-  --text-primary:      #4A536B;
-  --text-secondary:    #7D849A;
-  --text-muted:        #A8AEC1;
+  /* 文字 */
+  --text-primary:      #181818;
+  --text-secondary:    #525252;
+  --text-muted:        #A3A3A3;
   --text-inverted:     #FFFFFF;
-  --text-nav:          #5C6380;
-  --text-nav-active:   #7ACBB8;     /* 与加深 primary 协调 */
+  --text-nav:          #FFFFFF;
+  --text-nav-active:   #FFFFFF;
 
-  /* 边框 & 分割 - 加深 */
-  --border:            #C8B8D8;
-  --border-light:      rgba(200, 184, 216, 0.60);
-  --border-focus:      #7ACBB8;
+  /* 边框 & 分割 - 暖灰（hitoba 标志色） */
+  --border:            #D6D6C9;
+  --border-light:      #E5E5E0;
+  --border-focus:      #181818;
 
-  /* 阴影 - 参考 uniqlo 极轻微 + 加深基调 */
-  --shadow-sm:         0 1px 2px rgba(0, 0, 0, 0.08);
-  --shadow:            0 1px 4px rgba(0, 0, 0, 0.10);
-  --shadow-hover:      0 2px 8px rgba(0, 0, 0, 0.12);
-  --shadow-nav:        0 1px 3px rgba(0, 0, 0, 0.08);
+  /* 阴影 - 极致克制 */
+  --shadow-sm:         0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow:            0 1px 4px rgba(0, 0, 0, 0.06);
+  --shadow-hover:      0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-nav:        0 1px 3px rgba(0, 0, 0, 0.05);
 
-  /* 圆角 - 参考 uniqlo 极小 */
-  --radius-sm:         4px;
-  --radius:            6px;
-  --radius-lg:         8px;
-  --radius-xl:         10px;
-  --radius-pill:       9999px;
+  /* 圆角 - 全部 0（hitoba clip-path 哲学） */
+  --radius-sm:         0px;
+  --radius:            0px;
+  --radius-lg:         0px;
+  --radius-xl:         0px;
+  --radius-pill:       0px;
 
-  /* 过渡 - 参考 uniqlo 非常克制 */
-  --transition:        all 0.15s ease;
-  --transition-slow:   all 0.20s ease;
+  /* 过渡 - 克制 */
+  --transition:        all 0.18s ease;
+  --transition-slow:   all 0.25s ease;
+
+  /* Bootstrap 变量映射 */
+  --bs-primary: var(--primary);
+  --bs-primary-rgb: 24, 24, 24;
+  --bs-info: var(--info);
+  --bs-info-rgb: 107, 114, 128;
+  --bs-link-color: var(--primary);
+  --bs-link-hover-color: var(--primary-hover);
 }
 
 /* ──────────────────────────────────────────────
@@ -99,7 +102,7 @@ body {
   background: var(--bg-gradient);
   color: var(--text-primary);
   font-family: 'Inter', 'Noto Sans SC', system-ui, -apple-system, sans-serif;
-  font-weight: 500;
+  font-weight: 400;
   min-height: 100vh;
 }
 
@@ -110,40 +113,45 @@ main.container,
 .accordion-body,
 .card-body {
   background-color: #ffffff;
-  border: 1px solid var(--border-light);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
-  padding: 1.8rem 1.2rem;
+  padding: 1.5rem 1rem;
 }
 
 /* ──────────────────────────────────────────────
-   导航栏 - 强制修复透明问题
+   导航栏 - 近黑背景 + 白色文字
 ───────────────────────────────────────────────── */
-
 .navbar-macaron {
   background-color: var(--bg-nav) !important;
-  border-bottom: 1px solid var(--border-light) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
   box-shadow: var(--shadow-nav) !important;
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
-  transition: var(--transition-slow) !important;
+  transition: var(--transition) !important;
 }
 
-/* 确保展开/折叠区域不透明 */
+/* 主菜单区所有文字强制白色 */
+.navbar-macaron,
+.navbar-macaron .navbar-brand,
+.navbar-macaron .nav-link,
+.navbar-macaron .nav-link:hover,
+.navbar-macaron .nav-link.active,
+.navbar-macaron .navbar-toggler-icon {
+  color: var(--text-nav) !important;
+}
+
+/* 展开内容区无额外边框和阴影 */
 .navbar-macaron .collapse.navbar-collapse,
 .navbar-macaron .navbar-collapse.show {
-  background-color: var(--bg-nav) !important;
   border: none !important;
   box-shadow: none !important;
+  background: transparent !important;
 }
 
 /* 下拉菜单 */
 .navbar-macaron .dropdown-menu {
   background-color: #ffffff !important;
   border: 1px solid var(--border) !important;
-  border-radius: var(--radius-lg) !important;
-  box-shadow: var(--shadow) !important;
+  box-shadow: var(--shadow-sm) !important;
 }
 
 .navbar-macaron .dropdown-item {
@@ -156,30 +164,25 @@ main.container,
   color: var(--primary) !important;
 }
 
-/* 汉堡菜单图标颜色匹配文字 */
-.navbar-macaron .navbar-toggler-icon {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%235c6380' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
-}
-
-/* 登录按钮（未登录状态） */
-.navbar-macaron .login-btn {
-  border-color: var(--primary) !important;
-  color: var(--primary) !important;
-  background: transparent !important;
-}
-
-.navbar-macaron .login-btn:hover {
-  background-color: var(--primary) !important;
-  color: white !important;
-}
-
-/* 退出链接 */
+/* 退出链接保持红色 */
 .navbar-macaron .logout-link {
   color: var(--danger) !important;
 }
 
+/* 未登录"登录"按钮 */
+.navbar-macaron .login-btn {
+  border-color: white !important;
+  color: white !important;
+  background: transparent !important;
+}
+
+.navbar-macaron .login-btn:hover {
+  background-color: white !important;
+  color: var(--primary) !important;
+}
+
 /* ──────────────────────────────────────────────
-   左侧导航高亮（.nav-link.active）跟随主题主色
+   左侧导航高亮 - 跟随主色
 ───────────────────────────────────────────────── */
 .admin-sidebar .nav-link.active,
 .admin-sidebar .nav-link.active:hover,
@@ -187,7 +190,6 @@ main.container,
   background-color: var(--primary-light) !important;
   color: var(--primary) !important;
   font-weight: 600 !important;
-  border-radius: var(--radius-sm) !important;
 }
 
 .admin-sidebar .nav-link:hover {
@@ -195,11 +197,21 @@ main.container,
   color: var(--primary-hover) !important;
 }
 
+/* 导航菜单零圆角 */
+.admin-sidebar .nav-link,
+.admin-sidebar .nav-item,
+.admin-sidebar .nav-link.active,
+.admin-sidebar .nav-link.active:hover,
+.admin-sidebar .nav-link.active:focus,
+.admin-sidebar .nav-link:hover,
+.admin-sidebar .nav-link:focus {
+  border-radius: 0 !important;
+}
+
 /* ──────────────────────────────────────────────
-   彻底修复宽屏下右侧用户菜单被挤压/右移/只显示一小块（v6 最终加强版，与其他主题统一）
+   宽屏右侧用户菜单修复
 ───────────────────────────────────────────────── */
 @media (min-width: 992px) {
-
   .navbar-expand-lg .navbar-nav.ms-auto {
     flex: 0 0 auto !important;
     flex-shrink: 0 !important;
@@ -254,7 +266,6 @@ main.container,
   }
 }
 
-/* 全局保险措施 */
 .dropdown {
   overflow: visible !important;
   position: relative !important;
@@ -267,9 +278,8 @@ main.container,
 /* ──────────────────────────────────────────────
    Accordion & 按钮
 ───────────────────────────────────────────────── */
-
 .accordion-button {
-  font-weight: 600;
+  font-weight: 500;
   transition: var(--transition);
 }
 
@@ -279,7 +289,7 @@ main.container,
 }
 
 .accordion-button.collapsed {
-  background-color: var(--bg-surface) !important;
+  background-color: #f8f9fa !important;
   color: var(--text-primary) !important;
 }
 
@@ -293,7 +303,6 @@ main.container,
   background-color: var(--info) !important;
   border-color: var(--info) !important;
   color: white !important;
-  border-radius: var(--radius-pill) !important;
   box-shadow: var(--shadow-sm) !important;
   transition: var(--transition) !important;
 }
@@ -303,26 +312,23 @@ main.container,
 .edit-btn:hover {
   background-color: var(--info-hover) !important;
   border-color: var(--info-hover) !important;
-  transform: translateY(-3px) scale(1.04) !important;
   box-shadow: var(--shadow-hover) !important;
 }
 
 /* ──────────────────────────────────────────────
-   Dashboard 强化（参考 uniqlo 极简风格优化）
+   Dashboard 调整
 ───────────────────────────────────────────────── */
-
 .welcome-title {
   color: var(--primary);
+  font-size: 1.8rem;
 }
 
 .card-entry {
-  border-radius: 4px;                 /* 极小圆角 */
-  transition: var(--transition);      /* 克制过渡 */
-  border: 1px solid var(--border-light);
+  transition: var(--transition);
+  border: 1px solid var(--border);
 }
 
 .card-entry:hover {
-  transform: translateY(-2px) !important;  /* 轻微上移，无 scale */
   box-shadow: var(--shadow-hover);
 }
 
@@ -331,17 +337,14 @@ main.container,
 }
 
 /* ──────────────────────────────────────────────
-   其他通用
+   通用
 ───────────────────────────────────────────────── */
-
 .avatar-placeholder {
   border: 2px solid var(--border);
-  border-radius: 50%;
 }
 
 .avatar-placeholder:hover {
-  border-color: var(--info);
-  transform: scale(1.08);
+  border-color: var(--primary);
 }
 
 .alert-warning {
@@ -350,12 +353,11 @@ main.container,
 }
 
 .badge {
-  border-radius: var(--radius-sm);
+  border-radius: 0;
 }
 
 /* ──────────────────────────────────────────────
-   最终强制修复 dashboard 卡片等宽（card-body 100% 宽度 + card 320px）
-   放在最末尾，优先级最高
+   Dashboard 卡片等宽
 ───────────────────────────────────────────────── */
 .dashboard-cards .card,
 .dashboard-cards .card-entry {
@@ -363,14 +365,13 @@ main.container,
   max-width: 320px !important;
   min-width: 320px !important;
   flex: 0 0 320px !important;
-  border-radius: 4px !important;
 }
 
 .dashboard-cards .card-body {
   width: 100% !important;
   height: 100% !important;
   box-sizing: border-box !important;
-  padding: 1.5rem 1rem !important;
+  padding: 2rem 1.5rem !important;
 }
 
 .dashboard-cards {
@@ -383,12 +384,10 @@ main.container,
   margin: 0 auto !important;
 }
 
-/* 确保按钮贴底 */
 .dashboard-cards .card-btn {
   margin-top: auto !important;
 }
 
-/* 大屏适配 */
 @media (min-width: 992px) {
   .dashboard-cards {
     padding: 0 2rem !important;
@@ -396,12 +395,11 @@ main.container,
 }
 
 /* ──────────────────────────────────────────────
-   通用卡片按钮跟随主题颜色（放在每个主题 CSS 最末尾，优先级最高）
+   通用卡片按钮
 ───────────────────────────────────────────────── */
 .card-btn {
   font-weight: 500;
   transition: var(--transition);
-  border-radius: var(--radius-pill) !important;
   padding: 0.5rem 1.2rem !important;
   border: 1px solid transparent !important;
 }
@@ -411,7 +409,6 @@ main.container,
   box-shadow: var(--shadow-hover) !important;
 }
 
-/* 主色按钮 */
 .primary-btn {
   background-color: var(--primary) !important;
   border-color: var(--primary) !important;
@@ -423,7 +420,6 @@ main.container,
   border-color: var(--primary-hover) !important;
 }
 
-/* 成功色按钮 */
 .success-btn {
   background-color: var(--success) !important;
   border-color: var(--success) !important;
@@ -435,7 +431,6 @@ main.container,
   border-color: var(--success-hover) !important;
 }
 
-/* 信息色按钮 */
 .info-btn {
   background-color: var(--info) !important;
   border-color: var(--info) !important;
@@ -447,7 +442,6 @@ main.container,
   border-color: var(--info-hover) !important;
 }
 
-/* 次要按钮 */
 .secondary-btn {
   background-color: transparent !important;
   border-color: var(--text-muted) !important;
@@ -461,7 +455,8 @@ main.container,
 }
 
 /* ──────────────────────────────────────────────
-/* 修复 btn-primary 跟随主题 - 使用 CSS 变量 */
+   btn-primary 跟随主题
+───────────────────────────────────────────────── */
 .btn-primary,
 .primary-btn {
   background-color: var(--primary) !important;
@@ -477,24 +472,20 @@ main.container,
   background-color: var(--primary-hover) !important;
   border-color: var(--primary-hover) !important;
   color: white !important;
-  box-shadow: 0 0 0 0.25rem var(--primary-light) !important;
-}
+  box-shadow: 0 0 0 0.25rem rgba(24, 24, 24, 0.25) !important;
 }
 
 .btn-primary:active,
 .btn-primary.active,
 .primary-btn:active,
 .primary-btn.active {
-  background-color: #4E9A88 !important;
-  border-color: #4E9A88 !important;
+  background-color: #000000 !important;
+  border-color: #000000 !important;
   color: white !important;
 }
 
-/* 最终保险：防止其他地方覆盖成不协调色 */
 .btn-primary:hover:not(.disabled):not(:disabled),
 .primary-btn:hover:not(.disabled):not(:disabled) {
-  background-color: #65B3A0 !important;
+  background-color: #000000 !important;
   color: white !important;
 }
-
-

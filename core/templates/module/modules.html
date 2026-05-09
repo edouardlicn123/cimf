@@ -7,9 +7,12 @@
 {% block admin_title_content %}模块管理{% endblock %}
 
 {% block admin_buttons_content %}
-<a href="{{ url('module:scan') }}" class="btn btn-secondary">
-    <i class="bi bi-arrow-repeat"></i> 扫描模块
-</a>
+<form method="POST" action="{{ url('module:scan') }}" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-secondary">
+        <i class="bi bi-arrow-repeat"></i> 扫描模块
+    </button>
+</form>
 <a href="{{ url('module:create') }}" class="btn btn-primary">
     <i class="bi bi-plus-lg"></i> 新建模块
 </a>
@@ -124,9 +127,12 @@
                 </div>
                 {% endif %}
                 <div class="entry-card-actions mt-auto">
-                    <a href="{{ url('module:disable', mod_id) }}" class="btn btn-sm btn-warning">
-                        <i class="bi bi-pause-circle"></i> 禁用
-                    </a>
+                    <form method="POST" action="{{ url('module:disable', mod_id) }}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-warning">
+                            <i class="bi bi-pause-circle"></i> 禁用
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -160,9 +166,12 @@
                 </div>
                 {% endif %}
                 <div class="entry-card-actions mt-auto">
-                    <a href="{{ url('module:enable', mod_id) }}" class="btn btn-sm btn-success">
-                        <i class="bi bi-play-circle"></i> 启用
-                    </a>
+                    <form method="POST" action="{{ url('module:enable', mod_id) }}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-success">
+                            <i class="bi bi-play-circle"></i> 启用
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -190,9 +199,12 @@
                     {{ mod_description|truncatechars(60) }}
                 </p>
                 <div class="entry-card-actions mt-auto">
-                    <a href="{{ url('module:install', mod_id) }}" class="btn btn-sm btn-warning">
-                        <i class="bi bi-wrench"></i> 修复安装
-                    </a>
+                    <form method="POST" action="{{ url('module:install', mod_id) }}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-warning">
+                            <i class="bi bi-wrench"></i> 修复安装
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -215,9 +227,12 @@
                     {{ mod_description|truncatechars(60) }}
                 </p>
                 <div class="entry-card-actions mt-auto">
-                    <a href="{{ url('module:install', mod_id) }}" class="btn btn-sm btn-primary">
-                        <i class="bi bi-download"></i> 安装
-                    </a>
+                    <form method="POST" action="{{ url('module:install', mod_id) }}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="bi bi-download"></i> 安装
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -279,9 +294,12 @@
     </a>
     {% else %}
     <p class="text-muted mb-4">请使用扫描功能获取可用模块</p>
-    <a href="{{ url('module:scan') }}" class="btn btn-primary">
-        <i class="bi bi-arrow-repeat"></i> 扫描模块
-    </a>
+    <form method="POST" action="{{ url('module:scan') }}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-arrow-repeat"></i> 扫描模块
+        </button>
+    </form>
     {% endif %}
 </div>
 {% endif %}
