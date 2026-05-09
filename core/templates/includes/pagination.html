@@ -1,0 +1,33 @@
+{# 分页组件 #}
+{# 用法: {% set page_obj = page_obj %}{% set extra_params = extra_params %}{% include "includes/pagination.html" %} #}
+{# 需要上下文: current_page, total_pages, has_prev, has_next, prev_page, next_page #}
+
+{% if total_pages and total_pages > 1 %}
+<nav>
+    <ul class="pagination justify-content-center mb-0">
+        {% if has_prev %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ prev_page }}{{ extra_params|default('') }}">上一页</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">上一页</span>
+        </li>
+        {% endif %}
+        
+        <li class="page-item active">
+            <span class="page-link">第 {{ current_page }} / {{ total_pages }} 页 (共 {{ page_obj.paginator.count }} 条)</span>
+        </li>
+        
+        {% if has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ next_page }}{{ extra_params|default('') }}">下一页</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">下一页</span>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}

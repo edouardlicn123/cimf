@@ -1,0 +1,231 @@
+<!-- 导航卡片区域 -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-link-45deg me-2"></i>常用链接</h5>
+    </div>
+    <div class="card-body p-0">
+        <div id="navCardsArea" class="row g-1 mx-0">
+            <div class="col-2 nav-slot" data-position="1"></div>
+            <div class="col-2 nav-slot" data-position="2"></div>
+            <div class="col-2 nav-slot" data-position="3"></div>
+            <div class="col-2 nav-slot" data-position="4"></div>
+            <div class="col-2 nav-slot" data-position="5"></div>
+            <div class="col-2 nav-slot" data-position="6"></div>
+            <div class="col-2 nav-slot" data-position="7"></div>
+            <div class="col-2 nav-slot" data-position="8"></div>
+            <div class="col-2 nav-slot" data-position="9"></div>
+            <div class="col-2 nav-slot" data-position="10"></div>
+            <div class="col-2 nav-slot" data-position="11"></div>
+            <div class="col-2 nav-slot" data-position="12"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+.nav-slot {
+    height: 80px;
+    border: 1px solid var(--border);
+    border-radius: 0;
+    background-color: var(--bg-surface);
+    transition: all 0.2s ease;
+}
+.nav-slot.drag-over {
+    border-color: var(--primary);
+    background-color: var(--primary-light);
+}
+.nav-slot:empty {
+    border: 2px dashed var(--border);
+}
+.nav-card {
+    height: 100%;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 500;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.nav-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    color: #fff;
+}
+.nav-card.dragging {
+    opacity: 0.5;
+}
+</style>
+
+<script>
+(function() {
+    'use strict';
+
+    function getCsrfToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+               document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '';
+    }
+
+    function updateNavCardsDisplay(cards) {
+        var slots = document.querySelectorAll('.nav-slot');
+        slots.forEach(function(slot) {
+            slot.innerHTML = '';
+        });
+        
+        var usedPositions = new Set();
+        
+        cards.forEach(function(card) {
+            var position = card.position || 1;
+            
+            if (usedPositions.has(position)) {
+                for (var i = 1; i <= 12; i++) {
+                    if (!usedPositions.has(i)) {
+                        position = i;
+                        break;
+                    }
+                }
+            }
+            
+            usedPositions.add(position);
+            
+            var slot = document.querySelector('.nav-slot[data-position="' + position + '"]');
+            if (slot) {
+                var link = document.createElement('a');
+                link.href = card.url;
+                link.target = '_blank';
+                link.className = 'nav-card';
+                link.draggable = true;
+                link.dataset.id = card.id;
+                link.style.backgroundColor = card.bg_color;
+                link.textContent = card.name;
+                slot.appendChild(link);
+            }
+        });
+    }
+    
+    var navCardsData = [];
+    var navCardDragging = null;
+    
+    document.getElementById('navCardsArea').addEventListener('dragstart', function(e) {
+        if (e.target.classList.contains('nav-card')) {
+            navCardDragging = e.target;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+    });
+    
+    document.getElementById('navCardsArea').addEventListener('dragend', function(e) {
+        if (e.target.classList.contains('nav-card')) {
+            e.target.classList.remove('dragging');
+            navCardDragging = null;
+            document.querySelectorAll('.nav-slot').forEach(function(s) { s.classList.remove('drag-over'); });
+        }
+    });
+    
+    document.getElementById('navCardsArea').addEventListener('dragover', function(e) {
+        e.preventDefault();
+        var slot = e.target.closest('.nav-slot');
+        if (slot) slot.classList.add('drag-over');
+    });
+    
+    document.getElementById('navCardsArea').addEventListener('dragleave', function(e) {
+        var slot = e.target.closest('.nav-slot');
+        if (slot && !slot.contains(e.relatedTarget)) {
+            slot.classList.remove('drag-over');
+        }
+    });
+    
+    document.getElementById('navCardsArea').addEventListener('drop', function(e) {
+        e.preventDefault();
+        var toSlot = e.target.closest('.nav-slot');
+        if (!toSlot || !navCardDragging) return;
+        
+        toSlot.classList.remove('drag-over');
+        
+        var fromSlot = navCardDragging.closest('.nav-slot');
+        if (fromSlot === toSlot) return;
+        
+        var fromPosition = parseInt(fromSlot.dataset.position);
+        var toPosition = parseInt(toSlot.dataset.position);
+        var toCard = toSlot.querySelector('.nav-card');
+        
+        // 找到被拖拽的卡片数据
+        var cardData = navCardsData.find(function(c) { return c.id == navCardDragging.dataset.id; });
+        if (!cardData) return;
+        
+        if (toCard) {
+            // 交换两张卡片的position
+            var toCardData = navCardsData.find(function(c) { return c.id == toCard.dataset.id; });
+            if (toCardData) {
+                var tempPos = cardData.position;
+                cardData.position = toCardData.position;
+                toCardData.position = tempPos;
+            }
+        } else {
+            // 移动到空位置
+            cardData.position = toPosition;
+        }
+        
+        // 更新DOM并保存
+        updateNavCardsDisplay(navCardsData);
+        saveNavCardsOrder();
+    });
+    
+    function saveNavCardsOrder() {
+        fetch('{{ url("api:api_nav_cards_save") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({ cards: navCardsData }),
+            credentials: 'include'
+        }).then(function(response) { return response.json(); })
+          .catch(function() { console.error('保存导航卡片顺序失败'); });
+    }
+
+    function renderNavCards() {
+        fetch('/api/v1/user/nav-cards/', {credentials: 'include'})
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success && data.cards) {
+                    navCardsData = data.cards;
+                    updateNavCardsDisplay(navCardsData);
+                }
+            })
+            .catch(function() {
+                console.error('加载导航卡片失败');
+            });
+    }
+
+    // 初始化
+    function setupNavCardListeners() {
+        var channel = new BroadcastChannel('nav-cards-updated');
+        channel.addEventListener('message', function(event) {
+            renderNavCards();
+        });
+        
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'nav-cards-updated' && e.newValue) {
+                renderNavCards();
+            }
+        });
+        
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                renderNavCards();
+            }
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            renderNavCards();
+            setupNavCardListeners();
+        });
+    } else {
+        renderNavCards();
+        setupNavCardListeners();
+    }
+})();
+</script>

@@ -1,0 +1,54 @@
+{% extends "frames/frame_node.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'dashboard' %}
+
+{% block title %}事务总览 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}
+  事务总览
+{% endblock %}
+
+{% block admin_content %}
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+  {% if node_types %}
+    {% for node_type in node_types %}
+    <div class="col">
+      <div class="entry-card h-100">
+        <div class="entry-card-figure">
+          <i class="bi {{ node_type.icon|default('bi-folder') }}"></i>
+          <h5 class="entry-card-title">{{ node_type.name }}</h5>
+        </div>
+        <div class="entry-card-body">
+          <p class="entry-card-desc">
+            {{ node_type.description|default('暂无描述') }}
+          </p>
+          <div class="entry-card-actions">
+            <a href="{{ url('node:module_page', node_type.slug) }}" class="btn btn-primary btn-sm">
+              <i class="bi bi-arrow-right me-1"></i> 管理
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="col-12">
+      <div class="text-center py-5">
+        <div class="mb-4">
+          <i class="bi bi-folder2-open" style="font-size: 4rem; color: #dee2e6;"></i>
+        </div>
+        <h5 class="text-muted mb-3">暂无启用的模块</h5>
+        <p class="text-muted mb-4">
+          当前没有启用任何业务模块，请前往节点类型管理创建或启用模块。
+        </p>
+        <a href="{{ url('module:list') }}" class="btn btn-primary">
+          <i class="bi bi-plus-lg me-2"></i>前往模块管理
+        </a>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

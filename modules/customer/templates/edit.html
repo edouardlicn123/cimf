@@ -1,0 +1,244 @@
+{% extends "frames/frame_node.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% block admin_title_content %}
+  {% if customer %}编辑{% else %}新建{% endif %}{{ node_type.name }}
+{% endblock %}
+
+{% block admin_content %}
+<script src="{{ static('js/region_select.js') }}"></script>
+<form method="post" novalidate>
+    {% include "includes/csrf.html" %}
+    
+    <!-- 基本信息 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">基本信息</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">客户名称 *</label>
+                    <input type="text" name="customer_name" class="form-control" value="{{ customer.customer_name|default('') if customer else '' }}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">客户代码 <small class="text-muted">(不填则自动生成 CC+6位数字)</small></label>
+                    <input type="text" name="customer_code" class="form-control" value="{{ customer.customer_code|default('') if customer else '' }}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">客户类型</label>
+                    <select name="customer_type" class="form-select">
+                        <option value="">请选择</option>
+                        {% if customer_types %}
+                        {% for item in customer_types %}
+                        <option value="{{ item.id }}" {% if customer and customer.customer_type_id == item.id %}selected{% endif %}>{{ item.name }}</option>
+                        {% endfor %}
+                        {% endif %}
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">企业名称</label>
+                    <input type="text" name="enterprise_name" class="form-control" value="{{ customer.enterprise_name|default('') if customer else '' }}">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 联系信息 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">联系信息</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">电话1</label>
+                    <input type="text" name="phone1" class="form-control" value="{{ customer.phone1|default('') if customer else '' }}">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">邮箱1</label>
+                    <input type="email" name="email1" class="form-control" value="{{ customer.email1|default('') if customer else '' }}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">电话2（可选）</label>
+                    <input type="text" name="phone2" class="form-control" value="{{ customer.phone2|default('') if customer else '' }}">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">邮箱2（可选）</label>
+                    <input type="email" name="email2" class="form-control" value="{{ customer.email2|default('') if customer else '' }}">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">领英</label>
+                <input type="url" name="linkedin" class="form-control" 
+                       value="{{ customer.linkedin|default('') if customer else '' }}"
+                       placeholder="https://www.linkedin.com/company/xxx">
+                <small class="text-muted">请输入 LinkedIn 公司主页链接</small>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 地址信息 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">地址信息</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">国家</label>
+                    <div class="position-relative">
+                        <input type="text" name="country_display" id="country-input" class="form-control" 
+                               value="{{ customer.country.name if customer and customer.country else '' }}"
+                               autocomplete="off" data-country-id="{{ customer.country.id if customer and customer.country else '' }}">
+                        <input type="hidden" name="country" id="country-hidden" value="{{ customer.country.id if customer and customer.country else '' }}">
+                        <div id="country-dropdown" class="dropdown-menu" style="display: none; max-height: 200px; overflow-y: auto; width: 100%; position: absolute; top: 100%; left: 0; z-index: 1000;"></div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">省份/城市</label>
+                    <input type="text" name="province" class="form-control" value="{{ customer.province|default('') if customer else '' }}">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">邮政编码</label>
+                    <input type="text" name="postal_code" class="form-control" value="{{ customer.postal_code|default('') if customer else '' }}">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">详细地址</label>
+                <input type="text" name="address" class="form-control" value="{{ customer.address|default('') if customer else '' }}">
+            </div>
+        </div>
+    </div>
+    
+    <!-- 企业信息 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">企业信息（可选）</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">所属行业</label>
+                    <input type="text" name="industry" class="form-control" value="{{ customer.industry|default('') if customer else '' }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">企业性质</label>
+                    <select name="enterprise_type" class="form-select">
+                        <option value="">请选择</option>
+                        {% if enterprise_types %}
+                        {% for item in enterprise_types %}
+                        <option value="{{ item.id }}" {% if customer and customer.enterprise_type_id == item.id %}selected{% endif %}>{{ item.name }}</option>
+                        {% endfor %}
+                        {% endif %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">注册资本</label>
+                    <input type="number" name="registered_capital" class="form-control" value="{{ customer.registered_capital|default('') if customer else '' }}" step="0.01">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 其他 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">其他</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">客户等级</label>
+                    <select name="customer_level" class="form-select">
+                        <option value="">请选择</option>
+                        {% if customer_levels %}
+                        {% for item in customer_levels %}
+                        <option value="{{ item.id }}" {% if customer and customer.customer_level_id == item.id %}selected{% endif %}>{{ item.name }}</option>
+                        {% endfor %}
+                        {% endif %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">信用额度</label>
+                    <input type="number" name="credit_limit" class="form-control" value="{{ customer.credit_limit|default('') if customer else '' }}" step="0.01">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">网站</label>
+                    <input type="url" name="website" class="form-control" value="{{ customer.website|default('') if customer else '' }}">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">备注</label>
+                <textarea name="notes" class="form-control" rows="3">{{ customer.notes|default('') if customer else '' }}</textarea>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-end">
+        <a href="{{ url('node:module_page', node_type.slug) }}" class="btn btn-secondary">取消</a>
+        <button type="submit" class="btn btn-primary">保存</button>
+    </div>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const countryInput = document.getElementById('country-input');
+    const countryHidden = document.getElementById('country-hidden');
+    const countryDropdown = document.getElementById('country-dropdown');
+    const countries = {{ countries|tojson }};
+    let selectedId = countryInput.dataset.countryId;
+    
+    if (selectedId) {
+        const selected = countries.find(c => c.id === Number(selectedId));
+        if (selected) {
+            countryInput.value = selected.name;
+        }
+    }
+    
+    countryInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        
+        if (!query) {
+            countryDropdown.style.display = 'none';
+            return;
+        }
+        
+        const matches = countries.filter(c => c.name.toLowerCase().includes(query));
+        
+        if (matches.length === 0) {
+            countryDropdown.innerHTML = '<div class="dropdown-item text-muted">无匹配结果</div>';
+        } else {
+            countryDropdown.innerHTML = matches.map(c => 
+                `<div class="dropdown-item" data-id="${c.id}" data-name="${(c.name || '').replace(/"/g, '&quot;')}">${c.name}</div>`
+            ).join('');
+        }
+        
+        countryDropdown.style.display = 'block';
+    });
+    
+    countryDropdown.addEventListener('click', function(e) {
+        if (e.target.classList.contains('dropdown-item') && !e.target.classList.contains('text-muted')) {
+            const id = e.target.dataset.id;
+            const name = e.target.dataset.name;
+            
+            countryInput.value = name;
+            countryHidden.value = id;
+            countryDropdown.style.display = 'none';
+        }
+    });
+    
+    document.addEventListener('click', function(e) {
+        if (!countryInput.contains(e.target) && !countryDropdown.contains(e.target)) {
+            countryDropdown.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}

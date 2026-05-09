@@ -1,0 +1,18 @@
+{
+  "modules": [
+    {
+      "id": "resident_info",
+      "name": "居民信息",
+      "description": "管理居民住户信息",
+      "download_url": "https://github.com/edouardlicn123/cimf-resident_info/releases/download/1.2.1/cimf-resident_info.zip",
+      "version": "1.2.1"
+    },
+    {
+      "id": "customer_cn",
+      "name": "客户信息（国内）",
+      "description": "管理中国国内的客户信息",
+      "download_url": "https://github.com/edouardlicn123/cimf-customer_cn/releases/download/1.1.6/cimf-customer_cn.zip",
+      "version": "1.1.6"
+    }
+  ]
+}

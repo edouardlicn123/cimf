@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% set show_header = false %}
+{% set use_custom_main = true %}
+
+{% block admin_title_buttons %}{% endblock %}
+
+{% block main_content %}
+<div class="d-flex flex-column" style="min-height: 100vh;">
+  <div class="d-flex flex-grow-1">
+
+    <!-- 左侧导航栏（系统管理专属 sidebar） -->
+    <nav class="admin-sidebar flex-shrink-0"
+         style="width: 220px; min-width: 220px; background: var(--bg-surface, #f8f9fa); border-right: 1px solid var(--border-color, #dee2e6);">
+      <div class="h-100 overflow-auto">
+        <div class="position-sticky top-0 p-2 pt-4">
+          <ul class="nav flex-column mb-auto">
+            <li class="nav-item">
+              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'settings' %}active{% endif %}" 
+                 href="{{ url('core:system_settings') }}">
+                <i class="bi bi-gear me-2 fs-6"></i>
+                系统设置
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'users' %}active{% endif %}" 
+                 href="{{ url('core:system_users') }}">
+                <i class="bi bi-people me-2 fs-6"></i>
+                人员管理
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'permissions' %}active{% endif %}" 
+                 href="{{ url('core:system_permissions') }}">
+                <i class="bi bi-shield-lock me-2 fs-6"></i>
+                权限管理
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'cron' %}active{% endif %}" 
+                 href="{{ url('core:cron_manager') }}">
+                <i class="bi bi-clock me-2 fs-6"></i>
+                Cron 调度
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'permission_check' %}active{% endif %}" 
+                 href="{{ url('core:permission_check') }}">
+                <i class="bi bi-shield-check me-2 fs-6"></i>
+                权限检测
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'smtp' %}active{% endif %}" 
+                 href="{{ url('core:smtp_config') }}">
+                <i class="bi bi-envelope me-2 fs-6"></i>
+                SMTP 配置
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'logs' %}active{% endif %}" 
+                 href="{{ url('core:logs_index') }}">
+                <i class="bi bi-file-text me-2 fs-6"></i>
+                日志管理
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- 右侧主内容区 -->
+    <div class="flex-grow-1 overflow-auto px-4 py-4 py-md-5" style="background: var(--bg-body, #ffffff);">
+      <!-- 标题行 -->
+      <div class="d-flex justify-content-between align-items-center mb-2 flex-nowrap">
+        <h1 class="h2 mb-0 flex-grow-1 pe-3">
+          {% block admin_title_content %}{% endblock %}
+        </h1>
+        <div class="ms-auto ps-4">
+          {% block admin_buttons_content %}{% endblock %}
+        </div>
+      </div>
+
+      <!-- 子页面实际内容 -->
+      <div class="pb-4">
+        {% block admin_content %}{% endblock %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,193 @@
+/*
+ * indigo.css
+ * FFE 项目跟进系统 - 深靛蓝主题（Indigo Theme）
+ * 版本：2026-03-13 v1.0
+ *
+ * 风格定位：深靛蓝配色，专业沉稳，适合企业/科技风格
+ */
+
+:root {
+  /* 主色系 - 深靛蓝 */
+  --primary:           #394A7A;
+  --primary-hover:     #2D3B5F;
+  --primary-active:    #252F4A;
+  --primary-light:     rgba(57, 74, 122, 0.12);
+  --primary-extra-light: rgba(57, 74, 122, 0.06);
+
+  /* 信息 / 辅助 - 协调蓝紫色 */
+  --info:              #5A6C9A;
+  --info-hover:        #4A5878;
+  --info-active:       #3C485E;
+  --info-light:        rgba(90, 108, 154, 0.12);
+
+  /* 成功 */
+  --success:           #86C166;
+  --success-hover:     #6CA54E;
+  --warning-light:     rgba(134, 193, 102, 0.12);
+
+  /* 警告 / 强调 */
+  --warning:           #F4B084;
+  --warning-hover:     #E09A6C;
+  --warning-light:     rgba(244, 176, 132, 0.12);
+
+  /* 危险 */
+  --danger:            #E57373;
+  --danger-hover:      #CF5B5B;
+  --danger-light:      rgba(229, 115, 115, 0.12);
+
+  /* 背景 */
+  --bg-body:           #F5F6FA;
+  --bg-gradient:       linear-gradient(to bottom, #F5F6FA 0%, #FFFFFF 100%);
+  --bg-surface:        #FFFFFF;
+  --bg-card:           #FFFFFF;
+  --bg-nav:            linear-gradient(to right, #2D3B5F, #394A7A);
+  --bg-footer:         #EBEDF5;
+  --bg-hover:          rgba(57, 74, 122, 0.06);
+
+  /* 文字 */
+  --text-primary:      #2A2A3A;
+  --text-secondary:    #5A5A7A;
+  --text-muted:        #8A8AA0;
+  --text-inverted:     #FFFFFF;
+  --text-nav:          #FFFFFF;
+  --text-nav-active:   #FFFFFF;
+
+  /* 边框 & 分割 */
+  --border:            #A0A8C0;
+  --border-light:      #C8D0E0;
+  --border-focus:      #394A7A;
+
+  /* 阴影 - 克制 */
+  --shadow-sm:         0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow:            0 2px 6px rgba(0, 0, 0, 0.10);
+  --shadow-hover:      0 4px 12px rgba(0, 0, 0, 0.12);
+  --shadow-nav:        0 2px 4px rgba(0, 0, 0, 0.08);
+
+  /* 圆角 */
+  --radius-sm:         4px;
+  --radius:            6px;
+  --radius-lg:         8px;
+  --radius-xl:         10px;
+  --radius-pill:       9999px;
+
+  /* 过渡 */
+  --transition:        all 0.18s ease;
+  --transition-slow:   all 0.25s ease;
+
+  /* Bootstrap 变量映射 */
+  --bs-primary: var(--primary);
+  --bs-primary-rgb: 57, 74, 122;
+  --bs-info: var(--info);
+  --bs-info-rgb: 90, 108, 154;
+  --bs-link-color: var(--primary);
+  --bs-link-hover-color: var(--primary-hover);
+}
+
+/* === 强制覆盖导航栏背景 === */
+.navbar-macaron,
+.navbar.bg-primary,
+.navbar-dark {
+  background: var(--bg-nav) !important;
+}
+
+.navbar-macaron .navbar-nav .nav-link,
+.navbar-dark .navbar-nav .nav-link {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.navbar-macaron .navbar-nav .nav-link:hover,
+.navbar-macaron .navbar-nav .nav-link:focus,
+.navbar-macaron .navbar-nav .nav-link.active,
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link:focus,
+.navbar-dark .navbar-nav .nav-link.active {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  border-radius: 0.375rem;
+}
+
+.navbar-macaron .navbar-brand,
+.navbar-dark .navbar-brand {
+  color: #ffffff !important;
+}
+
+/* Card 背景 */
+.card {
+  background-image: linear-gradient(to bottom, #FFFFFF, #F5F6FA);
+}
+
+/* 左侧导航高亮 */
+.admin-sidebar .nav-link.active {
+  background-color: var(--primary-light) !important;
+  color: var(--primary) !important;
+  border-left-color: var(--primary) !important;
+}
+
+/* 按钮 */
+.btn-primary {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
+}
+
+/* daisyUI 风格卡片样式 - 带图片区域 */
+.entry-card {
+  background-color: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+  transition: var(--transition);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.entry-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.entry-card-figure {
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--info) 100%);
+}
+
+.entry-card-figure .bi {
+  font-size: 3.5rem;
+  color: white;
+  opacity: 0.9;
+}
+
+.entry-card-body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.entry-card-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.entry-card-desc {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  flex: 1;
+}
+
+.entry-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: auto;
+}

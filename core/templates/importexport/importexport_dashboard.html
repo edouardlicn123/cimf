@@ -1,0 +1,54 @@
+{% extends "frames/frame_importexport.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'dashboard' %}
+
+{% block title %}数据导入导出 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}
+  数据导入导出
+{% endblock %}
+
+{% block admin_content %}
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+  <div class="col">
+    <div class="entry-card h-100">
+      <div class="entry-card-figure">
+        <i class="bi bi-database-down"></i>
+        <h5 class="entry-card-title">数据导出</h5>
+      </div>
+      <div class="entry-card-body">
+        <p class="entry-card-desc">
+          将已启用的节点模块数据导出为 CSV/XLSX 格式
+        </p>
+        <div class="entry-card-actions">
+          <a href="{{ url('importexport:export_list') }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-arrow-right me-1"></i> 进入
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col">
+    <div class="entry-card h-100">
+      <div class="entry-card-figure">
+        <i class="bi bi-database-up"></i>
+        <h5 class="entry-card-title">数据导入</h5>
+      </div>
+      <div class="entry-card-body">
+        <p class="entry-card-desc">
+          从 CSV/XLSX 文件导入数据到节点模块
+        </p>
+        <div class="entry-card-actions">
+          <a href="{{ url('importexport:import_list') }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-arrow-right me-1"></i> 进入
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

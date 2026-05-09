@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}400 - 无效请求{% endblock %}
+
+{% block head_extra %}
+<style>
+    .error-container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 5rem 1rem;
+        text-align: center;
+    }
+    
+    .error-code {
+        font-size: 8.5rem;
+        font-weight: 700;
+        color: var(--danger);
+        line-height: 0.95;
+        margin: 0 0 1.2rem;
+    }
+    
+    .error-message {
+        font-size: 1.9rem;
+        margin: 1rem 0 1.5rem;
+        color: var(--text-primary);
+    }
+    
+    .error-desc {
+        font-size: 1.125rem;
+        color: var(--text-muted);
+        margin-bottom: 2.5rem;
+        max-width: 580px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .btn-retry {
+        min-width: 200px;
+        font-size: 1.125rem;
+        padding: 0.85rem 1.8rem;
+    }
+    
+    @media (max-width: 576px) {
+        .error-code {
+            font-size: 6rem;
+        }
+        .error-message {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% if messages %}
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+  {% for message in messages %}
+  <div class="toast show" role="alert">
+    <div class="toast-body">
+      {{ message }}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="error-container">
+    <h1 class="error-code">400</h1>
+    <h2 class="error-message">无效请求</h2>
+    
+    <p class="error-desc">
+        服务器无法理解您的请求，可能是因为请求格式错误、缺少必要参数或数据无效。
+    </p>
+
+    <p class="error-desc mb-4">
+        请检查您提交的内容（例如表单字段、URL 参数、文件大小等），然后重试。
+    </p>
+
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <a href="javascript:history.back()" class="btn btn-primary btn-lg btn-retry">
+            返回上一页重试
+        </a>
+        
+        <a href="{{ url('core:dashboard') }}" class="btn btn-outline-secondary btn-lg">
+            返回仪表盘
+        </a>
+    </div>
+
+    {% if user.is_authenticated and user.is_admin %}
+    <div class="mt-5 pt-4 border-top small text-muted">
+        （管理员可见）请求路径：{{ request.path }}<br>
+        如需排查，请检查请求参数或表单数据是否正确。
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

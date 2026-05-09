@@ -1,0 +1,569 @@
+{% extends "frames/frame_myinfo.html" %}
+
+{% block title %}导航卡片设置 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}导航卡片设置{% endblock %}
+
+{% block admin_buttons_content %}
+{% endblock %}
+
+{% block admin_content %}
+<style>
+.nav-cards-area {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--bg-surface);
+    border-radius: 8px;
+}
+
+.nav-cards-area .row {
+    --bs-gutter-x: 0.5rem;
+    --bs-gutter-y: 0.5rem;
+}
+
+.nav-slot {
+    height: 80px;
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    background: var(--bg-body);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-slot.drag-over {
+    border-color: var(--primary);
+    background-color: var(--primary-light);
+}
+
+.nav-card-setting {
+    height: 100%;
+    width: 100%;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 500;
+    cursor: grab;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+}
+
+.nav-card-setting:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    color: #fff;
+}
+
+.nav-card-setting.dragging {
+    opacity: 0.5;
+}
+
+.nav-card-setting .card-actions {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    display: none;
+    gap: 4px;
+}
+
+.nav-card-setting:hover .card-actions {
+    display: flex;
+}
+
+.btn-icon {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border-radius: 4px;
+    font-size: 12px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-icon.edit {
+    background: rgba(255,255,255,0.3);
+    color: #fff;
+}
+
+.btn-icon.delete {
+    background: rgba(255,255,255,0.3);
+    color: #fff;
+}
+
+.btn-icon:hover {
+    background: rgba(255,255,255,0.5);
+}
+
+.empty-hint {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+.nav-cards-tips {
+    background: var(--bg-surface);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.nav-cards-tips .tip {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+</style>
+
+<div class="nav-cards-tips">
+    <div class="tip">
+        <i class="bi bi-info-circle"></i>
+        <span>提示：最多添加 {{ max_cards }} 个导航卡片，已添加 <strong id="cardCount">{{ cards|length }}</strong> 个</span>
+    </div>
+</div>
+
+<div class="mb-3">
+    <button type="button" class="btn btn-success" id="addCardBtn" {% if cards|length >= max_cards %}disabled{% endif %}>
+        <i class="bi bi-plus-lg me-1"></i> 添加导航卡片
+    </button>
+</div>
+
+<div class="nav-cards-area">
+    <div class="mb-2 text-muted small">已添加卡片（拖拽排序）：</div>
+    <div class="row g-2 mb-3" id="cardsArea">
+        {% for card in cards %}
+        <div class="col-2">
+            <div class="nav-slot" data-position="{{ loop.index }}" data-card-id="{{ card.id }}">
+                <div class="nav-card-setting" draggable="true" data-card-id="{{ card.id }}"
+                     style="background-color: {{ card.bg_color }}">
+                    <span>{{ card.name }}</span>
+                    <div class="card-actions">
+                        <button type="button" class="btn-icon edit" onclick="editCard('{{ card.id }}')" title="编辑">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button type="button" class="btn-icon delete" onclick="deleteCard('{{ card.id }}')" title="删除">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="cardModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">添加导航卡片</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="cardId">
+                <div class="mb-3">
+                    <label class="form-label">网站名称 *</label>
+                    <input type="text" class="form-control" id="cardName" maxlength="20" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">网址 *</label>
+                    <input type="url" class="form-control" id="cardUrl" placeholder="https://example.com" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">背景颜色</label>
+                    <div class="d-flex gap-2">
+                        <input type="text" class="form-control" id="cardColor" value="#007bff" style="max-width: 120px;">
+                        <input type="color" class="form-control form-control-color" id="colorPicker" value="#007bff" style="width: 50px;">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">预览</label>
+                    <div id="cardPreview" class="nav-card-setting p-3 text-center" style="background-color: #007bff; color: #fff;">
+                        <span id="previewName">网站名称</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="saveCardBtn">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let cards = {{ cards|tojson|safe }};
+let maxCards = {{ max_cards }};
+let editingId = null;
+let draggingCard = null;
+
+function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
+function getCsrfToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+           document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '';
+}
+
+function updateCardCount() {
+    document.getElementById('cardCount').textContent = cards.length;
+    document.getElementById('addCardBtn').disabled = cards.length >= maxCards;
+}
+
+function updateCardDisplay() {
+    const cardsArea = document.getElementById('cardsArea');
+    cardsArea.innerHTML = '';
+    
+    // 先创建12个空格子
+    for (let i = 1; i <= 12; i++) {
+        const col = document.createElement('div');
+        col.className = 'col-2';
+        const slot = document.createElement('div');
+        slot.className = 'nav-slot';
+        slot.dataset.position = i;
+        slot.innerHTML = '<span class="empty-hint">拖入卡片</span>';
+        col.appendChild(slot);
+        cardsArea.appendChild(col);
+    }
+    
+    // 收集已使用的position，防止重复
+    const usedPositions = new Set();
+    
+    // 按position放置卡片
+    cards.forEach(card => {
+        let position = card.position || 1;
+        
+        // 如果position已被使用，分配到第一个空位置
+        if (usedPositions.has(position)) {
+            for (let i = 1; i <= 12; i++) {
+                if (!usedPositions.has(i)) {
+                    position = i;
+                    card.position = position;
+                    break;
+                }
+            }
+        }
+        
+        usedPositions.add(position);
+        
+        const slot = document.querySelector(`.nav-slot[data-position="${position}"]`);
+        if (slot) {
+            slot.innerHTML = `
+                <div class="nav-card-setting" draggable="true" data-card-id="${card.id}" data-position="${position}"
+                     style="background-color: ${card.bg_color}">
+                    <span>${card.name}</span>
+                    <div class="card-actions">
+                        <button type="button" class="btn-icon edit" onclick="editCard('${card.id}')" title="编辑">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button type="button" class="btn-icon delete" onclick="deleteCard('${card.id}')" title="删除">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+    });
+    
+    updateCardCount();
+    initDragAndDrop();
+}
+
+document.getElementById('addCardBtn').addEventListener('click', function() {
+    editingId = null;
+    document.getElementById('modalTitle').textContent = '添加导航卡片';
+    document.getElementById('cardId').value = '';
+    document.getElementById('cardName').value = '';
+    document.getElementById('cardUrl').value = '';
+    document.getElementById('cardColor').value = '#007bff';
+    document.getElementById('colorPicker').value = '#007bff';
+    updatePreview();
+    
+    const modal = new bootstrap.Modal(document.getElementById('cardModal'));
+    modal.show();
+});
+
+function editCard(cardId) {
+    const card = cards.find(c => c.id === cardId);
+    if (!card) return;
+    
+    editingId = cardId;
+    document.getElementById('modalTitle').textContent = '编辑导航卡片';
+    document.getElementById('cardId').value = card.id;
+    document.getElementById('cardName').value = card.name;
+    document.getElementById('cardUrl').value = card.url;
+    document.getElementById('cardColor').value = card.bg_color;
+    document.getElementById('colorPicker').value = card.bg_color;
+    updatePreview();
+    
+    const modal = new bootstrap.Modal(document.getElementById('cardModal'));
+    modal.show();
+}
+
+const navCardsChannel = new BroadcastChannel('nav-cards-updated');
+
+async function deleteCard(cardId) {
+    if (!confirm('确定要删除这个导航卡片吗？')) return;
+    
+    cards = cards.filter(c => c.id !== cardId);
+    updateCardDisplay();
+    
+    try {
+        const response = await fetch('{{ url("api:api_nav_cards_save") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({ cards: cards }),
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            navCardsChannel.postMessage({ cards: cards });
+            showToast('删除成功', 'success');
+        } else {
+            showToast(data.error || '删除失败', 'danger');
+        }
+    } catch (e) {
+        showToast('删除失败: ' + e.message, 'danger');
+    }
+}
+
+document.getElementById('cardName').addEventListener('input', updatePreview);
+document.getElementById('cardColor').addEventListener('input', function() {
+    document.getElementById('colorPicker').value = this.value;
+    updatePreview();
+});
+document.getElementById('colorPicker').addEventListener('input', function() {
+    document.getElementById('cardColor').value = this.value;
+    updatePreview();
+});
+
+function updatePreview() {
+    const name = document.getElementById('cardName').value || '网站名称';
+    const color = document.getElementById('cardColor').value;
+    document.getElementById('previewName').textContent = name;
+    document.getElementById('cardPreview').style.backgroundColor = color;
+}
+
+function getFirstEmptyPosition() {
+    const usedPositions = cards.map(function(c) { return c.position; });
+    for (let i = 1; i <= 12; i++) {
+        if (usedPositions.indexOf(i) === -1) return i;
+    }
+    return 0; // 已满
+}
+
+document.getElementById('saveCardBtn').addEventListener('click', async function() {
+    const name = document.getElementById('cardName').value.trim();
+    const url = document.getElementById('cardUrl').value.trim();
+    const bgColor = document.getElementById('cardColor').value;
+    
+    if (!name) {
+        alert('请输入网站名称');
+        return;
+    }
+    if (!url) {
+        alert('请输入网址');
+        return;
+    }
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        alert('网址必须以 http:// 或 https:// 开头');
+        return;
+    }
+    
+    if (editingId) {
+        const card = cards.find(function(c) { return c.id === editingId; });
+        if (card) {
+            card.name = name;
+            card.url = url;
+            card.bg_color = bgColor;
+        }
+    } else {
+        var newPosition = getFirstEmptyPosition();
+        if (!newPosition) {
+            alert('位置已满，无法新增卡片');
+            return;
+        }
+        cards.push({
+            id: generateUUID(),
+            name: name,
+            url: url,
+            bg_color: bgColor,
+            position: newPosition
+        });
+    }
+    
+    updateCardDisplay();
+    bootstrap.Modal.getInstance(document.getElementById('cardModal')).hide();
+    
+    // 保存到数据库
+    try {
+        const response = await fetch('{{ url("api:api_nav_cards_save") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({ cards: cards }),
+            credentials: 'include'
+        });
+        const data = await response.json();
+        if (data.success) {
+            navCardsChannel.postMessage({ cards: cards });
+            showToast('保存成功', 'success');
+        } else {
+            showToast(data.error || '保存失败', 'danger');
+        }
+    } catch (e) {
+        showToast('保存失败: ' + e.message, 'danger');
+    }
+});
+
+function onDragStart(e) {
+    draggingCard = e.target.closest('.nav-card-setting');
+    if (!draggingCard) return;
+    draggingCard.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', draggingCard.dataset.cardId);
+}
+
+function onDragEnd(e) {
+    if (draggingCard) {
+        draggingCard.classList.remove('dragging');
+    }
+    document.querySelectorAll('.nav-slot').forEach(function(slot) {
+        slot.classList.remove('drag-over');
+    });
+    draggingCard = null;
+}
+
+function onDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+}
+
+function onDragEnter(e) {
+    e.preventDefault();
+    var slot = e.target.closest('.nav-slot');
+    if (slot) slot.classList.add('drag-over');
+}
+
+function onDragLeave(e) {
+    var slot = e.target.closest('.nav-slot');
+    if (slot && !slot.contains(e.relatedTarget)) {
+        slot.classList.remove('drag-over');
+    }
+}
+
+function onNavCardDrop(e) {
+    e.preventDefault();
+    var toSlot = e.target.closest('.nav-slot');
+    if (!toSlot || !draggingCard) return;
+    
+    var card = draggingCard;
+    var fromSlot = draggingCard.closest('.nav-slot');
+    if (fromSlot === toSlot) return;
+    
+    var fromPosition = parseInt(fromSlot.dataset.position);
+    var toPosition = parseInt(toSlot.dataset.position);
+    var toCard = toSlot.querySelector('.nav-card-setting');
+    
+    // 找到被拖拽的卡片数据
+    var cardData = cards.find(function(c) { return c.id == card.dataset.cardId; });
+    if (!cardData) return;
+    
+    if (toCard) {
+        // 交换两张卡片的position
+        var toCardData = cards.find(function(c) { return c.id == toCard.dataset.cardId; });
+        if (toCardData) {
+            var tempPos = cardData.position;
+            cardData.position = toCardData.position;
+            toCardData.position = tempPos;
+        }
+    } else {
+        // 移动到空位置
+        cardData.position = toPosition;
+    }
+    
+    // 更新DOM并保存
+    updateCardDisplay();
+    saveCardsOrder();
+}
+
+function initDragAndDrop() {
+    var cardElements = document.querySelectorAll('.nav-card-setting');
+    var slots = document.querySelectorAll('.nav-slot');
+    
+    cardElements.forEach(function(card) {
+        card.addEventListener('dragstart', onDragStart);
+        card.addEventListener('dragend', onDragEnd);
+    });
+    
+    slots.forEach(function(slot) {
+        slot.addEventListener('dragover', onDragOver);
+        slot.addEventListener('drop', onNavCardDrop);
+        slot.addEventListener('dragenter', onDragEnter);
+        slot.addEventListener('dragleave', onDragLeave);
+    });
+}
+
+function saveCardsOrder() {
+        fetch('{{ url("api:api_nav_cards_save") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({ cards: cards }),
+        credentials: 'include'
+    }).then(function(response) { return response.json(); })
+      .then(function(data) {
+        if (data.success) {
+            navCardsChannel.postMessage({ cards: cards });
+        }
+      })
+      .catch(function(e) {
+        console.error('保存失败:', e);
+      });
+}
+
+updateCardDisplay();
+
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">${message}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container position-fixed top-0 end-0 p-3';
+        document.body.appendChild(container);
+    }
+    container.appendChild(toast);
+    
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+    toast.addEventListener('hidden.bs.toast', () => toast.remove());
+}
+</script>
+{% endblock %}

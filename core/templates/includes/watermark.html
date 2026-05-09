@@ -1,0 +1,9 @@
+<!-- Watermark placeholder -->
+<div id="watermarkContainer"
+     data-watermark-text="{{ system_settings.get('watermark_text', '') }}"
+     data-enable-shortcut="{{ system_settings.get('enable_watermark_shortcut', 'false') }}"
+     data-enable-detection="{{ system_settings.get('enable_devtools_detection', 'false') }}">
+</div>
+<div id="watermarkWarning" class="alert alert-warning position-fixed bottom-0 start-0 end-0 text-center" style="display: none; z-index: 9999;">
+    检测到开发者工具已打开，请关闭后再操作。
+</div>

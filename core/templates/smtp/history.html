@@ -1,0 +1,96 @@
+{% extends "frames/frame_admin.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% block title %}邮件发送历史 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}邮件发送历史{% endblock %}
+
+{% block admin_buttons_content %}
+<a href="{{ url('core:smtp_config') }}" class="btn btn-secondary">
+    <i class="bi bi-arrow-left"></i> 返回
+</a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">发送历史</h5>
+                    <div class="btn-group">
+                        <a href="{{ url('core:smtp_history') }}" class="btn btn-sm btn-outline-secondary {% if not status_filter %}active{% endif %}">全部</a>
+                        <a href="{{ url('core:smtp_history') }}?status=sent" class="btn btn-sm btn-outline-success {% if status_filter == 'sent' %}active{% endif %}">成功</a>
+                        <a href="{{ url('core:smtp_history') }}?status=failed" class="btn btn-sm btn-outline-danger {% if status_filter == 'failed' %}active{% endif %}">失败</a>
+                        <a href="{{ url('core:smtp_history') }}?status=pending" class="btn btn-sm btn-outline-warning {% if status_filter == 'pending' %}active{% endif %}">待发送</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if logs %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>时间</th>
+                                <th>收件人</th>
+                                <th>主题</th>
+                                <th>状态</th>
+                                <th>重试次数</th>
+                                <th>错误信息</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr>
+                                <td>
+                                    {% if log.created_at %}<small>{{ log.created_at|date("Y-m-d H:i") }}</small>{% else %}<small class="text-muted">-</small>{% endif %}
+                                    {% if log.sent_at %}
+                                    <br><small class="text-muted">发送: {{ log.sent_at|date("H:i:s") }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small title="{{ log.to_email }}">{{ log.to_email|slice(":40") }}{% if log.to_email|length > 40 %}...{% endif %}</small>
+                                </td>
+                                <td>
+                                    <small title="{{ log.subject }}">{{ log.subject|slice(":50") }}{% if log.subject|length > 50 %}...{% endif %}</small>
+                                </td>
+                                <td>
+                                    {% if log.status == 'sent' %}
+                                    <span class="badge bg-success">成功</span>
+                                    {% elif log.status == 'failed' %}
+                                    <span class="badge bg-danger">失败</span>
+                                    {% elif log.status == 'sending' %}
+                                    <span class="badge bg-info">发送中</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">待发送</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ log.retry_count }}</td>
+                                <td>
+                                    {% if log.error_message %}
+                                    <small class="text-danger" title="{{ log.error_message }}">
+                                        {{ log.error_message|slice(":30") }}{% if log.error_message|length > 30 %}...{% endif %}
+                                    </small>
+                                    {% else %}
+                                    <small class="text-muted">-</small>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-inbox fs-1"></i>
+                    <p class="mt-2">暂无发送记录</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

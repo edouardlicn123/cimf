@@ -1,0 +1,114 @@
+{% extends "frames/frame_structure.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'node_modules' %}
+
+{% block title %}新建模块 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}新建模块{% endblock %}
+
+{% block admin_content %}
+<form method="post" id="createModuleForm">
+    {% include "includes/csrf.html" %}
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">模块基本信息</h5>
+        </div>
+        <div class="card-body">
+            <p class="text-primary small mb-3">
+                <i class="bi bi-lightbulb me-1"></i>
+                在这个页面建立模块的基础内容，再继续进行代码开发或利用 AI 辅助开发。
+            </p>
+            <div class="mb-3">
+                <label class="form-label">模块标识符 *</label>
+                <input type="text" name="module_id" class="form-control" placeholder="如: supplier" required>
+                <small class="text-muted">模块的唯一标识符，只能使用字母、数字和下划线</small>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">模块名称 *</label>
+                <input type="text" name="name" class="form-control" placeholder="如: 供应商" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">模块类型 *</label>
+                <input type="text" name="module_type" class="form-control" placeholder="请输入模块类型" required>
+                <div class="form-text">建议选项: <code>node</code>（事务节点）、<code>system</code>（系统模块）</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">版本号</label>
+                <input type="text" name="version" class="form-control" value="1.0.0">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">作者</label>
+                <input type="text" name="author" class="form-control" placeholder="您的名字">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">描述</label>
+                <textarea name="description" class="form-control" rows="3" placeholder="模块功能描述"></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">图标</label>
+                <input type="text" name="icon" class="form-control" value="bi-folder">
+                <small class="text-muted">使用 Bootstrap Icons 类名</small>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" name="frontpage_card_clickable" class="form-check-input" id="frontpageCardClickable" checked>
+                <label class="form-check-label" for="frontpageCardClickable">
+                    首页卡片可点击
+                </label>
+                <small class="text-muted d-block">取消勾选则首页卡片无链接（如时钟、计算器等工具类模块）</small>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" name="install_on_init" class="form-check-input" id="installOnInit" checked>
+                <label class="form-check-label" for="installOnInit">
+                    初始化时自动安装此模块
+                </label>
+                <small class="text-muted d-block">取消勾选则系统初始化时不会自动安装此模块（手动扫描仍可安装）</small>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">依赖模块</label>
+                <input type="text" name="require" class="form-control" placeholder="如: customer,whatsapp">
+                <small class="text-muted">以英文逗号 "," 分隔多个依赖模块</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-end">
+        <a href="{{ url('module:list') }}" class="btn btn-secondary">取消</a>
+        <button type="submit" class="btn btn-primary">创建模块</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('createModuleForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    try {
+        const response = await fetch('{{ url("module:create_action") }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token_value }}'
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('模块创建成功！');
+            window.location.href = '{{ url("module:list") }}';
+        } else {
+            alert('错误: ' + result.error);
+        }
+    } catch (error) {
+        alert('请求失败: ' + error);
+    }
+});
+</script>
+{% endblock %}
