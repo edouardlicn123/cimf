@@ -138,16 +138,9 @@
 ```python
 from core.constants import UserTheme, Language
 
-# UserTheme.DISPLAY_LABELS:
-# {
-#     'default': '默认',
-#     'gov': '政府风格 - 酒红配色、沉稳',
-#     'indigo': '靛蓝风格 - 专业沉稳，科技感',
-#     'savawoku': 'Savawoku - 品牌红橙、专业商务',
-#     'macaron': '马卡龙风格 - 削弱视觉冲击',
-#     'teal': '青绿风格 - 清新现代',
-#     'uniklo': 'uniklo - 干净线条、经典红白',
-# }
+# UserTheme.CHOICES / LABELS:
+# ('default', '默认'), ('gov', '浓重红色'), ('indigo', '靛蓝'),
+# ('macaron', '马卡龙'), ('teal', '青绿'), ('uniklo', 'uniklo'), ('savawoku', 'Savawoku')
 
 # Language.CHOICES:
 # [('zh', '中文（简体）'), ('en', 'English')]

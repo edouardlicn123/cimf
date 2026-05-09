@@ -61,7 +61,7 @@
         0x04970, 0x0a4b0, 0x0b4b5, 0x06a50, 0x06d40, 0x1ab54, 0x02b60, 0x09570, 0x052f2, 0x04970,
         0x06566, 0x0d4a0, 0x0ea50, 0x06e95, 0x05ad0, 0x02b60, 0x186e3, 0x092e0, 0x1c8d7, 0x0c950,
         0x0d4a0, 0x1d8a6, 0x0b550, 0x056a0, 0x1a5b4, 0x025d0, 0x092d0, 0x0d2b2, 0x0a950, 0x0b557,
-        0x06ca0, 0x0b550, 0x15355, 0x04da0, 0x0a5b0, 0x14573, 0x052b0, 0x0a9a8, 0x0e950, 0x06aa6,
+        0x06ca0, 0x0b550, 0x15355, 0x04da0, 0x0a5b0, 0x14573, 0x052b0, 0x0a9a8, 0x0e950, 0x06aa0,
         0x0aea6, 0x0ab50, 0x04b60, 0x0aae4, 0x0a570, 0x05260, 0x0f263, 0x0d950, 0x05b57, 0x056a0,
         0x096d0, 0x04dd5, 0x04ad0, 0x0a4d0, 0x0d4d4, 0x0d250, 0x0d558, 0x0b540, 0x0b6a0, 0x195a6,
         0x095b0, 0x049b0, 0x0a974, 0x0a4b0, 0x0b27a, 0x06a50, 0x06d40, 0x0af46, 0x0ab60, 0x09570,
@@ -85,89 +85,62 @@
         '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十'];
     var gan = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
     var zhi = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+    var shengxiao = ['鼠', '牛', '虎', '兔', '龙', '蛇', '马', '羊', '猴', '鸡', '狗', '猪'];
 
     function getLunarDate(date) {
         var year = date.getFullYear();
         var month = date.getMonth() + 1;
         var day = date.getDate();
-        
-        var offset = -1;
-        var i, j, temp = 0;
-        
-        var baseYear = 1900;
-        for (i = baseYear; i < year; i++) {
-            temp = 348;
-            j = 0x8000;
-            while (j > 0x8) {
-                temp += (lunarInfo[i - baseYear] & j) ? 1 : 0;
-                j >>= 1;
+
+        var offset = (Date.UTC(year, month - 1, day) - Date.UTC(1900, 0, 31)) / 86400000;
+        if (offset < 0) return { lunar: '' };
+
+        var i, temp, isLeap = false, leap, m, yearDays;
+
+        // Find the lunar year
+        for (i = 0; i < lunarInfo.length; i++) {
+            yearDays = 0;
+            leap = lunarInfo[i] & 0xf;
+            for (m = 1; m <= 12; m++) {
+                yearDays += (lunarInfo[i] & (0x10000 >> m)) ? 30 : 29;
             }
-            offset += 365 + ((lunarInfo[i - baseYear] & 0x10000) ? 30 : 29);
+            if (leap > 0) {
+                yearDays += (lunarInfo[i] & 0x10000) ? 30 : 29;
+            }
+            if (offset < yearDays) break;
+            offset -= yearDays;
         }
-        
-        var leapMonth = lunarInfo[year - baseYear] & 0xf;
-        for (i = 1; i < month; i++) {
-            if (i > leapMonth) {
-                offset += 30;
+
+        if (i >= lunarInfo.length) return { lunar: '' };
+
+        var lunarYear = 1900 + i;
+        leap = lunarInfo[i] & 0xf;
+        var months = 12;
+        if (leap > 0) months = 13;
+
+        // Find the lunar month
+        for (m = 1; m <= months && offset > 0; m++) {
+            if (leap > 0 && m === leap + 1) {
+                temp = (lunarInfo[i] & 0x10000) ? 30 : 29;
             } else {
-                offset += (lunarInfo[year - baseYear] & (0x10000 >> i)) ? 30 : 29;
+                var regM = (leap > 0 && m > leap) ? m - 1 : m;
+                temp = (lunarInfo[i] & (0x10000 >> regM)) ? 30 : 29;
             }
-        }
-        offset += day;
-        
-        if (leapMonth > 0 && month > leapMonth) {
-            offset += 30;
-        }
-        
-        var isLeap = false;
-        i = 0;
-        while (i < 200 && offset > 0) {
-            temp = (lunarInfo[i] & 0x10000) ? 30 : 29;
-            if (offset <= temp) {
-                break;
-            }
+            if (offset < temp) break;
             offset -= temp;
-            i++;
         }
-        
-        var lMonth = 1;
-        var lDay = offset;
-        
-        var leap = lunarInfo[i] & 0xf;
-        if (leapMonth > 0 && i === leapMonth) {
-            isLeap = true;
-        }
-        
-        var m = 1;
-        while (m < 12) {
-            if (m === leap) {
-                if (lDay > 30) {
-                    lDay -= 30;
-                    m++;
-                }
-                if (lDay <= 0) break;
-            }
-            temp = (lunarInfo[i] & (0x10000 >> m)) ? 30 : 29;
-            if (lDay > temp) {
-                lDay -= temp;
-                m++;
-            } else {
-                break;
-            }
-        }
-        lMonth = m;
-        
-        var yearCyclical = (year - 1900) % 60;
-        
-        var yearStem = gan[yearCyclical % 10];
-        var yearBranch = zhi[yearCyclical % 12];
-        
+
+        isLeap = (leap > 0 && m === leap + 1);
+        var lMonth = isLeap ? leap : (leap > 0 && m > leap ? m - 1 : m);
+        var lDay = offset + 1;
+
+        var yearStem = gan[(lunarYear - 4) % 10];
+        var yearBranch = zhi[(lunarYear - 4) % 12];
+        var zodiac = shengxiao[(lunarYear - 4) % 12];
         var monthName = (isLeap ? '闰' : '') + lunarMonth[lMonth - 1] + '月';
-        var dayName = lunarDay[lDay - 1];
-        
-        return {
-            lunar: yearStem + yearBranch + ' ' + monthName + dayName
-        };
+        var dayName = lunarDay[lDay - 1] || '';
+
+        return { lunar: yearStem + yearBranch + ' ' + zodiac + '年 ' + monthName + dayName };
     }
 
     function getCsrfToken() {
@@ -237,7 +210,7 @@
         card.style.cssText = 'background-color:' + bgColor + ' !important;color:' + textColor + ' !important;border:none;height:100%;padding:0.75rem;display:flex;flex-direction:column;justify-content:center;align-items:center;cursor:grab;';
         
         card.innerHTML = 
-            '<div class="clock-date-weekday" style="font-size:0.875rem;opacity:0.75;margin-bottom:2px;">加载中... 星期</div>' +
+            '<div class="clock-date-weekday" style="font-size:0.875rem;opacity:0.75;margin-bottom:2px;">加载中...</div>' +
             '<div class="clock-lunar" style="font-size:0.875rem;opacity:0.75;margin-bottom:8px;">加载中...</div>' +
             '<div class="clock-time" style="font-size:1.5rem;font-weight:bold;letter-spacing:2px;">--:--:--</div>';
         
@@ -404,7 +377,12 @@
                                     card.style.cursor = 'pointer';
                                 }
                             } else {
-                                var card = createCustomerCard(moduleId, parseInt(position), moduleStats[moduleId]);
+                                var card;
+                                if (moduleId === 'clock') {
+                                    card = createClockCard(parseInt(position));
+                                } else {
+                                    card = createCustomerCard(moduleId, parseInt(position), moduleStats[moduleId]);
+                                }
                                 card.dataset.module = moduleId;
                                 slot.appendChild(card);
                             }

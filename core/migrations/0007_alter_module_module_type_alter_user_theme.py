@@ -18,6 +18,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='user',
             name='theme',
-            field=models.CharField(choices=[('default', '默认'), ('gov', '政府风格'), ('indigo', '靛蓝风格'), ('dopamine', '多巴胺风格'), ('macaron', '马卡龙风格'), ('teal', '青绿风格'), ('uniklo', '极简风格')], default='default', max_length=20, verbose_name='界面主题'),
+            field=models.CharField(choices=[('default', '默认'), ('gov', '政府风格'), ('indigo', '靛蓝风格'), ('macaron', '马卡龙风格'), ('teal', '青绿风格'), ('uniklo', '极简风格'), ('savawoku', 'Savawoku 风格')], default='default', max_length=20, verbose_name='界面主题'),
         ),
     ]
