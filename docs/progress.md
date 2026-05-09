@@ -938,4 +938,8 @@
 41. HITOBA 主题中文名改为「日系简约」
 42. HITOBA 主题中文名改为「黑色简约」
 43. 更新 README：补充技术栈、8主题一览、CSS设计套件、SMTP、模块市场、模块列表精简
+44. 删除黑色简约主题（HITOBA）：移除 constants.py/models.py 定义、删除 hitoba.css、创建迁移 0009 重置用户并更新 choices、清理 README
+45. 删除多巴胺主题 + 新建 Savawoku 主题：移除 DOPAMINE、删除 dopamine.css、新建 savawoku.css、创建迁移 0010、更新文档
+46. structure/dashboard/ 卡片改为 entry card 风格
+47. 修正 structure/dashboard 节点类型卡片：URL 改为 core:node_types_list，名称改为可用节点类型
 
