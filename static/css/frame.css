@@ -109,17 +109,25 @@ html, body {
 /* ── 基本卡片 ── */
 .card:has(.card-header:not(.d-flex)) {
     background: transparent;
-    border-radius: 0;
+    border-radius: var(--radius);
     box-shadow: none;
     border: none;
 }
 
 .card:has(.card-header:not(.d-flex)) .card-body {
-    background: var(--bg-card) !important;
-    border-radius: 0 var(--radius-sm) var(--radius-sm) var(--radius-sm) !important;
-    border: 1px solid var(--primary) !important;
-    box-shadow: none !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 0 var(--radius) var(--radius) !important;
     overflow: hidden;
+    padding: 0;
+}
+
+.card-body-border {
+    border: 1px solid var(--primary);
+    border-radius: 0 0 var(--radius) var(--radius);
+    overflow: hidden;
+    height: 100%;
+    background: var(--bg-card);
 }
 
 .card-header:not(.d-flex) {
