@@ -942,4 +942,11 @@
 45. 删除多巴胺主题 + 新建 Savawoku 主题：移除 DOPAMINE、删除 dopamine.css、新建 savawoku.css、创建迁移 0010、更新文档
 46. structure/dashboard/ 卡片改为 entry card 风格
 47. 修正 structure/dashboard 节点类型卡片：URL 改为 core:node_types_list，名称改为可用节点类型
+48. 清理无效迁移：0007 choices 合并 savawoku，删除 0008/0009/0010
+49. 主题重命名：政府风格→浓重红色、靛蓝风格→靛蓝、马卡龙风格→马卡龙、青绿风格→青绿、极简风格→uniklo、Savawoku风格→Savawoku，移除描述后缀
+50. 修复首页时钟卡片显示 undefined：renderCards 回退路径改用 createClockCard，清理占位文本
+51. 修复 getLunarDate() 农历计算算法：1) 年份查找循环改为计算全年总天数而非仅取29/30；2) 闰月天数改用 bit16 而非硬编码30；3) 闰月处理增加 leap>0 守卫；4) 干支年份改用 (year-4)%10/12
+52. 修正 getLunarDate() 中 month-finding 循环 regM 计算：添加 leap>0 守卫避免非闰年时错位一位，消除 undefined 月名
+53. 修复 lunarInfo[59] 数据错误：0x6aa6→0x6aa0（1959年误设闰月导致所有后续日期偏移29天），现已与 lunardate 权威数据一致
+54. 农历年份后增加生肖显示
 
