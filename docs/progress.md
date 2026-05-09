@@ -981,4 +981,24 @@
 17. 马卡龙主题：恢复选中菜单原始样式
 18. 大正紫主题：卡片内容区右上角改为直角
 19. 删除未使用的 node_modules/lunar-javascript
+20. structure/types/ 列表改为基本列表风格，列表填满容器
+21. structure/taxonomies/ 列表改为基本列表风格
+22. 列表卡片增加 card-header 主题主色边框（字段类型+词汇表）
+23. structure/types/（节点类型）改为基本列表风格+card-header边框
+24. fieldtypes/ 删除返回内容结构按钮
+25. fieldtypes/ 增加页面标题
+26. 修复卡片四角圆角（frame.css border-radius）
+27. 修复卡片border移至card本身，解决四角开口问题
+28. card-body边框仅底部圆角，上边平接header
+29. 卡片设计改为全宽card-header + card-body仅底部圆角边框
+30. 改用box-shadow:inset替代border消除角渲染问题
+31. 改用outset box-shadow替代border，由card overflow裁切底部圆角
+32. 用clip-path裁剪border底部圆角，避免border-radius渲染缺口
+33. 用::before伪元素画border，card-body的overflow:hidden裁切圆角
+34. ::before改用inset box-shadow，避免被overflow裁切且不被内容遮挡
+35. 双层background填充border区域底色，掩盖Firefox角渲染缺口
+36. 修复 Firefox card-body 底部角落边框渲染缺口：使用 inset box-shadow 替代 border
+37. 重新生成 structure/types/、taxonomies/、fieldtypes/ 三个页面：边框移到 .card，h5 margin-top:-1px 覆盖顶部边框，避免 Firefox 边框圆角渲染问题
+38. 重写结构管理三页面：card-body 内加 card-body-border 容器承载边框，避免 Firefox 圆角渲染缺口
+39. 卡片标题区改为透明背景，仅内容区(card-body-border)保留背景色
 
