@@ -143,7 +143,7 @@ from core.constants import UserTheme, Language
 #     'default': '默认',
 #     'gov': '政府风格 - 酒红配色、沉稳',
 #     'indigo': '靛蓝风格 - 专业沉稳，科技感',
-#     'dopamine': '多巴胺风格 - 高饱和、活力快乐',
+#     'savawoku': 'Savawoku - 品牌红橙、专业商务',
 #     'macaron': '马卡龙风格 - 削弱视觉冲击',
 #     'teal': '青绿风格 - 清新现代',
 #     'uniklo': 'uniklo - 干净线条、经典红白',

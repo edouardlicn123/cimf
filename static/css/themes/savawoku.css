@@ -1,0 +1,147 @@
+/*
+ * savawoku.css
+ * FFE / CIMF - Savawoku 风格主题
+ * 版本：2026-05-09 v1.0
+ *
+ * 风格定位：品牌红橙配色，清爽商务，B2B 专业感
+ * 参考：https://www.serverworks.co.jp/
+ */
+
+:root {
+  /* 主色系 - Savawoku 品牌红 */
+  --primary:           #D00F31;
+  --primary-hover:     #B00D2A;
+  --primary-active:    #8A0A20;
+  --primary-light:     rgba(208, 15, 49, 0.12);
+  --primary-extra-light: rgba(208, 15, 49, 0.06);
+
+  /* 信息 / 辅助 - Savawoku 强调橙 */
+  --info:              #FB8E22;
+  --info-hover:        #E07E1E;
+  --info-active:       #C66E1A;
+  --info-light:        rgba(251, 142, 34, 0.15);
+
+  /* 成功 - 沉稳海绿 */
+  --success:           #2E8B57;
+  --success-hover:     #267349;
+
+  /* 警告 / 强调 - 暖金 */
+  --warning:           #E09D1A;
+  --warning-hover:     #C68A16;
+  --warning-light:     rgba(224, 157, 26, 0.20);
+
+  /* 危险 - 深红 */
+  --danger:            #DC143C;
+  --danger-hover:      #C41234;
+  --danger-light:      rgba(220, 20, 60, 0.12);
+
+  /* 背景 - 清爽白底 */
+  --bg-body:           #FFFFFF;
+  --bg-gradient:       linear-gradient(to bottom, #FAFAFA 0%, #FFFFFF 100%);
+  --bg-surface:        #FFFFFF;
+  --bg-card:           #FFFFFF;
+  --bg-nav:            #D00F31;
+  --bg-nav-fallback:   rgba(208, 15, 49, 0.92);
+  --bg-footer:         #F5F5F5;
+  --bg-hover:          rgba(208, 15, 49, 0.06);
+
+  /* 文字 */
+  --text-primary:      #333333;
+  --text-secondary:    #555555;
+  --text-muted:        #888888;
+  --text-inverted:     #FFFFFF;
+  --text-nav:          #FFFFFF;
+  --text-nav-active:   #FFFFFF;
+
+  /* 边框 & 分割 */
+  --border:            #E0E0E0;
+  --border-light:      #F0F0F0;
+  --border-focus:      #D00F31;
+
+  /* 阴影 - 克制，商务感 */
+  --shadow-sm:         0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow:            0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-hover:      0 4px 12px rgba(0, 0, 0, 0.10);
+  --shadow-nav:        0 2px 4px rgba(0, 0, 0, 0.08);
+
+  /* 圆角 - 微圆角，专业感 */
+  --radius-sm:         3px;
+  --radius:            4px;
+  --radius-lg:         6px;
+  --radius-xl:         8px;
+  --radius-pill:       9999px;
+
+  /* 过渡 - 干净顺畅 */
+  --transition:        all 0.18s ease;
+  --transition-slow:   all 0.25s ease;
+
+  /* Bootstrap 变量映射 */
+  --bs-primary: var(--primary);
+  --bs-primary-rgb: 208, 15, 49;
+  --bs-info: var(--info);
+  --bs-info-rgb: 251, 142, 34;
+  --bs-link-color: var(--primary);
+  --bs-link-hover-color: var(--primary-hover);
+}
+
+/* === 导航栏 === */
+.navbar-macaron,
+.navbar.bg-primary,
+.navbar-dark {
+  background: var(--bg-nav) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10) !important;
+}
+
+.navbar-macaron .navbar-nav .nav-link,
+.navbar-dark .navbar-nav .nav-link {
+  color: rgba(255, 255, 255, 0.90) !important;
+}
+
+.navbar-macaron .navbar-nav .nav-link:hover,
+.navbar-macaron .navbar-nav .nav-link:focus,
+.navbar-macaron .navbar-nav .nav-link.active,
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link:focus,
+.navbar-dark .navbar-nav .nav-link.active {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border-radius: var(--radius);
+}
+
+.navbar-macaron .navbar-brand,
+.navbar-dark .navbar-brand {
+  color: #ffffff !important;
+}
+
+/* 左侧导航高亮 */
+.admin-sidebar .nav-link.active {
+  background-color: var(--primary-light) !important;
+  color: var(--primary) !important;
+  border-left-color: var(--primary) !important;
+}
+
+/* 按钮 */
+.btn-primary {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
+}
+
+/* 卡片 - 干净白底 */
+.card {
+  background-color: #FFFFFF;
+}
+
+/* 面包屑 / 页面标题区域 - 两级页面风格 */
+.page-header {
+  border-bottom: 1px solid var(--border-light);
+}
+
+/* 链接悬停 */
+a:not(.btn):not(.nav-link):hover {
+  color: var(--primary-hover);
+}

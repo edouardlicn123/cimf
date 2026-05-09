@@ -8,7 +8,7 @@
 
 {% block admin_buttons_content %}
 <form method="POST" action="{{ url('module:scan') }}" style="display:inline;">
-    {% csrf_token %}
+    {% include "includes/csrf.html" %}
     <button type="submit" class="btn btn-secondary">
         <i class="bi bi-arrow-repeat"></i> 扫描模块
     </button>
@@ -128,7 +128,7 @@
                 {% endif %}
                 <div class="entry-card-actions mt-auto">
                     <form method="POST" action="{{ url('module:disable', mod_id) }}" style="display:inline;">
-                        {% csrf_token %}
+                        {% include "includes/csrf.html" %}
                         <button type="submit" class="btn btn-sm btn-warning">
                             <i class="bi bi-pause-circle"></i> 禁用
                         </button>
@@ -167,7 +167,7 @@
                 {% endif %}
                 <div class="entry-card-actions mt-auto">
                     <form method="POST" action="{{ url('module:enable', mod_id) }}" style="display:inline;">
-                        {% csrf_token %}
+                        {% include "includes/csrf.html" %}
                         <button type="submit" class="btn btn-sm btn-success">
                             <i class="bi bi-play-circle"></i> 启用
                         </button>
@@ -200,7 +200,7 @@
                 </p>
                 <div class="entry-card-actions mt-auto">
                     <form method="POST" action="{{ url('module:install', mod_id) }}" style="display:inline;">
-                        {% csrf_token %}
+                        {% include "includes/csrf.html" %}
                         <button type="submit" class="btn btn-sm btn-warning">
                             <i class="bi bi-wrench"></i> 修复安装
                         </button>
@@ -228,7 +228,7 @@
                 </p>
                 <div class="entry-card-actions mt-auto">
                     <form method="POST" action="{{ url('module:install', mod_id) }}" style="display:inline;">
-                        {% csrf_token %}
+                        {% include "includes/csrf.html" %}
                         <button type="submit" class="btn btn-sm btn-primary">
                             <i class="bi bi-download"></i> 安装
                         </button>
@@ -295,7 +295,7 @@
     {% else %}
     <p class="text-muted mb-4">请使用扫描功能获取可用模块</p>
     <form method="POST" action="{{ url('module:scan') }}" style="display:inline;">
-        {% csrf_token %}
+        {% include "includes/csrf.html" %}
         <button type="submit" class="btn btn-primary">
             <i class="bi bi-arrow-repeat"></i> 扫描模块
         </button>

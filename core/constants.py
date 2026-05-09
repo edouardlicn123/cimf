@@ -23,7 +23,7 @@
 # ============================================================
 
 VERSION_MAJOR = '1'
-VERSION_MINOR = 755
+VERSION_MINOR = 759
 
 def get_version_display():
     return f"v{VERSION_MAJOR}.{VERSION_MINOR:03d}"
@@ -67,43 +67,39 @@ class UserTheme:
     DEFAULT = 'default'
     GOV = 'gov'
     INDIGO = 'indigo'
-    DOPAMINE = 'dopamine'
     MACARON = 'macaron'
     TEAL = 'teal'
     UNIKLO = 'uniklo'
-    HITOBA = 'hitoba'
+    SAVAWOKU = 'savawoku'
     
     CHOICES = [
         (DEFAULT, '默认'),
         (GOV, '政府风格'),
         (INDIGO, '靛蓝风格'),
-        (DOPAMINE, '多巴胺风格'),
         (MACARON, '马卡龙风格'),
         (TEAL, '青绿风格'),
         (UNIKLO, '极简风格'),
-        (HITOBA, '黑色简约'),
+        (SAVAWOKU, 'Savawoku 风格'),
     ]
     
     LABELS = {
         DEFAULT: '默认',
         GOV: '政府风格',
         INDIGO: '靛蓝风格',
-        DOPAMINE: '多巴胺风格',
         MACARON: '马卡龙风格',
         TEAL: '青绿风格',
         UNIKLO: '极简风格',
-        HITOBA: '黑色简约',
+        SAVAWOKU: 'Savawoku 风格',
     }
     
     DISPLAY_LABELS = {
         DEFAULT: '默认',
         GOV: '政府风格 - 酒红配色、沉稳',
         INDIGO: '靛蓝风格 - 专业沉稳，科技感',
-        DOPAMINE: '多巴胺风格 - 高饱和、活力快乐',
         MACARON: '马卡龙风格 - 削弱视觉冲击',
         TEAL: '青绿风格 - 清新现代',
         UNIKLO: 'uniklo - 干净线条、经典红白',
-        HITOBA: '黑色简约 - 暖灰基底、零圆角、极致简约',
+        SAVAWOKU: 'Savawoku - 品牌红橙、专业商务',
     }
 
 
