@@ -139,8 +139,8 @@ def modules_manage(request):
     })
 
 
-@admin_required
 @require_POST
+@admin_required
 def module_scan(request):
     """扫描并注册模块"""
     result = ModuleService.scan_register_install(do_install=True, dry_run=False, respect_install_on_init=False)
@@ -165,8 +165,8 @@ def module_scan(request):
     return redirect('module:list')
 
 
-@admin_required
 @require_POST
+@admin_required
 def module_install(request, module_id: str):
     """安装模块"""
     success, message = ModuleService.install_module(module_id)
@@ -177,8 +177,8 @@ def module_install(request, module_id: str):
     return redirect('module:list')
 
 
-@admin_required
 @require_POST
+@admin_required
 def module_enable(request, module_id: str):
     """启用模块"""
     success = ModuleService.enable_module(module_id)
@@ -187,8 +187,8 @@ def module_enable(request, module_id: str):
     return redirect('module:list')
 
 
-@admin_required
 @require_POST
+@admin_required
 def module_disable(request, module_id: str):
     """禁用模块"""
     success = ModuleService.disable_module(module_id)

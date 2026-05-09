@@ -23,7 +23,7 @@
 # ============================================================
 
 VERSION_MAJOR = '1'
-VERSION_MINOR = 749
+VERSION_MINOR = 755
 
 def get_version_display():
     return f"v{VERSION_MAJOR}.{VERSION_MINOR:03d}"
@@ -71,6 +71,7 @@ class UserTheme:
     MACARON = 'macaron'
     TEAL = 'teal'
     UNIKLO = 'uniklo'
+    HITOBA = 'hitoba'
     
     CHOICES = [
         (DEFAULT, '默认'),
@@ -80,6 +81,7 @@ class UserTheme:
         (MACARON, '马卡龙风格'),
         (TEAL, '青绿风格'),
         (UNIKLO, '极简风格'),
+        (HITOBA, '黑色简约'),
     ]
     
     LABELS = {
@@ -90,6 +92,7 @@ class UserTheme:
         MACARON: '马卡龙风格',
         TEAL: '青绿风格',
         UNIKLO: '极简风格',
+        HITOBA: '黑色简约',
     }
     
     DISPLAY_LABELS = {
@@ -100,6 +103,7 @@ class UserTheme:
         MACARON: '马卡龙风格 - 削弱视觉冲击',
         TEAL: '青绿风格 - 清新现代',
         UNIKLO: 'uniklo - 干净线条、经典红白',
+        HITOBA: '黑色简约 - 暖灰基底、零圆角、极致简约',
     }
 
 

@@ -1,20 +1,16 @@
 /*
  * teal.css
  * FFE 项目跟进系统 - Teal 青绿专业主题（适合医院/医疗/环保机构）
- * 版本：2026-02-17 v3.2（取消左侧导航菜单圆角 + 统一修复）
+ * 版本：2026-05-09 v4.0（冲突色全面升级，参考 izmd.com 配色体系）
  * 
- * 配色灵感：Teal 青绿（医院/健康/环保常见色调），参考 LinkedIn 专业结构
- * 主色       #006D5B   深鸭绿（主蓝替代）
- * 辅助/信息  #009688   中青绿
- * 强调/警告  #FFB74D   柔和橙（少用）
- * 危险       #E53935   专业红
- * 背景基调   #F5F8FA → #FFFFFF  浅蓝灰白到纯白
+ * 配色灵感：Teal 青绿（医院/健康/环保常见色调），参考 izmd.com 配色体系
+ * 主色       #006D5B   深鸭绿（保留品牌色）
+ * 辅助/信息  #6790B7   钢蓝（与主色拉开色相距离）
+ * 成功       #A8C84A   青柠绿（明亮鲜绿）
+ * 警告/强调  #D7A761   暖金（参考 izmd sub-03）
+ * 危险       #CF727C   玫瑰粉（参考 izmd sub-04）
+ * 背景基调   #F4F5EE → #FFFFFF  暖白渐变
  * 圆角：全局保持小圆角（4-8px），但左侧导航菜单已取消圆角（0px）
- * 新增/变更：
- *   - 左侧导航 .nav-link、.nav-item、.admin-sidebar 等所有圆角设为 0px
- *   - 修复导航高亮 + 按钮 hover 跟随主题（v3.1 延续）
- *   - 彻底修复宽屏下右侧用户下拉菜单被挤压/右移/只显示一小块（v6 方案，与其他主题统一）
- *   - dashboard 卡片等宽强制修复（card 320px + card-body 100% 撑满）
  */
 
 :root {
@@ -25,46 +21,45 @@
   --primary-light:     rgba(0, 109, 91, 0.10);
   --primary-extra-light: rgba(0, 109, 91, 0.05);
 
-  /* 信息 / 辅助 */
-  --info:              #009688;
-  --info-hover:        #00796B;
-  --info-active:       #00695C;
-  --info-light:        rgba(0, 150, 136, 0.10);
+  /* 信息 / 辅助 - 钢蓝（参考 izmd sub-06） */
+  --info:              #6790B7;
+  --info-hover:        #5A7EA5;
+  --info-light:        rgba(103, 144, 183, 0.10);
 
-  /* 成功 */
-  --success:           #388E3C;
-  --success-hover:     #2E7D32;
+  /* 成功 - 青柠绿（参考 izmd sub-01） */
+  --success:           #A8C84A;
+  --success-hover:     #8FB33E;
 
-  /* 警告 / 强调 */
-  --warning:           #FFB74D;
-  --warning-hover:     #FFA726;
-  --warning-light:     rgba(255, 183, 77, 0.12);
+  /* 警告 / 强调 - 暖金（参考 izmd sub-03） */
+  --warning:           #D7A761;
+  --warning-hover:     #C49650;
+  --warning-light:     rgba(215, 167, 97, 0.12);
 
-  /* 危险 */
-  --danger:            #E53935;
-  --danger-hover:      #C62828;
-  --danger-light:      rgba(229, 57, 53, 0.10);
+  /* 危险 - 玫瑰粉（参考 izmd sub-04） */
+  --danger:            #CF727C;
+  --danger-hover:      #B8606A;
+  --danger-light:      rgba(207, 114, 124, 0.10);
 
-  /* 背景 */
-  --bg-body:           #F5F8FA;     /* 极浅蓝灰白 - 医疗/环保常用 */
-  --bg-gradient:       linear-gradient(to bottom, #F5F8FA 0%, #FFFFFF 100%);
+  /* 背景 - 暖白（参考 izmd bg-01） */
+  --bg-body:           #F4F5EE;
+  --bg-gradient:       linear-gradient(to bottom, #F4F5EE 0%, #FFFFFF 100%);
   --bg-surface:        #FFFFFF;
   --bg-card:           #FFFFFF;
   --bg-nav:            #006D5B;     /* 主菜单区深鸭绿背景 */
   --bg-nav-text:       #FFFFFF;     /* 主菜单区白色文字 */
-  --bg-footer:         #F5F8FA;
+  --bg-footer:         #F4F5EE;
 
   /* 文字 */
-  --text-primary:      #0D1B2A;     /* 深蓝灰 - 高对比 */
-  --text-secondary:    #334155;
-  --text-muted:        #64748B;
+  --text-primary:      #1A2A20;     /* 暖深灰 - 参考 izmd text-primary */
+  --text-secondary:    #3A4A3A;     /* 参考 izmd text-secondary */
+  --text-muted:        #6A7A6A;
   --text-inverted:     #FFFFFF;
   --text-nav:          #FFFFFF;     /* 主菜单文字白色 */
   --text-nav-active:   #FFFFFF;
 
-  /* 边框 & 分割 */
-  --border:            #CBD5E1;
-  --border-light:      #E2E8F0;
+  /* 边框 & 分割 - 参考 izmd mono 色系 */
+  --border:            #D5D8CC;
+  --border-light:      #E8EADE;
   --border-focus:      #006D5B;
 
   /* 阴影 - 极克制 */

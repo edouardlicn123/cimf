@@ -79,6 +79,7 @@ class User(AbstractUser):
         MACARON = UserTheme.MACARON, UserTheme.LABELS[UserTheme.MACARON]
         TEAL = UserTheme.TEAL, UserTheme.LABELS[UserTheme.TEAL]
         UNIKLO = UserTheme.UNIKLO, UserTheme.LABELS[UserTheme.UNIKLO]
+        HITOBA = UserTheme.HITOBA, UserTheme.LABELS[UserTheme.HITOBA]
     
     nickname = models.CharField(
         max_length=64,
