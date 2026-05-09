@@ -1,92 +1,87 @@
 /*
- * uniqlo.css
- * FFE 项目跟进系统 - UNIQLO 风格主题（优衣库官网风）
- * 版本：2026-02-15 v3.1（修复导航高亮 + 按钮 hover 跟随主题）
- * 
- * 设计特点：
- *   - 主色：UNIQLO 经典红 #E4002B
- *   - 极简、直线条、几乎无圆角（仅按钮微圆）
- *   - 纯白背景 + 深灰/黑色文字，高对比度
- *   - navbar 主菜单区使用经典红背景 + 白色文字
- *   - 个人下拉菜单维持白色背景 + 深色文字
- *   - 整体干净、专业、可靠，适合 CRM/会员系统
- * 新增：
- *   - 左侧导航 .nav-link.active 跟随 --primary
- *   - .primary-btn / .btn-primary hover 统一为 --primary-hover
- *   - 彻底修复宽屏下右侧用户下拉菜单被挤压/右移/只显示一小块（v6 方案，与其他主题统一）
- *   - dashboard 卡片等宽强制修复（card 320px + card-body 100% 撑满）
+ * kajima.css
+ * CIMF - 鹿島ノ森主题（暖灰大地调）
+ * 版本：2026-05-09 v1.0
+ *
+ * 配色灵感：轻井泽 ホテル鹿島ノ森 https://kajimanomori.co.jp/
+ * 主色       #94634b   赭褐
+ * 导航栏     #364d3b   森林绿
+ * 背景       #d8d3ce / #e6e3e0 / #f4f2ee  暖灰系列
+ * 文字       #343434   近黑
  */
 
 :root {
-  /* 主色系 - UNIQLO 经典红 */
-  --primary:           #E4002B;     /* UNIQLO Red - 主导航、按钮、重点高亮 */
-  --primary-hover:     #C60024;
-  --primary-active:    #A5001E;
-  --primary-light:     rgba(228, 0, 43, 0.10);
-  --primary-extra-light: rgba(228, 0, 43, 0.05);
+  /* 主色系 - 赭褐 */
+  --primary:           #94634b;
+  --primary-hover:     #7a4f3e;
+  --primary-active:    #604032;
+  --primary-light:     rgba(148, 99, 75, 0.10);
+  --primary-extra-light: rgba(148, 99, 75, 0.05);
 
-  /* 信息 / 辅助 */
-  --info:              #006699;     /* 深蓝灰 - 辅助按钮、信息提示 */
-  --info-hover:        #005588;
-  --info-active:       #004466;
-  --info-light:        rgba(0, 102, 153, 0.10);
+  /* 信息 / 辅助 - 蓝 */
+  --info:              #2d539e;
+  --info-hover:        #244680;
+  --info-light:        rgba(45, 83, 158, 0.10);
 
-  /* 成功 */
-  --success:           #007A33;     /* 深绿 - 成功/确认 */
-  --success-hover:     #00662A;
+  /* 成功 - 暖橄榄（无绿方案下最接近的暖调） */
+  --success:           #8a7a50;
+  --success-hover:     #756845;
 
-  /* 警告 / 强调 */
-  --warning:           #FF9900;
-  --warning-hover:     #E68900;
-  --warning-light:     rgba(255, 153, 0, 0.12);
+  /* 警告 - 暖金 */
+  --warning:           #c49030;
+  --warning-hover:     #a87a28;
+  --warning-light:     rgba(196, 144, 48, 0.12);
 
-  /* 危险 */
-  --danger:            #CC0000;
-  --danger-hover:      #B30000;
-  --danger-light:      rgba(204, 0, 0, 0.10);
+  /* 危险 - 玫瑰粉 */
+  --danger:            #b8606a;
+  --danger-hover:      #a4505a;
+  --danger-light:      rgba(184, 96, 106, 0.10);
 
-  /* 背景 */
-  --bg-body:           #FFFFFF;
-  --bg-gradient:       linear-gradient(to bottom, #FFFFFF 0%, #F8F8F8 100%);
-  --bg-surface:        #FFFFFF;
-  --bg-card:           #FFFFFF;
-  --bg-nav:            #E4002B;     /* 主菜单区经典红背景 */
-  --bg-nav-text:       #FFFFFF;     /* 主菜单区白色文字 */
-  --bg-footer:         #F8F8F8;
+  /* 背景 - 暖白基底 */
+  --bg-body:           #f4f2ee;
+  --bg-gradient:       linear-gradient(to bottom, #f4f2ee 0%, #ffffff 100%);
+  --bg-surface:        #ffffff;
+  --bg-card:           #ffffff;
+  --bg-nav:            #364d3b;
+  --bg-nav-text:       #ffffff;
+  --bg-footer:         #343434;
 
   /* 文字 */
-  --text-primary:      #000000;     /* 纯黑 - 高对比 */
-  --text-secondary:    #333333;
-  --text-muted:        #666666;
-  --text-inverted:     #FFFFFF;
-  --text-nav:          #FFFFFF;     /* 主菜单文字白色 */
-  --text-nav-active:   #FFFFFF;
+  --text-primary:      #2a2a2a;
+  --text-secondary:    #4a4a4a;
+  --text-muted:        #7a7a7a;
+  --text-inverted:     #ffffff;
+  --text-nav:          #ffffff;
+  --text-nav-active:   #ffffff;
 
   /* 边框 & 分割 */
-  --border:            #E0E0E0;
-  --border-light:      #EEEEEE;
-  --border-focus:      #E4002B;
+  --border:            #d5d4cc;
+  --border-light:      #e8e6e0;
+  --border-focus:      #94634b;
 
-  /* 阴影 - 极轻微，几乎无感 */
-  --shadow-sm:         0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow:            0 1px 4px rgba(0, 0, 0, 0.06);
-  --shadow-hover:      0 2px 8px rgba(0, 0, 0, 0.08);
-  --shadow-nav:        0 1px 3px rgba(0, 0, 0, 0.06);
+  /* 阴影 - 克制柔和的阴影 */
+  --shadow-sm:         0 1px 3px rgba(52, 52, 52, 0.06);
+  --shadow:            0 2px 6px rgba(52, 52, 52, 0.08);
+  --shadow-hover:      0 4px 12px rgba(52, 52, 52, 0.10);
+  --shadow-nav:        0 2px 4px rgba(52, 52, 52, 0.06);
 
-  /* 圆角 - 极小或无圆角 */
+  /* 圆角 */
   --radius-sm:         0px;
-  --radius:            2px;
-  --radius-lg:         4px;
-  --radius-xl:         6px;
-  --radius-pill:       9999px;      /* 仅按钮保留 pill 形状 */
+  --radius:            4px;
+  --radius-lg:         6px;
+  --radius-xl:         8px;
+  --radius-pill:       9999px;
 
-  /* 过渡 - 非常克制 */
-  --transition:        all 0.15s ease;
-  --transition-slow:   all 0.20s ease;
+  /* 过渡 */
+  --transition:        all 0.18s ease;
+  --transition-slow:   all 0.25s ease;
+
+  /* 卡片渐变 */
+  --entry-card-gradient: linear-gradient(135deg, var(--primary) 0%, var(--warning) 100%);
 }
 
 /* ──────────────────────────────────────────────
-   全局基础 + 防溢出（与 linkedin/dopamine/macaron/teal 保持一致）
+   全局基础 + 防溢出
 ───────────────────────────────────────────────── */
 * {
   box-sizing: border-box !important;
@@ -106,7 +101,7 @@ body {
   min-height: 100vh;
 }
 
-/* 主要内容区域 - 纯白 + 极细边框 */
+/* 主要内容区域 */
 main.container,
 .page-wrapper,
 .content-area,
@@ -116,85 +111,88 @@ main.container,
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
-  padding: 1.2rem 0.8rem;
+  padding: 1.5rem 1rem;
 }
 
 /* ──────────────────────────────────────────────
-   导航栏 - UNIQLO 经典红背景 + 白色文字
+   导航栏 - 近黑背景 + 白色文字
 ───────────────────────────────────────────────── */
 
-.navbar-macaron {
+.navbar-kajima {
   background-color: var(--bg-nav) !important;
-  border-bottom: 1px solid rgba(255,255,255,0.15) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.12) !important;
   box-shadow: var(--shadow-nav) !important;
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
+  border-radius: 0 !important;
   transition: var(--transition) !important;
 }
 
-/* 主菜单区所有文字强制白色 */
-.navbar-macaron,
-.navbar-macaron .navbar-brand,
-.navbar-macaron .nav-link,
-.navbar-macaron .nav-link:hover,
-.navbar-macaron .nav-link.active,
-.navbar-macaron .navbar-toggler-icon {
+.navbar-kajima,
+.navbar-kajima .navbar-brand,
+.navbar-kajima .nav-link,
+.navbar-kajima .nav-link:hover,
+.navbar-kajima .nav-link.active,
+.navbar-kajima .navbar-toggler-icon {
   color: var(--text-nav) !important;
 }
 
-/* 展开内容区无额外边框和阴影 */
-.navbar-macaron .collapse.navbar-collapse,
-.navbar-macaron .navbar-collapse.show {
+.navbar-kajima .collapse.navbar-collapse,
+.navbar-kajima .navbar-collapse.show {
   border: none !important;
   box-shadow: none !important;
   background: transparent !important;
 }
 
-/* 个人下拉菜单 - 白色背景 + 深色文字 */
-.navbar-macaron .dropdown-menu {
+.navbar-kajima .dropdown-menu {
   background-color: #ffffff !important;
   border: 1px solid var(--border-light) !important;
   border-radius: var(--radius) !important;
   box-shadow: var(--shadow-sm) !important;
 }
 
-.navbar-macaron .dropdown-item {
+.navbar-kajima .dropdown-item {
   color: var(--text-primary) !important;
 }
 
-.navbar-macaron .dropdown-item:hover,
-.navbar-macaron .dropdown-item:focus {
+.navbar-kajima .dropdown-item:hover,
+.navbar-kajima .dropdown-item:focus {
   background-color: var(--primary-light) !important;
   color: var(--primary) !important;
 }
 
-/* 退出链接保持红色 */
-.navbar-macaron .logout-link {
+.navbar-kajima .logout-link {
   color: var(--danger) !important;
 }
 
-/* 未登录“登录”按钮 - 白色边框 + 白色文字（适配红背景） */
-.navbar-macaron .login-btn {
+.navbar-kajima .login-btn {
   border-color: white !important;
   color: white !important;
   background: transparent !important;
-  border-radius: var(--radius) !important;
 }
 
-.navbar-macaron .login-btn:hover {
+.navbar-kajima .login-btn:hover {
   background-color: white !important;
   color: var(--primary) !important;
 }
 
 /* ──────────────────────────────────────────────
-   左侧导航高亮（.nav-link.active）跟随主题主色
+   左侧导航高亮
 ───────────────────────────────────────────────── */
+.admin-sidebar .nav-link,
+.admin-sidebar .nav-item,
+.admin-sidebar .nav-link.active,
+.admin-sidebar .nav-link.active:hover,
+.admin-sidebar .nav-link.active:focus,
+.admin-sidebar .nav-link:hover,
+.admin-sidebar .nav-link:focus {
+  border-radius: 0 !important;
+}
+
 .admin-sidebar .nav-link.active,
 .admin-sidebar .nav-link.active:hover,
 .admin-sidebar .nav-link.active:focus {
   background-color: var(--primary-light) !important;
   color: var(--primary) !important;
   font-weight: 600 !important;
-  border-radius: var(--radius-sm) !important;
 }
 
 .admin-sidebar .nav-link:hover {
@@ -203,10 +201,9 @@ main.container,
 }
 
 /* ──────────────────────────────────────────────
-   彻底修复宽屏下右侧用户菜单被挤压/右移/只显示一小块（v6 最终加强版，与其他主题统一）
+   宽屏右侧用户菜单
 ───────────────────────────────────────────────── */
 @media (min-width: 992px) {
-
   .navbar-expand-lg .navbar-nav.ms-auto {
     flex: 0 0 auto !important;
     flex-shrink: 0 !important;
@@ -261,7 +258,6 @@ main.container,
   }
 }
 
-/* 全局保险措施 */
 .dropdown {
   overflow: visible !important;
   position: relative !important;
@@ -315,7 +311,7 @@ main.container,
 }
 
 /* ──────────────────────────────────────────────
-   Dashboard 调整
+   Dashboard
 ───────────────────────────────────────────────── */
 
 .welcome-title {
@@ -335,8 +331,6 @@ main.container,
 .card-icon {
   color: var(--primary);
 }
-
-
 
 /* ──────────────────────────────────────────────
    其他通用
@@ -361,8 +355,7 @@ main.container,
 }
 
 /* ──────────────────────────────────────────────
-   最终强制修复 dashboard 卡片等宽（card-body 100% 宽度 + card 320px）
-   放在最末尾，优先级最高，同步所有主题
+   Dashboard 卡片等宽
 ───────────────────────────────────────────────── */
 .dashboard-cards .card,
 .dashboard-cards .card-entry {
@@ -389,12 +382,10 @@ main.container,
   margin: 0 auto !important;
 }
 
-/* 确保按钮贴底 */
 .dashboard-cards .card-btn {
   margin-top: auto !important;
 }
 
-/* 大屏适配 */
 @media (min-width: 992px) {
   .dashboard-cards {
     padding: 0 2rem !important;
@@ -402,7 +393,7 @@ main.container,
 }
 
 /* ──────────────────────────────────────────────
-   通用卡片按钮跟随主题颜色（放在每个主题 CSS 最末尾，优先级最高）
+   通用卡片按钮
 ───────────────────────────────────────────────── */
 .card-btn {
   font-weight: 500;
@@ -417,7 +408,6 @@ main.container,
   box-shadow: var(--shadow-hover) !important;
 }
 
-/* 主色按钮 */
 .primary-btn {
   background-color: var(--primary) !important;
   border-color: var(--primary) !important;
@@ -429,7 +419,6 @@ main.container,
   border-color: var(--primary-hover) !important;
 }
 
-/* 成功色按钮 */
 .success-btn {
   background-color: var(--success) !important;
   border-color: var(--success) !important;
@@ -441,7 +430,6 @@ main.container,
   border-color: var(--success-hover) !important;
 }
 
-/* 信息色按钮 */
 .info-btn {
   background-color: var(--info) !important;
   border-color: var(--info) !important;
@@ -453,7 +441,6 @@ main.container,
   border-color: var(--info-hover) !important;
 }
 
-/* 次要按钮 */
 .secondary-btn {
   background-color: transparent !important;
   border-color: var(--text-muted) !important;
@@ -466,7 +453,6 @@ main.container,
   color: var(--primary) !important;
 }
 
-/* 修复 btn-primary 跟随主题 - 使用 CSS 变量 */
 .btn-primary,
 .primary-btn {
   background-color: var(--primary) !important;
@@ -480,23 +466,22 @@ main.container,
 .primary-btn:hover,
 .primary-btn:focus {
   background-color: var(--primary-hover) !important;
-  border-color: #C60024 !important;
+  border-color: var(--primary-hover) !important;
   color: white !important;
-  box-shadow: 0 0 0 0.25rem rgba(228, 0, 43, 0.25) !important;
+  box-shadow: 0 0 0 0.25rem rgba(148, 99, 75, 0.25) !important;
 }
 
 .btn-primary:active,
 .btn-primary.active,
 .primary-btn:active,
 .primary-btn.active {
-  background-color: #A5001E !important;
-  border-color: #A5001E !important;
+  background-color: #604032 !important;
+  border-color: #604032 !important;
   color: white !important;
 }
 
-/* 最终保险：防止其他地方覆盖成不协调色 */
 .btn-primary:hover:not(.disabled):not(:disabled),
 .primary-btn:hover:not(.disabled):not(:disabled) {
-  background-color: #C60024 !important;
+  background-color: #7a4f3e !important;
   color: white !important;
 }

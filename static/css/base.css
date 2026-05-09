@@ -391,7 +391,7 @@ footer {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--info) 100%);
+    background: var(--entry-card-gradient, linear-gradient(135deg, var(--primary) 0%, var(--info) 100%));
 }
 
 .entry-card-figure .entry-card-title {

@@ -1,10 +1,11 @@
 /*
  * savawoku.css
  * FFE / CIMF - Savawoku 风格主题
- * 版本：2026-05-09 v1.0
+ * 版本：2026-05-09 v2.0
  *
  * 风格定位：品牌红橙配色，清爽商务，B2B 专业感
  * 参考：https://www.serverworks.co.jp/
+ * 更新：精调配色 + 红橙渐变 navbar + entry-card 渐变
  */
 
 :root {
@@ -30,23 +31,22 @@
   --warning-hover:     #C68A16;
   --warning-light:     rgba(224, 157, 26, 0.20);
 
-  /* 危险 - 深红 */
-  --danger:            #DC143C;
-  --danger-hover:      #C41234;
-  --danger-light:      rgba(220, 20, 60, 0.12);
+  /* 危险 - 暖红（与品牌红拉开色相差距） */
+  --danger:            #C0392B;
+  --danger-hover:      #A33226;
+  --danger-light:      rgba(192, 57, 43, 0.12);
 
-  /* 背景 - 清爽白底 */
-  --bg-body:           #FFFFFF;
-  --bg-gradient:       linear-gradient(to bottom, #FAFAFA 0%, #FFFFFF 100%);
+  /* 背景 - 极暖白基底 */
+  --bg-body:           #FAF9FA;
+  --bg-gradient:       linear-gradient(to bottom, #FAF9FA 0%, #FFFFFF 100%);
   --bg-surface:        #FFFFFF;
   --bg-card:           #FFFFFF;
-  --bg-nav:            #D00F31;
-  --bg-nav-fallback:   rgba(208, 15, 49, 0.92);
+  --bg-nav:            linear-gradient(90deg, #D00F31 0%, #FB8E22 100%);
   --bg-footer:         #F5F5F5;
-  --bg-hover:          rgba(208, 15, 49, 0.06);
+  --bg-hover:          #F6EEED;
 
-  /* 文字 */
-  --text-primary:      #333333;
+  /* 文字 - 高对比度 */
+  --text-primary:      #242424;
   --text-secondary:    #555555;
   --text-muted:        #888888;
   --text-inverted:     #FFFFFF;
@@ -54,8 +54,8 @@
   --text-nav-active:   #FFFFFF;
 
   /* 边框 & 分割 */
-  --border:            #E0E0E0;
-  --border-light:      #F0F0F0;
+  --border:            #D9D9D9;
+  --border-light:      #DEDEDE;
   --border-focus:      #D00F31;
 
   /* 阴影 - 克制，商务感 */
@@ -75,6 +75,9 @@
   --transition:        all 0.18s ease;
   --transition-slow:   all 0.25s ease;
 
+  /* 卡片渐变 */
+  --entry-card-gradient: linear-gradient(135deg, #D00F31 0%, #FB8E22 100%);
+
   /* Bootstrap 变量映射 */
   --bs-primary: var(--primary);
   --bs-primary-rgb: 208, 15, 49;
@@ -84,22 +87,22 @@
   --bs-link-hover-color: var(--primary-hover);
 }
 
-/* === 导航栏 === */
-.navbar-macaron,
+/* === 导航栏 - 红橙渐变 === */
+.navbar-savawoku,
 .navbar.bg-primary,
 .navbar-dark {
   background: var(--bg-nav) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.10) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
 }
 
-.navbar-macaron .navbar-nav .nav-link,
+.navbar-savawoku .navbar-nav .nav-link,
 .navbar-dark .navbar-nav .nav-link {
   color: rgba(255, 255, 255, 0.90) !important;
 }
 
-.navbar-macaron .navbar-nav .nav-link:hover,
-.navbar-macaron .navbar-nav .nav-link:focus,
-.navbar-macaron .navbar-nav .nav-link.active,
+.navbar-savawoku .navbar-nav .nav-link:hover,
+.navbar-savawoku .navbar-nav .nav-link:focus,
+.navbar-savawoku .navbar-nav .nav-link.active,
 .navbar-dark .navbar-nav .nav-link:hover,
 .navbar-dark .navbar-nav .nav-link:focus,
 .navbar-dark .navbar-nav .nav-link.active {
@@ -108,7 +111,7 @@
   border-radius: var(--radius);
 }
 
-.navbar-macaron .navbar-brand,
+.navbar-savawoku .navbar-brand,
 .navbar-dark .navbar-brand {
   color: #ffffff !important;
 }
@@ -120,15 +123,40 @@
   border-left-color: var(--primary) !important;
 }
 
-/* 按钮 */
+/* 按钮 - 红橙渐变 */
 .btn-primary {
-  background-color: var(--primary) !important;
-  border-color: var(--primary) !important;
+  background: linear-gradient(90deg, #D00F31 0%, #FB8E22 100%) !important;
+  background-size: 200% 100% !important;
+  background-position: left center !important;
+  border-color: transparent !important;
+  transition: background-position 0.4s ease, box-shadow 0.3s ease !important;
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-hover) !important;
-  border-color: var(--primary-hover) !important;
+  background-position: right center !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 12px rgba(208, 15, 49, 0.30) !important;
+}
+
+.btn-primary:active {
+  background: linear-gradient(90deg, #B00D2A 0%, #E07E1E 100%) !important;
+  background-size: 200% 100% !important;
+  background-position: left center !important;
+}
+
+/* primary-btn 卡片按钮同步渐变 */
+.primary-btn {
+  background: linear-gradient(90deg, #D00F31 0%, #FB8E22 100%) !important;
+  background-size: 200% 100% !important;
+  background-position: left center !important;
+  border-color: transparent !important;
+  transition: background-position 0.4s ease, box-shadow 0.3s ease !important;
+}
+
+.primary-btn:hover {
+  background-position: right center !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 12px rgba(208, 15, 49, 0.30) !important;
 }
 
 /* 卡片 - 干净白底 */

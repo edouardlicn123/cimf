@@ -47,8 +47,8 @@
   --bg-gradient:       linear-gradient(135deg, #F8F4EE 0%, #F0F4F8 100%);
   --bg-surface:        #F5F3F0;
   --bg-card:           #FFFFFF;
-  --bg-nav:            #EDE8F5;     /* 原 #F5F0FF → 加深浅紫灰 */
-  --bg-nav-fallback:   rgba(237, 232, 245, 0.96);
+  --bg-nav:            #7D71A0;     /* 原 #EDE8F5 → 加深为中紫灰 */
+  --bg-nav-fallback:   rgba(125, 113, 160, 0.96);
   --bg-footer:         #F5F3F0;
 
   /* 文字 - 不动，保持柔和深灰 */
@@ -56,8 +56,8 @@
   --text-secondary:    #7D849A;
   --text-muted:        #A8AEC1;
   --text-inverted:     #FFFFFF;
-  --text-nav:          #5C6380;
-  --text-nav-active:   #7ACBB8;     /* 与加深 primary 协调 */
+  --text-nav:          #FFFFFF;
+  --text-nav-active:   #FFFFFF;
 
   /* 边框 & 分割 - 加深 */
   --border:            #C8B8D8;
@@ -122,12 +122,19 @@ main.container,
 
 .navbar-macaron {
   background-color: var(--bg-nav) !important;
-  border-bottom: 1px solid var(--border-light) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
   box-shadow: var(--shadow-nav) !important;
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
+  border-radius: 0 !important;
   transition: var(--transition-slow) !important;
+}
+
+.navbar-macaron,
+.navbar-macaron .navbar-brand,
+.navbar-macaron .nav-link,
+.navbar-macaron .nav-link:hover,
+.navbar-macaron .nav-link.active,
+.navbar-macaron .navbar-toggler-icon {
+  color: var(--text-nav) !important;
 }
 
 /* 确保展开/折叠区域不透明 */
@@ -158,19 +165,19 @@ main.container,
 
 /* 汉堡菜单图标颜色匹配文字 */
 .navbar-macaron .navbar-toggler-icon {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%235c6380' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23FFFFFF' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
 }
 
 /* 登录按钮（未登录状态） */
 .navbar-macaron .login-btn {
-  border-color: var(--primary) !important;
-  color: var(--primary) !important;
+  border-color: var(--text-nav) !important;
+  color: var(--text-nav) !important;
   background: transparent !important;
 }
 
 .navbar-macaron .login-btn:hover {
-  background-color: var(--primary) !important;
-  color: white !important;
+  background-color: var(--text-nav) !important;
+  color: var(--bg-nav) !important;
 }
 
 /* 退出链接 */
