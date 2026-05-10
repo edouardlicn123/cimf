@@ -1,6 +1,6 @@
 # AGENTS.md
 
-## 重要提醒
+## 用户指令响应规则
 
 **现有模块文档：**
 
@@ -21,11 +21,35 @@ Agent 应在以下情况检查该文档：
 使用 `run.sh` 维护菜单选项 6 运行 Ruff 后，报告自动保存到 `storage/reports/ruff_YYYYMMDD_HHMMSS.txt`
 
 Agent 在以下情况应读取最新报告：
+- 用户提及 "Ruff" 或 "ruff" 并要求检查 Bug 时，读取最新报告作为参考
 - 被要求修复 Ruff 发现的问题时
-- 执行代码质量检查时
-- 修复 Bug 时参考报告中的未使用导入、未定义变量等问题
+
+注意：检查 Bug 时若不提及 Ruff，则不读取此报告，仅按下方 Bug 排查规范执行。
 
 ---
+
+## 会话启动检查清单
+
+每次新会话开始时，依次完成以下检查：
+
+1. 读取 `docs/开发规范.md`，了解最新开发规范
+2. 如涉及模板修改，查阅 `docs/技术规范/A04_模板开发规范.md`
+3. 如涉及服务层/视图层/模型层修改，查阅对应的 B 系列技术规范
+
+---
+
+## 开发规范
+
+**⚠️ 模板引擎：Jinja2**
+- 项目使用 **Jinja2** 模板引擎，**不使用 Django 模板语法**
+- 禁止使用 `{% include "..." with ... %}`（Django 语法），应使用 `{% set var = value %}{% include "..." %}`
+- 禁止使用 `{% csrf_token %}`、`{% load %}`、`{% blocktrans %}` 等 Django 专属标签
+- 模板中使用 `url('namespace:name', arg)` 生成链接，详见 `A04_模板开发规范`
+- 编写/修改模板前，请查阅 `docs/技术规范/A04_模板开发规范.md`
+
+**虚拟环境：**
+- Django 项目使用独立虚拟环境，位于项目目录 `venv/`
+- 运行命令时使用项目内的虚拟环境：`./venv/bin/python` 或 `./run.sh`
 
 **初始化流程规范：**
 
@@ -41,32 +65,15 @@ Agent 应在以下情况检查该文档：
 - 完整初始化（--with-data）：< 15秒
 - 增量初始化（--incremental）：< 5秒
 
----
-
-**虚拟环境：**
-- Django 项目使用独立虚拟环境，位于项目目录 `venv/`
-- 运行命令时使用项目内的虚拟环境：`./venv/bin/python` 或 `./run.sh`
-
-## 开发规范
-
-**⚠️ 模板引擎：Jinja2**
-- 项目使用 **Jinja2** 模板引擎，**不使用 Django 模板语法**
-- 禁止使用 `{% include "..." with ... %}`（Django 语法），应使用 `{% set var = value %}{% include "..." %}`
-- 禁止使用 `{% csrf_token %}`、`{% load %}`、`{% blocktrans %}` 等 Django 专属标签
-- 模板中使用 `url('namespace:name', arg)` 生成链接，详见 `A04_模板开发规范`
-- 编写/修改模板前，请查阅 `docs/技术规范/A04_模板开发规范.md`
-
-**在每次会话开始时，请读取 `docs/开发规范.md` 以了解最新的开发规范。**
-
-**重要：每次完成编辑后，必须自动调用 `update_progress.py` 更新记录：**
-- 命令：`./venv/bin/python update_progress.py "修改内容描述"`
+**进度记录：**
+- 每次完成编辑后，必须自动调用 `./venv/bin/python update_progress.py "修改内容描述"` 更新记录
 - 修改内容应简洁明了，描述主要变更
 - 如果一次会话中有多次修改，可以合并为一条记录
 - **Bug 修复也必须更新进度**，不可遗漏
 
 **Bug 排查规范：**
 
-进行 Bug 检查时，请按照 `docs/技术规范/A08_Bug排查技术规范.md` 执行系统化检查：
+进行 Bug 检查时（未提及 Ruff），仅按 A08 规范执行系统化检查，不读取 ruff 报告：
 
 | 层级 | 优先级 | 检查内容 |
 |------|--------|----------|
@@ -78,70 +85,21 @@ Agent 应在以下情况检查该文档：
 
 ---
 
-## 开发阶段
+## 项目参考
+
+### 开发阶段
 
 **当前阶段：Stage 4**
 
 计划文档存放位置：`docs/stage4/`
 
----
-
-## 项目关键概念
-
-### 一、核心功能模块
-
-| 目录 | 功能 | 说明 |
-|------|------|------|
-| `core/marketplace/` | 模块市场 | 在线下载安装模块，配置在 `marketplace.json` |
-| `core/node/` | 节点系统 | 动态模块加载、节点类型管理 |
-| `core/smtp/` | 邮件系统 | SMTP 配置、邮件模板、发送历史 |
-| `core/importexport/` | 数据导入导出 | CSV/Excel 导入导出功能 |
-| `core/fields/` | 字段类型系统 | 24 种字段类型定义 |
-| `modules/` | 本地模块 | 已安装模块（customer, clock 等） |
-
-### 二、服务层（core/services/）
-
-| 服务 | 用途 |
-|------|------|
-| AuthService | 用户认证、登录、账号锁定 |
-| PermissionService | 权限管理、角色权限 |
-| UserService | 用户 CRUD、个人偏好 |
-| SettingsService | 系统配置管理 |
-| TaxonomyService | 词汇表管理 |
-| ChinaRegionService | 行政区划查询 |
-| WatermarkService | 图片水印 |
-| CronService | 定时任务调度 |
-| TimeSyncService | 时间同步 |
-
-### 三、关键配置文件
-
-| 文件 | 用途 |
-|------|------|
-| `core/marketplace/marketplace.json` | 模块市场模块列表（id, name, version, download_url） |
-| `modules/*/module.py` | 模块信息配置（MODULE_INFO 字典） |
-| `core/models.py` | 核心数据模型 |
-| `cimf_django/settings.py` | Django 配置 |
-
-### 四、数据库模型（core/models.py）
-
-- User、SystemSetting、Taxonomy、TaxonomyItem、ChinaRegion
-
-### 五、已安装本地模块
-
-| 模块 | 类型 | 说明 |
-|------|------|------|
-| customer | node | 海外客户信息 |
-| clock | system | 时钟显示 |
-
----
-
-## 技术规范
+### 技术规范
 
 **⚠️ 重要：在开发过程中，必须参考以下技术规范文档，确保代码符合项目标准。**
 
 项目制定了详细的技术规范文档，存放于 `docs/技术规范/` 目录：
 
-### 通用技术规范
+#### 通用技术规范
 
 | 文档 | 说明 |
 |------|------|
@@ -152,7 +110,7 @@ Agent 应在以下情况检查该文档：
 | [A05_Python代码开发规范](./技术规范/A05_Python代码开发规范.md) | Django 后端代码开发规范，包括文件头注释、导入规范、命名规范、Model/Service/View 规范、API 设计、测试、迁移、定时任务、**字段空值处理规范**等 |
 | [A08_Bug排查技术规范](./技术规范/A08_Bug排查技术规范.md) | 基于4轮20次检查的Bug模式目录、层级检查清单、根因分析、修复优先级决策树、新模块模板 |
 
-### core 技术规范
+#### core 技术规范
 
 | 文档 | 说明 |
 |------|------|
@@ -161,7 +119,17 @@ Agent 应在以下情况检查该文档：
 | [B03_core_views视图层规范](./技术规范/B03_core_views视图层规范.md) | 视图层请求处理，包含认证、管理后台、词汇表、API 等 50+ 视图函数 |
 | [B04_core_forms表单与验证规范](./技术规范/B04_core_forms表单与验证规范.md) | 表单与数据验证，包含 LoginForm、UserCreateForm、ProfileForm 等 9 个表单 |
 | [B05_core_urls路由与模块化规范](./技术规范/B05_core_urls路由与模块化规范.md) | URL 路由配置，包含命名规范、路径分组、动态路由等 |
+| [B06_初始化流程规范](./技术规范/B06_初始化流程规范.md) | 初始化流程规范 |
 
 如有新的技术规范需要制定，请在此目录创建文档。
 
----
+### 关键配置文件
+
+| 文件 | 用途 |
+|------|------|
+| `core/marketplace/marketplace.json` | 模块市场模块列表 |
+| `modules/*/module.py` | 模块信息配置（MODULE_INFO 字典） |
+| `core/models.py` | 核心数据模型 |
+| `cimf_django/settings.py` | Django 配置 |
+| `run.sh` | 启动/维护脚本 |
+| `core/urls.py` | URL 路由配置 |
