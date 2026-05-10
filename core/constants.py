@@ -23,7 +23,7 @@
 # ============================================================
 
 VERSION_MAJOR = '1'
-VERSION_MINOR = 831
+VERSION_MINOR = 838
 
 def get_version_display():
     return f"v{VERSION_MAJOR}.{VERSION_MINOR:03d}"
@@ -75,7 +75,7 @@ class UserTheme:
     
     CHOICES = [
         (DEFAULT, '默认'),
-        (GOV, '浓重红色'),
+        (GOV, '中国红'),
         (INDIGO, '靛蓝'),
         (MACARON, '马卡龙'),
         (SAVAWOKU, '橙红'),
@@ -86,7 +86,7 @@ class UserTheme:
     
     LABELS = {
         DEFAULT: '默认',
-        GOV: '浓重红色',
+        GOV: '中国红',
         INDIGO: '靛蓝',
         MACARON: '马卡龙',
         SAVAWOKU: '橙红',
