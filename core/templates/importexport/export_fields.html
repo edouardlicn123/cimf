@@ -15,14 +15,14 @@
 <form method="post">
     {% include "includes/csrf.html" %}
     
-    <div class="card mb-4">
+    <div class="card card-structure mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">选择字段</h5>
+        </div>
         <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">选择字段</h5>
-                <div>
-                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectAll()">全选</button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="selectNone()">全不选</button>
-                </div>
+            <div class="text-end mb-3">
+                <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectAll()">全选</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="selectNone()">全不选</button>
             </div>
             <div class="row">
                 {% for field in fields %}
@@ -40,9 +40,11 @@
         </div>
     </div>
     
-    <div class="card mb-4">
+    <div class="card card-structure mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">筛选条件（可选）</h5>
+        </div>
         <div class="card-body">
-            <h5>筛选条件（可选）</h5>
             <div id="filterContainer">
                 <div class="row mb-2 filter-row">
                     <div class="col-md-5">
@@ -82,9 +84,11 @@
         </div>
     </div>
     
-    <div class="card mb-4">
+    <div class="card card-structure mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">导出格式</h5>
+        </div>
         <div class="card-body">
-            <h5>导出格式</h5>
             <select name="format" class="form-select" style="width: auto;">
                 <option value="csv">CSV</option>
                 <option value="xlsx">Excel (XLSX)</option>

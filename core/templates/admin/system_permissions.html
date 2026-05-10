@@ -12,7 +12,7 @@
     {% include "includes/csrf.html" %}
     
     <!-- 角色名称设置 -->
-    <div class="card mb-4">
+    <div class="card card-structure mb-4">
         <div class="card-header">
             <h5 class="mb-0"><i class="bi bi-mask me-2"></i>角色名称设置</h5>
         </div>
@@ -37,7 +37,7 @@
     <!-- 系统权限卡片 -->
     {% if system_permissions %}
     {% for key, data in system_permissions.items() %}
-    <div class="card mb-3">
+    <div class="card card-structure mb-3">
         <div class="card-header">
             <h5 class="mb-0"><i class="bi {{ data.icon }} me-2"></i>{{ data.name }}</h5>
         </div>
@@ -76,7 +76,7 @@
     <!-- 节点权限卡片 -->
     {% if node_permissions %}
     {% for slug, data in node_permissions.items() %}
-    <div class="card mb-3">
+    <div class="card card-structure mb-3">
         <div class="card-header">
             <h5 class="mb-0"><i class="bi {{ data.icon }} me-2"></i>{{ data.name }}</h5>
         </div>

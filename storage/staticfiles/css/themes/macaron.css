@@ -16,40 +16,39 @@
  */
 
 :root {
-  /* 主色系 - 加深版（饱和/明度降低） */
-  --primary:           #7ACBB8;     /* 原 #98DDCA → 加深柔和薄荷绿 */
+  /* 主色系 - 开心果绿 */
+  --primary:           #7ACBB8;
   --primary-hover:     #65B3A0;
   --primary-active:    #4E9A88;
   --primary-light:     rgba(122, 203, 184, 0.18);
   --primary-extra-light: rgba(122, 203, 184, 0.08);
 
-  /* 信息 / 辅助 - 加深版 */
-  --info:              #93B3E8;     /* 原 #AEC6F6 → 加深浅蓝紫 */
-  --info-hover:        #7A9CD0;
-  --info-active:       #6185B8;
-  --info-light:        rgba(147, 179, 232, 0.18);
+  /* 信息 / 辅助 - 蓝莓紫 */
+  --info:              #89A9E8;
+  --info-hover:        #7295D0;
+  --info-light:        rgba(137, 169, 232, 0.18);
 
-  /* 成功 - 加深版 */
-  --success:           #7ACBB8;     /* 与 primary 协调 */
-  --success-hover:     #65B3A0;
+  /* 成功 - 抹茶绿 */
+  --success:           #A8C88A;
+  --success-hover:     #8FB37A;
 
-  /* 警告 / 强调 - 加深版 */
-  --warning:           #E6B892;     /* 原 #FFD3A3 → 加深柔和橙 */
-  --warning-hover:     #D1A17C;
-  --warning-light:     rgba(230, 184, 146, 0.20);
+  /* 警告 / 强调 - 柠檬黄 */
+  --warning:           #E8CC78;
+  --warning-hover:     #D1B566;
+  --warning-light:     rgba(232, 204, 120, 0.20);
 
-  /* 危险 - 加深版 */
-  --danger:            #E8A8B8;     /* 原 #FFC3D0 → 加深柔和玫红 */
-  --danger-hover:      #D18FA0;
-  --danger-light:      rgba(232, 168, 184, 0.18);
+  /* 危险 - 草莓粉 */
+  --danger:            #E8889E;
+  --danger-hover:      #D17A8E;
+  --danger-light:      rgba(232, 136, 158, 0.18);
 
   /* 背景 - 整体加深（从极浅 → 浅灰调） */
   --bg-body:           #F8F4EE;     /* 原 #FFF8E7 → 轻微加灰 */
   --bg-gradient:       linear-gradient(135deg, #F8F4EE 0%, #F0F4F8 100%);
   --bg-surface:        #F5F3F0;
   --bg-card:           #FFFFFF;
-  --bg-nav:            #EDE8F5;     /* 原 #F5F0FF → 加深浅紫灰 */
-  --bg-nav-fallback:   rgba(237, 232, 245, 0.96);
+  --bg-nav:            #7D71A0;     /* 原 #EDE8F5 → 加深为中紫灰 */
+  --bg-nav-fallback:   rgba(125, 113, 160, 0.96);
   --bg-footer:         #F5F3F0;
 
   /* 文字 - 不动，保持柔和深灰 */
@@ -57,8 +56,8 @@
   --text-secondary:    #7D849A;
   --text-muted:        #A8AEC1;
   --text-inverted:     #FFFFFF;
-  --text-nav:          #5C6380;
-  --text-nav-active:   #7ACBB8;     /* 与加深 primary 协调 */
+  --text-nav:          #FFFFFF;
+  --text-nav-active:   #FFFFFF;
 
   /* 边框 & 分割 - 加深 */
   --border:            #C8B8D8;
@@ -123,12 +122,19 @@ main.container,
 
 .navbar-macaron {
   background-color: var(--bg-nav) !important;
-  border-bottom: 1px solid var(--border-light) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
   box-shadow: var(--shadow-nav) !important;
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
+  border-radius: 0 !important;
   transition: var(--transition-slow) !important;
+}
+
+.navbar-macaron,
+.navbar-macaron .navbar-brand,
+.navbar-macaron .nav-link,
+.navbar-macaron .nav-link:hover,
+.navbar-macaron .nav-link.active,
+.navbar-macaron .navbar-toggler-icon {
+  color: var(--text-nav) !important;
 }
 
 /* 确保展开/折叠区域不透明 */
@@ -159,19 +165,19 @@ main.container,
 
 /* 汉堡菜单图标颜色匹配文字 */
 .navbar-macaron .navbar-toggler-icon {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%235c6380' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23FFFFFF' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
 }
 
 /* 登录按钮（未登录状态） */
 .navbar-macaron .login-btn {
-  border-color: var(--primary) !important;
-  color: var(--primary) !important;
+  border-color: var(--text-nav) !important;
+  color: var(--text-nav) !important;
   background: transparent !important;
 }
 
 .navbar-macaron .login-btn:hover {
-  background-color: var(--primary) !important;
-  color: white !important;
+  background-color: var(--text-nav) !important;
+  color: var(--bg-nav) !important;
 }
 
 /* 退出链接 */
@@ -498,60 +504,4 @@ main.container,
   color: white !important;
 }
 
-/* daisyUI 风格卡片样式 - 带图片区域 */
-.entry-card {
-  background-color: var(--bg-surface);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-light);
-  transition: var(--transition);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
 
-.entry-card:hover {
-  box-shadow: var(--shadow-hover);
-  transform: translateY(-2px);
-}
-
-.entry-card-figure {
-  height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--info) 100%);
-}
-
-.entry-card-figure .bi {
-  font-size: 3.5rem;
-  color: white;
-  opacity: 0.9;
-}
-
-.entry-card-body {
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.entry-card-title {
-  font-weight: 600;
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-}
-
-.entry-card-desc {
-  color: var(--text-muted);
-  font-size: 0.875rem;
-  margin-bottom: 1rem;
-  flex: 1;
-}
-
-.entry-card-actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
-  margin-top: auto;
-}

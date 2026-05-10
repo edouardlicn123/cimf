@@ -12,9 +12,11 @@
 {% endblock %}
 
 {% block admin_content %}
-<div class="card mb-4">
+<div class="card card-structure mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">导出信息</h5>
+    </div>
     <div class="card-body">
-        <h5>导出信息</h5>
         <table class="table">
             <tr>
                 <th>模块：</th>
@@ -45,9 +47,11 @@
     </div>
 </div>
 
-<div class="card mb-4">
+<div class="card card-structure mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">导出字段</h5>
+    </div>
     <div class="card-body">
-        <h5>导出字段</h5>
         <table class="table table-sm">
             <thead>
                 <tr>
@@ -70,9 +74,11 @@
 </div>
 
 {% if preview_data %}
-<div class="card mb-4">
+<div class="card card-structure mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">数据预览（前5条）</h5>
+    </div>
     <div class="card-body">
-        <h5>数据预览（前5条）</h5>
         <div class="table-responsive">
             <table class="table table-sm table-bordered">
                 <thead>

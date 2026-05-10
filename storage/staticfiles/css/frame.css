@@ -43,7 +43,7 @@
 
 .card {
   border-color: var(--border-light);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-sm);
   background: var(--bg-card);
 }
 
@@ -105,6 +105,203 @@ html, body {
   background-color: var(--primary-extra-light) !important;
 }
 
+
+/* ── 基本卡片（共享结构）── */
+.card:has(.card-header:not(.d-flex)) {
+    border-radius: var(--radius);
+    box-shadow: none;
+    border: none;
+}
+
+.card:has(.card-header:not(.d-flex)) .card-body {
+    border: none !important;
+    border-radius: 0 0 var(--radius) var(--radius) !important;
+    overflow: hidden;
+}
+
+/* ── 变体1：不透明背景（默认用于现有页面）── */
+.card.card-structure {
+    background: transparent !important;
+}
+.card.card-structure:has(.card-header:not(.d-flex)) .card-body {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--primary) !important;
+    border-radius: 0 0 var(--radius) var(--radius) !important;
+    overflow: hidden;
+}
+
+/* ── 变体2：标题透明（用于结构列表页面）── */
+.card.card-structure-transparent {
+    background: transparent !important;
+}
+.card-structure-transparent .card-body {
+    background: transparent !important;
+}
+
+/* ── 内容区边框容器（配合变体2使用）── */
+.card-body-border {
+    border: 1px solid var(--primary);
+    border-radius: 0 0 var(--radius) var(--radius);
+    overflow: hidden;
+    height: 100%;
+    background: var(--bg-card);
+}
+
+.card-header:not(.d-flex) {
+    border-bottom: none;
+    background: transparent;
+    padding: 0;
+}
+
+.card-header:not(.d-flex) h5,
+.card-header:not(.d-flex) h4 {
+    display: inline-block;
+    padding: 10px 32px 12px;
+    margin: 0;
+    background-color: var(--primary);
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    border-radius: 6px 6px 0 0;
+    white-space: nowrap;
+    line-height: 1.2;
+}
+
+/* 圆形图标按钮 */
+.btn-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-circle .bi {
+    font-size: 1.25rem;
+}
+
+/* ── Entry-card 按钮：描边 + background-size 填充动画 ── */
+.entry-card-actions .btn-primary   { --btn-clr: var(--primary); }
+.entry-card-actions .btn-success   { --btn-clr: var(--success); }
+.entry-card-actions .btn-warning   { --btn-clr: var(--warning); }
+.entry-card-actions .btn-info      { --btn-clr: var(--info); }
+.entry-card-actions .btn-danger    { --btn-clr: var(--danger); }
+.entry-card-actions .btn-secondary { --btn-clr: var(--text-secondary); }
+
+.entry-card-actions .btn {
+    border-radius: var(--radius) !important;
+    background-color: transparent !important;
+    border: 2px solid var(--btn-clr) !important;
+    color: var(--btn-clr) !important;
+    background-image: linear-gradient(135deg, var(--btn-clr), var(--btn-clr)) !important;
+    background-repeat: no-repeat !important;
+    background-size: 0% 100% !important;
+    transition: background-size 0.25s cubic-bezier(0.77, 0, 0.175, 1), color 0.25s ease !important;
+}
+
+.entry-card-actions .btn:hover,
+.entry-card-actions .btn:focus {
+    background-size: 100% 100% !important;
+    color: white !important;
+    box-shadow: 0 0 4px 1px var(--btn-clr) !important;
+}
+
+/* ── 日志文件选择 - 描边过滤标签 ── */
+.nav-pills-outline .nav-link {
+    background: #fff;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    border-radius: 6px 6px 0 0;
+}
+.nav-pills-outline .nav-link:hover {
+    background: var(--primary-light);
+}
+.nav-pills-outline .nav-link.active {
+    background: var(--primary);
+    color: #fff !important;
+}
+.nav-pills-outline .nav-link.active .badge {
+    background: #f57c00 !important;
+    color: #000 !important;
+}
+
+/* ── 日志表格边框 ── */
+.log-table-wrap {
+    border: 1px solid var(--primary);
+}
+
+/* ── 基本按键：渐变滑动动画 ── */
+.btn-primary,
+.btn-success,
+.btn-danger,
+.btn-warning,
+.btn-info {
+    border: none !important;
+    background-size: 200% 100% !important;
+    background-position: 0% 0% !important;
+    transition: background-position 0.4s ease, box-shadow 0.2s ease !important;
+    box-shadow: none !important;
+}
+
+.btn-primary:hover,
+.btn-primary:active,
+.btn-primary.active,
+.btn-success:hover,
+.btn-success:active,
+.btn-success.active,
+.btn-danger:hover,
+.btn-danger:active,
+.btn-danger.active,
+.btn-warning:hover,
+.btn-warning:active,
+.btn-warning.active,
+.btn-info:hover,
+.btn-info:active,
+.btn-info.active {
+    background-position: 100% 0% !important;
+}
+
+.btn-primary:focus-visible,
+.btn-success:focus-visible,
+.btn-danger:focus-visible,
+.btn-warning:focus-visible,
+.btn-info:focus-visible {
+    outline: 2px solid var(--primary) !important;
+    outline-offset: 2px !important;
+}
+
+.btn-primary {
+    --btn-lighter: color-mix(in srgb, var(--primary), white 20%);
+    background-image: linear-gradient(135deg, var(--btn-lighter) 0%, var(--primary) 30% 70%, var(--btn-lighter) 100%) !important;
+    color: #fff !important;
+}
+
+.btn-success {
+    --btn-lighter: color-mix(in srgb, var(--success), white 20%);
+    background-image: linear-gradient(135deg, var(--btn-lighter) 0%, var(--success) 30% 70%, var(--btn-lighter) 100%) !important;
+    color: #fff !important;
+}
+
+.btn-danger {
+    --btn-lighter: color-mix(in srgb, var(--danger), white 20%);
+    background-image: linear-gradient(135deg, var(--btn-lighter) 0%, var(--danger) 30% 70%, var(--btn-lighter) 100%) !important;
+    color: #fff !important;
+}
+
+.btn-warning {
+    --btn-lighter: color-mix(in srgb, var(--warning), white 20%);
+    background-image: linear-gradient(135deg, var(--btn-lighter) 0%, var(--warning) 30% 70%, var(--btn-lighter) 100%) !important;
+    color: #000 !important;
+}
+
+.btn-info {
+    --btn-lighter: color-mix(in srgb, var(--info), white 20%);
+    background-image: linear-gradient(135deg, var(--btn-lighter) 0%, var(--info) 30% 70%, var(--btn-lighter) 100%) !important;
+    color: #fff !important;
+}
 
 
 

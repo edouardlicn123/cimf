@@ -29,9 +29,7 @@ def system_settings(request):
         settings_dict = {}
         
         for key in SettingsService.DEFAULT_SETTINGS.keys():
-            if key in ['enable_audit_log', 'enable_web_watermark', 'enable_watermark_console_detection',
-                       'enable_watermark_shortcut_block', 'enable_export_watermark',
-                       'cron_time_sync_enabled', 'cron_cache_cleanup_enabled', 'site_logo_enabled']:
+            if key in SettingsService.BOOL_SETTINGS:
                 value = 'true' if request.POST.get(key) else 'false'
             elif key == 'web_watermark_content':
                 values = request.POST.getlist(key)

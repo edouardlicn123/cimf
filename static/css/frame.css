@@ -106,22 +106,39 @@ html, body {
 }
 
 
-/* ── 基本卡片 ── */
+/* ── 基本卡片（共享结构）── */
 .card:has(.card-header:not(.d-flex)) {
-    background: transparent;
     border-radius: var(--radius);
     box-shadow: none;
     border: none;
 }
 
 .card:has(.card-header:not(.d-flex)) .card-body {
-    background: transparent !important;
     border: none !important;
     border-radius: 0 0 var(--radius) var(--radius) !important;
     overflow: hidden;
-    padding: 0;
 }
 
+/* ── 变体1：不透明背景（默认用于现有页面）── */
+.card.card-structure {
+    background: transparent !important;
+}
+.card.card-structure:has(.card-header:not(.d-flex)) .card-body {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--primary) !important;
+    border-radius: 0 0 var(--radius) var(--radius) !important;
+    overflow: hidden;
+}
+
+/* ── 变体2：标题透明（用于结构列表页面）── */
+.card.card-structure-transparent {
+    background: transparent !important;
+}
+.card-structure-transparent .card-body {
+    background: transparent !important;
+}
+
+/* ── 内容区边框容器（配合变体2使用）── */
 .card-body-border {
     border: 1px solid var(--primary);
     border-radius: 0 0 var(--radius) var(--radius);

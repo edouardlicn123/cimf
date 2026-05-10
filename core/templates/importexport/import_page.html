@@ -12,9 +12,11 @@
 {% endblock %}
 
 {% block admin_content %}
-<div class="card mb-4">
+<div class="card card-structure mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">步骤 1：下载模板</h5>
+    </div>
     <div class="card-body">
-        <h5>步骤 1：下载模板</h5>
         <p>请先下载导入模板，填写数据后再上传</p>
         <a href="{{ url('importexport:download_template', node_type.slug) }}" class="btn btn-success">
             <i class="bi bi-download"></i> 下载模板
@@ -22,9 +24,11 @@
     </div>
 </div>
 
-<div class="card mb-4">
+<div class="card card-structure mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">步骤 2：上传文件</h5>
+    </div>
     <div class="card-body">
-        <h5>步骤 2：上传文件</h5>
         <form id="uploadForm" enctype="multipart/form-data">
             <div class="mb-3">
                 <input type="file" name="file" id="fileInput" accept=".xlsx,.xls,.csv" class="form-control">
