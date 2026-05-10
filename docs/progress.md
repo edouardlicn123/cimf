@@ -1015,4 +1015,6 @@
 51. run.sh 维护菜单新增选项6: Ruff代码检查
 52. run_ruff_check 增加报告保存到 storage/reports/；更新 .gitignore 和 AGENTS.md
 53. Ruff 71个问题全部修复：F821/F823运行时Bug、E402导入位置、F811重复定义、E712 True比较、F541/F701/F841/F401代码清理
+54. AGENTS.md 明确区分检查bug与ruff报告读取的触发条件
+55. 重构 AGENTS.md 为四段式结构：用户指令响应→启动清单→开发规范→项目参考，删除冗余列表
 
