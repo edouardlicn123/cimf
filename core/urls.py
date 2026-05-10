@@ -3,7 +3,7 @@
 核心应用 URL 路由配置
 """
 
-from django.urls import path, re_path, include
+from django.urls import path, re_path
 from django.views.generic.base import RedirectView
 from . import views
 from core.smtp import views as smtp_views

@@ -5,8 +5,7 @@
 
 import time
 import logging
-from typing import Union, List, Optional
-from django.conf import settings
+from typing import Union, List
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.utils import timezone
 from datetime import timedelta

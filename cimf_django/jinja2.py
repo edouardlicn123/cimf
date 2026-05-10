@@ -14,7 +14,6 @@
     - 1.2: 修复 url() 函数支持位置参数
 """
 
-from functools import partial
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.dateformat import format as date_format
@@ -101,9 +100,7 @@ def environment(**options):
     
     def get_request():
         """获取当前请求对象"""
-        from django.template import RequestContext
         try:
-            from django.template.context import Context
             if hasattr(env, '_context_stack') and env._context_stack:
                 for ctx in reversed(env._context_stack):
                     if hasattr(ctx, 'request'):

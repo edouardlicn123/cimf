@@ -24,7 +24,7 @@
 """
 
 from abc import ABC, abstractmethod
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Optional
 import logging
 from django.utils.timezone import now

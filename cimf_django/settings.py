@@ -28,6 +28,7 @@ except ImportError:
 # 加载环境变量
 from dotenv import load_dotenv
 import os
+from cimf_django.database import get_database_config
 
 # 尝试加载 config.env 文件
 load_dotenv(os.path.join(Path(__file__).resolve().parent.parent, 'config.env'))
@@ -164,7 +165,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'cimf_django.wsgi.application'
 
 # Database - 根据 config.env 配置选择 SQLite 或 MySQL
-from cimf_django.database import get_database_config
 DATABASES = {
     'default': get_database_config()
 }

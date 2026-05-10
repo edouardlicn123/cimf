@@ -40,7 +40,6 @@
     - core.models.SystemSetting: 系统设置数据模型
 """
 
-import time
 from typing import Dict, Any, Optional, Union
 from django.core.cache import cache
 from core.models import SystemSetting

@@ -46,7 +46,7 @@ class BaseField:
         placeholder = self.field_config.get('placeholder', '')
         max_length = self.field_config.get('max_length', '')
         
-        attrs = f'class="form-control" '
+        attrs = 'class="form-control" '
         if required:
             attrs += 'required '
         if placeholder:

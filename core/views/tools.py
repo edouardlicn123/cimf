@@ -19,7 +19,7 @@
 import os
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from core.module.models import Module, ToolType
+from core.module.models import Module
 from core.constants import ModuleType
 
 

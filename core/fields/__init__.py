@@ -34,7 +34,7 @@
     - region_select: 省市区联动
 """
 
-from .base import BaseField
+from .base import BaseField as BaseField
 from .string import StringField
 from .string_long import StringLongField
 from .text import TextField
@@ -62,7 +62,7 @@ from .address import AddressField
 from .gis import GISField
 
 # 省市县三级联动选择器
-from .region_select import RegionSelectField, RegionSelectWidget
+from .region_select import RegionSelectField, RegionSelectWidget as RegionSelectWidget
 
 
 FIELD_TYPES = {

@@ -470,6 +470,32 @@ run_init_menu() {
     done
 }
 
+run_ruff_check() {
+    if ! ./venv/bin/python -m ruff --version &>/dev/null; then
+        echo -e "${YELLOW}Ruff 未安装，正在安装...${NC}"
+        ./venv/bin/pip install ruff -q
+    fi
+    
+    local report_dir="storage/reports"
+    mkdir -p "$report_dir"
+    local timestamp=$(date +%Y%m%d_%H%M%S)
+    local report_file="${report_dir}/ruff_${timestamp}.txt"
+    
+    echo -e "${CYAN}正在扫描代码...${NC}"
+    ./venv/bin/python -m ruff check core/ modules/ cimf_django/ --output-format=concise \
+        > "$report_file" 2>&1
+    local exit_code=$?
+    
+    cat "$report_file"
+    
+    if [ $exit_code -eq 0 ]; then
+        echo -e "${GREEN}✅ 未发现问题${NC}"
+    else
+        echo -e "${YELLOW}检测完成 (退出码: $exit_code)${NC}"
+    fi
+    echo -e "${CYAN}报告已保存: ${report_file}${NC}"
+}
+
 # 维护子菜单
 show_maint_menu() {
     clear
@@ -482,6 +508,7 @@ show_maint_menu() {
     echo "  3 → 查看环境变量"
     echo "  4 → 杀死服务器进程"
     echo "  5 → 下载/更新省市区数据（从网络更新本地文件）"
+    echo "  6 → Ruff 代码检查"
     echo "  0 → 返回主菜单"
     echo
 }
@@ -489,7 +516,7 @@ show_maint_menu() {
 run_maint_menu() {
     while true; do
         show_maint_menu
-        read -p "请输入选项 (0/1/2/3/4/5): " raw_input
+        read -p "请输入选项 (0/1/2/3/4/5/6): " raw_input
         
         choice=$(echo "$raw_input" | sed 's/[^0-9]//g' | head -c 1)
         
@@ -500,6 +527,7 @@ run_maint_menu() {
             3) echo "→ 查看环境变量"; show_env_vars ;;
             4) echo "→ 杀死服务器进程"; kill_server ;;
             5) echo "→ 更新省市区数据"; update_china_regions ;;
+            6) echo "→ Ruff 代码检查"; run_ruff_check ;;
             *) echo -e "${YELLOW}无效选项 '$choice'${NC}" ;;
         esac
         

@@ -5,7 +5,6 @@
 
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils.http import url_has_allowed_host_and_scheme
 

@@ -43,7 +43,7 @@ class IntegerField(BaseField):
         
         if val:
             try:
-                int_val = int(val)
+                int(val)
                 errors.extend(self._validate_range(
                     min_value=int(self.field_config.get('min', float('-inf'))) if self.field_config.get('min') else None,
                     max_value=int(self.field_config.get('max', float('inf'))) if self.field_config.get('max') else None

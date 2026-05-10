@@ -8,6 +8,7 @@ ExportService - 导出服务
 
 from typing import List, Dict, Any, Optional, Type
 from django.http import HttpResponse
+from django.db import models
 from django.db.models import Q
 from django.utils.timezone import now as timezone_now
 
@@ -333,11 +334,11 @@ class ExportService:
                 
                 prefix = model_related_name or ('' if is_direct_query else f'{node_type_slug}_fields')
                 if province:
-                    q &= Q(**{f'{prefix}__region__province__icontains': province} if prefix else Q(**{f'region__province__icontains': province}))
+                    q &= Q(**{f'{prefix}__region__province__icontains': province} if prefix else Q(**{'region__province__icontains': province}))
                 if city:
-                    q &= Q(**{f'{prefix}__region__city__icontains': city} if prefix else Q(**{f'region__city__icontains': city}))
+                    q &= Q(**{f'{prefix}__region__city__icontains': city} if prefix else Q(**{'region__city__icontains': city}))
                 if district:
-                    q &= Q(**{f'{prefix}__region__district__icontains': district} if prefix else Q(**{f'region__district__icontains': district}))
+                    q &= Q(**{f'{prefix}__region__district__icontains': district} if prefix else Q(**{'region__district__icontains': district}))
                 
                 queryset = queryset.filter(q)
             elif model_class and hasattr(model_class, field):
@@ -349,6 +350,3 @@ class ExportService:
                     queryset = queryset.filter(**{f'{field}__icontains': value})
         
         return queryset
-
-
-from django.db import models

@@ -24,10 +24,14 @@ class AddressField(BaseField):
     def render(self, value: dict, mode: str = 'edit') -> str:
         if mode == 'view':
             parts = []
-            if value.get('province'): parts.append(value.get('province'))
-            if value.get('city'): parts.append(value.get('city'))
-            if value.get('district'): parts.append(value.get('district'))
-            if value.get('detail'): parts.append(value.get('detail'))
+            if value.get('province'):
+                parts.append(value.get('province'))
+            if value.get('city'):
+                parts.append(value.get('city'))
+            if value.get('district'):
+                parts.append(value.get('district'))
+            if value.get('detail'):
+                parts.append(value.get('detail'))
             return ''.join(parts)
         
         required = self.field_config.get('required', False)

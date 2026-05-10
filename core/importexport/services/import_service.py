@@ -256,8 +256,6 @@ class ImportService:
                     user, skip_duplicates: bool = True) -> Dict:
         """执行导入"""
         from core.importexport.model_registry import ModelRegistry
-        from core.importexport.fk_resolver import FKResolverPool
-        from core.importexport.special_field_handler import SpecialFieldPool
         from core.node.models import Node, NodeType
         
         model_class = ModelRegistry.get_model(node_type_slug)
@@ -376,7 +374,6 @@ class ImportService:
     @classmethod
     def get_fk_fields_with_options(cls, node_type_slug: str) -> List[Dict]:
         """获取 FK 字段及其可选值"""
-        from core.importexport.model_registry import ModelRegistry
         from core.models import Taxonomy, TaxonomyItem
         
         fields = cls.get_importable_fields(node_type_slug)

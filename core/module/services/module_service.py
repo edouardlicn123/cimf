@@ -2,7 +2,7 @@ import os
 import logging
 from typing import List, Optional, Dict, Any
 from django.utils import timezone
-from core.node.models import NodeType, Node
+from core.node.models import NodeType
 from core.module.models import Module, ToolType
 from core.models import Taxonomy, TaxonomyItem
 from importlib import import_module
@@ -134,7 +134,7 @@ class ModuleService:
     @staticmethod
     def scan_and_register_modules() -> List[Module]:
         """扫描并注册模块（供视图调用，保持原返回值类型）"""
-        scan_result = ModuleService.scan_register_install(do_install=True, dry_run=False)
+        ModuleService.scan_register_install(do_install=True, dry_run=False)
         
         # 返回已安装的模块列表（保持原返回值类型）
         registered = Module.objects.filter(is_installed=True)
@@ -385,7 +385,7 @@ except Exception as e:
         has_migrations = False
         if has_models and os.path.exists(migrations_path):
             migration_files = [f for f in os.listdir(migrations_path) if f.startswith('0') and f.endswith('.py')]
-            has_migrations = len(migration_files) > 1 or (len(migration_files) == 1 and '0001_initial.py' in migration_files)
+            has_migrations = len(migration_files) > 1 or (len(migration_files) == 1 and '0001_initial.py' in migration_files)  # noqa: F841
         
         # 如果没有模型文件，跳过迁移步骤，直接标记为安装成功
         if not has_models:

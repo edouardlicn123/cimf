@@ -6,7 +6,7 @@
 支持自动发现和模块补充指定
 """
 
-from typing import List, Dict, Type, Optional, Any
+from typing import List, Dict, Type, Optional
 from django.db import models
 
 

@@ -33,7 +33,6 @@
 """
 
 from typing import Optional, Dict, Any
-from django.contrib.auth import authenticate
 from django.utils import timezone
 from core.models import User
 from core.services.settings_service import SettingsService

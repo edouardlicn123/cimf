@@ -111,7 +111,7 @@ def taxonomy_delete(request, taxonomy_id: int):
 @admin_required
 def taxonomy_item_create(request, taxonomy_id: int):
     """创建词汇项"""
-    taxonomy = get_object_or_404(Taxonomy, id=taxonomy_id)
+    get_object_or_404(Taxonomy, id=taxonomy_id)
     
     if request.method == 'POST':
         name = request.POST.get('name', '').strip()
@@ -129,7 +129,7 @@ def taxonomy_item_create(request, taxonomy_id: int):
 @admin_required
 def taxonomy_item_update(request, taxonomy_id: int, item_id: int):
     """更新词汇项"""
-    taxonomy = get_object_or_404(Taxonomy, id=taxonomy_id)
+    get_object_or_404(Taxonomy, id=taxonomy_id)
     
     if request.method == 'POST':
         name = request.POST.get('name', '').strip()
