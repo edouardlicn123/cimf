@@ -161,6 +161,12 @@ class SettingsService:
         'smtp_system_url': '',
     }
     
+    BOOL_SETTINGS = {
+        'enable_audit_log', 'enable_web_watermark', 'enable_watermark_console_detection',
+        'enable_watermark_shortcut_block', 'enable_export_watermark',
+        'cron_time_sync_enabled', 'cron_cache_cleanup_enabled', 'site_logo_enabled',
+    }
+    
     CACHE_KEY = 'system_settings_all'
     CACHE_TTL = 60
     
@@ -244,13 +250,13 @@ class SettingsService:
     def save_settings_bulk(cls, settings_dict: Dict[str, Any]) -> int:
         """
         批量保存系统设置
-        
+         
         说明：
             批量保存多个设置项，最后统一清除缓存。
-        
+         
         参数：
             settings_dict: 设置字典
-            
+             
         返回：
             保存的设置项数量
         """
@@ -262,8 +268,17 @@ class SettingsService:
                 else:
                     value_str = str(value).strip()
                 
-                cls.save_setting(key, value_str)
+                SystemSetting.objects.update_or_create(
+                    key=key,
+                    defaults={
+                        'value': value_str,
+                        'description': f'系统设置 - {key}'
+                    }
+                )
                 updated_count += 1
+        
+        if updated_count:
+            cls.clear_cache()
         
         return updated_count
     
@@ -293,22 +308,19 @@ class SettingsService:
     @classmethod
     def _reset_to_default_bulk(cls) -> int:
         """批量重置所有设置到默认值"""
-        existing_keys = set(SystemSetting.objects.values_list('key', flat=True))
-        
-        settings_to_save = []
+        updated = 0
         for key, default_value in cls.DEFAULT_SETTINGS.items():
-            if key not in existing_keys:
-                settings_to_save.append(SystemSetting(
-                    key=key,
-                    value=str(default_value).strip(),
-                    description=f'系统设置 - {key}'
-                ))
+            _, created = SystemSetting.objects.update_or_create(
+                key=key,
+                defaults={
+                    'value': str(default_value).strip(),
+                    'description': f'系统设置 - {key}'
+                }
+            )
+            updated += 1
         
-        if settings_to_save:
-            SystemSetting.objects.bulk_create(settings_to_save, ignore_conflicts=True)
-            cls.clear_cache()
-        
-        return len(cls.DEFAULT_SETTINGS)
+        cls.clear_cache()
+        return updated
     
     @classmethod
     def clear_cache(cls):

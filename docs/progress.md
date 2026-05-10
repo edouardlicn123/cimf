@@ -1001,4 +1001,14 @@
 37. 重新生成 structure/types/、taxonomies/、fieldtypes/ 三个页面：边框移到 .card，h5 margin-top:-1px 覆盖顶部边框，避免 Firefox 边框圆角渲染问题
 38. 重写结构管理三页面：card-body 内加 card-body-border 容器承载边框，避免 Firefox 圆角渲染缺口
 39. 卡片标题区改为透明背景，仅内容区(card-body-border)保留背景色
+40. 卡片样式分成两个变体：card-structure(不透明)用于现有页面，card-structure-transparent(透明标题)用于结构列表页
+41. 基本卡片1(card-structure)标题区域改为透明，仅内容区保留背景色
+42. 提高 card-structure/card-structure-transparent 选择器优先级为 .card.card-structure，重启服务器
+43. 修复 system/settings/ 页: _reset_to_default_bulk 不重置bug、save_settings_bulk 缓存频繁清除、BOOL_SETTINGS 硬编码、Logo accept 缺GIF/WEBP
+44. 基本卡片1(card-structure): .card-body 添加主色调四周边框 (1px solid var(--primary))
+45. /system/settings/ 六个卡片添加 card-structure 类，实现透明标题+主色边框
+46. /system/permissions/ 三个卡片添加 card-structure 类
+47. /system/smtp/ config+history 卡片添加 card-structure 类
+48. node导入导出页: 5模板10卡片重构为基本卡片1(card-structure+card-header)
+49. nodes/customer/ 列表页2卡片重构为基本卡片1(card-structure+card-header)
 
