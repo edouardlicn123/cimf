@@ -276,7 +276,6 @@ def upload_preview(request, node_type_slug):
     
     # 验证文件扩展名
     allowed_extensions = ['.csv', '.xlsx', '.xls']
-    ext = filename.lower().split('.')[-1] if '.' in filename else ''
     if not any(filename.lower().endswith(ext) for ext in allowed_extensions):
         return JsonResponse({'success': False, 'error': '只允许上传 CSV 或 Excel 文件'}, status=400)
     

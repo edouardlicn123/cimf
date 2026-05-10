@@ -3,7 +3,6 @@
 Node 节点系统视图
 """
 
-import os
 import logging
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -164,7 +163,7 @@ def field_types_api(request):
 @login_required
 def taxonomy_items_api(request):
     """获取词汇表项 API"""
-    from core.models import Taxonomy, TaxonomyItem
+    from core.models import Taxonomy
     taxonomy_slug = request.GET.get('taxonomy')
     if not taxonomy_slug:
         return JsonResponse({'error': '缺少 taxonomy 参数'}, status=400)
@@ -186,7 +185,6 @@ def module_custom_dispatch(request, node_type_slug: str, extra_path: str):
     try:
         module = __import__(f'modules.{node_type_slug}.urls', fromlist=['urlpatterns'])
         from django.urls import URLResolver, URLPattern
-        from django.urls.exceptions import Resolver404
         path_to_match = extra_path.strip('/')
         for pattern in module.urlpatterns:
             if isinstance(pattern, URLResolver):
@@ -208,7 +206,6 @@ def module_dispatch(request, node_type_slug: str, node_id: int = None, action: s
     from core.module.models import Module
     if not Module.objects.filter(module_id=node_type_slug, is_installed=True, is_active=True).exists():
         raise Http404
-    from django.urls import reverse
     module_path = node_type_slug
     
     try:
@@ -241,5 +238,4 @@ def module_dispatch(request, node_type_slug: str, node_id: int = None, action: s
     except ImportError:
         pass
     
-    from django.http import Http404
     raise Http404(f'未找到模块: {node_type_slug}')

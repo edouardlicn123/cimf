@@ -33,7 +33,7 @@
     - core.models.TaxonomyItem: 词汇项模型
 """
 
-from typing import List, Optional, Dict, Any
+from typing import List
 from django.db import models
 from core.models import Taxonomy, TaxonomyItem
 from core.services.base_service import BaseService

@@ -5,7 +5,7 @@
 将 node_type_slug 映射到对应的 Django 模型类
 """
 
-from typing import Dict, Type, Optional
+from typing import Dict, Type
 
 
 class ModelRegistry:

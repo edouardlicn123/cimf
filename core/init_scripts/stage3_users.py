@@ -65,7 +65,6 @@
 """
 
 from core.init_scripts.common import print_section, print_step, colored
-from typing import Optional
 
 
 def run_stage3(force: bool = False, dry_run: bool = False) -> bool:
@@ -82,7 +81,6 @@ def run_stage3(force: bool = False, dry_run: bool = False) -> bool:
     print_section("阶段3：用户管理")
     print_step("3.1", "创建管理员用户")
     
-    from django.conf import settings
     from core.models import User
     from core.constants import UserRole
     import os
@@ -96,7 +94,7 @@ def run_stage3(force: bool = False, dry_run: bool = False) -> bool:
             return False
         else:
             admin_password = 'admin123'  # 仅开发环境默认值
-            print(f"⚠️ 警告：使用默认密码，生产环境请设置 ADMIN_PASSWORD")
+            print("⚠️ 警告：使用默认密码，生产环境请设置 ADMIN_PASSWORD")
     admin_email = os.environ.get('ADMIN_EMAIL', 'admin@example.com')
     admin_theme = os.environ.get('ADMIN_THEME', 'default')
     admin_notifications = os.environ.get('ADMIN_NOTIFICATIONS', 'true').lower() in ('true', '1', 'yes', 'on')
@@ -127,7 +125,7 @@ def run_stage3(force: bool = False, dry_run: bool = False) -> bool:
     if existing_admin and not force:
         print(colored(f"    - 管理员 '{admin_username}' 已存在，跳过创建", "yellow"))
         if force:
-            print(colored(f"    (使用 --force 可强制重置)", "yellow"))
+            print(colored("    (使用 --force 可强制重置)", "yellow"))
         return True
     
     if existing_admin and force:

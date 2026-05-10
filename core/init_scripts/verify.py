@@ -59,7 +59,7 @@ def verify_module_taxonomies() -> List[str]:
     """
     from core.module.services import ModuleService
     from core.module.models import Module
-    from core.models import Taxonomy, TaxonomyItem
+    from core.models import Taxonomy
     
     errors = []
     modules = Module.objects.filter(is_installed=True)

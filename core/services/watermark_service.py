@@ -28,7 +28,6 @@
 """
 
 import logging
-import os
 from typing import Optional, Tuple
 from PIL import Image, ImageDraw, ImageFont
 

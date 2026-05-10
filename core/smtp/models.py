@@ -4,7 +4,6 @@ SMTP 邮件模块模型
 """
 
 from django.db import models
-from django.utils import timezone
 
 
 class EmailTemplate(models.Model):

@@ -6,7 +6,6 @@
 支持 SQLite 和 MySQL 两种数据库
 """
 
-import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -67,15 +66,6 @@ def _get_sqlite_config() -> dict:
     db_path = BASE_DIR / 'instance' / 'django.db'
     # 确保 instance 目录存在
     db_path.parent.mkdir(parents=True, exist_ok=True)
-    
-    # 确保数据库文件使用WAL模式
-    import sqlite3
-    try:
-        conn = sqlite3.connect(str(db_path))
-        conn.execute("PRAGMA journal_mode=WAL")
-        conn.close()
-    except Exception:
-        pass  # 如果失败，继续
     
     return {
         'ENGINE': 'django.db.backends.sqlite3',

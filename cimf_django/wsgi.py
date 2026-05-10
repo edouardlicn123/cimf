@@ -16,5 +16,5 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cimf_django.settings')
 application = get_wsgi_application()
 
 # 初始化 Cron 服务（仅在 WSGI 服务器启动时）
-from core.services import init_cron_service
+from core.services import init_cron_service  # noqa: E402
 init_cron_service()

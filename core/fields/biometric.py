@@ -25,7 +25,6 @@ class BiometricField(BaseField):
         if mode == 'view':
             return '已录入' if value.get('value') else '未录入'
         
-        required = self.field_config.get('required', False)
         bio_type = self.field_config.get('biometric_type', 'fingerprint')
         
         return f'<input type="hidden" name="{self.field_name}" value="{value.get("value", "")}">' \

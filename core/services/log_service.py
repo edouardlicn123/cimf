@@ -10,9 +10,8 @@
 """
 
 import logging
-import os
 from pathlib import Path
-from typing import List, Dict, Optional
+from typing import List, Dict
 from django.conf import settings
 
 
@@ -140,8 +139,6 @@ class LogService:
                 all_lines = f.readlines()
         except Exception:
             return {'lines': [], 'total': 0, 'page': page, 'page_size': page_size, 'error': '无法读取文件'}
-        
-        total = len(all_lines)
         
         if level and level != 'all':
             filtered = [line for line in all_lines if level.upper() in line.upper()]

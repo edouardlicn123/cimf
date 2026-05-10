@@ -31,7 +31,7 @@
 """
 
 import json
-from typing import Dict, List, Optional
+from typing import Dict, List
 from core.models import User
 from core.constants import UserRole
 
@@ -174,7 +174,7 @@ class PermissionService:
     @staticmethod
     def can_access_admin(user: User) -> bool:
         """检查用户是否可以访问后台"""
-        return user.is_admin == True
+        return user.is_admin
     
     @staticmethod
     def init_default_role_permissions() -> None:

@@ -64,3 +64,6 @@ storage/logs/*.log
 
 # 静态文件收集目录
 storage/staticfiles/
+
+# Ruff 代码检查报告
+storage/reports/
