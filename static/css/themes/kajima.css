@@ -32,6 +32,9 @@
   --warning-hover:     #a87a28;
   --warning-light:     rgba(196, 144, 48, 0.12);
 
+  /* 金色点缀 */
+  --gold:              #c49030;
+
   /* 危险 - 玫瑰粉 */
   --danger:            #b8606a;
   --danger-hover:      #a4505a;
@@ -121,7 +124,7 @@ main.container,
 .navbar-kajima {
   background-color: var(--bg-nav) !important;
   border-bottom: 1px solid rgba(255,255,255,0.12) !important;
-  box-shadow: var(--shadow-nav) !important;
+  box-shadow: 0 2px 0 var(--gold), var(--shadow-nav) !important;
   border-radius: 0 !important;
   transition: var(--transition) !important;
 }
@@ -193,6 +196,7 @@ main.container,
   background-color: var(--primary-light) !important;
   color: var(--primary) !important;
   font-weight: 600 !important;
+  border-left-color: var(--gold) !important;
 }
 
 .admin-sidebar .nav-link:hover {
@@ -456,7 +460,8 @@ main.container,
 .btn-primary,
 .primary-btn {
   background-color: var(--primary) !important;
-  border-color: var(--primary) !important;
+  border-color: var(--gold) !important;
+  border-width: 2px !important;
   color: white !important;
 }
 
@@ -466,9 +471,10 @@ main.container,
 .primary-btn:hover,
 .primary-btn:focus {
   background-color: var(--primary-hover) !important;
-  border-color: var(--primary-hover) !important;
+  border-color: var(--gold) !important;
+  border-width: 2px !important;
   color: white !important;
-  box-shadow: 0 0 0 0.25rem rgba(148, 99, 75, 0.25) !important;
+  box-shadow: 0 0 0 0.25rem rgba(196, 144, 48, 0.25) !important;
 }
 
 .btn-primary:active,
@@ -476,7 +482,8 @@ main.container,
 .primary-btn:active,
 .primary-btn.active {
   background-color: #604032 !important;
-  border-color: #604032 !important;
+  border-color: var(--gold) !important;
+  border-width: 2px !important;
   color: white !important;
 }
 
@@ -484,4 +491,15 @@ main.container,
 .primary-btn:hover:not(.disabled):not(:disabled) {
   background-color: #7a4f3e !important;
   color: white !important;
+}
+
+/* ──────────────────────────────────────────────
+   按钮聚焦 - 金色外圈
+───────────────────────────────────────────────── */
+.btn-primary:focus-visible,
+.btn-success:focus-visible,
+.btn-danger:focus-visible,
+.btn-warning:focus-visible,
+.btn-info:focus-visible {
+  outline-color: var(--gold) !important;
 }
