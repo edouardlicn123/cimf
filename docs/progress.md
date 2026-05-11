@@ -1053,4 +1053,5 @@
 14. IP白名单简化：IP_WHITELIST为空时自动从ALLOWED_HOSTS提取IP
 15. 调整 run.sh 安装子菜单顺序 + 重写 run.bat（Windows版，全功能对齐）
 16. config.env/env.sample 新增 pip 镜像源配置段；run.sh/run.bat 改为 config.env 驱动
+17. 新增 run.ps1 (PowerShell 版启动脚本，全功能对齐 run.sh)
 
