@@ -74,6 +74,23 @@
   --transition:        all 0.18s ease;
   --transition-slow:   all 0.25s ease;
 
+  /* 相近色 - 靛蓝家族 */
+  --accent-navy:          #1E2A4F;
+  --accent-blue:          #4A7BC4;
+  --accent-violet:        #6C5B9E;
+  --accent-teal:          #4DA8A0;
+
+  /* 对比色 - 暖调点缀 */
+  --accent-gold:          #C49B47;
+  --accent-coral:         #E8927C;
+
+  /* 附加背景色 */
+  --bg-subtle:            #EFF1F7;
+  --bg-muted:             #E4E7F0;
+
+  /* 卡片渐变 */
+  --entry-card-gradient:  linear-gradient(135deg, #394A7A, #4A7BC4);
+
   /* Bootstrap 变量映射 */
   --bs-primary: var(--primary);
   --bs-primary-rgb: 57, 74, 122;
@@ -116,6 +133,12 @@
   background-image: linear-gradient(to bottom, #FFFFFF, #F5F6FA);
 }
 
+/* 药丸标签宽度加倍 */
+.card-header h5,
+.card-header h4 {
+  padding: 10px 64px 12px !important;
+}
+
 /* 左侧导航高亮 */
 .admin-sidebar .nav-link.active {
   background-color: var(--primary-light) !important;
@@ -132,6 +155,346 @@
 .btn-primary:hover {
   background-color: var(--primary-hover) !important;
   border-color: var(--primary-hover) !important;
+}
+
+/* ── 卡片标签底边 ── */
+.card-header {
+  border-bottom: 2px solid var(--accent-violet) !important;
+}
+
+/* ── 卡片底部 ── */
+.card-footer:last-child {
+  background-color: var(--bg-subtle) !important;
+  border-top: 2px solid var(--accent-blue) !important;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
+}
+
+/* ── 表格 ── */
+.table thead th {
+  border-bottom: 2px solid var(--accent-blue) !important;
+  color: var(--primary) !important;
+  font-weight: 600 !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: var(--primary-extra-light) !important;
+}
+
+.table-hover > tbody > tr:hover {
+  background-color: var(--bg-subtle) !important;
+}
+
+/* ── 分页 ── */
+.page-link {
+  color: var(--primary) !important;
+  border-color: var(--border-light) !important;
+  transition: var(--transition) !important;
+}
+
+.page-link:hover {
+  background-color: var(--bg-subtle) !important;
+  color: var(--primary-hover) !important;
+  border-color: var(--accent-blue) !important;
+}
+
+.page-item.active .page-link {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: white !important;
+}
+
+.page-item.disabled .page-link {
+  color: var(--text-muted) !important;
+}
+
+/* ── 进度条 ── */
+.progress {
+  background-color: var(--bg-muted) !important;
+  border-radius: var(--radius-pill) !important;
+}
+
+.progress-bar {
+  background: linear-gradient(90deg, var(--primary) 0%, var(--accent-blue) 100%) !important;
+}
+
+/* ── Accordion ── */
+.accordion-button {
+  font-weight: 500;
+  transition: var(--transition);
+  border-radius: var(--radius) !important;
+}
+
+.accordion-button:not(.collapsed) {
+  background: linear-gradient(135deg, var(--accent-navy) 0%, var(--primary) 100%) !important;
+  color: white !important;
+}
+
+.accordion-button.collapsed {
+  background-color: var(--bg-subtle) !important;
+  color: var(--text-primary) !important;
+}
+
+.accordion-button::after {
+  filter: brightness(0) invert(1);
+}
+
+.accordion-item {
+  border: 1px solid var(--border-light) !important;
+  margin-bottom: 4px;
+  border-radius: var(--radius) !important;
+}
+
+/* ── 按钮完整变体 ── */
+.btn-info,
+.settings-btn,
+.edit-btn {
+  background-color: var(--accent-blue) !important;
+  border-color: var(--accent-blue) !important;
+  color: white !important;
+  border-radius: var(--radius) !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: var(--transition) !important;
+}
+
+.btn-info:hover,
+.settings-btn:hover,
+.edit-btn:hover {
+  background-color: #3D6AA8 !important;
+  border-color: #3D6AA8 !important;
+  box-shadow: var(--shadow-hover) !important;
+}
+
+.btn-success {
+  background-color: var(--success) !important;
+  border-color: var(--success) !important;
+  color: white !important;
+}
+
+.btn-success:hover {
+  background-color: var(--success-hover) !important;
+  border-color: var(--success-hover) !important;
+  color: white !important;
+}
+
+.btn-warning {
+  background-color: var(--accent-gold) !important;
+  border-color: var(--accent-gold) !important;
+  color: white !important;
+}
+
+.btn-warning:hover {
+  background-color: #AE8539 !important;
+  border-color: #AE8539 !important;
+  color: white !important;
+}
+
+.btn-danger {
+  background-color: var(--danger) !important;
+  border-color: var(--danger) !important;
+  color: white !important;
+}
+
+.btn-danger:hover {
+  background-color: var(--danger-hover) !important;
+  border-color: var(--danger-hover) !important;
+  color: white !important;
+}
+
+.btn-outline-primary {
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: white !important;
+}
+
+/* ── 徽标 / Badge ── */
+.badge {
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+}
+
+.badge.bg-primary {
+  background-color: var(--primary) !important;
+}
+
+.badge.bg-info {
+  background-color: var(--accent-blue) !important;
+  color: white !important;
+}
+
+.badge.bg-success {
+  background-color: var(--success) !important;
+}
+
+.badge.bg-warning {
+  background-color: var(--accent-gold) !important;
+  color: white !important;
+}
+
+.badge.bg-danger {
+  background-color: var(--danger) !important;
+}
+
+/* ── 模态框 ── */
+.modal-header {
+  background: linear-gradient(135deg, var(--accent-navy) 0%, var(--primary) 100%) !important;
+  color: white !important;
+  border-bottom: none !important;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
+}
+
+.modal-header .btn-close {
+  filter: brightness(0) invert(1) !important;
+}
+
+.modal-content {
+  border: none !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-hover) !important;
+}
+
+.modal-footer {
+  border-top: 2px solid var(--accent-blue) !important;
+}
+
+/* ── 导航标签 / Nav Tabs ── */
+.nav-tabs .nav-link {
+  color: var(--text-secondary) !important;
+  border: none !important;
+  border-bottom: 2px solid transparent !important;
+  transition: var(--transition) !important;
+}
+
+.nav-tabs .nav-link:hover {
+  color: var(--accent-blue) !important;
+  border-bottom-color: var(--bg-subtle) !important;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--primary) !important;
+  border-bottom-color: var(--accent-gold) !important;
+  font-weight: 600 !important;
+}
+
+/* ── 提示 / Alert ── */
+.alert-primary {
+  background-color: rgba(57, 74, 122, 0.10) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+}
+
+.alert-info {
+  background-color: rgba(74, 123, 196, 0.10) !important;
+  border-color: var(--accent-blue) !important;
+  color: #2A3A6A !important;
+}
+
+.alert-success {
+  background-color: rgba(134, 193, 102, 0.10) !important;
+  border-color: var(--success) !important;
+  color: #2D6A1E !important;
+}
+
+.alert-warning {
+  background-color: rgba(196, 155, 71, 0.12) !important;
+  border-color: var(--accent-gold) !important;
+  color: #7A5A20 !important;
+}
+
+.alert-danger {
+  background-color: rgba(229, 115, 115, 0.10) !important;
+  border-color: var(--danger) !important;
+  color: #8A3030 !important;
+}
+
+/* ── 下拉菜单 ── */
+.dropdown-menu {
+  border: 1px solid var(--border-light) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.dropdown-header {
+  color: var(--text-muted) !important;
+}
+
+.dropdown-divider {
+  border-top-color: var(--border-light) !important;
+}
+
+/* ── Dashboard 卡片 ── */
+.welcome-title {
+  color: var(--primary);
+  font-size: 1.8rem;
+  border-bottom: 2px solid var(--accent-blue);
+  padding-bottom: 0.5rem;
+  display: inline-block;
+}
+
+.card-entry {
+  border-radius: var(--radius-lg);
+  transition: var(--transition);
+  border: 1px solid var(--border-light) !important;
+}
+
+.card-entry:hover {
+  box-shadow: var(--shadow-hover);
+  border-color: var(--accent-blue) !important;
+}
+
+.card-icon {
+  color: var(--accent-blue);
+}
+
+/* ── 表单焦点 ── */
+.form-control:focus {
+  border-color: var(--accent-blue) !important;
+  box-shadow: 0 0 0 0.2rem rgba(74, 123, 196, 0.25) !important;
+}
+
+.form-select:focus {
+  border-color: var(--accent-blue) !important;
+  box-shadow: 0 0 0 0.2rem rgba(74, 123, 196, 0.25) !important;
+}
+
+/* ── 其他通用 ── */
+::selection {
+  background: rgba(74, 123, 196, 0.30);
+  color: var(--text-primary);
+}
+
+.avatar-placeholder {
+  border: 2px solid var(--border);
+  border-radius: 50%;
+}
+
+.avatar-placeholder:hover {
+  border-color: var(--accent-blue);
+}
+
+hr {
+  border-color: var(--border-light) !important;
+  opacity: 0.5;
+}
+
+.text-primary {
+  color: var(--primary) !important;
+}
+
+.text-info {
+  color: var(--accent-blue) !important;
+}
+
+.bg-primary {
+  background-color: var(--primary) !important;
+}
+
+.bg-info {
+  background-color: var(--accent-blue) !important;
 }
 
 
