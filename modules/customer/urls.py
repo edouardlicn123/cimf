@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
 """
 海外客户 URL 路由
 """
 
 from django.urls import path
+
 from . import views
 
 app_name = 'customer'

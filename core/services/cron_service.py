@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 ================================================================================
 文件：cron_service.py
@@ -7,7 +6,7 @@
 
 功能说明：
     统一的定时任务调度服务，负责管理和执行后台定时任务。
-    
+
     主要功能：
     - 注册和管理多个定时任务（Task）
     - 后台线程循环检查任务执行时间
@@ -23,12 +22,16 @@
     - CronTask: 任务基类
 """
 
-import time
 import logging
+import os
 import threading
-from datetime import datetime
-from typing import Optional, Dict
+import time
+from typing import TYPE_CHECKING
+
 from django.utils.timezone import now
+
+if TYPE_CHECKING:
+    from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +39,7 @@ logger = logging.getLogger(__name__)
 class CronService:
     """
     统一的定时任务调度服务类
-    
+
     属性：
         _tasks: Dict[str, CronTask] - 已注册的任务字典
         _running: bool - 调度器运行状态
@@ -58,11 +61,11 @@ class CronService:
     def __init__(self):
         if self._initialized:
             return
-        self._tasks: Dict = {}
+        self._tasks: dict = {}
         self._lock: threading.Lock = threading.Lock()
         self._running: bool = False
-        self._thread: Optional[threading.Thread] = None
-        self._start_time: Optional[datetime] = None
+        self._thread: threading.Thread | None = None
+        self._start_time: datetime | None = None
         self._initialized = True
 
     def register(self, task):
@@ -85,9 +88,9 @@ class CronService:
     def _run_loop(self):
         """调度循环（内部方法）"""
         logger.info("Cron 服务已启动，等待应用就绪...")
-        
+
         time.sleep(10)
-        
+
         logger.info("Cron 服务开始执行任务")
 
         while self._running:
@@ -101,9 +104,9 @@ class CronService:
                     try:
                         if not task.is_enabled():
                             continue
-                        
+
                         should_run = False
-                        
+
                         if task._last_run is None:
                             if task._run_count == 0:
                                 should_run = True
@@ -111,7 +114,7 @@ class CronService:
                             next_run = task._last_run.timestamp() + task.get_interval()
                             if now >= next_run:
                                 should_run = True
-                        
+
                         if should_run:
                             logger.info(f"执行任务: {task.name}, run_count={task._run_count}, last_run={task._last_run}")
                             try:
@@ -184,7 +187,7 @@ class CronService:
             task.run()
         except Exception as e:
             logger.error(f"手动触发任务 {task_name} 失败: {e}", exc_info=True)
-            return {'success': False, 'error': f'任务执行失败: {str(e)}'}
+            return {'success': False, 'error': f'任务执行失败: {e!s}'}
 
         return {
             'success': True,
@@ -208,13 +211,13 @@ class CronService:
         }
 
 
-_cron_service: Optional[CronService] = None
+_cron_service: CronService | None = None
 _cron_initialized: bool = False
 
 
 def get_cron_service() -> CronService:
     """获取 Cron 服务单例"""
-    global _cron_service
+    global _cron_service  # noqa: PLW0603
     if _cron_service is None:
         _cron_service = CronService()
     return _cron_service
@@ -222,24 +225,22 @@ def get_cron_service() -> CronService:
 
 def init_cron_service():
     """初始化 Cron 服务并注册任务"""
-    global _cron_initialized
-    
+
     # 防止重复初始化（Django autoreload 会创建子进程，每个进程都会调用 ready()）
     # 使用环境变量标记，在子进程中不初始化 cron 服务
-    import os
     if os.environ.get('CIMF_CRON_INITIALIZED'):
         return
     os.environ['CIMF_CRON_INITIALIZED'] = '1'
-    
-    from core.services.tasks import TimeSyncTask, CacheCleanupTask, EmailSendingTask, EmailCleanupTask
-    
+
+    from core.services.tasks import CacheCleanupTask, EmailCleanupTask, EmailSendingTask, TimeSyncTask  # noqa: PLC0415
+
     cron = get_cron_service()
-    
+
     # 防止重复注册
     if cron._tasks:
         logger.info("Cron 服务已注册任务，跳过")
         return
-    
+
     cron.register(TimeSyncTask())
     cron.register(CacheCleanupTask())
     cron.register(EmailSendingTask())

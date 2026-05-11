@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 """Node 节点系统 URL 路由"""
 
 from django.urls import path
+
 from . import views
 
 app_name = 'node'

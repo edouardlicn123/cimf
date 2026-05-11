@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 ================================================================================
 文件：settings_forms.py
@@ -19,13 +18,14 @@
 
 from django import forms
 from django.core.exceptions import ValidationError
+
+from core.constants import Language, UserTheme
 from core.models import User
-from core.constants import UserTheme, Language
 
 
 class ProfileForm(forms.Form):
     """个人信息编辑表单（昵称、邮箱）"""
-    
+
     nickname = forms.CharField(
         label='显示昵称',
         max_length=64,
@@ -36,7 +36,7 @@ class ProfileForm(forms.Form):
             'autocomplete': 'nickname',
         })
     )
-    
+
     email = forms.EmailField(
         label='邮箱地址',
         required=False,
@@ -46,11 +46,11 @@ class ProfileForm(forms.Form):
             'autocomplete': 'email',
         })
     )
-    
+
     def __init__(self, *args, **kwargs):
         self.user_id = kwargs.pop('user_id', None)
         super().__init__(*args, **kwargs)
-    
+
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if email:
@@ -58,15 +58,14 @@ class ProfileForm(forms.Form):
             if self.user_id:
                 if User.objects.filter(email=email).exclude(id=self.user_id).exists():
                     raise ValidationError('该邮箱已被其他用户使用，请更换')
-            else:
-                if User.objects.filter(email=email).exists():
-                    raise ValidationError('该邮箱已被其他用户使用，请更换')
+            elif User.objects.filter(email=email).exists():
+                raise ValidationError('该邮箱已被其他用户使用，请更换')
         return email
 
 
 class PreferencesForm(forms.Form):
     """用户偏好设置表单（主题、通知，语言）"""
-    
+
     theme = forms.ChoiceField(
         label='界面主题',
         choices=UserTheme.DISPLAY_LABELS.items(),
@@ -74,7 +73,7 @@ class PreferencesForm(forms.Form):
             'class': 'form-select form-select-lg',
         })
     )
-    
+
     notifications_enabled = forms.BooleanField(
         label='开启系统通知',
         required=False,
@@ -85,7 +84,7 @@ class PreferencesForm(forms.Form):
             'id': 'notificationsSwitch',
         })
     )
-    
+
     preferred_language = forms.ChoiceField(
         label='界面语言',
         choices=Language.CHOICES,
@@ -97,7 +96,7 @@ class PreferencesForm(forms.Form):
 
 class ChangePasswordForm(forms.Form):
     """修改密码表单 - 安全强化版"""
-    
+
     current_password = forms.CharField(
         label='当前密码 *',
         widget=forms.PasswordInput(attrs={
@@ -106,7 +105,7 @@ class ChangePasswordForm(forms.Form):
             'autocomplete': 'current-password',
         })
     )
-    
+
     new_password = forms.CharField(
         label='新密码 *',
         min_length=10,
@@ -116,7 +115,7 @@ class ChangePasswordForm(forms.Form):
             'autocomplete': 'new-password',
         })
     )
-    
+
     confirm_password = forms.CharField(
         label='确认新密码 *',
         min_length=10,
@@ -126,28 +125,27 @@ class ChangePasswordForm(forms.Form):
             'autocomplete': 'new-password',
         })
     )
-    
+
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
-    
+
     def clean_current_password(self):
         current_password = self.cleaned_data.get('current_password')
-        if current_password and self.user:
-            if not self.user.check_password(current_password):
-                raise ValidationError('当前密码输入错误，请重试')
+        if current_password and self.user and not self.user.check_password(current_password):
+            raise ValidationError('当前密码输入错误，请重试')
         return current_password
-    
+
     def clean(self):
         cleaned_data = super().clean()
         current_password = cleaned_data.get('current_password')
         new_password = cleaned_data.get('new_password')
         confirm_password = cleaned_data.get('confirm_password')
-        
+
         # 如果填写了新密码，必须填写当前密码
         if new_password and not current_password:
             raise ValidationError('修改密码时必须填写当前密码')
-        
+
         if new_password:
             if not confirm_password:
                 raise ValidationError('请确认新密码')
@@ -155,5 +153,5 @@ class ChangePasswordForm(forms.Form):
                 raise ValidationError('两次输入的新密码不一致')
             if len(new_password) < 10:
                 raise ValidationError('新密码长度至少 10 个字符（建议 12+ 字符）')
-        
+
         return cleaned_data

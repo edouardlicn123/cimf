@@ -334,7 +334,7 @@ create_env_file() {
         case "$db_choice" in
             1)
                 # SQLite 配置
-                sed 's/^# DB_TYPE=mysql/DB_TYPE=sqlite/' config.env.sample > config.env
+                sed 's/^# DJANGO_DB_TYPE=mysql/DJANGO_DB_TYPE=sqlite/' config.env.sample > config.env
                 echo -e "${GREEN}已创建 config.env（SQLite）${NC}"
                 ;;
             2)
@@ -348,20 +348,20 @@ create_env_file() {
                 
                 # 生成配置
                 cp config.env.sample config.env
-                sed -i 's/^DB_TYPE=sqlite/DB_TYPE=mysql/' config.env
-                sed -i "s/^# DB_NAME=cimf/DB_NAME=${db_name:-cimf}/" config.env
-                sed -i "s/^# DB_USER=root/DB_USER=${db_user:-root}/" config.env
-                sed -i "s/^# DB_PASSWORD=$/DB_PASSWORD=${db_pass}/" config.env
-                sed -i "s/^# DB_HOST=localhost/DB_HOST=${db_host:-localhost}/" config.env
-                sed -i "s/^# DB_PORT=3306/DB_PORT=${db_port:-3306}/" config.env
+                sed -i 's/^DJANGO_DB_TYPE=sqlite/DJANGO_DB_TYPE=mysql/' config.env
+                sed -i "s/^# DJANGO_DB_NAME=cimf/DJANGO_DB_NAME=${db_name:-cimf}/" config.env
+                sed -i "s/^# DJANGO_DB_USER=root/DJANGO_DB_USER=${db_user:-root}/" config.env
+                sed -i "s/^# DJANGO_DB_PASSWORD=$/DJANGO_DB_PASSWORD=${db_pass}/" config.env
+                sed -i "s/^# DJANGO_DB_HOST=localhost/DJANGO_DB_HOST=${db_host:-localhost}/" config.env
+                sed -i "s/^# DJANGO_DB_PORT=3306/DJANGO_DB_PORT=${db_port:-3306}/" config.env
                 
                 # 取消注释 MySQL 配置行
-                sed -i 's/^# \(DB_TYPE=mysql\)/\1/' config.env
-                sed -i 's/^# \(DB_NAME=\)/\1/' config.env
-                sed -i 's/^# \(DB_USER=\)/\1/' config.env
-                sed -i 's/^# \(DB_PASSWORD=\)/\1/' config.env
-                sed -i 's/^# \(DB_HOST=\)/\1/' config.env
-                sed -i 's/^# \(DB_PORT=\)/\1/' config.env
+                sed -i 's/^# \(DJANGO_DB_TYPE=mysql\)/\1/' config.env
+                sed -i 's/^# \(DJANGO_DB_NAME=\)/\1/' config.env
+                sed -i 's/^# \(DJANGO_DB_USER=\)/\1/' config.env
+                sed -i 's/^# \(DJANGO_DB_PASSWORD=\)/\1/' config.env
+                sed -i 's/^# \(DJANGO_DB_HOST=\)/\1/' config.env
+                sed -i 's/^# \(DJANGO_DB_PORT=\)/\1/' config.env
                 
                 echo -e "${GREEN}已创建 config.env（MySQL）${NC}"
                 ;;
@@ -440,9 +440,9 @@ show_init_menu() {
     typewrite "$WHITE" "安装/初始化" 0.01
     typewrite "$CYAN" "▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄" 0.01
     echo
-    echo "  1 → 创建虚拟环境并安装依赖"
-    echo "  2 → 初始化系统（重建数据库+创建管理员）"
-    echo "  3 → 创建 config.env 文件"
+    echo "  1 → 创建 config.env 文件"
+    echo "  2 → 创建虚拟环境并安装依赖"
+    echo "  3 → 初始化系统（重建数据库+创建管理员）"
     echo "  4 → 生成随机 SECRET_KEY"
     echo "  0 → 返回主菜单"
     echo
@@ -457,9 +457,9 @@ run_init_menu() {
         
         case "$choice" in
             0) break ;;
-            1) echo "→ 创建虚拟环境"; install_venv ;;
-            2) echo "→ 初始化系统"; init_system ;;
-            3) echo "→ 创建 .env 文件"; create_env_file ;;
+            1) echo "→ 创建 .env 文件"; create_env_file ;;
+            2) echo "→ 创建虚拟环境"; install_venv ;;
+            3) echo "→ 初始化系统"; init_system ;;
             4) echo "→ 生成 SECRET_KEY"; generate_secret_key ;;
             *) echo -e "${YELLOW}无效选项 '$choice'${NC}" ;;
         esac
@@ -483,15 +483,14 @@ run_ruff_check() {
     
     echo -e "${CYAN}正在扫描代码...${NC}"
     ./venv/bin/python -m ruff check core/ modules/ cimf_django/ --output-format=concise \
-        > "$report_file" 2>&1
-    local exit_code=$?
+        > "$report_file" 2>&1 || true
     
     cat "$report_file"
     
-    if [ $exit_code -eq 0 ]; then
-        echo -e "${GREEN}✅ 未发现问题${NC}"
+    if grep -q '^Found.*errors' "$report_file" 2>/dev/null; then
+        echo -e "${YELLOW}检测完成（发现代码问题）${NC}"
     else
-        echo -e "${YELLOW}检测完成 (退出码: $exit_code)${NC}"
+        echo -e "${GREEN}✅ 未发现问题${NC}"
     fi
     echo -e "${CYAN}报告已保存: ${report_file}${NC}"
 }

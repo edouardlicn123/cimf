@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 ================================================================================
 文件：tools.py
@@ -16,18 +15,21 @@
     - core.node.models: Module, ToolType
 """
 
-import os
-from django.shortcuts import render, redirect
+import importlib.util
+import inspect
+from pathlib import Path
+
 from django.contrib.auth.decorators import login_required
-from core.module.models import Module
+from django.shortcuts import redirect, render
+
 from core.constants import ModuleType
+from core.module.models import Module
 
 
 def _load_module_info(module_id: str) -> dict:
     """动态加载模块的 MODULE_INFO"""
     try:
-        import importlib.util
-        module_path = os.path.join('modules', module_id, 'module.py')
+        module_path = Path('modules') / module_id / 'module.py'
         spec = importlib.util.spec_from_file_location(f'modules.{module_id}.module', module_path)
         if spec and spec.loader:
             module = importlib.util.module_from_spec(spec)
@@ -61,7 +63,7 @@ def tools_index(request):
 
 
 @login_required
-def tools_page(request, tool_slug: str, tool_id: int = None):
+def tools_page(request, tool_slug: str, tool_id: int | None = None):
     """协作工具页面 - 动态加载对应工具的视图"""
     tool_modules = Module.objects.filter(
         module_type=ModuleType.TOOL,
@@ -76,11 +78,10 @@ def tools_page(request, tool_slug: str, tool_id: int = None):
             'description': module_info.get('description', ''),
             'icon': module_info.get('icon', 'bi-wrench'),
         })
-    
+
     try:
         tool_views = __import__(f'modules.{tool_slug}.views', fromlist=[''])
         if hasattr(tool_views, 'tool_view'):
-            import inspect
             sig = inspect.signature(tool_views.tool_view)
             if len(sig.parameters) == 1:
                 return tool_views.tool_view(request)
@@ -91,5 +92,5 @@ def tools_page(request, tool_slug: str, tool_id: int = None):
             return tool_views.list_view(request)
     except ImportError:
         pass
-    
+
     return redirect('core:tools_index')

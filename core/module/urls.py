@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 """模块管理 URL 路由"""
 
 from django.urls import path
+
 from . import views
 
 app_name = 'module'

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 ================================================================================
 文件：admin.py
@@ -16,7 +15,8 @@
 """
 
 from django.contrib import admin
-from core.node.models import NodeType, Node
+
+from core.node.models import Node, NodeType
 
 
 @admin.register(NodeType)
@@ -26,7 +26,7 @@ class NodeTypeAdmin(admin.ModelAdmin):
     list_filter = ['is_active', 'created_at']
     search_fields = ['name', 'slug', 'description']
     ordering = ['name']
-    
+
     fieldsets = (
         ('基本信息', {
             'fields': ('name', 'slug', 'description', 'icon')
@@ -38,7 +38,7 @@ class NodeTypeAdmin(admin.ModelAdmin):
             'fields': ('created_at', 'updated_at')
         }),
     )
-    
+
     readonly_fields = ['created_at', 'updated_at']
 
 
@@ -49,7 +49,7 @@ class NodeAdmin(admin.ModelAdmin):
     list_filter = ['node_type', 'created_at']
     search_fields = ['id']
     ordering = ['-created_at']
-    
+
     fieldsets = (
         ('节点信息', {
             'fields': ('node_type',)
@@ -61,5 +61,5 @@ class NodeAdmin(admin.ModelAdmin):
             'fields': ('created_at', 'updated_at')
         }),
     )
-    
+
     readonly_fields = ['created_at', 'updated_at']

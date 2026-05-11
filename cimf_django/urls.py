@@ -2,7 +2,8 @@
 URL configuration for cimf_django project.
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path
+
 from core.importexport.urls import urlpatterns_all as importexport_urls
 
 urlpatterns = [

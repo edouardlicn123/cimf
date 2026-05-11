@@ -1,13 +1,14 @@
-# -*- coding: utf-8 -*-
 """
 模块市场视图
 """
 
-from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from core.decorators import admin_required
+from django.core.paginator import Paginator
 from django.http import JsonResponse
+from django.shortcuts import render
 from django.views.decorators.http import require_POST
+
+from core.decorators import admin_required
 
 from .services import MarketService
 
@@ -16,10 +17,10 @@ from .services import MarketService
 def market_index(request):
     """市场首页"""
     modules = MarketService.get_modules()
-    
+
     # 获取筛选参数
     type_filter = request.GET.get('type', '')  # node/system/tool
-    
+
     for module in modules:
         module_id = module.get('id', '')
         status = MarketService.get_module_status(module_id)
@@ -34,34 +35,30 @@ def market_index(request):
             module['description'] = ''
         if 'type' not in module:
             module['type'] = 'node'
-    
+
     # 应用类型筛选
     filtered = modules
     if type_filter:
         filtered = [m for m in filtered if m.get('type', '') == type_filter]
-    
+
     # 分页
-    from django.core.paginator import Paginator
     paginator = Paginator(filtered, 12)  # 每页12个
     page_num = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_num)
-    
+
     # 计算页码范围
     current = page_obj.number
     start = max(1, current - 2)
     end = min(paginator.num_pages, current + 2)
     page_range = list(range(start, end + 1))
-    
+
     # 构建基础查询字符串
     query_params = request.GET.copy()
     if 'page' in query_params:
         del query_params['page']
     base_query = query_params.urlencode()
-    if base_query:
-        base_query = '?' + base_query + '&'
-    else:
-        base_query = '?'
-    
+    base_query = '?' + base_query + '&' if base_query else '?'
+
     return render(request, 'marketplace/index.html', {
         'modules': page_obj.object_list,
         'page_obj': page_obj,
@@ -80,7 +77,7 @@ def market_index(request):
 
 @admin_required
 @require_POST
-def market_install(request, module_id: str):
+def market_install(request, module_id: str):  # noqa: ARG001
     """下载安装模块"""
 
     result = MarketService.download_and_extract(module_id)
@@ -88,7 +85,7 @@ def market_install(request, module_id: str):
         return JsonResponse(result)
 
     try:
-        from core.module.services import ModuleService
+        from core.module.services import ModuleService  # noqa: PLC0415
 
         module = ModuleService.register_module({
             'id': module_id,
@@ -99,6 +96,6 @@ def market_install(request, module_id: str):
             result['registered'] = True
     except Exception as e:
         result['success'] = False
-        result['error'] = f'注册失败: {str(e)}'
+        result['error'] = f'注册失败: {e!s}'
 
     return JsonResponse(result)

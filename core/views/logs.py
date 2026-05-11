@@ -1,17 +1,16 @@
-# -*- coding: utf-8 -*-
 """
 日志管理视图
 """
 
-from django.shortcuts import redirect, render
 from django.http import JsonResponse
+from django.shortcuts import redirect, render
 
 from core.decorators import admin_required
 from core.services.log_service import LogService
 
 
 @admin_required
-def logs_index(request):
+def logs_index(request):  # noqa: ARG001
     """日志管理首页 - 默认显示 cimf 日志"""
     return redirect('core:logs_view', log_type='cimf')
 
@@ -26,14 +25,14 @@ def logs_view(request, log_type):
         page = 1
         page_size = 100
     level = request.GET.get('level', 'all')
-    
+
     if log_type not in ['cimf', 'error', 'security']:
         log_type = 'cimf'
-    
+
     log_data = LogService.read_log(log_type, page, page_size, level)
     log_files = LogService.get_log_files()
     stats = LogService.get_log_stats(log_type)
-    
+
     return render(request, 'admin/logs.html', {
         'log_type': log_type,
         'log_files': log_files,
@@ -55,9 +54,9 @@ def logs_api(request, log_type):
         page = 1
         page_size = 100
     level = request.GET.get('level', 'all')
-    
+
     if log_type not in ['cimf', 'error', 'security']:
         return JsonResponse({'error': 'Invalid log type'}, status=400)
-    
+
     log_data = LogService.read_log(log_type, page, page_size, level)
     return JsonResponse(log_data)

@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
 """
 时钟模块服务层
 """
 
-from django.utils.timezone import now
 import time
+
+from django.utils.timezone import now
 
 
 class ClockService:

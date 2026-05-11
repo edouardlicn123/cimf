@@ -1,13 +1,16 @@
-# -*- coding: utf-8 -*-
 """
 SMTP 配置管理服务
 """
 
 import os
-from typing import Dict, Any, Optional, Tuple
-from django.conf import settings
-from core.services import SettingsService
+import smtplib
+import ssl
+from email.message import EmailMessage
+from typing import Any
 
+from django.conf import settings
+
+from core.services import SettingsService
 
 SMTP_PRESETS = {
     'gmail_ssl': {
@@ -80,17 +83,17 @@ class SmtpService:
     """SMTP 配置管理服务"""
 
     @classmethod
-    def get_provider_presets(cls, provider: Optional[str] = None) -> Dict[str, Any]:
+    def get_provider_presets(cls, provider: str | None = None) -> dict[str, Any]:
         """获取服务商预设配置"""
         if provider:
             return SMTP_PRESETS.get(provider, SMTP_PRESETS['custom'])
         return SMTP_PRESETS
 
     @classmethod
-    def get_current_config(cls) -> Dict[str, Any]:
+    def get_current_config(cls) -> dict[str, Any]:
         """获取当前 SMTP 配置"""
         settings_dict = SettingsService.get_all_settings()
-        
+
         config = {
             'enabled': settings_dict.get('smtp_enabled', 'false') == 'true',
             'provider': settings_dict.get('smtp_provider', 'gmail_tls'),
@@ -111,21 +114,21 @@ class SmtpService:
             'notify_email': settings_dict.get('smtp_notify_email', ''),
             'system_url': settings_dict.get('smtp_system_url', ''),
         }
-        
+
         return config
 
     @classmethod
     def _get_password(cls) -> str:
         """获取 SMTP 密码，优先从环境变量读取"""
-        env_password = os.environ.get('SMTP_PASSWORD', '')
+        env_password = os.environ.get('DJANGO_SMTP_PASSWORD', '')
         if env_password:
             return env_password
-        
+
         settings_dict = SettingsService.get_all_settings()
         return settings_dict.get('smtp_password', '')
 
     @classmethod
-    def save_config(cls, config: Dict[str, Any]) -> None:
+    def save_config(cls, config: dict[str, Any]) -> None:
         """保存 SMTP 配置"""
         mappings = {
             'smtp_enabled': 'true' if config.get('enabled') else 'false',
@@ -146,86 +149,82 @@ class SmtpService:
             'smtp_notify_email': str(config.get('notify_email', '')),
             'smtp_system_url': str(config.get('system_url', '')),
         }
-        
+
         for key, value in mappings.items():
             SettingsService.save_setting(key, value)
-        
+
         # 同步开启/关闭后台邮件任务
         smtp_enabled = config.get('enabled', False)
         SettingsService.save_setting('cron_email_sending_enabled', 'true' if smtp_enabled else 'false')
         SettingsService.save_setting('cron_email_cleanup_enabled', 'true' if smtp_enabled else 'false')
-        
+
         password = config.get('password', '')
         if password:
             SettingsService.save_setting('smtp_password', password)
-        
+
         cls.update_django_settings()
 
     @classmethod
-    def test_connection(cls, config: Optional[Dict[str, Any]] = None) -> Tuple[bool, str]:
+    def test_connection(cls, config: dict[str, Any] | None = None) -> tuple[bool, str]:
         """测试 SMTP 连接"""
         if config is None:
             config = cls.get_current_config()
-        
+
         try:
-            import smtplib
-            import ssl
-            from email.message import EmailMessage
-            
             password = config.get('password') or cls._get_password()
             if not password:
                 return False, '请先配置 SMTP 密码'
-            
+
             from_email = config.get('from_email') or config.get('username')
             if not from_email:
                 return False, '请先配置发件人邮箱'
-            
+
             host = config.get('host', 'smtp.gmail.com')
             port = config.get('port', 587)
             timeout = config.get('timeout', 30)
             use_ssl = config.get('use_ssl', False)
             use_tls = config.get('use_tls', True)
             skip_verify = config.get('skip_verify', False)
-            
+
             context = None
             if skip_verify:
                 context = ssl.create_default_context()
                 context.check_hostname = False
                 context.verify_mode = ssl.CERT_NONE
-            
+
             if use_ssl:
                 server = smtplib.SMTP_SSL(host, port, timeout=timeout, context=context)
             else:
                 server = smtplib.SMTP(host, port, timeout=timeout)
-            
+
             with server:
                 if use_tls:
                     server.starttls(context=context)
-                
+
                 username = config.get('username', from_email)
                 server.login(username, password)
-                
+
                 msg = EmailMessage()
                 msg['From'] = f"{config.get('from_name', '仙芙CIMF')} <{from_email}>"
                 msg['To'] = from_email
                 msg['Subject'] = 'CIMF 系统邮件测试'
                 msg.set_content('这是一封来自 CIMF 系统的测试邮件，如果您收到此邮件，说明 SMTP 配置正确。')
-                
+
                 server.send_message(msg)
-            
+
             return True, '连接测试成功！'
-            
+
         except Exception as e:
-            return False, f'连接失败: {str(e)}'
+            return False, f'连接失败: {e!s}'
 
     @classmethod
     def update_django_settings(cls) -> None:
         """更新 Django 邮件配置（运行时）"""
         config = cls.get_current_config()
-        
+
         if not config.get('enabled'):
             return
-        
+
         settings.EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
         settings.EMAIL_HOST = config.get('host', 'smtp.gmail.com')
         settings.EMAIL_PORT = config.get('port', 587)
@@ -236,32 +235,32 @@ class SmtpService:
         from_name = config.get('from_name', '仙芙CIMF')
         from_email = config.get('from_email', '')
         settings.DEFAULT_FROM_EMAIL = f"{from_name} <{from_email}>" if from_email else from_name
-    
+
     @classmethod
     def get_system_url(cls, request=None) -> str:
         """
         获取系统访问地址
-        
+
         优先级：
         1. 配置中的 system_url
         2. 当前请求的域名（如果有）
         3. 空字符串
-        
+
         Args:
             request: Django 请求对象，用于获取当前域名
-            
+
         Returns:
             系统访问地址（不含末尾斜杠）
         """
         config = cls.get_current_config()
         system_url = config.get('system_url', '').strip()
-        
+
         if system_url:
             return system_url.rstrip('/')
-        
+
         if request:
             host = request.get_host()
             scheme = 'https' if request.is_secure() else 'http'
             return f'{scheme}://{host}'
-        
+
         return ''

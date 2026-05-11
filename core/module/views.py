@@ -1,19 +1,19 @@
-# -*- coding: utf-8 -*-
 """
 模块管理视图
 """
 
-import os
 import logging
-from django.shortcuts import render, redirect
+from pathlib import Path
+
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.http import JsonResponse
+from django.middleware.csrf import get_token
+from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
 
 from core.decorators import admin_required
 from core.module.services import ModuleService
-
 
 logger = logging.getLogger(__name__)
 
@@ -81,16 +81,17 @@ def modules_manage(request):
 
         error_msg = None
         if m.path:
-            module_path = os.path.join(ModuleService.MODULES_DIR, m.path)
-            if not os.path.exists(module_path):
+            module_path = Path(ModuleService.MODULES_DIR) / m.path
+            if not module_path.exists():
                 status = 'error'
                 error_msg = f'模块目录不存在: {m.path}'
 
         modules_list.append(module_to_dict(m, status, True, error_msg))
 
-    for m in all_modules:
-        if m['id'] not in registered_ids:
-            modules_list.append(module_to_dict(m, 'uninstalled', False))
+    modules_list.extend(
+        module_to_dict(m, 'uninstalled', False)
+        for m in all_modules if m['id'] not in registered_ids
+    )
 
     if search:
         modules_list = [m for m in modules_list if search.lower() in m['name'].lower() or search.lower() in m['id'].lower()]
@@ -115,10 +116,7 @@ def modules_manage(request):
         params.append(f'type={type_filter}')
     if status_filter:
         params.append(f'status={status_filter}')
-    if params:
-        base_query = '&' + '&'.join(params) + '&'
-    else:
-        base_query = '?'
+    base_query = '&' + '&'.join(params) + '&' if params else '?'
 
     start = max(1, page_obj.number - 2)
     end = min(paginator.num_pages, page_obj.number + 2)
@@ -142,7 +140,7 @@ def modules_manage(request):
 def module_scan(request):
     """扫描并注册模块"""
     result = ModuleService.scan_register_install(do_install=True, dry_run=False, respect_install_on_init=False)
-    
+
     msg_parts = []
     if result.get('registered', 0) > 0:
         msg_parts.append(f"注册 {result['registered']} 个新模块")
@@ -150,16 +148,16 @@ def module_scan(request):
         msg_parts.append(f"安装 {result['installed']} 个模块")
     if result.get('skipped', 0) > 0:
         msg_parts.append(f"跳过 {result['skipped']} 个模块")
-    
+
     if msg_parts:
         messages.success(request, f"扫描完成: {', '.join(msg_parts)}")
     else:
         messages.info(request, "扫描完成: 没有新模块")
-    
+
     if result.get('failed'):
         for fail in result['failed']:
             messages.error(request, f"失败: {fail}")
-    
+
     return redirect('module:list')
 
 
@@ -198,7 +196,6 @@ def module_disable(request, module_id: str):
 @admin_required
 def module_create(request):
     """模块创建页面"""
-    from django.middleware.csrf import get_token
     return render(request, 'module/modules/create.html', {
         'active_section': 'modules',
         'csrf_token_value': get_token(request),
@@ -213,10 +210,10 @@ def module_create_action(request):
     module_id = request.POST.get('module_id', '').strip()
     module_type = request.POST.get('module_type', 'node').strip()
     description = request.POST.get('description', '').strip()
-    
+
     if not name or not module_id:
         return JsonResponse({'success': False, 'error': '名称和标识不能为空'})
-    
+
     try:
         ModuleService.create_module(module_id, name, module_type, description)
         return JsonResponse({'success': True, 'message': '模块创建成功'})

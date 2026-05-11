@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 ================================================================================
 文件：views.py
@@ -17,15 +16,16 @@
     - core.node.services: Node服务
 """
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.http import Http404, JsonResponse
+from django.shortcuts import redirect, render
 
-from core.node.services import NodeTypeService, NodeService
-from modules.customer.services import CustomerService
-from core.services import PermissionService
 from core.decorators import login_required_json
+from core.node.services import NodeService, NodeTypeService
+from core.services import PermissionService, TaxonomyService
+from modules.customer.services import CustomerService
 
 
 def safe_int(value: str, default=None):
@@ -42,22 +42,22 @@ def check_customer_permission(user, node, permission_type: str):
     """检查客户节点操作权限"""
     if user.is_admin:
         return True, None
-    
+
     is_creator = node.created_by_id == user.id
-    
+
     if is_creator:
         return True, None
-    
+
     perm_map = {
         'view': 'node.customer.view_others',
         'edit': 'node.customer.edit_others',
         'delete': 'node.customer.delete_others',
     }
-    
+
     perm = perm_map.get(permission_type)
     if perm and PermissionService.has_permission(user, perm):
         return True, None
-    
+
     return False, f'您没有权限{permission_type}别人的客户信息'
 
 
@@ -66,34 +66,32 @@ def node_list(request):
     """海外客户列表"""
     node_type = NodeTypeService.get_by_slug('customer')
     if not node_type:
-        from django.http import Http404
         raise Http404('节点类型不存在')
-    
+
     search = request.GET.get('search', '')
     customer_type_filter = request.GET.get('customer_type', '')
     customer_level_filter = request.GET.get('customer_level', '')
     node_types = NodeTypeService.get_all()
-    
-    from core.services import TaxonomyService
+
     customer_type_tax = TaxonomyService.get_taxonomy_by_slug('customer_type')
     customer_types = [{'id': c.id, 'name': c.name} for c in TaxonomyService.get_items(customer_type_tax.id)] if customer_type_tax else []
     customer_level_tax = TaxonomyService.get_taxonomy_by_slug('customer_level')
     customer_levels = [{'id': c.id, 'name': c.name} for c in TaxonomyService.get_items(customer_level_tax.id)] if customer_level_tax else []
-    
+
     customer_type_id = safe_int(customer_type_filter)
     customer_level_id = safe_int(customer_level_filter)
-    
+
     customers = CustomerService.get_list(
         search if search else None,
         customer_type_id=customer_type_id,
         customer_level_id=customer_level_id,
         user=request.user
     )
-    
+
     page_num = request.GET.get('page', 1)
     paginator = Paginator(customers, 10)
     page_obj = paginator.get_page(page_num)
-    
+
     return render(request, 'list.html', {
         'node_type': node_type,
         'node_types': node_types,
@@ -119,12 +117,10 @@ def node_create(request):
     """创建海外客户"""
     node_type = NodeTypeService.get_by_slug('customer')
     if not node_type:
-        from django.http import Http404
         raise Http404('节点类型不存在')
-    
+
     node_types = NodeTypeService.get_all()
-    
-    from core.services import TaxonomyService
+
     customer_type_tax = TaxonomyService.get_taxonomy_by_slug('customer_type')
     customer_types = TaxonomyService.get_items(customer_type_tax.id) if customer_type_tax else []
     customer_level_tax = TaxonomyService.get_taxonomy_by_slug('customer_level')
@@ -133,7 +129,7 @@ def node_create(request):
     enterprise_types = TaxonomyService.get_items(enterprise_type_tax.id) if enterprise_type_tax else []
     country_tax = TaxonomyService.get_taxonomy_by_slug('country')
     countries = [{'id': c.id, 'name': c.name} for c in TaxonomyService.get_items(country_tax.id)] if country_tax else []
-    
+
     if request.method == 'POST':
         data = {
             'customer_name': request.POST.get('customer_name', '').strip(),
@@ -157,14 +153,14 @@ def node_create(request):
             'website': request.POST.get('website', '').strip() or None,
             'notes': request.POST.get('notes', '').strip() or None,
         }
-        
+
         try:
             CustomerService.create(request.user, data)
             messages.success(request, '客户创建成功')
             return redirect('node:module_page', node_type_slug='customer')
         except Exception as e:
             messages.error(request, str(e))
-    
+
     return render(request, 'edit.html', {
         'node_type': node_type,
         'node_types': node_types,
@@ -182,21 +178,20 @@ def node_view(request, node_id: int):
     """查看海外客户"""
     node = NodeService.get_by_id(node_id)
     if not node:
-        from django.http import Http404
         raise Http404('节点不存在')
-    
+
     has_perm, error_msg = check_customer_permission(request.user, node, 'view')
     if not has_perm:
         messages.error(request, error_msg)
         return redirect('node:module_page', node_type_slug='customer')
-    
+
     node_types = NodeTypeService.get_all()
-    
+
     customer = CustomerService.get_by_node_id(node_id)
     if not customer:
         messages.error(request, '客户不存在')
         return redirect('node:module_page', node_type_slug='customer')
-    
+
     return render(request, 'view.html', {
         'node_type': node.node_type,
         'node_types': node_types,
@@ -211,22 +206,20 @@ def node_edit(request, node_id: int):
     """编辑海外客户"""
     node = NodeService.get_by_id(node_id)
     if not node:
-        from django.http import Http404
         raise Http404('节点不存在')
-    
+
     has_perm, error_msg = check_customer_permission(request.user, node, 'edit')
     if not has_perm:
         messages.error(request, error_msg)
         return redirect('node:node_view', node_type_slug='customer', node_id=node_id)
-    
+
     node_types = NodeTypeService.get_all()
-    
+
     customer = CustomerService.get_by_node_id(node_id)
     if not customer:
         messages.error(request, '客户不存在')
         return redirect('node:module_page', node_type_slug='customer')
-    
-    from core.services import TaxonomyService
+
     customer_type_tax = TaxonomyService.get_taxonomy_by_slug('customer_type')
     customer_types = TaxonomyService.get_items(customer_type_tax.id) if customer_type_tax else []
     customer_level_tax = TaxonomyService.get_taxonomy_by_slug('customer_level')
@@ -235,7 +228,7 @@ def node_edit(request, node_id: int):
     enterprise_types = TaxonomyService.get_items(enterprise_type_tax.id) if enterprise_type_tax else []
     country_tax = TaxonomyService.get_taxonomy_by_slug('country')
     countries = [{'id': c.id, 'name': c.name} for c in TaxonomyService.get_items(country_tax.id)] if country_tax else []
-    
+
     if request.method == 'POST':
         data = {
             'customer_name': request.POST.get('customer_name', '').strip(),
@@ -259,14 +252,14 @@ def node_edit(request, node_id: int):
             'website': request.POST.get('website', '').strip() or None,
             'notes': request.POST.get('notes', '').strip() or None,
         }
-        
+
         try:
             CustomerService.update(customer.id, request.user, data)
             messages.success(request, '客户更新成功')
             return redirect('node:node_view', node_type_slug='customer', node_id=node_id)
         except Exception as e:
             messages.error(request, str(e))
-    
+
     return render(request, 'edit.html', {
         'node_type': node.node_type,
         'node_types': node_types,
@@ -291,19 +284,16 @@ def node_delete(request, node_id: int):
         else:
             CustomerService.delete(node_id)
             messages.success(request, '客户已删除')
-    
+
     return redirect('node:module_page', node_type_slug='customer')
 
 
 @login_required_json
-def api_stats(request):
+def api_stats(request):  # noqa: ARG001
     """获取客户统计信息"""
-    from django.http import JsonResponse
-    from modules.customer.services import CustomerService
-    
     total = CustomerService.get_count()
     recent = CustomerService.get_recent_count(days=7)
-    
+
     return JsonResponse({
         'success': True,
         'data': {

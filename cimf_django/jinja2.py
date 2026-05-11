@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 ================================================================================
 文件：jinja2.py
@@ -14,9 +13,12 @@
     - 1.2: 修复 url() 函数支持位置参数
 """
 
+from django.conf import settings
+from django.middleware.csrf import get_token
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.dateformat import format as date_format
+from django.utils.safestring import mark_safe
 from jinja2 import Environment
 
 
@@ -83,21 +85,18 @@ def jinja2_slice(value, start=0, end=None):
 def environment(**options):
     """创建自定义 Jinja2 环境"""
     env = Environment(**options)
-    
+
     def media(path):
         """生成媒体文件 URL"""
-        from django.conf import settings
         return f"{settings.MEDIA_URL}{path}"
-    
+
     def csrf_token():
         request = get_request()
         if request is None:
             return ''
-        from django.middleware.csrf import get_token
-        from django.utils.safestring import mark_safe
         token = get_token(request)
         return mark_safe(f'<input type="hidden" name="csrfmiddlewaretoken" value="{token}">')
-    
+
     def get_request():
         """获取当前请求对象"""
         try:
@@ -108,7 +107,7 @@ def environment(**options):
         except Exception:
             pass
         return None
-    
+
     # 添加 static 函数
     env.globals.update({
         'static': static,
@@ -117,10 +116,10 @@ def environment(**options):
         'media': media,
         'csrf_token': csrf_token,
     })
-    
+
     # 添加过滤器
     env.filters['date'] = jinja2_date_filter
     env.filters['truncatechars'] = jinja2_truncatechars
     env.filters['slice'] = jinja2_slice
-    
+
     return env

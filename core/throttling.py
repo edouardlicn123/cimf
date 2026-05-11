@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 ===============================================================================
 文件：throttling.py
@@ -7,7 +6,7 @@
 
 功能说明：
     自定义请求频率限制类
-    
+
     提供多种频率限制策略：
     - LoginRateThrottle: 登录频率限制 (10/minute)
     - AdminRateThrottle: 管理后台限制 (1000/hour)
@@ -27,7 +26,7 @@ class LoginRateThrottle(SimpleRateThrottle):
     """登录频率限制：防止暴力破解"""
     scope = 'login'
 
-    def get_cache_key(self, request, view):
+    def get_cache_key(self, request, _view):
         if request.method != 'POST':
             return None
         return self.get_ident(request)
@@ -37,7 +36,7 @@ class AdminRateThrottle(SimpleRateThrottle):
     """管理后台频率限制：高权限用户"""
     scope = 'admin'
 
-    def get_cache_key(self, request, view):
+    def get_cache_key(self, request, _view):
         if not request.user or not request.user.is_authenticated:
             return None
         if not getattr(request.user, 'is_admin', False):
@@ -49,5 +48,5 @@ class IPRateThrottle(SimpleRateThrottle):
     """IP 级别频率限制：更严格的限制"""
     scope = 'ip'
 
-    def get_cache_key(self, request, view):
+    def get_cache_key(self, request, _view):
         return self.get_ident(request)

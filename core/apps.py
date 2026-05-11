@@ -1,11 +1,12 @@
+import logging
+
 from django.apps import AppConfig
 from django.db.backends.signals import connection_created
-import logging
 
 logger = logging.getLogger(__name__)
 
 
-def _enable_sqlite_wal(sender, connection, **kwargs):
+def _enable_sqlite_wal(sender, connection, **_kwargs):  # noqa: ARG001
     """SQLite 连接创建时启用 WAL 模式"""
     if connection.vendor == 'sqlite':
         with connection.cursor() as cursor:

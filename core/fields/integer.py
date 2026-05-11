@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 ===============================================================================
 文件：integer.py
@@ -7,7 +6,7 @@
 
 功能说明：
     整数字段类型
-    
+
 版本：
     - 1.0: 从 Flask 迁移
     - 2.0: 使用简化模式调用基类方法
@@ -21,26 +20,26 @@ class IntegerField(BaseField):
     label = '整数'
     widget = 'input'
     properties = ['value', 'min', 'max']
-    
+
     def render(self, value: dict, mode: str = 'edit') -> str:
         if mode == 'view':
             return str(value.get('value', ''))
-        
+
         min_val = self.field_config.get('min', '')
         max_val = self.field_config.get('max', '')
-        
+
         extra_attrs = {}
         if min_val:
             extra_attrs['min'] = min_val
         if max_val:
             extra_attrs['max'] = max_val
-        
+
         return self._render_input(input_type='number', **extra_attrs)
-    
+
     def validate(self, value: dict) -> list:
         errors = self._validate_required()
         val = value.get('value')
-        
+
         if val:
             try:
                 int(val)
@@ -50,5 +49,5 @@ class IntegerField(BaseField):
                 ))
             except ValueError:
                 errors.append(f'{self.field_config.get("label")} 必须是整数')
-        
+
         return errors

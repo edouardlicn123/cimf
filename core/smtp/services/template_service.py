@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
 """
 邮件模板服务
 """
 
 import logging
-from typing import Optional, List, Tuple
+
 from jinja2 import Template, UndefinedError
+
 from core.smtp.models import EmailTemplate
 
 logger = logging.getLogger(__name__)
@@ -15,7 +15,7 @@ class TemplateService:
     """邮件模板服务"""
 
     @classmethod
-    def get_template(cls, name: str) -> Optional[EmailTemplate]:
+    def get_template(cls, name: str) -> EmailTemplate | None:
         """获取模板"""
         return EmailTemplate.objects.filter(name=name, is_active=True).first()
 
@@ -34,14 +34,14 @@ class TemplateService:
         return cls._render_safe(template.subject, context)
 
     @classmethod
-    def render_body(cls, template: EmailTemplate, context: dict) -> Tuple[str, str]:
+    def render_body(cls, template: EmailTemplate, context: dict) -> tuple[str, str]:
         """渲染邮件正文，返回 (html, text)"""
         html_body = cls._render_safe(template.html_body, context)
         text_body = cls._render_safe(template.text_body, context)
         return html_body, text_body
 
     @classmethod
-    def list_templates(cls) -> List[EmailTemplate]:
+    def list_templates(cls) -> list[EmailTemplate]:
         """列出所有模板"""
         return list(EmailTemplate.objects.filter(is_active=True).order_by('-created_at'))
 
@@ -67,11 +67,11 @@ class TemplateService:
     def update_template(
         cls,
         template: EmailTemplate,
-        subject: str = None,
-        html_body: str = None,
-        text_body: str = None,
-        description: str = None,
-        is_active: bool = None,
+        subject: str | None = None,
+        html_body: str | None = None,
+        text_body: str | None = None,
+        description: str | None = None,
+        is_active: bool | None = None,
     ) -> EmailTemplate:
         """更新模板"""
         if subject is not None:
@@ -96,7 +96,7 @@ class TemplateService:
     def init_default_templates(cls) -> int:
         """
         初始化默认邮件模板
-        
+
         Returns:
             创建的模板数量
         """
@@ -281,10 +281,10 @@ class TemplateService:
 &copy; {{ year | default('2026') }} {{ system_name | default('CIMF系统') }}''',
             },
         ]
-        
+
         # 批量查询已存在的模板名称（优化：避免循环查询）
         existing_names = set(EmailTemplate.objects.values_list('name', flat=True))
-        
+
         templates_to_create = []
         for tmpl in default_templates:
             if tmpl['name'] not in existing_names:
@@ -297,8 +297,8 @@ class TemplateService:
                     is_active=True,
                 ))
                 existing_names.add(tmpl['name'])  # 更新内存缓存
-        
+
         if templates_to_create:
             EmailTemplate.objects.bulk_create(templates_to_create, batch_size=10)
-        
+
         return len(templates_to_create)

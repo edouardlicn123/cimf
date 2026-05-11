@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 ================================================================================
 文件：forms.py
@@ -20,7 +19,7 @@ from django import forms
 
 class NodeTypeForm(forms.Form):
     """节点类型表单"""
-    
+
     name = forms.CharField(
         label='节点类型名称',
         max_length=100,
@@ -29,7 +28,7 @@ class NodeTypeForm(forms.Form):
             'placeholder': '请输入节点类型名称',
         })
     )
-    
+
     slug = forms.SlugField(
         label='标识符',
         max_length=50,
@@ -38,7 +37,7 @@ class NodeTypeForm(forms.Form):
             'placeholder': '请输入 URL 标识符（英文、数字、下划线）',
         })
     )
-    
+
     description = forms.CharField(
         label='描述',
         max_length=500,
@@ -49,7 +48,7 @@ class NodeTypeForm(forms.Form):
             'rows': 3,
         })
     )
-    
+
     icon = forms.CharField(
         label='图标',
         max_length=50,

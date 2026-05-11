@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 core.importexport - 数据导入导出功能组件
 
@@ -8,10 +7,10 @@ core.importexport - 数据导入导出功能组件
 - TemplateGenerator: 导入模板生成器
 """
 
-from .services import ImportService, ExportService, TemplateGenerator
+from .services import ExportService, ImportService, TemplateGenerator
 
 __all__ = [
-    'ImportService',
     'ExportService',
+    'ImportService',
     'TemplateGenerator',
 ]

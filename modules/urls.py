@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 模块 URL 路由配置 - 动态加载
 
@@ -6,8 +5,11 @@
 确保系统可以在没有任何模块的情况下启动。
 """
 
-from django.urls import path, include
 from importlib import import_module
+
+from django.urls import include, path
+
+from core.module.models import Module
 from core.node import views as node_views
 
 app_name = 'modules'
@@ -24,8 +26,8 @@ def try_include_module(module_slug, prefix=''):
 
 def get_installed_module_slugs():
     """动态获取所有已安装模块的信息"""
+
     try:
-        from core.module.models import Module
         modules = Module.objects.filter(is_installed=True, is_active=True)
         return [(m.module_id, m.module_type) for m in modules]
     except Exception:
@@ -52,6 +54,4 @@ def get_dynamic_routes():
     return routes
 
 
-urlpatterns = get_dynamic_routes() + [
-    path('api/taxonomy-items/', node_views.taxonomy_items_api, name='taxonomy_items_api'),
-]
+urlpatterns = [*get_dynamic_routes(), path('api/taxonomy-items/', node_views.taxonomy_items_api, name='taxonomy_items_api')]

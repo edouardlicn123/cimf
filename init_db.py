@@ -30,13 +30,13 @@
     python init_db.py --stage 1               # 仅执行阶段1
     python init_db.py --stage 2 --with-data  # 仅执行阶段2
     
-    环境变量：
-    ADMIN_USERNAME: 管理员用户名 (默认: admin)
-    ADMIN_NICKNAME: 管理员昵称 (默认: 系统管理员)
-    ADMIN_PASSWORD: 管理员密码 (默认: admin123)
-    ADMIN_EMAIL: 管理员邮箱 (默认: admin@example.com)
-    ADMIN_THEME: 主题偏好 (默认: default)
-    ALLOW_SEED_PROD: 允许在生产环境执行 (默认: false)
+     环境变量：
+     DJANGO_ADMIN_USERNAME: 管理员用户名 (默认: admin)
+     DJANGO_ADMIN_NICKNAME: 管理员昵称 (默认: 系统管理员)
+     DJANGO_ADMIN_PASSWORD: 管理员密码 (默认: admin123)
+     DJANGO_ADMIN_EMAIL: 管理员邮箱 (默认: admin@example.com)
+     DJANGO_ADMIN_THEME: 主题偏好 (默认: default)
+     DJANGO_ALLOW_SEED_PROD: 允许在生产环境执行 (默认: false)
 
 版本：
     - 4.0: 重构为多阶段分文件架构（core/init_scripts/）

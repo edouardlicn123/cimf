@@ -1,16 +1,15 @@
-# -*- coding: utf-8 -*-
 """
 SMTP 邮件模块视图
 """
 
-from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
 from core.decorators import admin_required
-from core.smtp.services import SmtpService, EmailService
 from core.smtp.forms import SmtpConfigForm
 from core.smtp.models import EmailLog
+from core.smtp.services import EmailService, SmtpService
 
 
 @admin_required
@@ -19,15 +18,15 @@ def smtp_config(request):
     """SMTP 配置页面"""
     config = SmtpService.get_current_config()
     presets = SmtpService.get_provider_presets()
-    
+
     if request.method == 'POST':
         form = SmtpConfigForm(request.POST)
         if form.is_valid():
             config_data = form.cleaned_data
-            
+
             if not config_data.get('password'):
                 config_data['password'] = config.get('password', '')
-            
+
             # 保存前测试连接
             test_result, test_msg = SmtpService.test_connection(config_data)
             if not test_result:
@@ -40,7 +39,7 @@ def smtp_config(request):
                     'recent_logs': recent_logs,
                     'active_section': 'smtp',
                 })
-            
+
             SmtpService.save_config(config_data)
             messages.success(request, 'SMTP 配置已保存')
             return redirect('core:smtp_config')
@@ -66,9 +65,9 @@ def smtp_config(request):
             'system_url': config.get('system_url', ''),
         }
         form = SmtpConfigForm(initial=initial)
-    
+
     recent_logs = EmailLog.objects.all()[:10]
-    
+
     return render(request, 'smtp/config.html', {
         'form': form,
         'config': config,
@@ -84,7 +83,7 @@ def smtp_test(request):
     """测试 SMTP 连接"""
     config = SmtpService.get_current_config()
     success, message = SmtpService.test_connection(config)
-    
+
     if success:
         messages.success(request, message)
     else:
@@ -92,7 +91,7 @@ def smtp_test(request):
         password = config.get('password', '')
         safe_message = message.replace(password, '***') if password else message
         messages.error(request, safe_message)
-    
+
     return redirect('core:smtp_config')
 
 
@@ -101,7 +100,7 @@ def smtp_history(request):
     """发送历史页面"""
     status_filter = request.GET.get('status', '')
     logs = EmailService.get_send_history(limit=100, status=status_filter)
-    
+
     return render(request, 'smtp/history.html', {
         'logs': logs,
         'status_filter': status_filter,
@@ -115,5 +114,5 @@ def smtp_cleanup_logs(request):
     """手动清理邮件日志"""
     deleted_count = EmailService.cleanup_old_logs()
     messages.success(request, f'已清理 {deleted_count} 条过期日志')
-    
+
     return redirect('core:smtp_config')
