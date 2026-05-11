@@ -59,7 +59,7 @@ if [[ -f "$PROJECT_ROOT/config.env" ]]; then
 fi
 
 VENV_DIR="venv"
-PIP_INDEX="https://pypi.tuna.tsinghua.edu.cn/simple"
+PIP_INDEX="${PIP_INDEX:-https://pypi.tuna.tsinghua.edu.cn/simple}"
 APP_PORT=${DJANGO_PORT:-8000}
 DB_PATH="instance/django.db"
 BACKUP_DIR="storage/backups"
