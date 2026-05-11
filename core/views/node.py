@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
 """
 节点管理视图模块
 """
 
 from django.shortcuts import render
+
 from core.decorators import admin_required
 
 

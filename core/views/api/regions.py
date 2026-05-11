@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 地区 API 模块
 """
@@ -12,7 +11,7 @@ from core.services import ChinaRegionService
 
 @login_required
 @require_GET
-def api_regions_provinces(request):
+def api_regions_provinces(request):  # noqa: ARG001
     """获取所有省份"""
     provinces = ChinaRegionService.get_provinces()
     return JsonResponse({
@@ -28,7 +27,7 @@ def api_regions_cities(request):
     province_code = request.GET.get('province')
     if not province_code:
         return JsonResponse({'success': False, 'error': '缺少province参数'}, status=400)
-    
+
     cities = ChinaRegionService.get_cities(province_code)
     return JsonResponse({
         'success': True,
@@ -43,7 +42,7 @@ def api_regions_districts(request):
     city_code = request.GET.get('city')
     if not city_code:
         return JsonResponse({'success': False, 'error': '缺少city参数'}, status=400)
-    
+
     districts = ChinaRegionService.get_districts(city_code)
     return JsonResponse({
         'success': True,
@@ -58,7 +57,7 @@ def api_regions_search(request):
     keyword = request.GET.get('q', '')
     if not keyword:
         return JsonResponse({'success': False, 'error': '缺少q参数'}, status=400)
-    
+
     results = ChinaRegionService.search(keyword)
     return JsonResponse({
         'success': True,
@@ -81,7 +80,7 @@ def api_regions_path(request):
     code = request.GET.get('code')
     if not code:
         return JsonResponse({'success': False, 'error': '缺少code参数'}, status=400)
-    
+
     path = ChinaRegionService.get_full_path(code)
     return JsonResponse({
         'success': True,
@@ -91,7 +90,7 @@ def api_regions_path(request):
 
 @login_required
 @require_GET
-def api_regions_stats(request):
+def api_regions_stats(request):  # noqa: ARG001
     """获取统计信息"""
     stats = ChinaRegionService.get_stats()
     return JsonResponse({

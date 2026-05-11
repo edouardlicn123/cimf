@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
 """
 海外客户 Admin 配置
 """
 
 from django.contrib import admin
+
 from .models import CustomerFields
 
 
@@ -13,7 +13,7 @@ class CustomerFieldsAdmin(admin.ModelAdmin):
     list_filter = ['customer_type', 'customer_level', 'created_at']
     search_fields = ['customer_name', 'enterprise_name', 'phone1', 'phone2', 'email1', 'email2']
     ordering = ['-created_at']
-    
+
     fieldsets = (
         ('基本信息', {
             'fields': ('node', 'customer_name', 'customer_code', 'customer_type', 'enterprise_name')
@@ -37,5 +37,5 @@ class CustomerFieldsAdmin(admin.ModelAdmin):
             'fields': ('created_at', 'updated_at')
         }),
     )
-    
+
     readonly_fields = ['created_at', 'updated_at']

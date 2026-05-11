@@ -1039,4 +1039,17 @@
 
 1. frame.css 新增渐进式加载动画：navbar(0s)→sidebar(0.12s)→主内容(0.25s) 淡入
 2. 增强渐进加载动画：navbar 下滑、sidebar 左滑、内容上浮，时长 0.55s、间隔 0.2s
+3. 升级依赖：django 6.0.5、DRF 3.17.1、requests 2.33.1、gunicorn 26.0.0、pillow 12.2.0、pypdf 6.11.0
+4. 依赖升级后兼容性检查通过，无需修改代码
+5. A08 Bug检查修复：ClockModel添加__str__、SQLite添加WAL模式、环境变量统一DJANGO_前缀、清理config.env冗余/孤立密钥
+6. ruff 集成：requirements.txt + ruff.toml（严格规则），自动修复 2579 个问题，剩余 351 个待审
+7. 修复 run.sh ruff 选项因 set -e 强退的问题
+8. 修复所有 PTH (flake8-use-pathlib) 问题，涉及 13 个文件：settings.py/database.py/checks.py/marketplace/services.py/module/models.py/module_service.py/views.py/node_type_service.py/china_region_service.py/log_service.py/health.py/settings.py/tools.py
+9. 修复所有 ARG (unused argument) 问题：将未使用参数加下划线前缀，视图函数加 noqa 注释
+10. Fix all 155 PLC0415 import-at-top-level ruff issues across 48 files
+11. ruff 全部 351 个问题修复完成（PTH/ARG/PLC0415/PERF/SIM等），ruff+manage.py check 通过
+12. 修复 signal handler 参数名 _sender→sender（ARG 修复的副作用）
+13. config.env 改进：修复settings.py错误消息、DB_*统一DJANGO_前缀、更新database.py/run.sh、添加WAL注释；apps.py加noqa
+14. IP白名单简化：IP_WHITELIST为空时自动从ALLOWED_HOSTS提取IP
+15. 调整 run.sh 安装子菜单顺序 + 重写 run.bat（Windows版，全功能对齐）
 

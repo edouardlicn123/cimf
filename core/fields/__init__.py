@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 字段类型模块，统一导出所有 26 种字段类型
-    
+
 版本：
     - 1.0: 从 Flask 迁移
 
@@ -34,36 +33,36 @@
     - region_select: 省市区联动
 """
 
+from .address import AddressField
+from .ai_tags import AITagsField
 from .base import BaseField as BaseField
+from .biometric import BiometricField
+from .boolean import BooleanField
+from .color import ColorField
+from .datetime import DatetimeField
+from .decimal import DecimalField
+from .email import EmailField
+from .entity_reference import EntityReferenceField
+from .file import FileField
+from .float import FloatField
+from .geolocation import GeolocationField
+from .gis import GISField
+from .identity import IdentityField
+from .image import ImageField
+from .integer import IntegerField
+from .link import LinkField
+from .masked import MaskedField
+
+# 省市县三级联动选择器
+from .region_select import RegionSelectField
+from .region_select import RegionSelectWidget as RegionSelectWidget
 from .string import StringField
 from .string_long import StringLongField
+from .telephone import TelephoneField
 from .text import TextField
 from .text_long import TextLongField
 from .text_with_summary import TextWithSummaryField
-from .boolean import BooleanField
-from .integer import IntegerField
-from .decimal import DecimalField
-from .float import FloatField
-from .entity_reference import EntityReferenceField
-from .file import FileField
-from .image import ImageField
-from .link import LinkField
-from .email import EmailField
-from .telephone import TelephoneField
-from .datetime import DatetimeField
 from .timestamp import TimestampField
-from .geolocation import GeolocationField
-from .color import ColorField
-from .ai_tags import AITagsField
-from .identity import IdentityField
-from .masked import MaskedField
-from .biometric import BiometricField
-from .address import AddressField
-from .gis import GISField
-
-# 省市县三级联动选择器
-from .region_select import RegionSelectField, RegionSelectWidget as RegionSelectWidget
-
 
 FIELD_TYPES = {
     'string': StringField,
@@ -118,4 +117,4 @@ def get_field_type_info(name: str) -> dict:
 
 def get_all_field_types_info() -> list:
     """获取所有字段类型详细信息列表"""
-    return [get_field_type_info(name) for name in FIELD_TYPES.keys()]
+    return [get_field_type_info(name) for name in FIELD_TYPES]

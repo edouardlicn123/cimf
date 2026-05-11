@@ -1,10 +1,13 @@
-# -*- coding: utf-8 -*-
 import ast
+import json
 import operator
-from django.shortcuts import render
+
 from django.contrib.auth.decorators import login_required
-from core.module.models import Module, ToolType
+from django.http import JsonResponse
+from django.shortcuts import render
+
 from core.constants import ModuleType
+from core.module.models import Module, ToolType
 
 
 class ArithmeticEvaluator(ast.NodeVisitor):
@@ -68,9 +71,6 @@ def tool_view(request):
 @login_required
 def calculate(request):
     """计算表达式AJAX接口"""
-    import json
-    from django.http import JsonResponse
-
     if request.method == 'POST':
         try:
             data = json.loads(request.body)

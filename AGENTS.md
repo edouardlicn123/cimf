@@ -26,6 +26,10 @@ Agent 在以下情况应读取最新报告：
 
 注意：检查 Bug 时若不提及 Ruff，则不读取此报告，仅按下方 Bug 排查规范执行。
 
+**⚠️ Ruff 修复注意事项：**
+- **Django signal handler 的 `sender` 参数名不可修改！** Signal dispatcher 以 `receiver(sender=..., connection=...)` 关键字形式传参，`sender` 必须保持原名。若被 ruff 的 ARG 规则重命名为 `_sender`，将导致 TypeError。
+- 修复 ARG 规则发现的问题时，对于 Django view 函数（使用 `@login_required` 等装饰器）和 signal handler 的 `sender` 参数，应加 `# noqa: ARG001` 而非重命名。
+
 ---
 
 ## 会话启动检查清单

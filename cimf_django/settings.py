@@ -6,7 +6,7 @@
 
 功能说明：
     Django 项目配置文件，包含应用设置、数据库、模板引擎等配置。
-    
+
 版本：
     - 1.0: 初始版本
 
@@ -26,12 +26,14 @@ except ImportError:
     pass
 
 # 加载环境变量
-from dotenv import load_dotenv
 import os
+
+from dotenv import load_dotenv
+
 from cimf_django.database import get_database_config
 
 # 尝试加载 config.env 文件
-load_dotenv(os.path.join(Path(__file__).resolve().parent.parent, 'config.env'))
+load_dotenv(Path(__file__).resolve().parent.parent / 'config.env')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -53,16 +55,20 @@ SECRET_KEY = os.environ.get(
 DEBUG = os.getenv('DJANGO_DEBUG', 'True').lower() == 'true'
 
 # 允许访问的主机列表：从环境变量读取，逗号分隔
+# 用于 Django Host 头校验，防止 HTTP Host 头攻击。
+# 也作为 IP 白名单的第二来源（中间件自动提取其中的 IP 地址）。
 ALLOWED_HOSTS_STR = os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1')
 ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',') if host.strip()]
 
 # ----- IP 访问限制配置 -----
-IP_RESTRICTION_ENABLED = os.getenv('IP_RESTRICTION_ENABLED', 'false').lower() == 'true'
-_ip_whitelist_str = os.getenv('IP_WHITELIST', '').strip()
+# IPWhitelistMiddleware 据此限制客户端 IP 来源。
+# 白名单来源优先级：
+#   1. DJANGO_IP_WHITELIST（显式配置，支持 CIDR 段）
+#   2. DJANGO_ALLOWED_HOSTS（自动提取其中的 IP 地址，域名被静默跳过）
+# 详见 cimf_django/middleware.py IPWhitelistMiddleware.__init__。
+IP_RESTRICTION_ENABLED = os.getenv('DJANGO_IP_RESTRICTION_ENABLED', 'false').lower() == 'true'
+_ip_whitelist_str = os.getenv('DJANGO_IP_WHITELIST', '').strip()
 IP_WHITELIST = [ip.strip() for ip in _ip_whitelist_str.split(',') if ip.strip()]
-
-if IP_RESTRICTION_ENABLED and not IP_WHITELIST:
-    raise ValueError("IP限制已启用但白名单为空！请在config.env中配置IP_WHITELIST")
 
 # Application definition
 
@@ -82,24 +88,23 @@ _base_apps = [
 
 # 动态扫描 modules/ 下的模块模板目录（仅用于模板加载，不添加到 INSTALLED_APPS）
 _module_template_dirs = []
-_nodes_dir = os.path.join(BASE_DIR, 'modules')
-if os.path.isdir(_nodes_dir):
-    for item in os.listdir(_nodes_dir):
-        module_path = os.path.join(_nodes_dir, item)
-        if os.path.isdir(module_path):
-            template_dir = os.path.join(module_path, 'templates')
-            if os.path.isdir(template_dir):
-                _module_template_dirs.append(Path(template_dir))
+_nodes_dir = BASE_DIR / 'modules'
+if _nodes_dir.is_dir():
+    for item in _nodes_dir.iterdir():
+        if item.is_dir():
+            template_dir = item / 'templates'
+            if template_dir.is_dir():
+                _module_template_dirs.append(template_dir)
 
 # 动态扫描并添加 modules/ 下的子模块到 INSTALLED_APPS
 _module_apps = []
-_nodes_dir = os.path.join(BASE_DIR, 'modules')
-if os.path.isdir(_nodes_dir):
-    for item in os.listdir(_nodes_dir):
-        module_path = os.path.join(_nodes_dir, item)
-        apps_path = os.path.join(module_path, 'apps.py')
-        if os.path.isdir(module_path) and os.path.exists(apps_path):
-            _module_apps.append(f'modules.{item}')
+_nodes_dir = BASE_DIR / 'modules'
+if _nodes_dir.is_dir():
+    for item in _nodes_dir.iterdir():
+        if item.is_dir():
+            apps_path = item / 'apps.py'
+            if apps_path.exists():
+                _module_apps.append(f'modules.{item.name}')
 
 INSTALLED_APPS = _base_apps + _module_apps
 
@@ -119,9 +124,7 @@ ROOT_URLCONF = 'cimf_django.urls'
 
 # Jinja2 模板引擎配置（兼容现有 Flask 模板）
 # 动态收集所有模板目录
-_template_dirs = [
-    BASE_DIR / 'core' / 'templates',
-] + _module_template_dirs
+_template_dirs = [BASE_DIR / 'core' / 'templates', *_module_template_dirs]
 
 TEMPLATES = [
     {

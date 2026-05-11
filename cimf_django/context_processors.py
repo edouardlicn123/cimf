@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 ================================================================================
 文件：context_processors.py
@@ -13,10 +12,13 @@
 """
 
 import time
-from core.services import SettingsService
+
+from django.middleware.csrf import get_token
+
+from core.services import PermissionService, SettingsService
 
 
-def system_settings(request):
+def system_settings(_request):
     """
     为所有模板提供系统设置
     """
@@ -41,9 +43,7 @@ def user_permissions(request):
     """
     if not hasattr(request, 'user') or not request.user.is_authenticated:
         return {'user_permissions': []}
-    
-    from core.services.permission_service import PermissionService
-    
+
     return {
         'user_permissions': PermissionService.get_user_effective_permissions(request.user)
     }
@@ -54,5 +54,4 @@ def csrf_token(request):
     为 Jinja2 模板提供 CSRF token 值（仅返回 token，不包含 HTML）
     HTML 渲染由 jinja2.py 中的函数处理
     """
-    from django.middleware.csrf import get_token
     return {'csrf_token_value': get_token(request)}

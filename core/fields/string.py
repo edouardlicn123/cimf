@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 ===============================================================================
 文件：string.py
@@ -7,7 +6,7 @@
 
 功能说明：
     单行文本字段类型
-    
+
 版本：
     - 1.0: 从 Flask 迁移
     - 2.0: 使用简化模式调用基类方法
@@ -21,7 +20,7 @@ class StringField(BaseField):
     label = '单行文本'
     widget = 'input'
     properties = ['value', 'max_length']
-    
+
     def render(self, value: dict, mode: str = 'edit') -> str:
         if mode == 'view':
             return value.get('value', '')
@@ -30,6 +29,6 @@ class StringField(BaseField):
             max_length=self.field_config.get('max_length', 255),
             placeholder=self.field_config.get('placeholder', '')
         )
-    
-    def validate(self, value: dict) -> list:
+
+    def validate(self, _value: dict) -> list:
         return self._validate_required()

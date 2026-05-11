@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 ================================================================================
 文件：auth_forms.py
@@ -20,7 +19,7 @@ from django import forms
 
 class LoginForm(forms.Form):
     """登录表单"""
-    
+
     username = forms.CharField(
         label='用户名',
         max_length=64,
@@ -32,7 +31,7 @@ class LoginForm(forms.Form):
             'autofocus': True,
         })
     )
-    
+
     password = forms.CharField(
         label='密码',
         widget=forms.PasswordInput(attrs={
@@ -41,7 +40,7 @@ class LoginForm(forms.Form):
             'autocomplete': 'current-password',
         })
     )
-    
+
     remember_me = forms.BooleanField(
         label='记住我',
         required=False,
@@ -51,7 +50,7 @@ class LoginForm(forms.Form):
             'role': 'switch',
         })
     )
-    
+
     def clean_username(self):
         username = self.cleaned_data.get('username')
         if username:

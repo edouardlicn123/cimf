@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 ================================================================================================================================================
 文件：constants.py
@@ -7,9 +6,9 @@
 
 功能说明：
     项目全局常量定义，包含版本号、角色、主题、模块类型、语言等。
-    
+
     该文件不导入任何项目内部模块，避免循环导入问题。
-    
+
 版本：
     - 2.0: 重构为集中化常量
 
@@ -23,7 +22,7 @@
 # ============================================================
 
 VERSION_MAJOR = '1'
-VERSION_MINOR = 850
+VERSION_MINOR = 863
 
 def get_version_display():
     return f"v{VERSION_MAJOR}.{VERSION_MINOR:03d}"
@@ -38,19 +37,19 @@ class UserRole:
     MANAGER = 'manager'
     LEADER = 'leader'
     EMPLOYEE = 'employee'
-    
+
     CHOICES = [
         (MANAGER, '一类用户'),
         (LEADER, '二类用户'),
         (EMPLOYEE, '三类用户'),
     ]
-    
+
     LABELS = {
         MANAGER: '一类用户',
         LEADER: '二类用户',
         EMPLOYEE: '三类用户',
     }
-    
+
     BADGE_CLASSES = {
         MANAGER: 'bg-danger',
         LEADER: 'bg-warning text-dark',
@@ -72,7 +71,7 @@ class UserTheme:
     KAJIMA = 'kajima'
     ODOGU = 'odoru'
     TAIS = 'tais'
-    
+
     CHOICES = [
         (DEFAULT, '默认'),
         (GOV, '中国红'),
@@ -83,7 +82,7 @@ class UserTheme:
         (ODOGU, '踊'),
         (TAIS, '梵紫'),
     ]
-    
+
     LABELS = {
         DEFAULT: '默认',
         GOV: '中国红',
@@ -94,7 +93,7 @@ class UserTheme:
         ODOGU: '踊',
         TAIS: '梵紫',
     }
-    
+
     DISPLAY_LABELS = LABELS.copy()
 
 
@@ -107,7 +106,7 @@ class ModuleType:
     NODE = 'node'
     SYSTEM = 'system'
     TOOL = 'tool'
-    
+
     CHOICES = [
         (NODE, '节点模块'),
         (SYSTEM, '系统模块'),
@@ -123,7 +122,7 @@ class Language:
     """语言常量"""
     ZH = 'zh'
     EN = 'en'
-    
+
     CHOICES = [
         (ZH, '中文（简体）'),
         (EN, 'English'),

@@ -1,15 +1,15 @@
-# -*- coding: utf-8 -*-
 """
 用户管理视图模块
 """
 
-from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
+
 from core.decorators import admin_required
+from core.forms.admin_forms import UserCreateForm, UserEditForm
 from core.models import User
 from core.services import UserService
-from core.forms.admin_forms import UserCreateForm, UserEditForm
 
 
 @admin_required
@@ -18,14 +18,14 @@ def system_users(request):
     search_term = request.GET.get('search', '')
     only_active = request.GET.get('only_active', 'true') == 'true'
     role_filter = request.GET.get('role_filter', '')
-    
+
     users = UserService.get_user_list(
         search_term=search_term if search_term else None,
         only_active=only_active,
         exclude_admin=True,
         role=role_filter if role_filter else None
     )
-    
+
     return render(request, 'admin/system_users.html', {
         'users': users,
         'search_term': search_term,
@@ -56,7 +56,7 @@ def user_create(request):
                 messages.error(request, str(e))
     else:
         form = UserCreateForm()
-    
+
     return render(request, 'admin/system_user_edit.html', {
         'form': form,
         'is_create': True,
@@ -67,11 +67,11 @@ def user_create(request):
 def user_edit(request, user_id: int):
     """编辑用户"""
     user = get_object_or_404(User, id=user_id)
-    
+
     if user_id == 1:
         messages.error(request, '系统管理员账号禁止编辑')
         return redirect('core:system_users')
-    
+
     if request.method == 'POST':
         form = UserEditForm(request.POST, instance=user, user_id=user_id)
         if form.is_valid():
@@ -92,7 +92,7 @@ def user_edit(request, user_id: int):
                 messages.error(request, str(e))
     else:
         form = UserEditForm(instance=user, user_id=user_id)
-    
+
     return render(request, 'admin/system_user_edit.html', {
         'form': form,
         'user': user,
@@ -107,15 +107,15 @@ def user_delete(request, user_id: int):
     if user_id == 1:
         messages.error(request, '系统管理员账号禁止删除')
         return redirect('core:system_users')
-    
+
     if user_id == request.user.id:
         messages.error(request, '禁止删除当前登录账号')
         return redirect('core:system_users')
-    
+
     user = get_object_or_404(User, id=user_id)
     try:
         user.delete()
         messages.success(request, '用户已删除')
     except Exception as e:
-        messages.error(request, f'删除用户失败: {str(e)}')
+        messages.error(request, f'删除用户失败: {e!s}')
     return redirect('core:system_users')

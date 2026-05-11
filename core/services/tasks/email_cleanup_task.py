@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 ================================================================================
 文件：email_cleanup_task.py
@@ -7,7 +6,7 @@
 
 功能说明：
     邮件日志清理任务，定时清理过期的邮件发送记录。
-    
+
 版本：
     - 1.0: 新增
 
@@ -16,6 +15,7 @@
 """
 
 import logging
+
 from .base import CronTask
 
 logger = logging.getLogger(__name__)
@@ -24,13 +24,13 @@ logger = logging.getLogger(__name__)
 class EmailCleanupTask(CronTask):
     """
     邮件日志清理任务类
-    
+
     说明：
         定时清理超过保留天数的邮件发送记录。
     """
 
     name = "email_cleanup"
-    
+
     default_interval = 86400  # 24小时
 
     @property
@@ -43,8 +43,8 @@ class EmailCleanupTask(CronTask):
 
     def execute(self):
         """执行日志清理"""
-        from core.smtp.services import EmailService
-        
+        from core.smtp.services import EmailService  # noqa: PLC0415
+
         count = EmailService.cleanup_old_logs()
         if count > 0:
             logger.info(f"邮件日志清理任务完成: 清理 {count} 条记录")

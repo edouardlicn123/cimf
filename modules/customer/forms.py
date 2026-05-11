@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 ================================================================================
 文件：forms.py
@@ -17,7 +16,7 @@ from django import forms
 
 class CustomerForm(forms.Form):
     """客户表单"""
-    
+
     customer_name = forms.CharField(
         label='客户名称',
         max_length=200,
@@ -26,7 +25,7 @@ class CustomerForm(forms.Form):
             'placeholder': '请输入客户名称',
         })
     )
-    
+
     contact_person = forms.CharField(
         label='联系人',
         max_length=100,
@@ -36,7 +35,7 @@ class CustomerForm(forms.Form):
             'placeholder': '请输入联系人姓名',
         })
     )
-    
+
     phone = forms.CharField(
         label='电话',
         max_length=20,
@@ -46,7 +45,7 @@ class CustomerForm(forms.Form):
             'placeholder': '请输入电话号码',
         })
     )
-    
+
     email = forms.EmailField(
         label='邮箱',
         max_length=100,
@@ -56,7 +55,7 @@ class CustomerForm(forms.Form):
             'placeholder': '请输入邮箱地址',
         })
     )
-    
+
     address = forms.CharField(
         label='地址',
         max_length=500,
@@ -66,7 +65,7 @@ class CustomerForm(forms.Form):
             'placeholder': '请输入地址',
         })
     )
-    
+
     notes = forms.CharField(
         label='备注',
         max_length=2000,

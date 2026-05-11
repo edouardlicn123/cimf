@@ -1,11 +1,12 @@
-# -*- coding: utf-8 -*-
 """
 导入导出 URL 路由
 """
 
 from django.urls import path
-from . import views
+
 from core.views import importexport_dashboard
+
+from . import views
 
 # 导出 URL
 urlpatterns = [
@@ -27,6 +28,4 @@ urlpatterns_import = [
 ]
 
 # 完整 URL（包含仪表盘、导出和导入）
-urlpatterns_all = [
-    path('', importexport_dashboard, name='importexport_dashboard'),
-] + urlpatterns + urlpatterns_import
+urlpatterns_all = [path('', importexport_dashboard, name='importexport_dashboard'), *urlpatterns, *urlpatterns_import]

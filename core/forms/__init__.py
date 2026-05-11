@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 ================================================================================
 文件：__init__.py
@@ -23,18 +22,18 @@
     - PermissionForm: 权限编辑表单
 """
 
+from .admin_forms import PermissionForm, SystemSettingsForm, UserCreateForm, UserEditForm, UserSearchForm
 from .auth_forms import LoginForm
-from .admin_forms import UserCreateForm, UserEditForm, UserSearchForm, SystemSettingsForm, PermissionForm
-from .settings_forms import ProfileForm, PreferencesForm, ChangePasswordForm
+from .settings_forms import ChangePasswordForm, PreferencesForm, ProfileForm
 
 __all__ = [
+    'ChangePasswordForm',
     'LoginForm',
+    'PermissionForm',
+    'PreferencesForm',
+    'ProfileForm',
+    'SystemSettingsForm',
     'UserCreateForm',
     'UserEditForm',
     'UserSearchForm',
-    'SystemSettingsForm',
-    'ProfileForm',
-    'PreferencesForm',
-    'ChangePasswordForm',
-    'PermissionForm',
 ]
