@@ -1035,3 +1035,8 @@
 71. 靛蓝主题：药丸标签水平内边距改为 64px（长度加倍）
 72. 靛蓝主题：大幅增强——新增accent色系（navy/blue/violet/gold/teal/coral）、bg-subtle/muted、卡片/表格/分页/进度条/Accordion/按钮/徽标/模态框/导航标签/Alert/下拉菜单/Dashboard卡片/表单焦点等完整组件样式
 
+# 2026-05-11 修改记录
+
+1. frame.css 新增渐进式加载动画：navbar(0s)→sidebar(0.12s)→主内容(0.25s) 淡入
+2. 增强渐进加载动画：navbar 下滑、sidebar 左滑、内容上浮，时长 0.55s、间隔 0.2s
+

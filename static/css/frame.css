@@ -1,11 +1,31 @@
 /* static/css/frame.css - 只写布局 + 导航差异，颜色全走变量 */
 
-/* 左侧导航 */
-.admin-sidebar {
-  background: var(--bg-surface);
-  border-right: 1px solid var(--border-light);
-  height: 100vh;
-  overflow-y: auto;
+/* ── 渐进式加载动画：navbar(下滑) → 侧栏(左滑) → 主体(上浮) ── */
+@media (prefers-reduced-motion: no-preference) {
+    .navbar {
+        animation: slideDown 0.55s ease-out 0s both;
+    }
+    .admin-sidebar {
+        animation: slideLeft 0.55s ease-out 0.2s both;
+    }
+    .admin-sidebar + .flex-grow-1 {
+        animation: slideUp 0.55s ease-out 0.4s both;
+    }
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-100%); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideLeft {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .admin-sidebar .nav-link {
