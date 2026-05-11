@@ -1027,4 +1027,11 @@
 63. 绿岛森林主题：新增金色线条（sidebar竖条 + 按钮聚焦环）
 64. 绿岛森林主题：基本按钮加入金色外圈
 65. 绿岛森林主题：navbar下加1px金色条
+66. 梵紫主题：card-header 背景改为 transparent shorthand
+67. 梵紫主题：移除 card-header 自定义规则，与 frame.css 保持一致
+68. 梵紫主题：删除 tais.css card-header 规则，frame.css 改为对所有 .card-header 设置 transparent（含 background-color）
+69. 梵紫主题：去除 tais.css .card 的 border 和 box-shadow，让 frame.css 接管
+70. 梵紫主题：给 card-header 加 2px 粉色底边（与 card-footer 对称）
+71. 靛蓝主题：药丸标签水平内边距改为 64px（长度加倍）
+72. 靛蓝主题：大幅增强——新增accent色系（navy/blue/violet/gold/teal/coral）、bg-subtle/muted、卡片/表格/分页/进度条/Accordion/按钮/徽标/模态框/导航标签/Alert/下拉菜单/Dashboard卡片/表单焦点等完整组件样式
 

@@ -147,14 +147,15 @@ html, body {
     background: var(--bg-card);
 }
 
-.card-header:not(.d-flex) {
+.card-header {
     border-bottom: none;
-    background: transparent;
+    background: transparent !important;
+    background-color: transparent !important;
     padding: 0;
 }
 
-.card-header:not(.d-flex) h5,
-.card-header:not(.d-flex) h4 {
+.card-header h5,
+.card-header h4 {
     display: inline-block;
     padding: 10px 32px 12px;
     margin: 0;

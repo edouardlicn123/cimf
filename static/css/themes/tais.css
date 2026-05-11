@@ -478,18 +478,12 @@ main.container,
 ───────────────────────────────────────────────── */
 
 .card {
-  border: 1px solid var(--border-light) !important;
   border-radius: var(--radius-lg) 0 var(--radius-lg) var(--radius-lg) !important;
-  box-shadow: var(--shadow-sm) !important;
   overflow: visible !important;
 }
 
-.card-header:first-child {
-  background-color: transparent !important;
+.card-header {
   border-bottom: 2px solid var(--info) !important;
-  color: var(--primary) !important;
-  font-weight: 600 !important;
-  border-radius: var(--radius-lg) 0 0 0 !important;
 }
 
 .card-footer:last-child {
@@ -498,12 +492,8 @@ main.container,
   border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
 }
 
-body .card:has(.card-header:not(.d-flex)) .card-body {
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
-}
-
 /* ──────────────────────────────────────────────
-   表格
+    表格
 ───────────────────────────────────────────────── */
 
 .table {
