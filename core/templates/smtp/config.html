@@ -17,10 +17,12 @@
             <div class="card-body">
                 <div class="d-flex align-items-center mb-3">
                     <span class="me-2">服务状态：</span>
-                    {% if config.enabled %}
-                    <span class="badge bg-success">已启用</span>
+                    {% if not config.enabled %}
+                    <span class="badge bg-secondary">未启用</span>
+                    {% elif config.service_connected %}
+                    <span class="badge bg-success">已连接</span>
                     {% else %}
-                    <span class="badge bg-secondary">已禁用</span>
+                    <span class="badge bg-danger">未连接</span>
                     {% endif %}
                 </div>
                 <div class="mb-2">
@@ -82,7 +84,18 @@
                     <h5 class="mb-0">服务商预设</h5>
                 </div>
                 <div class="card-body">
-                    <div class="mb-0">
+                    {% if form.errors %}
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                {% for field_name, errors in form.errors.items() %}
+                    {% for err in errors %}
+                    <li>{{ err }}</li>
+                    {% endfor %}
+                {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            <div class="mb-0">
                         <label class="form-label">选择服务商</label>
                         <select class="form-select" id="providerSelect" name="provider">
                             {% for key, preset in presets.items() %}
@@ -128,7 +141,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mb-0">
+                    <div id="encryptionSection" class="mb-0" style="display: none;">
                         <label class="form-label">加密方式</label>
                         <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="checkbox" id="useSsl" name="use_ssl" 
@@ -280,19 +293,27 @@ document.addEventListener('DOMContentLoaded', function() {
     const useSslCheckbox = document.getElementById('useSsl');
     const useTlsCheckbox = document.getElementById('useTls');
     const helpText = document.getElementById('presetHelp');
+    const encryptionSection = document.getElementById('encryptionSection');
     
     const presets = {{ presets | tojson | safe }};
     
-    providerSelect.addEventListener('change', function() {
-        const preset = presets[this.value];
+    function applyPreset(provider) {
+        const preset = presets[provider];
         if (preset) {
             hostInput.value = preset.host;
             portInput.value = preset.port;
             useSslCheckbox.checked = preset.use_ssl;
             useTlsCheckbox.checked = preset.use_tls;
             helpText.textContent = preset.help_text || '';
+            encryptionSection.style.display = provider === 'custom' ? 'block' : 'none';
         }
+    }
+    
+    providerSelect.addEventListener('change', function() {
+        applyPreset(this.value);
     });
+    
+    applyPreset(providerSelect.value);
 });
 </script>
 {% endblock %}
