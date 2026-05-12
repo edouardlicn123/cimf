@@ -21,6 +21,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http import Http404, JsonResponse
 from django.shortcuts import redirect, render
+from django.views.decorators.http import require_POST
 
 from core.decorators import login_required_json
 from core.node.services import NodeService, NodeTypeService
@@ -274,6 +275,7 @@ def node_edit(request, node_id: int):
 
 
 @login_required
+@require_POST
 def node_delete(request, node_id: int):
     """删除海外客户"""
     node = NodeService.get_by_id(node_id)

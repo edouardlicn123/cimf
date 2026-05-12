@@ -56,10 +56,14 @@ def smtp_config(request):
             'enabled': config.get('enabled', False),
             'batch_size': config.get('batch_size', 10),
             'rate_limit': config.get('rate_limit', 0),
+            'send_interval': config.get('send_interval', 120),
             'log_days': config.get('log_days', 30),
             'failed_notify': config.get('failed_notify', False),
             'notify_email': config.get('notify_email', ''),
             'system_url': config.get('system_url', ''),
+            'use_proxy': config.get('use_proxy', False),
+            'proxy_host': config.get('proxy_host', ''),
+            'proxy_port': config.get('proxy_port', 10808),
         }
         form = SmtpConfigForm(initial=initial)
 
@@ -80,6 +84,9 @@ def smtp_test(request):
     """测试 SMTP 连接"""
     config = SmtpService.get_current_config()
     success, message = SmtpService.test_connection(config)
+
+    # 更新数据库中的连接状态（传入已获取的结果，避免重复测试）
+    SmtpService.update_connection_status(success=success, message=message)
 
     if success:
         messages.success(request, message)
@@ -103,6 +110,18 @@ def smtp_history(request):
         'status_filter': status_filter,
         'active_section': 'smtp',
     })
+
+
+@admin_required
+@require_http_methods(['POST'])
+def smtp_process_queue(request):
+    """手动处理待发送邮件队列"""
+    sent_count = EmailService.process_pending_emails()
+    if sent_count > 0:
+        messages.success(request, f'已处理 {sent_count} 封待发送邮件')
+    else:
+        messages.info(request, '队列中没有待发送的邮件')
+    return redirect('core:smtp_config')
 
 
 @admin_required

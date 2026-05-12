@@ -1080,4 +1080,22 @@
 21. SMTP表单：表单无效时显示错误消息和字段错误提示
 22. SMTP表单：顶部显示全部字段错误信息(含字段级)
 23. SMTP加密方式：非自定义时隐藏，选择预设自动设加密
+24. 修复SMTP状态检测：get_all_settings返回bool导致== 'true'永远False
+25. SMTP代理：新增SOCKS5代理开关，保存后可随时启用/关闭
+26. SMTP代理开关新增详细使用说明
+27. SMTP代理说明改为可折叠，加小问号图标触发
+28. SMTP: 发送设置卡片添加发送间隔(默认120s)，修复测试连接按钮不更新状态的问题
+29. SMTP代理设置改为填写IP和端口(默认127.0.0.1:10808)，替换原有use_proxy开关
+30. SMTP配置页重构：服务商预设合并到服务器配置，服务开关移至左侧状态卡，通知合并到发送设置，代理新增启用开关+说明折叠
+31. 修复 _convert_setting_value 误将 IP 地址 127.0.0.1 当作 float 解析的 bug
+32. 修复 enabled 复选框在 form 标签外无法提交的问题（添加 form='smtpForm' 属性）
+33. 修复 EmailLog._create_log 中 html_body=None 导致 NOT NULL constraint failed（smpt测试工具全部发送失败）
+34. 修复 _send_sync 参数名不匹配及删除未使用的 from_email 参数
+35. CoreConfig.ready() 启动时自动同步 SMTP Django 运行时配置
+36. CoreConfig.ready() 启动时同步 Django EMAIL 运行时配置（用 noqa 避免循环导入）
+37. 创建 docs/stage4/01_SMTP邮件发送流程改进方案.md
+38. P2: EMAIL_TIMEOUT, contextmanager refactor, EmailLog.status index, update_connection_status dedup, process queue route/button
+39. P2.3/P2.6: EmailLog text_body/html_body/error_message default=''
+40. Bug全检: header.html block修复 + error页面show_header修复
+41. Bug全检第2轮: customer node_delete + @require_POST, JS fetch catch检查
 

@@ -4,13 +4,38 @@ SMTP 配置管理服务
 
 import os
 import smtplib
+import socket
 import ssl
+from contextlib import contextmanager
 from email.message import EmailMessage
 from typing import Any
 
+import socks
 from django.conf import settings
 
 from core.services import SettingsService
+
+
+@contextmanager
+def _apply_proxy_patch(config: dict[str, Any]):
+    """如果配置了代理，替换 socket.socket 为 SOCKS5 版本"""
+    if not config.get('use_proxy', False):
+        yield
+        return
+    proxy_host = config.get('proxy_host', '').strip()
+    if not proxy_host:
+        yield
+        return
+
+    proxy_port = int(config.get('proxy_port', 10808))
+    socks.set_default_proxy(socks.SOCKS5, proxy_host, proxy_port)
+    original = socket.socket
+    socket.socket = socks.socksocket
+    try:
+        yield
+    finally:
+        socket.socket = original
+
 
 SMTP_PRESETS = {
     'gmail_ssl': {
@@ -95,25 +120,29 @@ class SmtpService:
         settings_dict = SettingsService.get_all_settings()
 
         config = {
-            'enabled': settings_dict.get('smtp_enabled', 'false') == 'true',
-            'service_connected': settings_dict.get('smtp_service_connected', 'false') == 'true',
+            'enabled': str(settings_dict.get('smtp_enabled', 'false')).lower() == 'true',
+            'service_connected': str(settings_dict.get('smtp_service_connected', 'false')).lower() == 'true',
             'provider': settings_dict.get('smtp_provider', 'gmail_tls'),
             'host': settings_dict.get('smtp_host', 'smtp.gmail.com'),
             'port': int(settings_dict.get('smtp_port', '587')),
-            'use_ssl': settings_dict.get('smtp_use_ssl', 'false') == 'true',
-            'use_tls': settings_dict.get('smtp_use_tls', 'true') == 'true',
+            'use_ssl': str(settings_dict.get('smtp_use_ssl', 'false')).lower() == 'true',
+            'use_tls': str(settings_dict.get('smtp_use_tls', 'true')).lower() == 'true',
             'username': settings_dict.get('smtp_username', ''),
             'password': cls._get_password(),
             'from_email': settings_dict.get('smtp_from_email', ''),
             'from_name': settings_dict.get('smtp_from_name', '仙芙CIMF'),
             'timeout': int(settings_dict.get('smtp_timeout', '30')),
-            'skip_verify': settings_dict.get('smtp_skip_verify', 'false') == 'true',
+            'skip_verify': str(settings_dict.get('smtp_skip_verify', 'false')).lower() == 'true',
             'batch_size': int(settings_dict.get('smtp_batch_size', '10')),
             'rate_limit': int(settings_dict.get('smtp_rate_limit', '0')),
+            'send_interval': int(settings_dict.get('smtp_send_interval', '120')),
             'log_days': int(settings_dict.get('smtp_log_days', '30')),
-            'failed_notify': settings_dict.get('smtp_failed_notify', 'false') == 'true',
+            'failed_notify': str(settings_dict.get('smtp_failed_notify', 'false')).lower() == 'true',
             'notify_email': settings_dict.get('smtp_notify_email', ''),
             'system_url': settings_dict.get('smtp_system_url', ''),
+            'use_proxy': str(settings_dict.get('smtp_use_proxy', 'false')).lower() == 'true',
+            'proxy_host': settings_dict.get('smtp_proxy_host', ''),
+            'proxy_port': int(settings_dict.get('smtp_proxy_port', '10808')),
         }
 
         return config
@@ -145,10 +174,14 @@ class SmtpService:
             'smtp_skip_verify': 'true' if config.get('skip_verify') else 'false',
             'smtp_batch_size': str(config.get('batch_size', '10')),
             'smtp_rate_limit': str(config.get('rate_limit', '0')),
+            'smtp_send_interval': str(config.get('send_interval', '120')),
             'smtp_log_days': str(config.get('log_days', '30')),
             'smtp_failed_notify': 'true' if config.get('failed_notify') else 'false',
             'smtp_notify_email': str(config.get('notify_email', '')),
             'smtp_system_url': str(config.get('system_url', '')),
+            'smtp_use_proxy': 'true' if config.get('use_proxy') else 'false',
+            'smtp_proxy_host': str(config.get('proxy_host', '')),
+            'smtp_proxy_port': str(config.get('proxy_port', '10808')),
         }
 
         for key, value in mappings.items():
@@ -166,9 +199,10 @@ class SmtpService:
         cls.update_django_settings()
 
     @classmethod
-    def update_connection_status(cls) -> tuple[bool, str]:
+    def update_connection_status(cls, success: bool | None = None, message: str = '') -> tuple[bool, str]:
         """测试连接并存储服务状态"""
-        success, message = cls.test_connection()
+        if success is None:
+            success, message = cls.test_connection()
         SettingsService.save_setting('smtp_service_connected', 'true' if success else 'false')
         return success, message
 
@@ -194,31 +228,32 @@ class SmtpService:
             use_tls = config.get('use_tls', True)
             skip_verify = config.get('skip_verify', False)
 
-            context = None
-            if skip_verify:
-                context = ssl.create_default_context()
-                context.check_hostname = False
-                context.verify_mode = ssl.CERT_NONE
+            with _apply_proxy_patch(config):
+                context = None
+                if skip_verify:
+                    context = ssl.create_default_context()
+                    context.check_hostname = False
+                    context.verify_mode = ssl.CERT_NONE
 
-            if use_ssl:
-                server = smtplib.SMTP_SSL(host, port, timeout=timeout, context=context)
-            else:
-                server = smtplib.SMTP(host, port, timeout=timeout)
+                if use_ssl:
+                    server = smtplib.SMTP_SSL(host, port, timeout=timeout, context=context)
+                else:
+                    server = smtplib.SMTP(host, port, timeout=timeout)
 
-            with server:
-                if use_tls:
-                    server.starttls(context=context)
+                with server:
+                    if use_tls:
+                        server.starttls(context=context)
 
-                username = config.get('username', from_email)
-                server.login(username, password)
+                    username = config.get('username', from_email)
+                    server.login(username, password)
 
-                msg = EmailMessage()
-                msg['From'] = f"{config.get('from_name', '仙芙CIMF')} <{from_email}>"
-                msg['To'] = from_email
-                msg['Subject'] = 'CIMF 系统邮件测试'
-                msg.set_content('这是一封来自 CIMF 系统的测试邮件，如果您收到此邮件，说明 SMTP 配置正确。')
+                    msg = EmailMessage()
+                    msg['From'] = f"{config.get('from_name', '仙芙CIMF')} <{from_email}>"
+                    msg['To'] = from_email
+                    msg['Subject'] = 'CIMF 系统邮件测试'
+                    msg.set_content('这是一封来自 CIMF 系统的测试邮件，如果您收到此邮件，说明 SMTP 配置正确。')
 
-                server.send_message(msg)
+                    server.send_message(msg)
 
             return True, '连接测试成功！'
 
@@ -240,6 +275,7 @@ class SmtpService:
         settings.EMAIL_USE_SSL = config.get('use_ssl', False)
         settings.EMAIL_HOST_USER = config.get('username', '')
         settings.EMAIL_HOST_PASSWORD = config.get('password', '')
+        settings.EMAIL_TIMEOUT = config.get('timeout', 30)
         from_name = config.get('from_name', '仙芙CIMF')
         from_email = config.get('from_email', '')
         settings.DEFAULT_FROM_EMAIL = f"{from_name} <{from_email}>" if from_email else from_name

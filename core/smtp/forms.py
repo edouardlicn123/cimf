@@ -95,6 +95,29 @@ class SmtpConfigForm(forms.Form):
         help_text='启用后将使用配置的 SMTP 服务器发送邮件',
     )
 
+    use_proxy = forms.BooleanField(
+        label='启用 SOCKS5 代理',
+        required=False,
+        initial=False,
+    )
+
+    proxy_host = forms.CharField(
+        label='代理服务器地址',
+        max_length=255,
+        required=False,
+        initial='127.0.0.1',
+        help_text='SOCKS5 代理服务器 IP 或域名',
+    )
+
+    proxy_port = forms.IntegerField(
+        label='代理端口',
+        min_value=1,
+        max_value=65535,
+        initial=10808,
+        required=False,
+        help_text='SOCKS5 代理服务器端口（默认 10808）',
+    )
+
     batch_size = forms.IntegerField(
         label='每批发送数量',
         min_value=1,
@@ -109,6 +132,14 @@ class SmtpConfigForm(forms.Form):
         max_value=1000,
         initial=0,
         help_text='每分钟发送的邮件数量上限（0=不限制）',
+    )
+
+    send_interval = forms.IntegerField(
+        label='发送间隔（秒）',
+        min_value=10,
+        max_value=86400,
+        initial=120,
+        help_text='定时任务轮询间隔，每隔 N 秒检查一次待发送邮件',
     )
 
     log_days = forms.IntegerField(

@@ -55,6 +55,7 @@ urlpatterns = [
     path('system/smtp/test/', smtp_views.smtp_test, name='smtp_test'),
     path('system/smtp/history/', smtp_views.smtp_history, name='smtp_history'),
     path('system/smtp/cleanup/', smtp_views.smtp_cleanup_logs, name='smtp_cleanup_logs'),
+    path('system/smtp/process/', smtp_views.smtp_process_queue, name='smtp_process_queue'),
     path('system/logs/', views.logs_index, name='logs_index'),
     path('system/logs/<str:log_type>/', views.logs_view, name='logs_view'),
 

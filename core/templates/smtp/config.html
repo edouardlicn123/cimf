@@ -37,6 +37,12 @@
                     <small class="text-muted">端口：</small>
                     <div>{{ config.port }}</div>
                 </div>
+                <hr>
+                <div class="form-check form-switch mb-0">
+                    <input class="form-check-input" type="checkbox" id="enabled" name="enabled" form="smtpForm"
+                           {% if form.enabled.value() %}checked{% endif %}>
+                    <label class="form-check-label" for="enabled">启用邮件服务</label>
+                </div>
             </div>
         </div>
         
@@ -81,7 +87,7 @@
             
             <div class="card card-structure mb-4">
                 <div class="card-header">
-                    <h5 class="mb-0">服务商预设</h5>
+                    <h5 class="mb-0">服务器配置</h5>
                 </div>
                 <div class="card-body">
                     {% if form.errors %}
@@ -95,7 +101,7 @@
                 </ul>
             </div>
             {% endif %}
-            <div class="mb-0">
+                    <div class="mb-3">
                         <label class="form-label">选择服务商</label>
                         <select class="form-select" id="providerSelect" name="provider">
                             {% for key, preset in presets.items() %}
@@ -110,14 +116,7 @@
                             {% endif %}
                         </div>
                     </div>
-                </div>
-            </div>
-            
-            <div class="card card-structure mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">服务器配置</h5>
-                </div>
-                <div class="card-body">
+                    <hr>
                     <div class="row">
                         <div class="col-md-8 mb-3">
                             <label class="form-label">SMTP 服务器 *</label>
@@ -135,7 +134,7 @@
                         </div>
                         <div class="col-md-6 mb-3 d-flex align-items-center">
                             <div class="form-check form-switch mt-4">
-                                <input class="form-check-input" type="checkbox" id="skipVerify" name="skip_verify" 
+                                <input class="form-check-input" type="checkbox" id="skipVerify" name="skip_verify"
                                        {% if form.skip_verify.value() %}checked{% endif %}>
                                 <label class="form-check-label" for="skipVerify">跳过证书验证</label>
                             </div>
@@ -144,12 +143,12 @@
                     <div id="encryptionSection" class="mb-0" style="display: none;">
                         <label class="form-label">加密方式</label>
                         <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="useSsl" name="use_ssl" 
+                                <input class="form-check-input" type="checkbox" id="useSsl" name="use_ssl"
                                        {% if form.use_ssl.value() %}checked{% endif %}>
                             <label class="form-check-label" for="useSsl">SSL</label>
                         </div>
                         <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="useTls" name="use_tls" 
+                                <input class="form-check-input" type="checkbox" id="useTls" name="use_tls"
                                        {% if form.use_tls.value() %}checked{% endif %}>
                             <label class="form-check-label" for="useTls">TLS (推荐)</label>
                         </div>
@@ -157,9 +156,47 @@
                         <div class="text-danger small">{{ form.use_ssl.errors.0 }}</div>
                         {% endif %}
                     </div>
+                    <hr>
+                    <div class="mb-0">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" id="useProxy" name="use_proxy"
+                                       {% if form.use_proxy.value() %}checked{% endif %}>
+                                <label class="form-check-label" for="useProxy">启用 SOCKS5 代理</label>
+                            </div>
+                            <small>
+                                <a class="text-decoration-none text-muted" data-bs-toggle="collapse" href="#proxyHelp" role="button" aria-expanded="false" aria-controls="proxyHelp">
+                                    <i class="bi bi-question-circle"></i> 说明
+                                </a>
+                            </small>
+                        </div>
+                        <div id="proxyFields" style="{% if not form.use_proxy.value() %}display:none;{% endif %}">
+                            <div class="row">
+                                <div class="col-md-8 mb-2">
+                                    <input type="text" class="form-control" name="proxy_host" value="{{ form.proxy_host.value() }}" placeholder="127.0.0.1">
+                                    <div class="form-text">代理服务器 IP 或域名</div>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <input type="number" class="form-control" name="proxy_port" value="{{ form.proxy_port.value() }}" min="1" max="65535" placeholder="10808">
+                                    <div class="form-text">端口号</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="collapse" id="proxyHelp">
+                            <div class="mt-1 p-3 bg-light rounded small text-muted" style="border-left: 3px solid #6c757d; line-height: 1.8;">
+                                <div><strong>什么是 SOCKS5 代理？</strong></div>
+                                <div>当 SMTP 服务商（如 Gmail）被网络屏蔽时，可通过代理服务器中转连接。</div>
+                                <div class="mt-1"><strong>使用方法：</strong></div>
+                                <div>1. 在服务器上启动 SOCKS5 代理客户端（如 Clash、v2ray、ssr 等）</div>
+                                <div>2. 确保代理监听地址和端口与上面的设置一致（默认为 <code>127.0.0.1:10808</code>）</div>
+                                <div>3. 开启"启用代理"开关，填写地址和端口，保存配置</div>
+                                <div class="mt-1"><strong>注意：</strong>不需要代理时请关闭此开关。</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            
+
             <div class="card card-structure mb-4">
                 <div class="card-header">
                     <h5 class="mb-0">账户信息</h5>
@@ -187,7 +224,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="card card-structure mb-4">
                 <div class="card-header">
                     <h5 class="mb-0">发送设置</h5>
@@ -205,23 +242,21 @@
                             <div class="form-text">0=不限制</div>
                         </div>
                         <div class="col-md-4 mb-3">
+                            <label class="form-label">发送间隔（秒）</label>
+                            <input type="number" class="form-control" name="send_interval" value="{{ form.send_interval.value() }}" min="10" max="86400">
+                            <div class="form-text">每 N 秒检查一次待发送队列，默认120</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
                             <label class="form-label">日志保留天数</label>
                             <input type="number" class="form-control" name="log_days" value="{{ form.log_days.value() }}" min="1" max="365">
                             <div class="form-text">超过此天数的日志将被清理</div>
                         </div>
                     </div>
-                </div>
-            </div>
-            
-            <div class="card card-structure mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">通知设置</h5>
-                </div>
-                <div class="card-body">
+                    <hr>
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="failedNotify" name="failed_notify" 
+                                <input class="form-check-input" type="checkbox" id="failedNotify" name="failed_notify"
                                        {% if form.failed_notify.value() %}checked{% endif %}
                                        onchange="document.getElementById('notifyEmailGroup').style.display = this.checked ? 'block' : 'none'">
                                 <label class="form-check-label" for="failedNotify">失败时发送通知</label>
@@ -243,20 +278,7 @@
                     </div>
                 </div>
             </div>
-            
-            <div class="card card-structure mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">服务开关</h5>
-                </div>
-                <div class="card-body">
-                    <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="enabled" name="enabled" 
-                                       {% if form.enabled.value() %}checked{% endif %}>
-                        <label class="form-check-label" for="enabled">启用邮件服务</label>
-                    </div>
-                </div>
-            </div>
-            
+
         </form>
 
         <div class="d-flex gap-2 mb-4">
@@ -272,6 +294,12 @@
             <a href="{{ url('core:smtp_history') }}" class="btn btn-info">
                 <i class="bi bi-clock-history me-1"></i> 发送历史
             </a>
+            <form method="post" action="{{ url('core:smtp_process_queue') }}" class="d-inline">
+                {% include "includes/csrf.html" %}
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-send me-1"></i> 处理队列
+                </button>
+            </form>
             <form method="post" action="{{ url('core:smtp_cleanup_logs') }}" class="d-inline" 
                   onsubmit="return confirm('确定要清理过期日志吗？')">
                 {% include "includes/csrf.html" %}
@@ -314,6 +342,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     applyPreset(providerSelect.value);
+
+    // SOCKS5 proxy toggle show/hide fields
+    const useProxyCheckbox = document.getElementById('useProxy');
+    const proxyFields = document.getElementById('proxyFields');
+    if (useProxyCheckbox && proxyFields) {
+        useProxyCheckbox.addEventListener('change', function() {
+            proxyFields.style.display = this.checked ? 'block' : 'none';
+        });
+    }
 });
 </script>
 {% endblock %}
