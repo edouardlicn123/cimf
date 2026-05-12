@@ -1073,4 +1073,5 @@
 14. whatsapp/views.py: 3处API视图request参数加# noqa: ARG001
 15. whatsapp卡片第二行改为显示海外客户人数
 16. customer卡片第二行改为显示当前客户人数
+17. 整理.gitignore，分类重组并独立模块排除段
 
