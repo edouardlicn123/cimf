@@ -65,3 +65,15 @@ def login_required_json(func):
             return JsonResponse({'error': '请先登录'}, status=401)
         return func(request, *args, **kwargs)
     return wrapper
+
+
+def admin_required_json(view_func):
+    """管理员权限检查装饰器，返回JSON错误（用于API）"""
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': '请先登录'}, status=401)
+        if not getattr(request.user, 'is_admin', False):
+            return JsonResponse({'error': '需要管理员权限'}, status=403)
+        return view_func(request, *args, **kwargs)
+    return wrapper

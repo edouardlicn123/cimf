@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 
 from core.constants import ModuleType
+from core.decorators import login_required_json
 from core.module.models import Module, ToolType
 
 
@@ -68,7 +69,7 @@ def tool_view(request):
     })
 
 
-@login_required
+@login_required_json
 def calculate(request):
     """计算表达式AJAX接口"""
     if request.method == 'POST':

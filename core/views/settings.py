@@ -254,7 +254,7 @@ def homepage_settings(request):
     elif not setting:
         logger.debug("配置未找到: user_dashboard_card_positions，使用默认值")
 
-    default_positions = positions | {str(i): {'module': None} for i in range(1, 7)}
+    default_positions = {str(i): {'module': None} for i in range(1, 7)} | positions
 
     available_modules = []
 
@@ -266,12 +266,14 @@ def homepage_settings(request):
                 try:
                     mod = import_module(f'modules.{module_path}.module')
                     if hasattr(mod, 'MODULE_INFO'):
-                        module_info = {
-                            'id': node_module.module_id,
-                            'name': mod.MODULE_INFO.get('name', node_module.module_id),
-                            'icon': mod.MODULE_INFO.get('icon', 'bi-grid'),
-                        }
-                        available_modules.append(module_info)
+                        mod_info = mod.MODULE_INFO
+                        if mod_info.get('frontpage_card', False) and 'dashboard_cards' in mod_info:
+                            module_info = {
+                                'id': node_module.module_id,
+                                'name': mod_info.get('name', node_module.module_id),
+                                'icon': mod_info.get('icon', 'bi-grid'),
+                            }
+                            available_modules.append(module_info)
                 except Exception:
                     pass
     except Exception:
