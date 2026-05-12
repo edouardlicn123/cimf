@@ -27,22 +27,19 @@ def smtp_config(request):
             if not config_data.get('password'):
                 config_data['password'] = config.get('password', '')
 
-            # 保存前测试连接
-            test_result, test_msg = SmtpService.test_connection(config_data)
-            if not test_result:
-                recent_logs = EmailLog.objects.all()[:10]
-                messages.error(request, f'SMTP 连接测试失败: {test_msg}')
-                return render(request, 'smtp/config.html', {
-                    'form': form,
-                    'presets': presets,
-                    'config': config,
-                    'recent_logs': recent_logs,
-                    'active_section': 'smtp',
-                })
-
+            # 保存配置（无论连接测试结果）
             SmtpService.save_config(config_data)
-            messages.success(request, 'SMTP 配置已保存')
+
+            # 保存后检测服务连接状态
+            test_result, test_msg = SmtpService.update_connection_status()
+            if test_result:
+                messages.success(request, 'SMTP 配置已保存，服务连接正常')
+            else:
+                messages.warning(request, f'配置已保存，但 SMTP 服务连接失败: {test_msg}')
+
             return redirect('core:smtp_config')
+        else:
+            messages.error(request, '表单验证失败，请检查填写内容')
     else:
         initial = {
             'provider': config.get('provider', 'gmail_tls'),

@@ -96,6 +96,7 @@ class SmtpService:
 
         config = {
             'enabled': settings_dict.get('smtp_enabled', 'false') == 'true',
+            'service_connected': settings_dict.get('smtp_service_connected', 'false') == 'true',
             'provider': settings_dict.get('smtp_provider', 'gmail_tls'),
             'host': settings_dict.get('smtp_host', 'smtp.gmail.com'),
             'port': int(settings_dict.get('smtp_port', '587')),
@@ -163,6 +164,13 @@ class SmtpService:
             SettingsService.save_setting('smtp_password', password)
 
         cls.update_django_settings()
+
+    @classmethod
+    def update_connection_status(cls) -> tuple[bool, str]:
+        """测试连接并存储服务状态"""
+        success, message = cls.test_connection()
+        SettingsService.save_setting('smtp_service_connected', 'true' if success else 'false')
+        return success, message
 
     @classmethod
     def test_connection(cls, config: dict[str, Any] | None = None) -> tuple[bool, str]:
