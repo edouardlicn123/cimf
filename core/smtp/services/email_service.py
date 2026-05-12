@@ -11,7 +11,7 @@ from django.utils import timezone
 
 from core.services import SettingsService
 from core.smtp.models import EmailLog
-from core.smtp.services.smtp_service import SmtpService
+from core.smtp.services.smtp_service import SmtpService, _apply_proxy_patch
 from core.smtp.services.template_service import TemplateService
 
 logger = logging.getLogger(__name__)
@@ -76,7 +76,6 @@ class EmailService:
                 subject=subject,
                 body=body,
                 html_body=html_body,
-                from_email=from_email,
                 default_from=default_from,
             )
 
@@ -145,7 +144,7 @@ class EmailService:
             to_email=','.join(to_emails),
             subject=subject,
             text_body=text_body,
-            html_body=html_body,
+            html_body=html_body or '',
             template_name=template_name,
             status='pending',
         )
@@ -162,29 +161,30 @@ class EmailService:
         subject: str,
         body: str,
         html_body: str,
-        _from_email: str,
         default_from: str,
     ) -> bool:
         """同步发送邮件"""
+        config = SmtpService.get_current_config()
         try:
-            if html_body:
-                msg = EmailMultiAlternatives(
-                    subject=subject,
-                    body=body,
-                    from_email=default_from,
-                    to=to_list,
-                )
-                msg.attach_alternative(html_body, 'text/html')
-                msg.send()
-            else:
-                send_mail(
-                    subject=subject,
-                    message=body,
-                    from_email=default_from,
-                    recipient_list=to_list,
-                    fail_silently=False,
-                )
-            return True
+            with _apply_proxy_patch(config):
+                if html_body:
+                    msg = EmailMultiAlternatives(
+                        subject=subject,
+                        body=body,
+                        from_email=default_from,
+                        to=to_list,
+                    )
+                    msg.attach_alternative(html_body, 'text/html')
+                    msg.send()
+                else:
+                    send_mail(
+                        subject=subject,
+                        message=body,
+                        from_email=default_from,
+                        recipient_list=to_list,
+                        fail_silently=False,
+                    )
+                return True
         except Exception as e:
             logger.error(f"邮件发送失败: to={to_list}, subject={subject}, error={e}", exc_info=True)
             return False
@@ -226,7 +226,6 @@ class EmailService:
                     subject=log.subject,
                     body=log.text_body,
                     html_body=log.html_body,
-                    from_email=from_email,
                     default_from=default_from,
                 )
 
@@ -306,7 +305,6 @@ CIMF 系统检测到最近有 {failed_count} 封邮件发送失败，请检查 S
             subject=subject,
             body=body,
             html_body='',
-            from_email=from_email,
             default_from=default_from,
         )
 

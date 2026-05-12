@@ -68,7 +68,7 @@ def _convert_setting_value(value: str) -> bool | int | float | str:
         return value.lower() == 'true'
     elif value.isdigit():
         return int(value)
-    elif '.' in value and value.replace('.', '').isdigit():
+    elif value.count('.') == 1 and value.replace('.', '').isdigit():
         return float(value)
     return value
 
@@ -133,7 +133,7 @@ class SettingsService:
         'cron_time_sync_enabled': 'true',
         'cron_cache_cleanup_enabled': 'true',
         'cron_email_sending_enabled': 'false',
-        'smtp_send_interval': '100',
+        'smtp_send_interval': '120',
         'cron_email_cleanup_enabled': 'false',
         'cron_email_cleanup_interval': '86400',
 
@@ -159,6 +159,9 @@ class SettingsService:
         'smtp_failed_notify': 'false',
         'smtp_notify_email': '',
         'smtp_system_url': '',
+        'smtp_proxy_host': '127.0.0.1',
+        'smtp_proxy_port': '10808',
+        'smtp_use_proxy': 'false',
     }
 
     BOOL_SETTINGS = {
