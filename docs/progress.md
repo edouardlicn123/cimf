@@ -1055,3 +1055,22 @@
 16. config.env/env.sample 新增 pip 镜像源配置段；run.sh/run.bat 改为 config.env 驱动
 17. 新增 run.ps1 (PowerShell 版启动脚本，全功能对齐 run.sh)
 
+# 2026-05-12 修改记录
+
+1. 修复 clock 模块迁移文件缺少 options 配置导致安装失败的问题
+2. 修复 homepage_settings 视图未过滤 frontpage_card 导致所有活跃模块出现在功能卡片设置页
+3. 修复功能卡片设置页 CSRF 处理（head_extra 补充 super()，getCsrfToken 增加 hidden input 回退）
+4. 修复功能卡片保存失效：Python dict 合并运算符  方向反了，已保存数据被默认值覆盖
+5. whatsapp 模块添加 frontpage_card: True，恢复首页功能卡片
+6. 修复多个模块问题：whatsapp日志模板状态值/customer表单字段/whatsapp timezone.now/移除重复装饰器和deprecated模式/添加install_on_init/更新文档
+7. 修复 customer/__init__.py deprecated default_app_config、customer/forms.py 遗留字段、customer/edit.html 移除不适用的 region_select.js、whatsapp 改用 core.decorators.admin_required_json
+8. whatsapp HTML 视图改用 @login_required 替代 @login_required_json
+9. 修复 whatsapp 导入路径/未使用导入/ARG001/异常处理，calc calculate 改用 @login_required_json
+10. ruff.toml 添加 unsafe-fixes = false，防止 ARG001 自动重命名参数
+11. 修复 ruff 配置：unsafe-fixes = false 移至顶层位置
+12. AGENTS.md: 补充AR规则说明及3处已知待修复ARG001清单
+13. AGENTS.md: 重构AR规则为通用规范，使用✅/❌分类明确fix规则
+14. whatsapp/views.py: 3处API视图request参数加# noqa: ARG001
+15. whatsapp卡片第二行改为显示海外客户人数
+16. customer卡片第二行改为显示当前客户人数
+

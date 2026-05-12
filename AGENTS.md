@@ -28,7 +28,12 @@ Agent 在以下情况应读取最新报告：
 
 **⚠️ Ruff 修复注意事项：**
 - **Django signal handler 的 `sender` 参数名不可修改！** Signal dispatcher 以 `receiver(sender=..., connection=...)` 关键字形式传参，`sender` 必须保持原名。若被 ruff 的 ARG 规则重命名为 `_sender`，将导致 TypeError。
-- 修复 ARG 规则发现的问题时，对于 Django view 函数（使用 `@login_required` 等装饰器）和 signal handler 的 `sender` 参数，应加 `# noqa: ARG001` 而非重命名。
+- **`unsafe-fixes = false`** 必须设置在 `ruff.toml` 顶层（不在 `[lint]` 下），否则 ARG 自动重命名规则不会被阻止。
+- **通用规则：修复 ARG001 时，对于以下情况必须加 `# noqa: ARG001`（禁止重命名或删除参数）：**
+  - ✅ Django view 函数 — 只要使用了 `@login_required`、`@login_required_json`、`@admin_required`、`@admin_required_json`、`@require_POST` 等装饰器，`request` 参数是 Django URL 分发器按位置传入的，不可移除或重命名
+  - ✅ Django signal handler — `sender` 参数是 signal dispatcher 以关键字 `sender=` 传入的，不可重命名
+  - ✅ 任何由框架按签名自动传参的函数参数（如中间件、上下文处理器等）
+  - ❌ 反之，非框架调用的普通函数中未使用的参数，应直接删除参数（不设 noqa）
 
 ---
 

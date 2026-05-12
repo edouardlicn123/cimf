@@ -16,5 +16,10 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
             ],
+            options={
+                'db_table': 'clock_model',
+                'verbose_name': '时钟',
+                'verbose_name_plural': '时钟',
+            },
         ),
     ]
