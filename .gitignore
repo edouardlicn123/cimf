@@ -1,69 +1,66 @@
-# Python
+# ========== Python ==========
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
+.mypy_cache/
+.pytest_cache/
+
+# ========== 虚拟环境 ==========
 env/
 venv/
 .venv/
-pip-log.txt
-pip-delete-this-directory.txt
 
-# Flask / 项目运行相关
+# ========== 运行时数据 ==========
 instance/
+instance/uploads/*
 *.db
 *.sqlite3
-*.log
 
-# 环境配置文件
+# ========== 环境变量 ==========
 config.env
 
-# 上传文件目录（后续会用到）
-instance/uploads/*
+# ========== 静态文件收集 ==========
+static/fonts/**/*.zip
+static/fonts/**/extras/
+storage/staticfiles/
+storage/staticfiles/fonts/**/*.zip
+storage/staticfiles/fonts/**/extras/
 
-# macOS / Windows 常见垃圾文件
-.DS_Store
-Thumbs.db
-ehthumbs.db
-desktop.ini
+# ========== 日志与报告 ==========
+*.log
+storage/logs/*.log
+storage/reports/
 
-# 编辑器临时文件
+# ========== 代码覆盖率 ==========
+coverage.xml
+htmlcov/
+
+# ========== 编辑器临时文件 ==========
 *.swp
 *.swo
 *~
 .#*
 
-# 其他可能出现的
-.mypy_cache/
-.pytest_cache/
-coverage.xml
-htmlcov/
+# ========== 操作系统垃圾文件 ==========
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
 
-# 模块排除（开发中的模块）
-modules/resident_info/
-modules/customer_cn/
-modules/whatsapp/
-
-# 开发阶段文档
+# ========== 开发阶段文档 ==========
 docs/stage3/
 docs/stage4/
 
-# 字体压缩包和冗余格式
-static/fonts/**/*.zip
-storage/staticfiles/fonts/**/*.zip
-static/fonts/**/extras/
-storage/staticfiles/fonts/**/extras/
+# ========== 模块排除 ==========
+# whatsapp
+modules/whatsapp/
+# resident_info
+modules/resident_info/
+# customer_cn
+modules/customer_cn/
 
-# Python 缓存
-__pycache__/
-*.pyc
-
-# 日志文件
-storage/logs/*.log
-
-# 静态文件收集目录
-storage/staticfiles/
-
-# Ruff 代码检查报告
-storage/reports/
+# ========== 其他（包管理工具相关）==========
+pip-log.txt
+pip-delete-this-directory.txt
