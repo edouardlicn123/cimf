@@ -135,7 +135,7 @@ class SettingsService:
         'cron_time_sync_enabled': 'true',
         'cron_cache_cleanup_enabled': 'true',
         'cron_email_sending_enabled': 'false',
-        'smtp_send_interval': '120',
+        'smtp_send_interval': '240',
         'cron_email_cleanup_enabled': 'false',
         'cron_email_cleanup_interval': '86400',
 
@@ -156,7 +156,6 @@ class SettingsService:
         'smtp_password': '',
         'smtp_retry_count': '3',
         'smtp_batch_size': '10',
-        'smtp_rate_limit': '0',
         'smtp_log_days': '30',
         'smtp_failed_notify': 'false',
         'smtp_notify_email': '',

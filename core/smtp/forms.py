@@ -126,20 +126,12 @@ class SmtpConfigForm(forms.Form):
         help_text='每次处理的邮件数量',
     )
 
-    rate_limit = forms.IntegerField(
-        label='每分钟发送上限',
-        min_value=0,
-        max_value=1000,
-        initial=0,
-        help_text='每分钟发送的邮件数量上限（0=不限制）',
-    )
-
     send_interval = forms.IntegerField(
-        label='发送间隔（秒）',
-        min_value=10,
+        label='发送间隔',
+        min_value=30,
         max_value=86400,
-        initial=120,
-        help_text='定时任务轮询间隔，每隔 N 秒检查一次待发送邮件',
+        initial=240,
+        help_text='每批邮件发送后，等待此时间后再发下一批。实际等待时间会在设定值±15秒范围内随机，例如240秒则实际为225~255秒',
     )
 
     log_days = forms.IntegerField(

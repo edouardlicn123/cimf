@@ -3,6 +3,7 @@
 """
 
 import logging
+import random
 import time
 from datetime import timedelta
 
@@ -20,7 +21,8 @@ logger = logging.getLogger(__name__)
 class EmailService:
     """邮件发送服务"""
 
-    _last_send_time = 0
+    _last_send_time = 0.0
+    _next_delay = 0.0
 
     @classmethod
     def send_email(
@@ -193,8 +195,14 @@ class EmailService:
         """处理待发送邮件（由定时任务调用）"""
         config = SmtpService.get_current_config()
         batch_size = config.get('batch_size', 10)
-        rate_limit = config.get('rate_limit', 0)
+        send_interval = config.get('send_interval', 240)
         retry_count = int(SettingsService.get_setting('smtp_retry_count', 3))
+
+        # 检查发送间隔是否已到
+        elapsed = time.time() - cls._last_send_time
+        if elapsed < cls._next_delay:
+            logger.debug(f"发送间隔未到，跳过本次处理（已过{elapsed:.0f}s，还需{cls._next_delay - elapsed:.0f}s）")
+            return 0
 
         pending_logs = EmailLog.objects.filter(
             status='pending',
@@ -203,9 +211,6 @@ class EmailService:
 
         sent_count = 0
         for log in pending_logs:
-            if rate_limit > 0:
-                cls._check_rate_limit(rate_limit)
-
             try:
                 log.status = 'sending'
                 log.save(update_fields=['status'])
@@ -246,23 +251,12 @@ class EmailService:
                 log.save(update_fields=['status', 'error_message', 'retry_count'])
 
         if sent_count > 0:
+            cls._last_send_time = time.time()
+            cls._next_delay = send_interval + random.randint(-15, 15)
+            logger.info(f"发送 {sent_count} 封，下次间隔 {cls._next_delay:.0f}s（设定 {send_interval}s ±15s）")
             cls._check_and_notify_failed()
 
         return sent_count
-
-    @classmethod
-    def _check_rate_limit(cls, rate_limit: int) -> None:
-        """检查并实施速率限制"""
-        if rate_limit <= 0:
-            return
-
-        min_interval = 60.0 / rate_limit
-        elapsed = time.time() - cls._last_send_time
-
-        if elapsed < min_interval:
-            time.sleep(min_interval - elapsed)
-
-        cls._last_send_time = time.time()
 
     @classmethod
     def _check_and_notify_failed(cls) -> None:
