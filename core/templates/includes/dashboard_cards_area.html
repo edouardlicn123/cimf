@@ -323,8 +323,29 @@
             });
     }
 
+    // ── 服务端时间管理 ──
+    var serverTimeData = { timestamp: 0, recvTime: 0 };
+
+    function fetchServerTime() {
+        return fetch('/api/v1/time/current/')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                serverTimeData.timestamp = data.timestamp;
+                serverTimeData.recvTime = performance.now();
+            })
+            .catch(function() {
+                serverTimeData.timestamp = Math.floor(Date.now() / 1000);
+                serverTimeData.recvTime = performance.now();
+            });
+    }
+
+    function getServerDate() {
+        var elapsed = (performance.now() - serverTimeData.recvTime) / 1000;
+        return new Date((serverTimeData.timestamp + elapsed) * 1000);
+    }
+
     function updateClock() {
-        var now = new Date();
+        var now = getServerDate();
         var timeEl = document.querySelector('.clock-time');
         var dateWeekdayEl = document.querySelector('.clock-date-weekday');
         var lunarEl = document.querySelector('.clock-lunar');
@@ -493,10 +514,15 @@
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function() {
             renderCards();
-            updateClock();
-            if (!window._clockInterval) {
-                window._clockInterval = setInterval(updateClock, 1000);
-            }
+            fetchServerTime().then(function() {
+                updateClock();
+                if (!window._clockInterval) {
+                    window._clockInterval = setInterval(updateClock, 1000);
+                }
+                if (!window._syncInterval) {
+                    window._syncInterval = setInterval(fetchServerTime, 60000);
+                }
+            });
         });
     }
 })();

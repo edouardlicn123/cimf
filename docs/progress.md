@@ -1109,4 +1109,6 @@
 6. A08 自动化检查完成：所有 13 项检查通过，无 P0/P1 发现
 7. 首页卡片 CSS 设计：hover 升起改为白色半透明内发光（inset box-shadow），更新 D01 §5 文档及 2 个模板
 8. 首页卡片内发光：缩小扩散至 8px，改为不透明白色 #fff
+9. 38号方案文档完善：修正注释措辞、ClockService timestamp 一致化纳入计划
+10. 实施38号方案：TimeSyncService持久化+单调时钟、ClockService使用同步时间、API新增timestamp、前端fetchServerTime+getServerDate同步
 

@@ -22,7 +22,7 @@
 # ============================================================
 
 VERSION_MAJOR = '1'
-VERSION_MINOR = 914
+VERSION_MINOR = 916
 
 def get_version_display():
     return f"v{VERSION_MAJOR}.{VERSION_MINOR:03d}"
