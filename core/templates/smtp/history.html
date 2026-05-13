@@ -14,83 +14,97 @@
 {% endblock %}
 
 {% block admin_content %}
-<div class="row">
-    <div class="col-12">
-        <div class="card card-structure">
-            <div class="card-header">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">发送历史</h5>
-                    <div class="btn-group">
-                        <a href="{{ url('core:smtp_history') }}" class="btn btn-sm btn-outline-secondary {% if not status_filter %}active{% endif %}">全部</a>
-                        <a href="{{ url('core:smtp_history') }}?status=sent" class="btn btn-sm btn-outline-success {% if status_filter == 'sent' %}active{% endif %}">成功</a>
-                        <a href="{{ url('core:smtp_history') }}?status=failed" class="btn btn-sm btn-outline-danger {% if status_filter == 'failed' %}active{% endif %}">失败</a>
-                        <a href="{{ url('core:smtp_history') }}?status=pending" class="btn btn-sm btn-outline-warning {% if status_filter == 'pending' %}active{% endif %}">待发送</a>
-                    </div>
-                </div>
+
+<!-- 列表、分页合并卡片 -->
+<div class="card card-structure">
+    <div class="card-header">
+        <h5 class="mb-0">发送记录</h5>
+    </div>
+    <div class="card-body">
+        <div class="d-flex align-items-end gap-2" style="margin-bottom:-1px">
+            <div class="nav nav-pills nav-pills-outline gap-1 ms-auto">
+                <a href="?status=all" class="nav-link {% if filter_status == 'all' %}active{% endif %}">
+                    全部 <span class="badge ms-1" style="background:#f57c00;color:#fff">{{ total_count }}</span>
+                </a>
+                <a href="?status=sent" class="nav-link {% if filter_status == 'sent' %}active{% endif %}">
+                    成功 <span class="badge ms-1" style="background:#f57c00;color:#fff">{{ sent_count }}</span>
+                </a>
+                <a href="?status=failed" class="nav-link {% if filter_status == 'failed' %}active{% endif %}">
+                    失败 <span class="badge ms-1" style="background:#f57c00;color:#fff">{{ failed_count }}</span>
+                </a>
+                <a href="?status=pending" class="nav-link {% if filter_status == 'pending' %}active{% endif %}">
+                    待发送 <span class="badge ms-1" style="background:#f57c00;color:#fff">{{ pending_count }}</span>
+                </a>
             </div>
-            <div class="card-body">
-                {% if logs %}
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>时间</th>
-                                <th>收件人</th>
-                                <th>主题</th>
-                                <th>状态</th>
-                                <th>重试次数</th>
-                                <th>错误信息</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for log in logs %}
-                            <tr>
-                                <td>
-                                    {% if log.created_at %}<small>{{ log.created_at|date("Y-m-d H:i") }}</small>{% else %}<small class="text-muted">-</small>{% endif %}
-                                    {% if log.sent_at %}
-                                    <br><small class="text-muted">发送: {{ log.sent_at|date("H:i:s") }}</small>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <small title="{{ log.to_email }}">{{ log.to_email|slice(":40") }}{% if log.to_email|length > 40 %}...{% endif %}</small>
-                                </td>
-                                <td>
-                                    <small title="{{ log.subject }}">{{ log.subject|slice(":50") }}{% if log.subject|length > 50 %}...{% endif %}</small>
-                                </td>
-                                <td>
-                                    {% if log.status == 'sent' %}
-                                    <span class="badge bg-success">成功</span>
-                                    {% elif log.status == 'failed' %}
-                                    <span class="badge bg-danger">失败</span>
-                                    {% elif log.status == 'sending' %}
-                                    <span class="badge bg-info">发送中</span>
-                                    {% else %}
-                                    <span class="badge bg-warning">待发送</span>
-                                    {% endif %}
-                                </td>
-                                <td>{{ log.retry_count }}</td>
-                                <td>
-                                    {% if log.error_message %}
-                                    <small class="text-danger" title="{{ log.error_message }}">
-                                        {{ log.error_message|slice(":30") }}{% if log.error_message|length > 30 %}...{% endif %}
-                                    </small>
-                                    {% else %}
-                                    <small class="text-muted">-</small>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <div class="text-center text-muted py-5">
-                    <i class="bi bi-inbox fs-1"></i>
-                    <p class="mt-2">暂无发送记录</p>
-                </div>
-                {% endif %}
+        </div>
+        <div class="log-table-wrap table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>时间</th>
+                        <th>收件人</th>
+                        <th>主题</th>
+                        <th style="width: 100px;">状态</th>
+                        <th style="width: 80px;">重试</th>
+                        <th>错误信息</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in page_obj %}
+                    <tr>
+                        <td>
+                            {% if log.created_at %}<small>{{ log.created_at|date("Y-m-d H:i") }}</small>{% else %}<small class="text-muted">-</small>{% endif %}
+                            {% if log.sent_at %}
+                            <br><small class="text-muted">发送: {{ log.sent_at|date("H:i:s") }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <small title="{{ log.to_email }}">{{ log.to_email|slice(":40") }}{% if log.to_email|length > 40 %}...{% endif %}</small>
+                        </td>
+                        <td>
+                            <small title="{{ log.subject }}">{{ log.subject|slice(":50") }}{% if log.subject|length > 50 %}...{% endif %}</small>
+                        </td>
+                        <td>
+                            {% if log.status == 'sent' %}
+                            <span class="badge bg-success">成功</span>
+                            {% elif log.status == 'failed' %}
+                            <span class="badge bg-danger">失败</span>
+                            {% elif log.status == 'sending' %}
+                            <span class="badge bg-info">发送中</span>
+                            {% else %}
+                            <span class="badge bg-warning">待发送</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ log.retry_count }}</td>
+                        <td>
+                            {% if log.error_message %}
+                            <small class="text-danger" title="{{ log.error_message }}">
+                                {{ log.error_message|slice(":30") }}{% if log.error_message|length > 30 %}...{% endif %}
+                            </small>
+                            {% else %}
+                            <small class="text-muted">-</small>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">暂无数据</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="text-muted small">
+                <i class="bi bi-lightbulb me-1"></i>
+                邮件发送记录 · 每页 20 条
             </div>
+            {% set extra_params = "&status=" ~ filter_status %}
+            {% include "includes/pagination.html" %}
         </div>
     </div>
 </div>
+
 {% endblock %}

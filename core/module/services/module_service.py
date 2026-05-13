@@ -2,6 +2,7 @@ import ast
 import logging
 import shutil
 import subprocess
+import sys
 import tempfile
 from importlib import import_module
 from pathlib import Path
@@ -347,6 +348,26 @@ except Exception as e:
         return errors
 
     @staticmethod
+    def _install_requirements(module_id: str) -> tuple[bool, str]:
+        """安装模块的 Python 依赖（requirements.txt）"""
+        req_path = Path(ModuleService.MODULES_DIR) / module_id / 'requirements.txt'
+        if not req_path.exists():
+            return True, '无依赖需求'
+        try:
+            result = subprocess.run(
+                [sys.executable, '-m', 'pip', 'install', '-r', str(req_path)],
+                capture_output=True, text=True, timeout=120, check=False,
+            )
+            if result.returncode != 0:
+                return False, f'pip 安装失败: {result.stderr.strip()}'
+            logger.info(f'模块 {module_id} 依赖安装完成:\n{result.stdout}')
+            return True, '依赖安装成功'
+        except subprocess.TimeoutExpired:
+            return False, '依赖安装超时(120s)'
+        except Exception as e:
+            return False, f'依赖安装异常: {e!s}'
+
+    @staticmethod
     def install_module(module_id: str) -> tuple:
         module = Module.objects.filter(module_id=module_id).first()
         if not module:
@@ -358,6 +379,11 @@ except Exception as e:
 
         if module.is_installed:
             return True, '模块已安装'
+
+        # 安装 Python 依赖（迁移前执行，因为 models/services 可能需要 import）
+        success, msg = ModuleService._install_requirements(module_id)
+        if not success:
+            return False, f'模块 {module_id} 依赖安装失败: {msg}'
 
         # 提前加载模块信息，供后续使用
         module_info = ModuleService._load_module_info(module.path)

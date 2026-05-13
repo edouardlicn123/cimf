@@ -116,9 +116,8 @@ class EmailService:
         cls,
         to_email: str | None = None,
         status: str | None = None,
-        limit: int = 50,
-    ) -> list[EmailLog]:
-        """获取发送历史"""
+    ):
+        """获取发送历史 QuerySet"""
         queryset = EmailLog.objects.all()
 
         if to_email:
@@ -126,7 +125,7 @@ class EmailService:
         if status:
             queryset = queryset.filter(status=status)
 
-        return list(queryset[:limit])
+        return queryset
 
     @classmethod
     def _create_log(
