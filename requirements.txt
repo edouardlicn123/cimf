@@ -29,3 +29,9 @@ pypdf>=6.10.2,<7.0
 # pytest>=8.0,<9.0
 # pytest-django>=4.8,<5.0
 ruff>=0.15,<1.0
+
+# SMTP SOCKS5 代理
+PySocks>=1.7.1,<2.0
+
+# WhatsApp WABridge 客户端
+wabridge>=0.2.0,<1.0
