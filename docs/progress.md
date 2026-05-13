@@ -1114,4 +1114,6 @@
 11. 首页卡片 hover 白色外框 2px → 1px 收窄
 12. SMTP 发送间隔合并：删除 rate_limit，send_interval 默认240s ±15s 随机化，前端补充说明
 13. Ruff 43项修复：UP009/W292/I001/RUF010/F401 自动修复 + PLC0415/F821 手动移惰性导入至顶层
+14. smtp 迁移文件 squash: 0001-0004 → 0001_squashed_0004
+15. smtp 迁移合并：删除旧 0001-0004，保留单文件 0001_squashed_0004
 
