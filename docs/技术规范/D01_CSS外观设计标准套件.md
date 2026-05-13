@@ -502,12 +502,12 @@ Hover（白色半透明内发光）：
 ```css
 /* 功能卡片 hover */
 .module-card:hover {
-    box-shadow: inset 0 0 0 2px #fff;
+    box-shadow: inset 0 0 0 1px #fff;
 }
 
 /* 导航卡片 hover */
 .nav-card:hover {
-    box-shadow: inset 0 0 0 2px #fff;
+    box-shadow: inset 0 0 0 1px #fff;
     color: #fff;
 }
 ```
@@ -516,7 +516,7 @@ Hover（白色半透明内发光）：
 
 | 属性 | 值 | 说明 |
 |------|----|------|
-| `box-shadow` | `inset 0 0 0 2px #fff` | `inset` + `0 0 0`（无模糊）+ `2px` 扩展半径，形成纯白色内边框线 |
+| `box-shadow` | `inset 0 0 0 1px #fff` | `inset` + `0 0 0`（无模糊）+ `1px` 扩展半径，形成纯白色内边框线 |
 | 颜色 | `#fff` | 白色不透明 |
 | 线框宽度 | `2px` | 清晰可见的白色边框 |
 | `transform` | 无 | 明确不升起，保持卡片平面感 |
@@ -530,7 +530,7 @@ Hover（白色半透明内发光）：
 
 ### 注意事项
 
-1. **与现有阴影兼容**：`.module-card` 默认有 `box-shadow: var(--shadow)`，hover 时被 `inset` 替换。如需要同时保留外阴影，应使用 `box-shadow: var(--shadow), inset 0 0 0 2px #fff`（用逗号分隔多层阴影）
+1. **与现有阴影兼容**：`.module-card` 默认有 `box-shadow: var(--shadow)`，hover 时被 `inset` 替换。如需要同时保留外阴影，应使用 `box-shadow: var(--shadow), inset 0 0 0 1px #fff`（用逗号分隔多层阴影）
 2. **与主题变量无关**：内线框颜色固定为白色，不依赖任何 CSS 变量，在所有主题中表现一致
 3. **仅影响 hover**：默认态和 active/grabbing 等状态不受影响，保持原有样式
 4. **升序选择器顺序**：`.module-card:hover` 必须定义在同文件 `.module-card` 之后，确保优先级正确

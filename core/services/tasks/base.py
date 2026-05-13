@@ -118,8 +118,11 @@ class CronTask(ABC):
         try:
             from core.services import SettingsService  # noqa: PLC0415
             interval = SettingsService.get_setting(self.setting_key_interval)
-            if interval and isinstance(interval, int):
-                return interval
+            if interval:
+                try:
+                    return int(interval)
+                except (TypeError, ValueError):
+                    pass
         except Exception as e:
             logger.warning(f"任务 {self.name} 获取间隔失败: {e}")
         return self.default_interval

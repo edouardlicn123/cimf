@@ -1111,4 +1111,7 @@
 8. 首页卡片内发光：缩小扩散至 8px，改为不透明白色 #fff
 9. 38号方案文档完善：修正注释措辞、ClockService timestamp 一致化纳入计划
 10. 实施38号方案：TimeSyncService持久化+单调时钟、ClockService使用同步时间、API新增timestamp、前端fetchServerTime+getServerDate同步
+11. 首页卡片 hover 白色外框 2px → 1px 收窄
+12. SMTP 发送间隔合并：删除 rate_limit，send_interval 默认240s ±15s 随机化，前端补充说明
+13. Ruff 43项修复：UP009/W292/I001/RUF010/F401 自动修复 + PLC0415/F821 手动移惰性导入至顶层
 
