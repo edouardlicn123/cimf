@@ -1105,4 +1105,8 @@
 2. 模块安装时自动安装 requirements.txt 依赖（新增 _install_requirements 静态方法）
 3. 删除 smtp/history 模板顶部统计卡片行，保留主卡片内 nav-pills 统计值
 4. WhatsApp 模块模板改用基本卡片1：logs.html/manage.html/send.html 添加 card-structure 类，修复 card-header d-flex 违规
+5. 方案A：修复 WhatsApp 模块路由 — modules/urls.py 挂载 tool 类型模块 urls.py，模板中 AJAX URL 改为 /modules/whatsapp/api/... 绝对路径
+6. A08 自动化检查完成：所有 13 项检查通过，无 P0/P1 发现
+7. 首页卡片 CSS 设计：hover 升起改为白色半透明内发光（inset box-shadow），更新 D01 §5 文档及 2 个模板
+8. 首页卡片内发光：缩小扩散至 8px，改为不透明白色 #fff
 
