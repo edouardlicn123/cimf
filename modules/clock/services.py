@@ -2,9 +2,7 @@
 时钟模块服务层
 """
 
-import time
-
-from django.utils.timezone import now
+from core.services import get_time_sync_service
 
 
 class ClockService:
@@ -16,10 +14,10 @@ class ClockService:
 
     @staticmethod
     def get_current_time():
-        dt = now()
+        dt = get_time_sync_service().get_current_time()
         return {
             'datetime': dt.strftime('%Y-%m-%d %H:%M:%S'),
-            'timestamp': int(time.time()),
+            'timestamp': int(dt.timestamp()),
             'date': dt.strftime('%Y年%m月%d日'),
             'time': dt.strftime('%H:%M:%S'),
             'weekday': ClockService.WEEKDAYS_CN[dt.weekday()],

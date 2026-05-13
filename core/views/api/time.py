@@ -18,6 +18,7 @@ def api_time_current(request):  # noqa: ARG001
 
     return JsonResponse({
         'time': TimeService.get_current_time(),
+        'timestamp': int(TimeService.get_current_datetime().timestamp()),
         'timezone': TimeService.get_timezone(),
         'synced': synced,
     })

@@ -129,6 +129,8 @@ class SettingsService:
         'time_zone': 'Asia/Shanghai',
         'time_sync_interval': '15',
         'time_sync_max_retries': '5',
+        'system_synced_time': '',
+        'system_sync_monotonic': '0',
 
         'cron_time_sync_enabled': 'true',
         'cron_cache_cleanup_enabled': 'true',

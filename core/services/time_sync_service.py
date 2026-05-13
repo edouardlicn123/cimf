@@ -139,15 +139,43 @@ class TimeSyncService:
         if not self.is_enabled():
             logger.info("时间同步已禁用")
             return False
-        return self._try_sync_with_servers()
+
+        result = self._try_sync_with_servers()
+        if result and self._synced_time is not None:
+            try:
+                from core.services import SettingsService  # noqa: PLC0415
+                SettingsService.save_setting('system_synced_time', self._synced_time.isoformat())
+                SettingsService.save_setting('system_sync_monotonic', str(time.monotonic()))
+                logger.info(f"持久化同步时间成功: {self._synced_time.isoformat()}")
+            except Exception as e:
+                logger.error(f"持久化同步时间失败: {e}")
+        return result
 
     def get_current_time(self) -> datetime:
         """获取当前时间"""
+        # ── 第一优先：从 DB 读取持久化的同步基准 ──
+        try:
+            from core.services import SettingsService  # noqa: PLC0415
+            synced_str = SettingsService.get_setting('system_synced_time')
+            monotonic_str = SettingsService.get_setting('system_sync_monotonic')
+
+            if synced_str and monotonic_str:
+                synced = datetime.fromisoformat(synced_str)
+                mono = float(monotonic_str)
+                elapsed = time.monotonic() - mono
+                if elapsed >= 0:
+                    return synced + timedelta(seconds=elapsed)
+        except Exception as e:
+            logger.warning(f"从 DB 读取同步时间失败: {e}")
+
+        # ── 第二优先：内存缓存（进程内第二次调用时更快） ──
         if (self._synced_time is not None and
             self._sync_status == 'success' and
             self._last_sync_timestamp is not None):
             elapsed = time.time() - self._last_sync_timestamp
             return self._synced_time + timedelta(seconds=elapsed)
+
+        # ── 第三优先：兜底 ──
         return now()
 
     def get_current_time_str(self, fmt: str = '%Y-%m-%d %H:%M:%S') -> str:
@@ -156,9 +184,12 @@ class TimeSyncService:
 
     def get_status(self) -> dict:
         """获取同步状态"""
+        from core.services import SettingsService  # noqa: PLC0415
+        synced_str = SettingsService.get_setting('system_synced_time')
         return {
             'status': self._sync_status,
-            'synced_time': self._synced_time.strftime('%Y-%m-%d %H:%M:%S') if self._synced_time else None,
+            'synced_time': self._synced_time.isoformat() if self._synced_time else None,
+            'persisted_synced_time': synced_str,
             'last_sync_timestamp': self._last_sync_timestamp,
             'enabled': self.is_enabled(),
         }
