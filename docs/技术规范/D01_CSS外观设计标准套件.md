@@ -458,3 +458,82 @@
 11. **`color-mix()` 浏览器支持**：`color-mix()` 是 CSS Color Level 5 函数，支持所有现代浏览器（Chrome 111+, Firefox 113+, Safari 16.2+）。不支持 `color-mix()` 的浏览器会跳过整个 `background` 声明，回退到主题的 `background-color` 纯色按钮，功能不受影响
 
 ---
+
+## 5. 首页卡片
+
+首页卡片适用于仪表盘中的功能入口卡片（快捷入口）和常用链接卡片。设计强调**深色背景上的白色半透明内发光**，hover 时浮现柔和光晕，无升起效果。
+
+```
+默认：
+┌──────────────────────┐
+│                      │
+│   客户信息            │  ← 纯色背景（primary 或 primary-light）
+│   150                 │
+│   本周新增 5 条       │
+│                      │
+└──────────────────────┘
+
+Hover（白色半透明内发光）：
+┌──────────────────────┐
+│ ░░░░░░░░░░░░░░░░░░░░ │  ← inset box-shadow
+│ ░░  客户信息      ░░ │     白色半透明层叠在背景之上
+│ ░░  150          ░░ │
+│ ░░  本周新增 5 条 ░░ │
+│ ░░░░░░░░░░░░░░░░░░░░ │
+└──────────────────────┘
+```
+
+### 用途
+
+- 快捷入口的 6 张功能卡片（`.module-card`）
+- 常用链接的 12 张导航卡片（`.nav-card`）
+
+### 受影响的 CSS 类
+
+| 类名 | 所在文件 | 说明 |
+|------|----------|------|
+| `.module-card` | `includes/dashboard_cards_area.html` | 功能卡片（inline style） |
+| `.nav-card` | `includes/nav_cards_area.html` | 导航卡片（inline style） |
+
+### CSS 规则
+
+所有规则以内联 `<style>` 形式写在对应模板文件中：
+
+```css
+/* 功能卡片 hover */
+.module-card:hover {
+    box-shadow: inset 0 0 0 2px #fff;
+}
+
+/* 导航卡片 hover */
+.nav-card:hover {
+    box-shadow: inset 0 0 0 2px #fff;
+    color: #fff;
+}
+```
+
+### 技术原理
+
+| 属性 | 值 | 说明 |
+|------|----|------|
+| `box-shadow` | `inset 0 0 0 2px #fff` | `inset` + `0 0 0`（无模糊）+ `2px` 扩展半径，形成纯白色内边框线 |
+| 颜色 | `#fff` | 白色不透明 |
+| 线框宽度 | `2px` | 清晰可见的白色边框 |
+| `transform` | 无 | 明确不升起，保持卡片平面感 |
+
+### 使用说明
+
+1. **可见性依赖背景色**：白色内发光在深色背景上最为明显（`var(--primary)`、`var(--primary-light)` 或自定义 `bg_color`），浅色背景上效果较弱
+2. **`inset` 不干扰外阴影**：内发光与外阴影独立共存，如卡片本身有 `box-shadow` 外阴影，hover 时不会被覆盖
+3. **`color: #fff` 保持**：导航卡片 hover 时文字色保持白色，不被内发光影响
+4. **过渡动画**：利用原有 `.module-card` / `.nav-card` 上的 `transition` 属性即可平滑显现内发光（已定义 `transition: transform 0.2s ease, box-shadow 0.2s ease`），无需额外声明
+
+### 注意事项
+
+1. **与现有阴影兼容**：`.module-card` 默认有 `box-shadow: var(--shadow)`，hover 时被 `inset` 替换。如需要同时保留外阴影，应使用 `box-shadow: var(--shadow), inset 0 0 0 2px #fff`（用逗号分隔多层阴影）
+2. **与主题变量无关**：内线框颜色固定为白色，不依赖任何 CSS 变量，在所有主题中表现一致
+3. **仅影响 hover**：默认态和 active/grabbing 等状态不受影响，保持原有样式
+4. **升序选择器顺序**：`.module-card:hover` 必须定义在同文件 `.module-card` 之后，确保优先级正确
+5. **导航卡片 `color`**：`.nav-card:hover` 中的 `color: #fff` 用于覆盖可能的外链默认色（如 `a` 标签的蓝色），确保 hover 时文字不跳色
+
+---

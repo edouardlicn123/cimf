@@ -43,8 +43,8 @@ def get_dynamic_routes():
             # node 类型由 core/node/urls.py 分发，跳过
             continue
         elif mod_type == 'tool':
-            # tool 类型由 core/urls.py tools_page 分发，跳过
-            continue
+            # tool 类型挂载到 modules/<slug>/ 供 API 和子页面访问
+            routes.extend(try_include_module(mod_slug))
         elif mod_type == 'system':
             # system 类型挂载到 system/<slug>/
             routes.extend(try_include_module(mod_slug, prefix='system/'))
