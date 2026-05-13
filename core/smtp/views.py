@@ -10,6 +10,7 @@ from core.decorators import admin_required
 from core.smtp.forms import SmtpConfigForm
 from core.smtp.models import EmailLog
 from core.smtp.services import EmailService, SmtpService
+from core.utils.pagination import paginate_queryset
 
 
 @admin_required
@@ -102,12 +103,27 @@ def smtp_test(request):
 @admin_required
 def smtp_history(request):
     """发送历史页面"""
-    status_filter = request.GET.get('status', '')
-    logs = EmailService.get_send_history(limit=100, status=status_filter)
+    status_filter = request.GET.get('status', 'all')
+
+    logs_qs = EmailService.get_send_history()
+    if status_filter != 'all':
+        logs_qs = logs_qs.filter(status=status_filter)
+
+    all_qs = EmailService.get_send_history()
+    total_count = all_qs.count()
+    sent_count = all_qs.filter(status='sent').count()
+    failed_count = all_qs.filter(status='failed').count()
+    pending_count = all_qs.filter(status__in=['pending', 'sending']).count()
+
+    page_ctx = paginate_queryset(request, logs_qs, per_page=20)
 
     return render(request, 'smtp/history.html', {
-        'logs': logs,
-        'status_filter': status_filter,
+        **page_ctx,
+        'filter_status': status_filter,
+        'total_count': total_count,
+        'sent_count': sent_count,
+        'failed_count': failed_count,
+        'pending_count': pending_count,
         'active_section': 'smtp',
     })
 

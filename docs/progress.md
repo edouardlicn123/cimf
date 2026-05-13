@@ -1099,3 +1099,10 @@
 40. Bug全检: header.html block修复 + error页面show_header修复
 41. Bug全检第2轮: customer node_delete + @require_POST, JS fetch catch检查
 
+# 2026-05-13 修改记录
+
+1. 参照 system/permission-check/ 设计模式重构 system/smtp/history/：添加分页(paginate_queryset)、统计卡片(总/成功/失败/待发送)、过滤改为 nav-pills-outline 样式、修复 card-header d-flex 违规
+2. 模块安装时自动安装 requirements.txt 依赖（新增 _install_requirements 静态方法）
+3. 删除 smtp/history 模板顶部统计卡片行，保留主卡片内 nav-pills 统计值
+4. WhatsApp 模块模板改用基本卡片1：logs.html/manage.html/send.html 添加 card-structure 类，修复 card-header d-flex 违规
+
