@@ -278,12 +278,6 @@ def upload_preview(request, node_type_slug):
     if not any(filename.lower().endswith(ext) for ext in allowed_extensions):
         return JsonResponse({'success': False, 'error': '只允许上传 CSV 或 Excel 文件'}, status=400)
 
-    # 验证文件类型（MIME）
-    allowed_mimes = ['text/csv', 'application/vnd.ms-excel',
-                     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
-    if file.content_type not in allowed_mimes:
-        return JsonResponse({'success': False, 'error': '文件格式不正确'}, status=400)
-
     format = 'xlsx' if filename.lower().endswith(('.xlsx', '.xls')) else 'csv'
 
     try:
