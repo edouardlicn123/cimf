@@ -281,7 +281,7 @@ kill_server() {
     echo -e "\n${GREEN}>>> 杀死服务器进程 (端口: ${APP_PORT})${NC}\n"
     
     local pids
-    pids=$(lsof -ti:${APP_PORT} 2>/dev/null || true)
+    pids=$(lsof -ti:${APP_PORT} -sTCP:LISTEN 2>/dev/null || true)
     
     if [[ -z "$pids" ]]; then
         echo -e "${YELLOW}端口 ${APP_PORT} 上没有运行的进程${NC}"

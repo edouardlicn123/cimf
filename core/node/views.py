@@ -219,6 +219,12 @@ def module_dispatch(request, node_type_slug: str, node_id: int | None = None, ac
             elif hasattr(module_views, 'delete'):
                 return module_views.delete(request, node_id)
 
+        if action == 'edit':
+            if hasattr(module_views, 'node_edit'):
+                return module_views.node_edit(request, node_id)
+            elif hasattr(module_views, 'edit'):
+                return module_views.edit(request, node_id)
+
         if hasattr(module_views, 'module_view'):
             return module_views.module_view(request, node_id)
         elif hasattr(module_views, 'detail_view') and node_id:
