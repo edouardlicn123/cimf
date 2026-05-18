@@ -1122,3 +1122,32 @@
 # 2026-05-14 修改记录
 
 1. 修复导入XLS模板时MIME类型检查过于严格导致'文件格式不正确'的问题，移除了不可靠的MIME content_type检查
+
+# 2026-05-17 修改记录
+
+1. WhatsApp 模块：发送页和管理页状态卡片添加刷新状态按钮；管理页测试连接后自动刷新状态徽章
+2. WhatsApp 模块：修复 SOCKS5 代理导致 httpx 无法连接 wabridge 的问题（_create_wa 临时清除代理环境变量 + trust_env=False）; 发送页/管理页 refreshStatus 增加错误显示和 catch 处理
+3. 修复 cimf-whatsapp/runwabridge.sh 启动方式：run_start 改为后台 daemon 模式（nohup+PID 文件）；新增 --stop/--restart/--pid 命令；同步 services.py/templates 修复到 cimf-whatsapp
+4. WhatsApp 模块状态卡片重构：徽章/账号/操作/错误四行布局；账号独立一行显示；添加刷新时间戳和加载动画；错误信息独立显示区域
+5. WhatsApp 模块：新增 api_customers 视图，调用海外客户模块数据 + SendLog 标注最近发送时间并按发送时间升序排列；send.html 重写客户加载 JS 实现真实数据加载、搜索防抖、勾选功能
+6. 修复 send.html 中 templates 变量未 JSON 序列化导致 JS 解析失败（expected expression, got '<'）— views.py 改用 json.dumps 后模板引用 templates_json
+
+# 2026-05-18 修改记录
+
+1. 修复 manage.html：模板保存/编辑/删除 fetch 添加 .catch() 错误提示；onclick 改为 data-* 属性+事件委托，避免模板内容含引号时 HTML 属性断裂
+2. 修复 core/node：node_edit 路由缺少 action='edit' 参数，导致编辑请求被 node_view 拦截；module_dispatch 新增 action=='edit' 分发逻辑
+3. 修复 manage.html 模板保存 JSON 解析失败：模板 API 视图添加 @csrf_exempt，避免 fetch POST/PUT 因缺少 CSRF token 返回 HTML
+4. send.html 发送按钮添加 .catch() 错误提示；manage.html 所有 fetch 添加 .catch()
+5. 重写 send.html 客户选择逻辑：移除 selectedCustomers 数组，改为直接读取 DOM 已勾选 checkbox；selectAll/复选框改为事件委托
+6. send.html：复选框同时绑定 change+click 事件；loadCustomers fetch 添加 .catch() 错误处理
+7. 修复发送时电话号带 + 号导致 WABridge 验证错误：wa.send() 前 lstrip('+')
+8. 重排发送页面布局：三卡片从上到下（发送模板/选择客户/服务状态）；模板下拉默认回到请选择
+9. 发送页面顶部按钮栏添加「发送消息」按钮，置于发送记录之前
+10. Pre-create pending SendLog records on batch start; add 'pending' to STATUS_CHOICES
+11. Fix pending log display: add 排队中 badge, show customer_id for pending, update sent_at on status change
+12. Fix kill_server in run.sh: add -sTCP:LISTEN; add 杀进程安全规范 to AGENTS.md
+13. WhatsApp 发送列表页面改进：表头sticky固定、服务端分页、过滤改造（搜索按钮+排除最近发送下拉）、最近发送只取wabridge成功记录、默认间隔改为300/600秒
+14. WhatsApp 批次限制：每批次最多59条
+15. WhatsApp 批次截断：超59条自动截断+toast提示+记录页截断提示
+16. WhatsApp 管理页新增每批最大条数设置项
+
