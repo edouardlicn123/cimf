@@ -26,6 +26,7 @@ import logging
 import os
 import threading
 import time
+from importlib import import_module
 from typing import TYPE_CHECKING
 
 from django.utils.timezone import now
@@ -223,6 +224,36 @@ def get_cron_service() -> CronService:
     return _cron_service
 
 
+def _register_single_task(task_path: str):
+    """按完整导入路径注册单个 cron 任务"""
+    mod_path, cls_name = task_path.rsplit('.', 1)
+    task_class = getattr(import_module(mod_path), cls_name)
+    task = task_class()
+    get_cron_service().register(task)
+    logger.info(f"Cron 任务已注册: {task.name} ({task_path})")
+
+
+def _unregister_single_task(task_path: str):
+    """按完整导入路径注销单个 cron 任务"""
+    mod_path, cls_name = task_path.rsplit('.', 1)
+    task_class = getattr(import_module(mod_path), cls_name)
+    get_cron_service().unregister(task_class.name)
+    logger.info(f"Cron 任务已注销: {task_class.name} ({task_path})")
+
+
+def _register_installed_module_tasks():
+    """扫描所有已安装且激活的模块，注册其 cron_tasks"""
+    from core.module.models import Module  # noqa: PLC0415
+    from core.module.services.module_service import ModuleService  # noqa: PLC0415
+    for mod in Module.objects.filter(is_installed=True, is_active=True):
+        info = ModuleService._load_module_info(mod.path) or {}
+        for task_path in info.get('cron_tasks', []):
+            try:
+                _register_single_task(task_path)
+            except Exception as e:
+                logger.warning(f"模块 {mod.module_id} cron 任务注册失败: {e}")
+
+
 def init_cron_service():
     """初始化 Cron 服务并注册任务"""
 
@@ -245,6 +276,7 @@ def init_cron_service():
     cron.register(CacheCleanupTask())
     cron.register(EmailSendingTask())
     cron.register(EmailCleanupTask())
+    _register_installed_module_tasks()
     cron.set_app_ready(True)
     cron.start()
     logger.info("Cron 服务初始化完成")

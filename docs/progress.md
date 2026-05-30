@@ -1151,3 +1151,16 @@
 15. WhatsApp 批次截断：超59条自动截断+toast提示+记录页截断提示
 16. WhatsApp 管理页新增每批最大条数设置项
 
+# 2026-05-30 修改记录
+
+1. 修复whatsapp模块批量发送：默认间隔从300/600秒改为30/60秒；修复首次发送前sleep问题，改为第一条立即发送、后续间隔发送
+2. WhatsApp模块：默认间隔改为61-122秒，设置页添加间隔参考提示；发送记录页新增一键终止发送功能
+3. 修复海外客户列表页删除405错误：将删除链接从GET方式的a标签改为POST表单+CSRF
+4. WhatsApp发送列表排序改为：未发送优先→发送最远优先→客户名称排序
+5. WhatsApp模块默认间隔恢复为300-600秒，更新参考提示
+6. WhatsApp模块批次限制默认值从59改为49
+7. 创建 docs/stage4/40_WhatsApp发送Cron架构改造方案.md —— 记录懒注册+安装时注册方案
+8. 创建 docs/stage4/41_模块Cron任务自动注册机制.md —— 通用 MODULE_INFO.cron_tasks 注册框架
+9. 修正文档 39/40/41 冲突：40 重写为依赖 41 通用机制，39 适配 cron 架构并标注执行顺序
+10. 实施 41/40/39 三个方案：core cron 自动注册机制、WhatsApp cron 重写（WhatsAppSendTask + services 新函数 + models 新字段 + 0003 迁移 + views/urls 改造）、UI 改进（toast 59条 + cron 调度卡片 + rate_limited 状态展示 + 移除废弃 batch_limit 设置）
+
