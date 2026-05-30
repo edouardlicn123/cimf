@@ -460,6 +460,15 @@ except Exception as e:
         module.installed_at = timezone.now()
         module.save()
 
+        # 注册 cron 任务
+        info = ModuleService._load_module_info(module.path) or {}
+        for task_path in info.get('cron_tasks', []):
+            try:
+                from core.services.cron_service import _register_single_task  # noqa: PLC0415
+                _register_single_task(task_path)
+            except Exception as e:
+                return False, f"cron 任务注册失败: {e}"
+
         return True, '安装成功'
 
     @staticmethod
@@ -675,6 +684,12 @@ except Exception as e:
                 module.activated_at = timezone.now()
                 module.save(update_fields=['is_active', 'activated_at'])
 
+                # 注册 cron 任务
+                info = ModuleService._load_module_info(module.path) or {}
+                for task_path in info.get('cron_tasks', []):
+                    from core.services.cron_service import _register_single_task  # noqa: PLC0415
+                    _register_single_task(task_path)
+
                 if module.module_type == 'node':
                     node_type = NodeType.objects.filter(slug=module.module_id).first()
                     if not node_type:
@@ -706,6 +721,12 @@ except Exception as e:
         try:
             module.is_active = False
             module.save(update_fields=['is_active'])
+
+            # 注销 cron 任务
+            info = ModuleService._load_module_info(module.path) or {}
+            for task_path in info.get('cron_tasks', []):
+                from core.services.cron_service import _unregister_single_task  # noqa: PLC0415
+                _unregister_single_task(task_path)
 
             if module.module_type == 'node':
                 node_type = NodeType.objects.filter(slug=module.module_id).first()
