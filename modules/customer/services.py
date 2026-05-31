@@ -144,8 +144,15 @@ class CustomerService:
             raise ValueError('客户关联节点不存在')
         NodeService.update_node(customer.node_id, {})
 
+        allowed_fields = {
+            'customer_name', 'customer_code', 'customer_type_id', 'enterprise_name',
+            'phone1', 'email1', 'phone2', 'email2', 'linkedin',
+            'country_id', 'province', 'address', 'postal_code',
+            'industry', 'enterprise_type_id', 'registered_capital',
+            'customer_level_id', 'credit_limit', 'website', 'notes',
+        }
         for key, value in data.items():
-            if hasattr(customer, key) and key not in {'id', 'node'}:
+            if key in allowed_fields:
                 setattr(customer, key, value)
 
         customer.save()
