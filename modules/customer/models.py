@@ -28,12 +28,12 @@ class CustomerFields(BaseModel):
         related_name='customer_type_customers',
         verbose_name='客户类型'
     )
-    enterprise_name = models.CharField(max_length=200, blank=True, null=True, verbose_name='企业名称')
+    enterprise_name = models.CharField(max_length=200, blank=True, default='', verbose_name='企业名称')
 
-    phone1 = models.CharField(max_length=20, blank=True, null=True, verbose_name='电话1')
-    email1 = models.EmailField(blank=True, null=True, verbose_name='邮箱1')
-    phone2 = models.CharField(max_length=20, blank=True, null=True, verbose_name='电话2')
-    email2 = models.EmailField(blank=True, null=True, verbose_name='邮箱2')
+    phone1 = models.CharField(max_length=20, blank=True, default='', verbose_name='电话1')
+    email1 = models.EmailField(blank=True, default='', verbose_name='邮箱1')
+    phone2 = models.CharField(max_length=20, blank=True, default='', verbose_name='电话2')
+    email2 = models.EmailField(blank=True, default='', verbose_name='邮箱2')
     linkedin = models.URLField(max_length=200, blank=True, null=True, verbose_name='领英')
 
     country = models.ForeignKey(
@@ -44,11 +44,11 @@ class CustomerFields(BaseModel):
         related_name='country_customers',
         verbose_name='国家'
     )
-    province = models.CharField(max_length=50, blank=True, null=True, verbose_name='省份/城市')
-    address = models.CharField(max_length=200, blank=True, null=True, verbose_name='详细地址')
-    postal_code = models.CharField(max_length=10, blank=True, null=True, verbose_name='邮政编码')
+    province = models.CharField(max_length=50, blank=True, default='', verbose_name='省份/城市')
+    address = models.CharField(max_length=200, blank=True, default='', verbose_name='详细地址')
+    postal_code = models.CharField(max_length=10, blank=True, default='', verbose_name='邮政编码')
 
-    industry = models.CharField(max_length=50, blank=True, null=True, verbose_name='所属行业')
+    industry = models.CharField(max_length=50, blank=True, default='', verbose_name='所属行业')
     enterprise_type = models.ForeignKey(
         'core.TaxonomyItem',
         on_delete=models.SET_NULL,

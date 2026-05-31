@@ -159,7 +159,7 @@ def node_create(request):
             CustomerService.create(request.user, data)
             messages.success(request, '客户创建成功')
             return redirect('node:module_page', node_type_slug='customer')
-        except Exception as e:
+        except ValueError as e:
             messages.error(request, str(e))
 
     return render(request, 'edit.html', {
@@ -258,7 +258,7 @@ def node_edit(request, node_id: int):
             CustomerService.update(customer.id, request.user, data)
             messages.success(request, '客户更新成功')
             return redirect('node:node_view', node_type_slug='customer', node_id=node_id)
-        except Exception as e:
+        except ValueError as e:
             messages.error(request, str(e))
 
     return render(request, 'edit.html', {
@@ -284,8 +284,12 @@ def node_delete(request, node_id: int):
         if not has_perm:
             messages.error(request, error_msg)
         else:
-            CustomerService.delete(node_id)
-            messages.success(request, '客户已删除')
+            customer = CustomerService.get_by_node_id(node_id)
+            if customer:
+                CustomerService.delete(customer.id)
+                messages.success(request, '客户已删除')
+            else:
+                messages.error(request, '客户不存在')
 
     return redirect('node:module_page', node_type_slug='customer')
 

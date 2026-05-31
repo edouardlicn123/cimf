@@ -1164,3 +1164,10 @@
 9. 修正文档 39/40/41 冲突：40 重写为依赖 41 通用机制，39 适配 cron 架构并标注执行顺序
 10. 实施 41/40/39 三个方案：core cron 自动注册机制、WhatsApp cron 重写（WhatsAppSendTask + services 新函数 + models 新字段 + 0003 迁移 + views/urls 改造）、UI 改进（toast 59条 + cron 调度卡片 + rate_limited 状态展示 + 移除废弃 batch_limit 设置）
 
+# 2026-05-31 修改记录
+
+1. Bug检查：移除 @csrf_exempt(7处) / 修正 CharField null=True(9处)
+2. 修复节点详情页卡片样式为基本卡片1(card-structure)
+3. 全部修复: node_delete PK类型/P2死代码竞态计数器/F()原子更新/字段白名单/narrow except/select_related
+4. 修复 ruff I001: 合并 django.views.decorators.http 导入组
+
