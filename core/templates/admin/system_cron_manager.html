@@ -94,6 +94,9 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const CRON_RUN_URL = '{{ url("api:api_cron_run_task", task_name="__TASK__") }}';
+    const CRON_TOGGLE_URL = '{{ url("api:api_cron_toggle_task", task_name="__TASK__") }}';
+    
     const csrfInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
     if (!csrfInput) {
         console.error('CSRF token not found!');
@@ -108,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const taskName = this.dataset.task;
             
-            fetch(`/api/v1/cron/run/${taskName}/`, { 
+            fetch(CRON_RUN_URL.replace('__TASK__', taskName), { 
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': csrfToken,
@@ -138,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const taskName = this.dataset.task;
             const enabled = this.checked;
             
-            fetch(`/api/v1/cron/toggle/${taskName}/`, {
+            fetch(CRON_TOGGLE_URL.replace('__TASK__', taskName), {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',

@@ -6,8 +6,8 @@ from django.urls import path
 
 from . import views
 
-app_name = 'clock'
+app_name = "clock"
 
 urlpatterns = [
-    path('api/time/', views.api_time, name='api_time'),
+    path("api/time/", views.api_time, name="api_time"),
 ]

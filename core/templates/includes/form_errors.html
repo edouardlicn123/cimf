@@ -1,0 +1,18 @@
+{% if form.errors %}
+<div class="alert alert-danger">
+  <ul class="mb-0">
+  {% for field_name, errors in form.errors.items() %}
+    {% for err in errors %}
+    <li>{{ err }}</li>
+    {% endfor %}
+  {% endfor %}
+  </ul>
+</div>
+{% endif %}
+{% if form.non_field_errors %}
+<div class="alert alert-danger">
+  {% for error in form.non_field_errors %}
+  {{ error }}{% if not loop.last %}<br>{% endif %}
+  {% endfor %}
+</div>
+{% endif %}

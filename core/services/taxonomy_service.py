@@ -32,7 +32,6 @@
     - core.models.TaxonomyItem: 词汇项模型
 """
 
-
 import logging
 
 from django.core.management import call_command
@@ -40,6 +39,7 @@ from django.db import models
 
 from core.models import Taxonomy, TaxonomyItem
 from core.services.base_service import BaseService
+from core.services.mixins import update_fields
 
 
 class TaxonomyService(BaseService):
@@ -47,97 +47,87 @@ class TaxonomyService(BaseService):
     词汇表服务层
     提供词汇表和词汇项的 CRUD 操作
     """
+
     model_class = Taxonomy
 
     @staticmethod
     def get_all_taxonomies():
         """获取所有词汇表"""
-        return Taxonomy.objects.all().order_by('id')
+        return Taxonomy.objects.all().order_by("id")
 
-    @staticmethod
-    def get_taxonomy_by_id(taxonomy_id: int):
+    @classmethod
+    def get_taxonomy_by_id(cls, taxonomy_id: int):
         """获取词汇表详情"""
-        return Taxonomy.objects.filter(id=taxonomy_id).first()
+        return cls.get_by_id(taxonomy_id)
 
-    @staticmethod
-    def get_taxonomy_by_slug(slug: str):
+    @classmethod
+    def get_taxonomy_by_slug(cls, slug: str):
         """通过 slug 获取词汇表"""
-        return Taxonomy.objects.filter(slug=slug).first()
+        return cls.get_first(slug=slug)
 
     @staticmethod
-    def create_taxonomy(name: str, slug: str, description: str = '') -> models.Model:
+    def create_taxonomy(name: str, slug: str, description: str = "") -> models.Model:
         """创建词汇表（存在则更新，不存在则创建）"""
         taxonomy, _created = Taxonomy.objects.update_or_create(
-            slug=slug,
-            defaults={'name': name, 'description': description}
+            slug=slug, defaults={"name": name, "description": description}
         )
         return taxonomy
 
-    @staticmethod
-    def update_taxonomy(taxonomy_id: int, name: str | None = None, slug: str | None = None, description: str | None = None) -> models.Model:
+    @classmethod
+    def update_taxonomy(
+        cls, taxonomy_id: int, name: str | None = None, slug: str | None = None, description: str | None = None
+    ) -> models.Model:
         """更新词汇表"""
-        taxonomy = Taxonomy.objects.filter(id=taxonomy_id).first()
+        taxonomy = cls.get_by_id(taxonomy_id)
         if taxonomy:
-            if name is not None:
-                taxonomy.name = name
-            if slug is not None:
-                taxonomy.slug = slug
-            if description is not None:
-                taxonomy.description = description
-            taxonomy.save()
+            update_fields(taxonomy, name=name, slug=slug, description=description)
         return taxonomy
 
-    @staticmethod
-    def delete_taxonomy(taxonomy_id: int) -> bool:
+    @classmethod
+    def delete_taxonomy(cls, taxonomy_id: int) -> bool:
         """删除词汇表（同时删除所有关联的词汇项）"""
-        taxonomy = Taxonomy.objects.filter(id=taxonomy_id).first()
-        if taxonomy:
-            taxonomy.delete()
-            return True
-        return False
+        return cls.delete(taxonomy_id)
 
     @staticmethod
     def get_items(taxonomy_id: int) -> list[models.Model]:
         """获取词汇表的所有词汇项"""
-        return TaxonomyItem.objects.filter(taxonomy_id=taxonomy_id).order_by('weight', 'name')
+        return TaxonomyItem.objects.filter(taxonomy_id=taxonomy_id).order_by("weight", "name")
+
+    @staticmethod
+    def get_item_by_id(item_id: int):
+        """根据 ID 获取词汇项"""
+        return TaxonomyItem.objects.filter(id=item_id).first()
 
     @staticmethod
     def get_item(item_id: int):
         """获取词汇项详情"""
-        return TaxonomyItem.objects.filter(id=item_id).first()
+        return TaxonomyService.get_item_by_id(item_id)
 
     @staticmethod
-    def create_item(taxonomy_id: int, name: str, description: str = '', weight: int | None = None) -> models.Model:
+    def create_item(taxonomy_id: int, name: str, description: str = "", weight: int | None = None) -> models.Model:
         """创建词汇项"""
         if weight is None:
-            max_weight = TaxonomyItem.objects.filter(taxonomy_id=taxonomy_id).aggregate(models.Max('weight'))['weight__max'] or 0
+            max_weight = (
+                TaxonomyItem.objects.filter(taxonomy_id=taxonomy_id).aggregate(models.Max("weight"))["weight__max"] or 0
+            )
             weight = max_weight + 1
-        item = TaxonomyItem.objects.create(
-            taxonomy_id=taxonomy_id,
-            name=name,
-            description=description,
-            weight=weight
-        )
+        item = TaxonomyItem.objects.create(taxonomy_id=taxonomy_id, name=name, description=description, weight=weight)
         return item
 
-    @staticmethod
-    def update_item(item_id: int, name: str | None = None, description: str | None = None, weight: int | None = None) -> models.Model:
+    @classmethod
+    def update_item(
+        cls, item_id: int, name: str | None = None, description: str | None = None, weight: int | None = None
+    ) -> models.Model:
         """更新词汇项"""
-        item = TaxonomyItem.objects.filter(id=item_id).first()
+        item = cls.get_item_by_id(item_id)
         if item:
-            if name is not None:
-                item.name = name
-            if description is not None:
-                item.description = description
-            if weight is not None:
-                item.weight = weight
-            item.save()
+            update_fields(item, name=name, description=description, weight=weight)
         return item
 
-    @staticmethod
-    def delete_item(item_id: int) -> bool:
+    @classmethod
+    def delete_item(cls, item_id: int) -> bool:
         """删除词汇项"""
-        item = TaxonomyItem.objects.filter(id=item_id).first()
+        item = cls.get_item_by_id(item_id)
         if item:
             item.delete()
             return True
@@ -165,7 +155,7 @@ class TaxonomyService(BaseService):
         if Taxonomy.objects.exists():
             return 0
 
-        call_command('loaddata', 'initial_taxonomies.json', verbosity=0)
+        call_command("loaddata", "initial_taxonomies.json", verbosity=0)
         count = Taxonomy.objects.count()
         logger.info(f"词汇表 fixture 加载完成，共 {count} 个词汇表")
         return count

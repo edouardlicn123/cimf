@@ -67,13 +67,10 @@
   /* 圆角 - 微圆角，专业感 */
   --radius-sm:         3px;
   --radius:            4px;
+  --radius-md:         5px;
   --radius-lg:         6px;
   --radius-xl:         8px;
   --radius-pill:       9999px;
-
-  /* 过渡 - 干净顺畅 */
-  --transition:        all 0.18s ease;
-  --transition-slow:   all 0.25s ease;
 
   /* 卡片渐变 */
   --entry-card-gradient: linear-gradient(135deg, #D00F31 0%, #FB8E22 100%);
@@ -118,8 +115,6 @@
 
 /* 左侧导航高亮 */
 .admin-sidebar .nav-link.active {
-  background-color: var(--primary-light) !important;
-  color: var(--primary) !important;
   border-left-color: var(--primary) !important;
 }
 

@@ -11,34 +11,29 @@
 <form method="post">
     {% include "includes/csrf.html" %}
     
-    <div class="card mb-4">
-        <div class="card-header">
-            <h5 class="mb-0">基本信息</h5>
-        </div>
-        <div class="card-body">
-            <div class="mb-3">
-                <label class="form-label">名称 *</label>
-                <input type="text" name="name" class="form-control" value="{{ node_type.name|default('') if node_type else '' }}" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">标识符 *</label>
-                <input type="text" name="slug" class="form-control" value="{{ node_type.slug|default('') if node_type else '' }}" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">图标</label>
-                <input type="text" name="icon" class="form-control" value="{{ node_type.icon|default('bi-folder') if node_type else 'bi-folder' }}">
-                <small class="text-muted">使用 Bootstrap Icons 类名，如 bi-folder, bi-person, bi-gear 等</small>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">描述</label>
-                <textarea name="description" class="form-control">{{ node_type.description|default('') if node_type else '' }}</textarea>
-            </div>
-        </div>
+    {% set card_class = "card mb-4" %}
+    {% set section_title %}基本信息{% endset %}
+    {% set section_body %}
+    <div class="mb-3">
+        <label class="form-label">名称 *</label>
+        <input type="text" name="name" class="form-control" value="{{ node_type.name|default('') if node_type else '' }}" required>
     </div>
+    <div class="mb-3">
+        <label class="form-label">标识符 *</label>
+        <input type="text" name="slug" class="form-control" value="{{ node_type.slug|default('') if node_type else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">图标</label>
+        <input type="text" name="icon" class="form-control" value="{{ node_type.icon|default('bi-folder') if node_type else 'bi-folder' }}">
+        <small class="text-muted">使用 Bootstrap Icons 类名，如 bi-folder, bi-person, bi-gear 等</small>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">描述</label>
+        <textarea name="description" class="form-control">{{ node_type.description|default('') if node_type else '' }}</textarea>
+    </div>
+    {% endset %}
+    {% include "includes/card_section.html" %}
     
-    <div class="text-end">
-        <a href="{{ url('core:node_types_list') }}" class="btn btn-secondary">取消</a>
-        <button type="submit" class="btn btn-primary">保存</button>
-    </div>
+    {% set cancel_url = url('core:node_types_list') %}{% include "includes/form_actions.html" %}
 </form>
 {% endblock %}

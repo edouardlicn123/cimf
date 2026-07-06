@@ -32,10 +32,12 @@ from urllib.request import urlopen
 
 from django.utils.timezone import now
 
+from core.services.mixins import SingletonMixin, safe_execute
+
 logger = logging.getLogger(__name__)
 
 
-class TimeSyncService:
+class TimeSyncService(SingletonMixin):
     """
     时钟同步服务类
     """
@@ -43,71 +45,66 @@ class TimeSyncService:
     DEFAULT_SYNC_INTERVAL = 15 * 60  # 15分钟
     DEFAULT_MAX_RETRIES = 5
     DEFAULT_RETRY_DELAY = 2
-    DEFAULT_SERVER_URL = 'https://api.uuni.cn/api/time'
+    DEFAULT_SERVER_URL = "https://api.uuni.cn/api/time"
 
     BACKUP_SERVERS = [
-        'https://api.uuni.cn/api/time',
-        'http://api.baidu.com/time/get',
-        'http://worldtimeapi.org/api/timezone/Asia/Shanghai',
+        "https://api.uuni.cn/api/time",
+        "http://api.baidu.com/time/get",
+        "http://worldtimeapi.org/api/timezone/Asia/Shanghai",
     ]
 
     def __init__(self):
         self._synced_time: datetime | None = None
         self._last_sync_timestamp: float | None = None
-        self._sync_status: str = 'never'
+        self._sync_status: str = "never"
+
+    @staticmethod
+    def _get_settings_value(key, default=None):
+        try:
+            from core.services import SettingsService  # noqa: PLC0415
+
+            value = SettingsService.get_setting(key)
+            return value if value is not None else default
+        except Exception:
+            return default
 
     def is_enabled(self) -> bool:
         """检查时间同步是否启用"""
-        try:
-            from core.services import SettingsService  # noqa: PLC0415
-            setting = SettingsService.get_setting('enable_time_sync')
-            return setting is None or setting is True or str(setting).lower() == 'true'
-        except Exception:
-            return True
+        setting = self._get_settings_value("enable_time_sync", True)
+        return setting is None or setting is True or str(setting).lower() == "true"
 
     def get_sync_interval(self) -> int:
         """获取同步间隔（秒）"""
-        try:
-            from core.services import SettingsService  # noqa: PLC0415
-            interval = SettingsService.get_setting('time_sync_interval')
-            if interval and isinstance(interval, int):
-                return interval * 60
-        except Exception:
-            pass
+        interval = self._get_settings_value("time_sync_interval")
+        if interval and isinstance(interval, int):
+            return interval * 60
         return self.DEFAULT_SYNC_INTERVAL
 
     def get_max_retries(self) -> int:
         """获取最大重试次数"""
-        try:
-            from core.services import SettingsService  # noqa: PLC0415
-            retries = SettingsService.get_setting('time_sync_max_retries')
-            if retries and isinstance(retries, int):
-                return retries
-        except Exception:
-            pass
+        retries = self._get_settings_value("time_sync_max_retries")
+        if retries and isinstance(retries, int):
+            return retries
         return self.DEFAULT_MAX_RETRIES
 
     def get_server_url(self) -> str:
         """获取时间服务器 URL"""
-        try:
-            from core.services import SettingsService  # noqa: PLC0415
-            url = SettingsService.get_setting('time_server_url')
-            return url or self.DEFAULT_SERVER_URL
-        except Exception:
-            return self.DEFAULT_SERVER_URL
+        url = self._get_settings_value("time_server_url")
+        return url or self.DEFAULT_SERVER_URL
 
     def _fetch_time_from_server(self, url: str) -> datetime | None:
         """从指定服务器获取时间"""
-        try:
+
+        def _fetch():
             with urlopen(url, timeout=3) as response:
                 if response.status == 200:
-                    data = json.loads(response.read().decode('utf-8'))
-                    date_str = data.get('date') or data.get('datetime', '').split('+')[0]
+                    data = json.loads(response.read().decode("utf-8"))
+                    date_str = data.get("date") or data.get("datetime", "").split("+")[0]
                     if date_str:
-                        return datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S').replace(tzinfo=None)
-        except Exception as e:
-            logger.warning(f"从 {url} 获取时间失败: {e}")
-        return None
+                        return datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S").replace(tzinfo=None)
+            return None
+
+        return safe_execute(_fetch, error_return=None, log_msg=f"从 {url} 获取时间失败", logger=logger)
 
     def _try_sync_with_servers(self) -> bool:
         """尝试从服务器同步时间"""
@@ -122,7 +119,7 @@ class TimeSyncService:
                 if server_time:
                     self._synced_time = server_time
                     self._last_sync_timestamp = time.time()
-                    self._sync_status = 'success'
+                    self._sync_status = "success"
                     logger.info(f"时间同步成功: {server_time}")
                     return True
 
@@ -130,7 +127,7 @@ class TimeSyncService:
                 logger.info(f"所有服务器同步失败，{self.DEFAULT_RETRY_DELAY}秒后重试...")
                 time.sleep(self.DEFAULT_RETRY_DELAY)
 
-        self._sync_status = 'failed'
+        self._sync_status = "failed"
         logger.error("时间同步失败，已达到最大重试次数")
         return False
 
@@ -144,8 +141,9 @@ class TimeSyncService:
         if result and self._synced_time is not None:
             try:
                 from core.services import SettingsService  # noqa: PLC0415
-                SettingsService.save_setting('system_synced_time', self._synced_time.isoformat())
-                SettingsService.save_setting('system_sync_monotonic', str(time.monotonic()))
+
+                SettingsService.save_setting("system_synced_time", self._synced_time.isoformat())
+                SettingsService.save_setting("system_sync_monotonic", str(time.monotonic()))
                 logger.info(f"持久化同步时间成功: {self._synced_time.isoformat()}")
             except Exception as e:
                 logger.error(f"持久化同步时间失败: {e}")
@@ -156,8 +154,9 @@ class TimeSyncService:
         # ── 第一优先：从 DB 读取持久化的同步基准 ──
         try:
             from core.services import SettingsService  # noqa: PLC0415
-            synced_str = SettingsService.get_setting('system_synced_time')
-            monotonic_str = SettingsService.get_setting('system_sync_monotonic')
+
+            synced_str = SettingsService.get_setting("system_synced_time")
+            monotonic_str = SettingsService.get_setting("system_sync_monotonic")
 
             if synced_str and monotonic_str:
                 synced = datetime.fromisoformat(synced_str)
@@ -169,38 +168,31 @@ class TimeSyncService:
             logger.warning(f"从 DB 读取同步时间失败: {e}")
 
         # ── 第二优先：内存缓存（进程内第二次调用时更快） ──
-        if (self._synced_time is not None and
-            self._sync_status == 'success' and
-            self._last_sync_timestamp is not None):
+        if self._synced_time is not None and self._sync_status == "success" and self._last_sync_timestamp is not None:
             elapsed = time.time() - self._last_sync_timestamp
             return self._synced_time + timedelta(seconds=elapsed)
 
         # ── 第三优先：兜底 ──
         return now()
 
-    def get_current_time_str(self, fmt: str = '%Y-%m-%d %H:%M:%S') -> str:
+    def get_current_time_str(self, fmt: str = "%Y-%m-%d %H:%M:%S") -> str:
         """获取当前时间字符串"""
         return self.get_current_time().strftime(fmt)
 
     def get_status(self) -> dict:
         """获取同步状态"""
         from core.services import SettingsService  # noqa: PLC0415
-        synced_str = SettingsService.get_setting('system_synced_time')
+
+        synced_str = SettingsService.get_setting("system_synced_time")
         return {
-            'status': self._sync_status,
-            'synced_time': self._synced_time.isoformat() if self._synced_time else None,
-            'persisted_synced_time': synced_str,
-            'last_sync_timestamp': self._last_sync_timestamp,
-            'enabled': self.is_enabled(),
+            "status": self._sync_status,
+            "synced_time": self._synced_time.isoformat() if self._synced_time else None,
+            "persisted_synced_time": synced_str,
+            "last_sync_timestamp": self._last_sync_timestamp,
+            "enabled": self.is_enabled(),
         }
-
-
-_time_sync_service: TimeSyncService | None = None
 
 
 def get_time_sync_service() -> TimeSyncService:
     """获取时间同步服务单例"""
-    global _time_sync_service  # noqa: PLW0603
-    if _time_sync_service is None:
-        _time_sync_service = TimeSyncService()
-    return _time_sync_service
+    return TimeSyncService()

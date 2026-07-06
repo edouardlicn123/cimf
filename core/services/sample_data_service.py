@@ -3,7 +3,6 @@
 """
 
 
-
 class SampleDataService:
     """客户样本数据初始化服务"""
 
@@ -18,18 +17,18 @@ class SampleDataService:
         from modules.customer.models import CustomerFields  # noqa: PLC0415
         from modules.customer.sample_data import OVERSEAS_CUSTOMERS  # noqa: PLC0415
 
-        results = {'overseas': 0, 'domestic': 0}
+        results = {"overseas": 0, "domestic": 0}
 
         admin_user = User.objects.filter(is_admin=True).first()
 
-        customer_node_type = NodeType.objects.filter(slug='customer').first()
-        customer_cn_node_type = NodeType.objects.filter(slug='customer_cn').first()
+        customer_node_type = NodeType.objects.filter(slug="customer").first()
+        customer_cn_node_type = NodeType.objects.filter(slug="customer_cn").first()
 
         if not admin_user or not customer_node_type or not customer_cn_node_type:
             return results
 
         for data in OVERSEAS_CUSTOMERS:
-            if CustomerFields.objects.filter(customer_name=data['customer_name']).exists():
+            if CustomerFields.objects.filter(customer_name=data["customer_name"]).exists():
                 continue
 
             node = Node.objects.create(
@@ -38,18 +37,21 @@ class SampleDataService:
                 updated_by=admin_user,
             )
 
-            fields_data = {k: v for k, v in data.items()
-                          if k not in ('customer_name', 'customer_type_id', 'country_id',
-                                       'enterprise_type_id', 'customer_level_id')}
+            fields_data = {
+                k: v
+                for k, v in data.items()
+                if k
+                not in ("customer_name", "customer_type_id", "country_id", "enterprise_type_id", "customer_level_id")
+            }
             CustomerFields.objects.create(
                 node=node,
-                customer_name=data['customer_name'],
+                customer_name=data["customer_name"],
                 **fields_data,
             )
-            results['overseas'] += 1
+            results["overseas"] += 1
 
         for data in DOMESTIC_CUSTOMERS:
-            if CustomerCnFields.objects.filter(customer_name=data['customer_name']).exists():
+            if CustomerCnFields.objects.filter(customer_name=data["customer_name"]).exists():
                 continue
 
             node = Node.objects.create(
@@ -58,14 +60,16 @@ class SampleDataService:
                 updated_by=admin_user,
             )
 
-            fields_data = {k: v for k, v in data.items()
-                          if k not in ('customer_name', 'customer_type_id',
-                                       'enterprise_type_id', 'customer_level_id')}
+            fields_data = {
+                k: v
+                for k, v in data.items()
+                if k not in ("customer_name", "customer_type_id", "enterprise_type_id", "customer_level_id")
+            }
             CustomerCnFields.objects.create(
                 node=node,
-                customer_name=data['customer_name'],
+                customer_name=data["customer_name"],
                 **fields_data,
             )
-            results['domestic'] += 1
+            results["domestic"] += 1
 
         return results

@@ -4,32 +4,53 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
-    replaces = [('core', '0005_add_install_on_init_to_module'), ('core', '0006_add_icon_to_module'), ('core', '0007_alter_module_module_type_alter_user_theme')]
+    replaces = [
+        ("core", "0005_add_install_on_init_to_module"),
+        ("core", "0006_add_icon_to_module"),
+        ("core", "0007_alter_module_module_type_alter_user_theme"),
+    ]
 
     dependencies = [
-        ('core', '0004_import_china_regions'),
+        ("core", "0004_import_china_regions"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='module',
-            name='install_on_init',
-            field=models.BooleanField(default=True, verbose_name='初始化时安装'),
+            model_name="module",
+            name="install_on_init",
+            field=models.BooleanField(default=True, verbose_name="初始化时安装"),
         ),
         migrations.AddField(
-            model_name='module',
-            name='icon',
-            field=models.CharField(default='bi-wrench', max_length=50, verbose_name='图标'),
+            model_name="module",
+            name="icon",
+            field=models.CharField(default="bi-wrench", max_length=50, verbose_name="图标"),
         ),
         migrations.AlterField(
-            model_name='module',
-            name='module_type',
-            field=models.CharField(choices=[('node', '节点模块'), ('system', '系统模块'), ('tool', '工具模块')], default='node', max_length=20, verbose_name='模块类型'),
+            model_name="module",
+            name="module_type",
+            field=models.CharField(
+                choices=[("node", "节点模块"), ("system", "系统模块"), ("tool", "工具模块")],
+                default="node",
+                max_length=20,
+                verbose_name="模块类型",
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='theme',
-            field=models.CharField(choices=[('default', '默认'), ('gov', '政府风格'), ('indigo', '靛蓝风格'), ('macaron', '马卡龙风格'), ('teal', '青绿风格'), ('uniklo', '极简风格'), ('savawoku', 'Savawoku 风格')], default='default', max_length=20, verbose_name='界面主题'),
+            model_name="user",
+            name="theme",
+            field=models.CharField(
+                choices=[
+                    ("default", "默认"),
+                    ("gov", "政府风格"),
+                    ("indigo", "靛蓝风格"),
+                    ("macaron", "马卡龙风格"),
+                    ("teal", "青绿风格"),
+                    ("uniklo", "极简风格"),
+                    ("savawoku", "Savawoku 风格"),
+                ],
+                default="default",
+                max_length=20,
+                verbose_name="界面主题",
+            ),
         ),
     ]

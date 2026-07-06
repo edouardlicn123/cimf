@@ -19,17 +19,9 @@
     <div class="col-12 mb-3">
         <div class="card">
             <div class="card-body">
-                <form method="get" class="row g-3 align-items-center">
-                    <div class="col-auto">
-                        <input type="text" name="search" class="form-control" placeholder="搜索名称..." value="{{ search|default('') }}">
-                    </div>
-                    <div class="col-auto">
-                        <button type="submit" class="btn btn-primary">搜索</button>
-                        {% if search %}
-                        <a href="{{ url('core:taxonomies') }}" class="btn btn-secondary">清除</a>
-                        {% endif %}
-                    </div>
-                </form>
+                {% set filter_action = url('core:taxonomies') %}
+                {% set filter_fields = [{"name": "search", "label": "搜索名称...", "type": "text"}] %}
+                {% include "includes/filter_bar.html" %}
             </div>
         </div>
     </div>
@@ -62,7 +54,7 @@
             </div>
         </div>
         {% else %}
-        <div class="list-group-item text-center text-muted py-5">暂无词汇表</div>
+        {% set empty_type = "list" %}{% set empty_message = "暂无词汇表" %}{% include "includes/empty_state.html" %}
         {% endfor %}
     </div>
         </div>
@@ -70,34 +62,7 @@
 </div>
 
 {% if page_obj and page_obj.paginator.num_pages > 1 %}
-<nav aria-label="词汇表分页" class="mt-4">
-    <ul class="pagination justify-content-center">
-        {% if page_obj.has_previous() %}
-        <li class="page-item">
-            <a class="page-link" href="{{ url('core:taxonomies') }}?page={{ page_obj.previous_page_number() }}{% if search %}&search={{ search }}{% endif %}">上一页</a>
-        </li>
-        {% else %}
-        <li class="page-item disabled">
-            <span class="page-link">上一页</span>
-        </li>
-        {% endif %}
-
-        {% for p in page_obj.paginator.page_range %}
-        <li class="page-item {% if p == page_obj.number %}active{% endif %}">
-            <a class="page-link" href="{{ url('core:taxonomies') }}?page={{ p }}{% if search %}&search={{ search }}{% endif %}">{{ p }}</a>
-        </li>
-        {% endfor %}
-
-        {% if page_obj.has_next() %}
-        <li class="page-item">
-            <a class="page-link" href="{{ url('core:taxonomies') }}?page={{ page_obj.next_page_number() }}{% if search %}&search={{ search }}{% endif %}">下一页</a>
-        </li>
-        {% else %}
-        <li class="page-item disabled">
-            <span class="page-link">下一页</span>
-        </li>
-        {% endif %}
-    </ul>
-</nav>
+{% set extra_params = '&search=' + search if search else '' %}
+{% include "includes/pagination.html" %}
 {% endif %}
 {% endblock %}

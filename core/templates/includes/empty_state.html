@@ -1,0 +1,12 @@
+{% if empty_type == "table" and empty_colspan %}
+<tr>
+  <td colspan="{{ empty_colspan }}" class="text-center text-muted py-4">{{ empty_message }}</td>
+</tr>
+{% elif empty_type == "list" %}
+<div class="text-center text-muted py-4">{{ empty_message }}</div>
+{% elif empty_type == "page" %}
+<div class="text-center py-5">
+  <i class="bi {{ empty_icon|default('bi-inbox') }} d-block mb-3" style="font-size: 3rem; color: var(--text-muted);"></i>
+  <p class="text-muted">{{ empty_message }}</p>
+</div>
+{% endif %}

@@ -25,14 +25,12 @@ class ModelRegistry:
 
         # 动态导入模块模型
         try:
-            mod = import_module(f'modules.{slug}.models')
+            mod = import_module(f"modules.{slug}.models")
 
             # 查找 Fields 结尾的模型类
             for attr_name in dir(mod):
                 attr = getattr(mod, attr_name)
-                if (attr_name.endswith('Fields') and
-                    hasattr(attr, '_meta') and
-                    hasattr(attr, 'node')):
+                if attr_name.endswith("Fields") and hasattr(attr, "_meta") and hasattr(attr, "node"):
                     cls._registry[slug] = attr
                     return attr
         except (ImportError, ModuleNotFoundError):

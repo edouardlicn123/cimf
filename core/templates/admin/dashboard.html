@@ -9,41 +9,17 @@
   <div class="col-12">
     <h4 class="mb-3">概览</h4>
   </div>
-  
-  <div class="col-md-6 col-lg-3">
-    <div class="card text-white bg-primary h-100">
-      <div class="card-body">
-        <h5 class="card-title">用户总数</h5>
-        <p class="card-text display-4">{{ stats.total_users }}</p>
-      </div>
-    </div>
-  </div>
-  
-  <div class="col-md-6 col-lg-3">
-    <div class="card text-white bg-success h-100">
-      <div class="card-body">
-        <h5 class="card-title">活跃用户</h5>
-        <p class="card-text display-4">{{ stats.active_users }}</p>
-      </div>
-    </div>
-  </div>
-  
-  <div class="col-md-6 col-lg-3">
-    <div class="card text-white bg-info h-100">
-      <div class="card-body">
-        <h5 class="card-title">系统设置</h5>
-        <p class="card-text display-4">{{ settings_count }}</p>
-      </div>
-    </div>
-  </div>
-  
-  <div class="col-md-6 col-lg-3">
-    <div class="card text-white bg-warning h-100">
-      <div class="card-body">
-        <h5 class="card-title">词汇表</h5>
-        <p class="card-text display-4">{{ taxonomy_count }}</p>
-      </div>
-    </div>
-  </div>
+  {% set stats_data = [
+    {"title": "用户总数", "value": stats.total, "color": "primary"},
+    {"title": "管理员", "value": stats.manager, "color": "success"},
+    {"title": "组长", "value": stats.leader, "color": "info"},
+    {"title": "员工", "value": stats.employee, "color": "warning"},
+    {"title": "系统设置", "value": settings_count, "color": "info"},
+    {"title": "词汇表", "value": taxonomy_count, "color": "warning"}
+  ] %}
+  {% for stat in stats_data %}
+    {% set stat_title = stat.title %}{% set stat_value = stat.value %}{% set stat_color = stat.color %}
+    {% include "includes/stat_card.html" %}
+  {% endfor %}
 </div>
 {% endblock %}

@@ -46,13 +46,13 @@ from .stage3_users import run_stage3
 from .stage4_modules import print_module_results, run_stage4
 
 __all__ = [
-    'colored',
-    'print_module_results',
-    'print_section',
-    'print_step',
-    'run_stage1',
-    'run_stage2',
-    'run_stage3',
-    'run_stage4',
-    'verify_module_taxonomies'
+    "colored",
+    "print_module_results",
+    "print_section",
+    "print_step",
+    "run_stage1",
+    "run_stage2",
+    "run_stage3",
+    "run_stage4",
+    "verify_module_taxonomies",
 ]

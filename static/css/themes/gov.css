@@ -66,13 +66,10 @@
   /* 圆角 */
   --radius-sm:         4px;
   --radius:            6px;
+  --radius-md:         7px;
   --radius-lg:         8px;
   --radius-xl:         10px;
   --radius-pill:       9999px;
-
-  /* 过渡 */
-  --transition:        all 0.18s ease;
-  --transition-slow:   all 0.25s ease;
 
   /* Bootstrap 变量映射 */
   --bs-primary: var(--primary);
@@ -119,8 +116,6 @@
 
 /* 左侧导航高亮 */
 .admin-sidebar .nav-link.active {
-  background-color: var(--primary-light) !important;
-  color: var(--primary) !important;
   border-left-color: var(--primary) !important;
 }
 

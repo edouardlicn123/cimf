@@ -16,18 +16,18 @@ from .base import BaseField
 
 
 class StringField(BaseField):
-    name = 'string'
-    label = '单行文本'
-    widget = 'input'
-    properties = ['value', 'max_length']
+    name = "string"
+    label = "单行文本"
+    widget = "input"
+    properties = ["value", "max_length"]
 
-    def render(self, value: dict, mode: str = 'edit') -> str:
-        if mode == 'view':
-            return value.get('value', '')
+    def render(self, value: dict, mode: str = "edit") -> str:
+        if mode == "view":
+            return value.get("value", "")
         return self._render_input(
-            input_type='text',
-            max_length=self.field_config.get('max_length', 255),
-            placeholder=self.field_config.get('placeholder', '')
+            input_type="text",
+            max_length=self.field_config.get("max_length", 255),
+            placeholder=self.field_config.get("placeholder", ""),
         )
 
     def validate(self, _value: dict) -> list:

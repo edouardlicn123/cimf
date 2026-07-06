@@ -17,4 +17,4 @@ from .email_cleanup_task import EmailCleanupTask
 from .email_sending_task import EmailSendingTask
 from .time_sync_task import TimeSyncTask
 
-__all__ = ['CacheCleanupTask', 'CronTask', 'EmailCleanupTask', 'EmailSendingTask', 'TimeSyncTask']
+__all__ = ["CacheCleanupTask", "CronTask", "EmailCleanupTask", "EmailSendingTask", "TimeSyncTask"]

@@ -73,10 +73,10 @@ def run_stage2(dry_run: bool) -> dict[str, Any]:
     print_step("2.1-2.4", "初始化系统配置（设置、权限、词汇表、邮件模板）")
 
     results = {
-        'settings': {'count': 0, 'success': False, 'error': None},
-        'permissions': {'success': False, 'error': None},
-        'taxonomies': {'count': 0, 'success': False, 'error': None},
-        'templates': {'count': 0, 'success': False, 'error': None},
+        "settings": {"count": 0, "success": False, "error": None},
+        "permissions": {"success": False, "error": None},
+        "taxonomies": {"count": 0, "success": False, "error": None},
+        "templates": {"count": 0, "success": False, "error": None},
     }
 
     if dry_run:
@@ -85,49 +85,53 @@ def run_stage2(dry_run: bool) -> dict[str, Any]:
     try:
         # 2.1 系统设置
         from core.services import SettingsService  # noqa: PLC0415
-        results['settings'] = {'count': SettingsService.reset_to_default(), 'success': True}
+
+        results["settings"] = {"count": SettingsService.reset_to_default(), "success": True}
     except Exception as e:
-        results['settings'] = {'error': str(e)}
+        results["settings"] = {"error": str(e)}
 
     try:
         # 2.2 角色权限
         from core.services import PermissionService  # noqa: PLC0415
+
         PermissionService.init_default_role_permissions()
-        results['permissions'] = {'success': True}
+        results["permissions"] = {"success": True}
     except Exception as e:
-        results['permissions'] = {'error': str(e)}
+        results["permissions"] = {"error": str(e)}
 
     try:
         # 2.3 词汇表
         from core.services.taxonomy_service import TaxonomyService  # noqa: PLC0415
-        results['taxonomies'] = {'count': TaxonomyService.init_default_taxonomies(), 'success': True}
+
+        results["taxonomies"] = {"count": TaxonomyService.init_default_taxonomies(), "success": True}
     except Exception as e:
-        results['taxonomies'] = {'error': str(e)}
+        results["taxonomies"] = {"error": str(e)}
 
     try:
         # 2.4 邮件模板
         from core.smtp.services.template_service import TemplateService  # noqa: PLC0415
-        results['templates'] = {'count': TemplateService.init_default_templates(), 'success': True}
+
+        results["templates"] = {"count": TemplateService.init_default_templates(), "success": True}
     except Exception as e:
-        results['templates'] = {'error': str(e)}
+        results["templates"] = {"error": str(e)}
 
     # 输出结果
-    if results.get('settings', {}).get('success'):
-        count = results.get('settings', {}).get('count', 0)
+    if results.get("settings", {}).get("success"):
+        count = results.get("settings", {}).get("count", 0)
         print(colored(f"    ✓ 系统设置默认值已重置/插入，共 {count} 项", "green"))
 
-    if results.get('permissions', {}).get('success'):
+    if results.get("permissions", {}).get("success"):
         print(colored("    ✓ 角色权限初始化完成", "green"))
 
-    if results.get('taxonomies', {}).get('success'):
-        count = results.get('taxonomies', {}).get('count', 0)
+    if results.get("taxonomies", {}).get("success"):
+        count = results.get("taxonomies", {}).get("count", 0)
         print(colored(f"    ✓ 词汇表数据初始化完成，共创建 {count} 个词汇表", "green"))
 
-    if results.get('templates', {}).get('success'):
-        count = results.get('templates', {}).get('count', 0)
+    if results.get("templates", {}).get("success"):
+        count = results.get("templates", {}).get("count", 0)
         print(colored(f"    ✓ 邮件模板初始化完成，共创建 {count} 个模板", "green"))
 
-    errors = [f"{k}: {v.get('error')}" for k, v in results.items() if v.get('error')]
+    errors = [f"{k}: {v.get('error')}" for k, v in results.items() if v.get("error")]
     if errors:
         print(colored(f"    ⚠ 部分任务执行异常: {'; '.join(errors)}", "yellow"))
 

@@ -72,7 +72,7 @@ class CronTask(ABC):
         初始化任务状态
         """
         self._last_run: datetime | None = None
-        self._last_status: str = 'never'
+        self._last_status: str = "never"
         self._last_error: str | None = None
         self._run_count: int = 0
         self._app_ready: bool = False
@@ -87,14 +87,14 @@ class CronTask(ABC):
         self._app_ready = ready
 
     @property
-    @abstractmethod
     def setting_key_enabled(self) -> str:
         """获取启用设置项的 key"""
+        return f"cron_{self.name}_enabled"
 
     @property
-    @abstractmethod
     def setting_key_interval(self) -> str:
         """获取间隔设置项的 key"""
+        return f"cron_{self.name}_interval"
 
     def is_enabled(self) -> bool:
         """检查任务是否启用"""
@@ -104,8 +104,9 @@ class CronTask(ABC):
 
         try:
             from core.services import SettingsService  # noqa: PLC0415
+
             setting = SettingsService.get_setting(self.setting_key_enabled)
-            return setting is None or setting is True or str(setting).lower() == 'true'
+            return setting is None or setting is True or str(setting).lower() == "true"
         except Exception as e:
             logger.warning(f"任务 {self.name} 检查启用状态失败: {e}")
             return self.enabled_by_default
@@ -117,6 +118,7 @@ class CronTask(ABC):
 
         try:
             from core.services import SettingsService  # noqa: PLC0415
+
             interval = SettingsService.get_setting(self.setting_key_interval)
             if interval:
                 try:
@@ -142,10 +144,10 @@ class CronTask(ABC):
 
         try:
             self.execute()
-            self._last_status = 'success'
+            self._last_status = "success"
             self._last_error = None
         except Exception as e:
-            self._last_status = 'failed'
+            self._last_status = "failed"
             self._last_error = str(e)
             logger.error(f"任务 {self.name} 执行失败: {e}", exc_info=True)
         finally:
@@ -162,21 +164,22 @@ class CronTask(ABC):
         """获取任务状态"""
         next_run = self.get_next_run_time()
         return {
-            'name': self.name,
-            'enabled': self.is_enabled(),
-            'interval': self.get_interval(),
-            'app_ready': self._app_ready,
-            'last_run': self._last_run.strftime('%Y-%m-%d %H:%M:%S') if self._last_run else None,
-            'next_run': next_run.strftime('%Y-%m-%d %H:%M:%S') if next_run else None,
-            'last_status': self._last_status,
-            'last_error': self._last_error,
-            'run_count': self._run_count,
+            "name": self.name,
+            "enabled": self.is_enabled(),
+            "interval": self.get_interval(),
+            "app_ready": self._app_ready,
+            "last_run": self._last_run.strftime("%Y-%m-%d %H:%M:%S") if self._last_run else None,
+            "next_run": next_run.strftime("%Y-%m-%d %H:%M:%S") if next_run else None,
+            "last_status": self._last_status,
+            "last_error": self._last_error,
+            "run_count": self._run_count,
         }
 
     def toggle(self, enabled: bool) -> bool:
         """切换任务启用状态"""
         try:
             from core.services import SettingsService  # noqa: PLC0415
+
             SettingsService.save_setting(self.setting_key_enabled, enabled)
             logger.info(f"任务 {self.name} 已{'启用' if enabled else '禁用'}")
             return True

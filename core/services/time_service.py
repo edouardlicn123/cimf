@@ -68,7 +68,7 @@ class TimeService:
     @staticmethod
     def get_current_time() -> str:
         """获取当前时间字符串（统一入口）"""
-        return get_time_sync_service().get_current_time_str('%Y-%m-%d %H:%M:%S')
+        return get_time_sync_service().get_current_time_str("%Y-%m-%d %H:%M:%S")
 
     @staticmethod
     def get_current_datetime() -> datetime:
@@ -78,7 +78,7 @@ class TimeService:
     @staticmethod
     def get_timezone() -> str:
         """获取配置的时区"""
-        return SettingsService.get_setting('time_zone') or 'Asia/Shanghai'
+        return SettingsService.get_setting("time_zone") or "Asia/Shanghai"
 
     @staticmethod
     def get_sync_status() -> dict:

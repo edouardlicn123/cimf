@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% set show_header = false %}
+{% set use_custom_main = true %}
+{% block main_content %}
+<div class="d-flex flex-column" style="min-height: 100vh;">
+  <div class="d-flex flex-grow-1">
+    {% set sidebar_nav %}{% block sidebar_nav %}{% endblock %}{% endset %}
+    {% include "includes/sidebar.html" %}
+    {% set content_title %}{% block admin_title_content %}{% endblock %}{% endset %}
+    {% set content_buttons %}{% block admin_buttons_content %}{% endblock %}{% endset %}
+    {% set content_body %}{% block admin_content %}{% endblock %}{% endset %}
+    {% include "includes/content_area.html" %}
+  </div>
+</div>
+{% endblock %}

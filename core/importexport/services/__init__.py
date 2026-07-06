@@ -12,7 +12,7 @@ from .import_service import ImportService
 from .template_generator import TemplateGenerator
 
 __all__ = [
-    'ExportService',
-    'ImportService',
-    'TemplateGenerator',
+    "ExportService",
+    "ImportService",
+    "TemplateGenerator",
 ]

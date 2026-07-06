@@ -4,22 +4,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='ClockModel',
+            name="ClockModel",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
             ],
             options={
-                'db_table': 'clock_model',
-                'verbose_name': '时钟',
-                'verbose_name_plural': '时钟',
+                "db_table": "clock_model",
+                "verbose_name": "时钟",
+                "verbose_name_plural": "时钟",
             },
         ),
     ]

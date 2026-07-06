@@ -1,0 +1,20 @@
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+  {% for entry in entries %}
+  <div class="col">
+    <div class="entry-card h-100">
+      <div class="entry-card-figure">
+        <i class="bi {{ entry.icon }}"></i>
+        <h5 class="entry-card-title">{{ entry.title }}</h5>
+      </div>
+      <div class="entry-card-body">
+        <p class="entry-card-desc">{{ entry.description }}</p>
+        <div class="entry-card-actions">
+          <a href="{{ entry.url }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-arrow-right me-1"></i> {{ entry.action_text }}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>

@@ -45,6 +45,7 @@ class TimeSyncTask(CronTask):
         """获取执行间隔（秒）"""
         try:
             from core.services import SettingsService  # noqa: PLC0415
+
             interval = SettingsService.get_setting(self.setting_key_interval)
             if interval and isinstance(interval, int):
                 return interval * 60  # 分钟转换为秒
@@ -55,5 +56,6 @@ class TimeSyncTask(CronTask):
     def execute(self):
         """执行时间同步"""
         from core.services import get_time_sync_service  # noqa: PLC0415
+
         time_sync = get_time_sync_service()
         time_sync.sync_time()

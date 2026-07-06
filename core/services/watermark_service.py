@@ -40,15 +40,48 @@ class WatermarkService:
     提供服务端水印功能，用于导出文件时添加水印
     """
 
-    @staticmethod
+    POSITIONS = {
+        "topleft": (10, 10, "lt"),
+        "topright": (10, 10, "rt"),
+        "bottomleft": (10, 10, "lb"),
+        "bottomright": (10, 10, "rb"),
+        "center": (0, 0, "cc"),
+    }
+
+    @classmethod
+    def _get_position_coords(cls, position, img_width, img_height, marker_width, marker_height):
+        config = cls.POSITIONS.get(position) or cls.POSITIONS.get(
+            {
+                "top_left": "topleft",
+                "top_right": "topright",
+                "bottom_left": "bottomleft",
+                "bottom_right": "bottomright",
+            }.get(position),
+            cls.POSITIONS["center"],
+        )
+        margin_x, margin_y, anchor = config
+        if anchor == "lt":
+            return (margin_x, margin_y)
+        elif anchor == "rt":
+            return (img_width - marker_width - margin_x, margin_y)
+        elif anchor == "lb":
+            return (margin_x, img_height - marker_height - margin_y)
+        elif anchor == "rb":
+            return (img_width - marker_width - margin_x, img_height - marker_height - margin_y)
+        elif anchor == "cc":
+            return ((img_width - marker_width) // 2, (img_height - marker_height) // 2)
+        return (margin_x, margin_y)
+
+    @classmethod
     def add_text_watermark(
+        cls,
         image_path: str,
         output_path: str,
         text: str,
-        position: str = 'center',
+        position: str = "center",
         opacity: float = 0.3,
         font_size: int = 48,
-        color: tuple[int, int, int] = (128, 128, 128)
+        color: tuple[int, int, int] = (128, 128, 128),
     ) -> bool:
         """
         添加文字水印
@@ -66,9 +99,9 @@ class WatermarkService:
             是否成功
         """
         try:
-            img = Image.open(image_path).convert('RGBA')
+            img = Image.open(image_path).convert("RGBA")
 
-            watermark = Image.new('RGBA', img.size, (255, 255, 255, 0))
+            watermark = Image.new("RGBA", img.size, (255, 255, 255, 0))
             draw = ImageDraw.Draw(watermark)
 
             try:
@@ -82,23 +115,15 @@ class WatermarkService:
 
             img_width, img_height = img.size
 
-            positions = {
-                'center': ((img_width - text_width) // 2, (img_height - text_height) // 2),
-                'bottom_right': (img_width - text_width - 20, img_height - text_height - 20),
-                'bottom_left': (20, img_height - text_height - 20),
-                'top_right': (img_width - text_width - 20, 20),
-                'top_left': (20, 20),
-            }
-
-            pos = positions.get(position, positions['center'])
+            pos = cls._get_position_coords(position, img_width, img_height, text_width, text_height)
 
             alpha = int(255 * opacity)
             draw.text(pos, text, font=font, fill=(*color, alpha))
 
             watermarked = Image.alpha_composite(img, watermark)
 
-            if watermarked.mode == 'RGBA':
-                watermarked = watermarked.convert('RGB')
+            if watermarked.mode == "RGBA":
+                watermarked = watermarked.convert("RGB")
 
             watermarked.save(output_path)
             return True
@@ -107,14 +132,15 @@ class WatermarkService:
             logger.error(f"添加水印失败: {e}", exc_info=True)
             return False
 
-    @staticmethod
+    @classmethod
     def add_image_watermark(
+        cls,
         image_path: str,
         output_path: str,
         logo_path: str,
-        position: str = 'center',
+        position: str = "center",
         opacity: float = 0.5,
-        size: tuple[int, int] | None = None
+        size: tuple[int, int] | None = None,
     ) -> bool:
         """
         添加图片水印
@@ -131,14 +157,14 @@ class WatermarkService:
             是否成功
         """
         try:
-            img = Image.open(image_path).convert('RGBA')
-            logo = Image.open(logo_path).convert('RGBA')
+            img = Image.open(image_path).convert("RGBA")
+            logo = Image.open(logo_path).convert("RGBA")
 
             if size:
                 logo = logo.resize(size, Image.Resampling.LANCZOS)
 
-            if logo.mode != 'RGBA':
-                logo = logo.convert('RGBA')
+            if logo.mode != "RGBA":
+                logo = logo.convert("RGBA")
 
             alpha = logo.split()[3]
             alpha = alpha.point(lambda p: int(p * opacity))
@@ -147,22 +173,14 @@ class WatermarkService:
             img_width, img_height = img.size
             logo_width, logo_height = logo.size
 
-            positions = {
-                'center': ((img_width - logo_width) // 2, (img_height - logo_height) // 2),
-                'bottom_right': (img_width - logo_width - 20, img_height - logo_height - 20),
-                'bottom_left': (20, img_height - logo_height - 20),
-                'top_right': (img_width - logo_width - 20, 20),
-                'top_left': (20, 20),
-            }
+            pos = cls._get_position_coords(position, img_width, img_height, logo_width, logo_height)
 
-            pos = positions.get(position, positions['center'])
-
-            result = Image.new('RGBA', img.size, (255, 255, 255, 0))
+            result = Image.new("RGBA", img.size, (255, 255, 255, 0))
             result.paste(img, (0, 0))
             result.paste(logo, pos, logo)
 
-            if result.mode == 'RGBA':
-                result = result.convert('RGB')
+            if result.mode == "RGBA":
+                result = result.convert("RGB")
 
             result.save(output_path)
             return True

@@ -22,10 +22,10 @@ from django.utils.safestring import mark_safe
 from jinja2 import Environment
 
 
-def jinja2_date_filter(value, format_string='Y-m-d H:i'):
+def jinja2_date_filter(value, format_string="Y-m-d H:i"):
     """Date filter for Jinja2 templates"""
     if value is None:
-        return ''
+        return ""
     if isinstance(value, str):
         return value
     try:
@@ -56,22 +56,22 @@ def url_with_args(viewname, *args, **kwargs):
 def jinja2_truncatechars(value, length=50):
     """Truncate characters filter for Jinja2 templates"""
     if value is None:
-        return ''
+        return ""
     if isinstance(value, int):
         value = str(value)
     if len(value) <= length:
         return value
-    return value[:length] + '...'
+    return value[:length] + "..."
 
 
 def jinja2_slice(value, start=0, end=None):
     """Slice filter for Jinja2 templates - supports ':50' style"""
     if value is None:
-        return ''
+        return ""
     if isinstance(value, int):
         value = str(value)
     if isinstance(value, str):
-        if isinstance(start, str) and start.startswith(':'):
+        if isinstance(start, str) and start.startswith(":"):
             end = int(start[1:])
             start = 0
         elif isinstance(start, str):
@@ -93,33 +93,35 @@ def environment(**options):
     def csrf_token():
         request = get_request()
         if request is None:
-            return ''
+            return ""
         token = get_token(request)
         return mark_safe(f'<input type="hidden" name="csrfmiddlewaretoken" value="{token}">')
 
     def get_request():
         """获取当前请求对象"""
         try:
-            if hasattr(env, '_context_stack') and env._context_stack:
+            if hasattr(env, "_context_stack") and env._context_stack:
                 for ctx in reversed(env._context_stack):
-                    if hasattr(ctx, 'request'):
+                    if hasattr(ctx, "request"):
                         return ctx.request
         except Exception:
             pass
         return None
 
     # 添加 static 函数
-    env.globals.update({
-        'static': static,
-        'url': url_with_args,
-        'range': range,
-        'media': media,
-        'csrf_token': csrf_token,
-    })
+    env.globals.update(
+        {
+            "static": static,
+            "url": url_with_args,
+            "range": range,
+            "media": media,
+            "csrf_token": csrf_token,
+        }
+    )
 
     # 添加过滤器
-    env.filters['date'] = jinja2_date_filter
-    env.filters['truncatechars'] = jinja2_truncatechars
-    env.filters['slice'] = jinja2_slice
+    env.filters["date"] = jinja2_date_filter
+    env.filters["truncatechars"] = jinja2_truncatechars
+    env.filters["slice"] = jinja2_slice
 
     return env

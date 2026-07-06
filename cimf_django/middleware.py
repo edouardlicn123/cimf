@@ -1,5 +1,4 @@
-"""
-IP 访问限制中间件
+"""IP 访问限制中间件
 
 提供两层安全控制：
 1. IPWhitelistMiddleware — 按客户端 IP 限制访问来源
@@ -24,9 +23,11 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 
-logger = logging.getLogger('cimf')
+from core.utils.response import json_error
+
+logger = logging.getLogger("cimf")
 
 
 class IPWhitelistMiddleware:
@@ -41,8 +42,8 @@ class IPWhitelistMiddleware:
 
     def __init__(self, get_response):
         self.get_response = get_response
-        self.enabled = getattr(settings, 'IP_RESTRICTION_ENABLED', False)
-        self.whitelist = getattr(settings, 'IP_WHITELIST', [])
+        self.enabled = getattr(settings, "IP_RESTRICTION_ENABLED", False)
+        self.whitelist = getattr(settings, "IP_WHITELIST", [])
         self._compiled_whitelist = []
 
         # 第一来源：显式配置的 IP_WHITELIST
@@ -54,28 +55,14 @@ class IPWhitelistMiddleware:
         # 这些在解析 IP 时会抛出 ValueError 被静默跳过，不影响正常流程。
         if self.enabled and not self._compiled_whitelist:
             for host in settings.ALLOWED_HOSTS:
-                try:
-                    if '/' in host:
-                        self._compiled_whitelist.append(
-                            ipaddress.ip_network(host, strict=False)
-                        )
-                    else:
-                        self._compiled_whitelist.append(
-                            ipaddress.ip_address(host)
-                        )
-                except ValueError:
-                    pass
+                self._add_to_whitelist(host)
 
     def _add_to_whitelist(self, ip_str):
         try:
-            if '/' in ip_str:
-                self._compiled_whitelist.append(
-                    ipaddress.ip_network(ip_str, strict=False)
-                )
+            if "/" in ip_str:
+                self._compiled_whitelist.append(ipaddress.ip_network(ip_str, strict=False))
             else:
-                self._compiled_whitelist.append(
-                    ipaddress.ip_address(ip_str)
-                )
+                self._compiled_whitelist.append(ipaddress.ip_address(ip_str))
         except ValueError:
             logger.warning(f"无效的IP配置: {ip_str}")
 
@@ -83,17 +70,17 @@ class IPWhitelistMiddleware:
         if not self.enabled:
             return self.get_response(request)
 
-        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-        client_ip = x_forwarded_for.split(',')[0].strip() if x_forwarded_for else request.META.get('REMOTE_ADDR', '')
+        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+        client_ip = x_forwarded_for.split(",")[0].strip() if x_forwarded_for else request.META.get("REMOTE_ADDR", "")
 
         if not self._is_ip_allowed(client_ip):
             logger.warning(
                 f"IP访问被拒绝: {client_ip} - {request.method} {request.path} - "
-                f"User-Agent: {request.META.get('HTTP_USER_AGENT', 'Unknown')}"
+                f"User-Agent: {request.META.get('HTTP_USER_AGENT', 'Unknown')}",
             )
-            if 'application/json' in request.headers.get('Accept', ''):
-                return JsonResponse({'error': '拒绝访问：您的IP不在允许范围内'}, status=403)
-            return HttpResponse('<h1>403 Forbidden</h1><p>拒绝访问：您的IP不在允许范围内</p>', status=403)
+            if "application/json" in request.headers.get("Accept", ""):
+                return json_error("拒绝访问：您的IP不在允许范围内", 403)
+            return HttpResponse("<h1>403 Forbidden</h1><p>拒绝访问：您的IP不在允许范围内</p>", status=403)
 
         return self.get_response(request)
 
@@ -118,9 +105,8 @@ class GlobalLoginRequiredMiddleware:
         self.get_response = get_response
         # 白名单：不需要登录的路径
         self.whitelist = [
-            '/accounts/login/',
-            '/admin/login/',
-            '/api/',  # API 有自己的认证装饰器
+            "/accounts/login/",
+            "/admin/login/",
         ]
 
     def __call__(self, request):
@@ -133,10 +119,12 @@ class GlobalLoginRequiredMiddleware:
             return self.get_response(request)
 
         # 未登录：根据请求类型返回不同响应
-        if (request.path.startswith('/api/') or
-            request.headers.get('Accept') == 'application/json' or
-            request.headers.get('X-Requested-With') == 'XMLHttpRequest'):
-            return JsonResponse({'error': '请先登录'}, status=401)
+        if (
+            request.path.startswith("/api/")
+            or request.headers.get("Accept") == "application/json"
+            or request.headers.get("X-Requested-With") == "XMLHttpRequest"
+        ):
+            return json_error("请先登录", 401)
 
         # 页面请求：重定向到登录页
         return redirect_to_login(request.get_full_path())

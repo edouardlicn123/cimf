@@ -52,12 +52,12 @@ class EmailService:
 
         config = SmtpService.get_current_config()
 
-        if not config.get('enabled'):
+        if not config.get("enabled"):
             return False
 
-        from_email = from_email or config.get('from_email')
+        from_email = from_email or config.get("from_email")
         if not from_email:
-            from_email = config.get('username', '')
+            from_email = config.get("username", "")
 
         default_from = f"{config.get('from_name', '仙芙CIMF')} <{from_email}>"
 
@@ -135,25 +135,25 @@ class EmailService:
         from_email: str,
         to_emails: list[str],
         subject: str,
-        text_body: str = '',
-        html_body: str = '',
-        template_name: str = '',
+        text_body: str = "",
+        html_body: str = "",
+        template_name: str = "",
     ) -> EmailLog:
         """创建邮件日志"""
         return EmailLog.objects.create(
             from_email=from_email,
-            to_email=','.join(to_emails),
+            to_email=",".join(to_emails),
             subject=subject,
             text_body=text_body,
-            html_body=html_body or '',
+            html_body=html_body or "",
             template_name=template_name,
-            status='pending',
+            status="pending",
         )
 
     @classmethod
     def _send_async(cls, log_id: int) -> None:
         """异步发送 - 实际发送由后台任务执行"""
-        EmailLog.objects.filter(id=log_id).update(status='pending')
+        EmailLog.objects.filter(id=log_id).update(status="pending")
 
     @classmethod
     def _send_sync(
@@ -175,7 +175,7 @@ class EmailService:
                         from_email=default_from,
                         to=to_list,
                     )
-                    msg.attach_alternative(html_body, 'text/html')
+                    msg.attach_alternative(html_body, "text/html")
                     msg.send()
                 else:
                     send_mail(
@@ -194,9 +194,9 @@ class EmailService:
     def process_pending_emails(cls) -> int:
         """处理待发送邮件（由定时任务调用）"""
         config = SmtpService.get_current_config()
-        batch_size = config.get('batch_size', 10)
-        send_interval = config.get('send_interval', 240)
-        retry_count = int(SettingsService.get_setting('smtp_retry_count', 3))
+        batch_size = config.get("batch_size", 10)
+        send_interval = config.get("send_interval", 240)
+        retry_count = int(SettingsService.get_setting("smtp_retry_count", 3))
 
         # 检查发送间隔是否已到
         elapsed = time.time() - cls._last_send_time
@@ -205,24 +205,24 @@ class EmailService:
             return 0
 
         pending_logs = EmailLog.objects.filter(
-            status='pending',
+            status="pending",
             retry_count__lt=retry_count,
-        ).order_by('created_at')[:batch_size]
+        ).order_by("created_at")[:batch_size]
 
         sent_count = 0
         for log in pending_logs:
             try:
-                log.status = 'sending'
-                log.save(update_fields=['status'])
+                log.status = "sending"
+                log.save(update_fields=["status"])
 
-                if not config.get('enabled'):
-                    log.status = 'failed'
-                    log.error_message = 'SMTP 服务未启用'
-                    log.save(update_fields=['status', 'error_message'])
+                if not config.get("enabled"):
+                    log.status = "failed"
+                    log.error_message = "SMTP 服务未启用"
+                    log.save(update_fields=["status", "error_message"])
                     continue
 
-                to_list = log.to_email.split(',')
-                from_email = log.from_email or config.get('username', '')
+                to_list = log.to_email.split(",")
+                from_email = log.from_email or config.get("username", "")
                 default_from = f"{config.get('from_name', '仙芙CIMF')} <{from_email}>"
 
                 success = cls._send_sync(
@@ -234,21 +234,21 @@ class EmailService:
                 )
 
                 if success:
-                    log.status = 'sent'
+                    log.status = "sent"
                     log.sent_at = timezone.now()
                     sent_count += 1
                 else:
-                    log.status = 'failed'
-                    log.error_message = '发送失败'
+                    log.status = "failed"
+                    log.error_message = "发送失败"
                     log.retry_count += 1
 
-                log.save(update_fields=['status', 'sent_at', 'error_message', 'retry_count'])
+                log.save(update_fields=["status", "sent_at", "error_message", "retry_count"])
 
             except Exception as e:
-                log.status = 'failed'
+                log.status = "failed"
                 log.error_message = str(e)
                 log.retry_count += 1
-                log.save(update_fields=['status', 'error_message', 'retry_count'])
+                log.save(update_fields=["status", "error_message", "retry_count"])
 
         if sent_count > 0:
             cls._last_send_time = time.time()
@@ -263,41 +263,39 @@ class EmailService:
         """检查失败邮件并通知"""
         config = SmtpService.get_current_config()
 
-        if not config.get('failed_notify'):
+        if not config.get("failed_notify"):
             return
 
-        notify_email = config.get('notify_email', '')
+        notify_email = config.get("notify_email", "")
         if not notify_email:
             return
 
-        retry_count = int(SettingsService.get_setting('smtp_retry_count', 3))
+        retry_count = int(SettingsService.get_setting("smtp_retry_count", 3))
 
         failed_logs = EmailLog.objects.filter(
-            status='failed',
-            retry_count__gte=retry_count,
-            created_at__gte=timezone.now() - timedelta(hours=1)
+            status="failed", retry_count__gte=retry_count, created_at__gte=timezone.now() - timedelta(hours=1)
         )
 
         if not failed_logs.exists():
             return
 
         failed_count = failed_logs.count()
-        subject = f'CIMF 系统邮件发送失败通知 ({failed_count}封)'
-        body = f'''您好，
+        subject = f"CIMF 系统邮件发送失败通知 ({failed_count}封)"
+        body = f"""您好，
 
 CIMF 系统检测到最近有 {failed_count} 封邮件发送失败，请检查 SMTP 配置。
 
 此邮件由系统自动发送。
 
--- CIMF 系统'''
+-- CIMF 系统"""
 
-        from_email = config.get('from_email', '') or config.get('username', '')
+        from_email = config.get("from_email", "") or config.get("username", "")
         default_from = f"{config.get('from_name', '仙芙CIMF')} <{from_email}>"
         cls._send_sync(
             to_list=[notify_email],
             subject=subject,
             body=body,
-            html_body='',
+            html_body="",
             default_from=default_from,
         )
 
@@ -305,13 +303,11 @@ CIMF 系统检测到最近有 {failed_count} 封邮件发送失败，请检查 S
     def cleanup_old_logs(cls) -> int:
         """清理过期的邮件日志"""
         config = SmtpService.get_current_config()
-        log_days = config.get('log_days', 30)
+        log_days = config.get("log_days", 30)
 
         cutoff_date = timezone.now() - timedelta(days=log_days)
 
-        deleted_count, _ = EmailLog.objects.filter(
-            created_at__lt=cutoff_date
-        ).delete()
+        deleted_count, _ = EmailLog.objects.filter(created_at__lt=cutoff_date).delete()
 
         return deleted_count
 
@@ -336,14 +332,14 @@ CIMF 系统检测到最近有 {failed_count} 封邮件发送失败，请检查 S
         """
         system_url = SmtpService.get_system_url(request)
         context = {
-            'code': code,
-            'expire_minutes': expire_minutes,
-            'system_url': system_url,
-            'year': timezone.now().year,
+            "code": code,
+            "expire_minutes": expire_minutes,
+            "system_url": system_url,
+            "year": timezone.now().year,
         }
         return cls.send_template_email(
             to=to,
-            template_name='verification_code',
+            template_name="verification_code",
             context=context,
             async_send=async_send,
         )
@@ -369,14 +365,14 @@ CIMF 系统检测到最近有 {failed_count} 封邮件发送失败，请检查 S
         """
         system_url = SmtpService.get_system_url(request)
         context = {
-            'reset_link': reset_link,
-            'expire_hours': expire_hours,
-            'system_url': system_url,
-            'year': timezone.now().year,
+            "reset_link": reset_link,
+            "expire_hours": expire_hours,
+            "system_url": system_url,
+            "year": timezone.now().year,
         }
         return cls.send_template_email(
             to=to,
-            template_name='password_reset',
+            template_name="password_reset",
             context=context,
             async_send=async_send,
         )
@@ -387,8 +383,8 @@ CIMF 系统检测到最近有 {failed_count} 封邮件发送失败，请检查 S
         to: str | list[str],
         title: str,
         message: str,
-        action_url: str = '',
-        action_text: str = '',
+        action_url: str = "",
+        action_text: str = "",
         request=None,
         async_send: bool = True,
     ) -> bool | int:
@@ -406,16 +402,16 @@ CIMF 系统检测到最近有 {failed_count} 封邮件发送失败，请检查 S
         """
         system_url = SmtpService.get_system_url(request)
         context = {
-            'title': title,
-            'message': message,
-            'action_url': action_url,
-            'action_text': action_text,
-            'system_url': system_url,
-            'year': timezone.now().year,
+            "title": title,
+            "message": message,
+            "action_url": action_url,
+            "action_text": action_text,
+            "system_url": system_url,
+            "year": timezone.now().year,
         }
         return cls.send_template_email(
             to=to,
-            template_name='notification',
+            template_name="notification",
             context=context,
             async_send=async_send,
         )

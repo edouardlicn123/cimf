@@ -23,47 +23,26 @@
 
 <style>
 .nav-slot {
-    height: 80px;
     border: 1px solid var(--border);
     border-radius: 0;
     background-color: var(--bg-surface);
-    transition: all 0.2s ease;
-}
-.nav-slot.drag-over {
-    border-color: var(--primary);
-    background-color: var(--primary-light);
 }
 .nav-slot:empty {
     border: 2px dashed var(--border);
 }
 .nav-card {
-    height: 100%;
     border-radius: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-weight: 500;
     text-decoration: none;
-    transition: transform 0.2s, box-shadow 0.2s;
 }
 .nav-card:hover {
     box-shadow: inset 0 0 0 1px #fff;
     color: #fff;
-}
-.nav-card.dragging {
-    opacity: 0.5;
 }
 </style>
 
 <script>
 (function() {
     'use strict';
-
-    function getCsrfToken() {
-        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
-               document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '';
-    }
 
     function updateNavCardsDisplay(cards) {
         var slots = document.querySelectorAll('.nav-slot');
@@ -103,57 +82,19 @@
     }
     
     var navCardsData = [];
-    var navCardDragging = null;
     
-    document.getElementById('navCardsArea').addEventListener('dragstart', function(e) {
-        if (e.target.classList.contains('nav-card')) {
-            navCardDragging = e.target;
-            e.target.classList.add('dragging');
-            e.dataTransfer.effectAllowed = 'move';
-        }
-    });
-    
-    document.getElementById('navCardsArea').addEventListener('dragend', function(e) {
-        if (e.target.classList.contains('nav-card')) {
-            e.target.classList.remove('dragging');
-            navCardDragging = null;
-            document.querySelectorAll('.nav-slot').forEach(function(s) { s.classList.remove('drag-over'); });
-        }
-    });
-    
-    document.getElementById('navCardsArea').addEventListener('dragover', function(e) {
-        e.preventDefault();
-        var slot = e.target.closest('.nav-slot');
-        if (slot) slot.classList.add('drag-over');
-    });
-    
-    document.getElementById('navCardsArea').addEventListener('dragleave', function(e) {
-        var slot = e.target.closest('.nav-slot');
-        if (slot && !slot.contains(e.relatedTarget)) {
-            slot.classList.remove('drag-over');
-        }
-    });
-    
-    document.getElementById('navCardsArea').addEventListener('drop', function(e) {
-        e.preventDefault();
-        var toSlot = e.target.closest('.nav-slot');
-        if (!toSlot || !navCardDragging) return;
-        
-        toSlot.classList.remove('drag-over');
-        
-        var fromSlot = navCardDragging.closest('.nav-slot');
+    function onNavCardDrop(draggingCard, toSlot) {
+        var fromSlot = draggingCard.closest('.nav-slot');
         if (fromSlot === toSlot) return;
         
         var fromPosition = parseInt(fromSlot.dataset.position);
         var toPosition = parseInt(toSlot.dataset.position);
         var toCard = toSlot.querySelector('.nav-card');
         
-        // 找到被拖拽的卡片数据
-        var cardData = navCardsData.find(function(c) { return c.id == navCardDragging.dataset.id; });
+        var cardData = navCardsData.find(function(c) { return c.id == draggingCard.dataset.id; });
         if (!cardData) return;
         
         if (toCard) {
-            // 交换两张卡片的position
             var toCardData = navCardsData.find(function(c) { return c.id == toCard.dataset.id; });
             if (toCardData) {
                 var tempPos = cardData.position;
@@ -161,21 +102,21 @@
                 toCardData.position = tempPos;
             }
         } else {
-            // 移动到空位置
             cardData.position = toPosition;
         }
         
-        // 更新DOM并保存
         updateNavCardsDisplay(navCardsData);
         saveNavCardsOrder();
-    });
+    }
+
+    window.FFE.DragDrop.makeSortable('#navCardsArea', '.nav-card', '.nav-slot', onNavCardDrop);
     
     function saveNavCardsOrder() {
         fetch('{{ url("api:api_nav_cards_save") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCsrfToken()
+                'X-CSRFToken': window.FFE.getCsrfToken()
             },
             body: JSON.stringify({ cards: navCardsData }),
             credentials: 'include'
@@ -184,7 +125,7 @@
     }
 
     function renderNavCards() {
-        fetch('/api/v1/user/nav-cards/', {credentials: 'include'})
+        fetch('{{ url('api:api_nav_cards') }}', {credentials: 'include'})
             .then(function(response) { return response.json(); })
             .then(function(data) {
                 if (data.success && data.cards) {

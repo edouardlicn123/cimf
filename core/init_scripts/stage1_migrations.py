@@ -53,8 +53,7 @@
 from core.init_scripts.common import colored, print_section, print_step
 
 
-def run_stage1(skip_migrate: bool, incremental: bool, db_exists: bool,
-                dry_run: bool) -> bool:
+def run_stage1(skip_migrate: bool, incremental: bool, db_exists: bool, dry_run: bool) -> bool:
     """
     执行阶段1：数据库结构迁移
 
@@ -80,7 +79,8 @@ def run_stage1(skip_migrate: bool, incremental: bool, db_exists: bool,
                 print(colored("    ⊘ 无待执行迁移，跳过", "green"))
             else:
                 from django.core.management import call_command  # noqa: PLC0415
-                call_command('migrate', '--noinput')
+
+                call_command("migrate", "--noinput")
                 print(colored("    ✓ migrations 执行完成", "green"))
         else:
             print(colored("    [模拟] 将检查并执行 pending migrations", "yellow"))
@@ -88,12 +88,14 @@ def run_stage1(skip_migrate: bool, incremental: bool, db_exists: bool,
 
     if not dry_run:
         from django.core.management import call_command  # noqa: PLC0415
+
         try:
-            call_command('migrate', '--noinput')
+            call_command("migrate", "--noinput")
             print(colored("    ✓ migrations 执行完成", "green"))
         except Exception as e:
             print(colored(f"    ✗ migrations 执行失败: {e!s}", "red"))
             import sys  # noqa: PLC0415
+
             sys.exit(1)
     else:
         print(colored("    [模拟] 将执行 python manage.py migrate --noinput", "yellow"))
@@ -103,7 +105,7 @@ def run_stage1(skip_migrate: bool, incremental: bool, db_exists: bool,
 
 def _has_pending_migrations() -> bool:
     """检查是否有待执行的迁移（带缓存优化）"""
-    if hasattr(_has_pending_migrations, '_cached_result'):
+    if hasattr(_has_pending_migrations, "_cached_result"):
         return _has_pending_migrations._cached_result
 
     from io import StringIO  # noqa: PLC0415
@@ -111,9 +113,9 @@ def _has_pending_migrations() -> bool:
     from django.core.management import call_command  # noqa: PLC0415
 
     out = StringIO()
-    call_command('showmigrations', '--plan', stdout=out)
-    lines = out.getvalue().strip().split('\n')
-    result = any(line.startswith('[ ]') for line in lines)
+    call_command("showmigrations", "--plan", stdout=out)
+    lines = out.getvalue().strip().split("\n")
+    result = any(line.startswith("[ ]") for line in lines)
 
     # 缓存结果（本次执行期间有效）
     _has_pending_migrations._cached_result = result

@@ -34,15 +34,6 @@
 .homepage-settings .card-grid .col-4 {
     padding: 0 !important;
 }
-.homepage-settings .card-slot {
-    height: 150px;
-    border: 1px solid var(--border) !important;
-    background-color: var(--bg-surface) !important;
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
 .homepage-settings .card-slot:nth-child(odd) {
     background-color: var(--bg-surface);
 }
@@ -51,10 +42,6 @@
 }
 .homepage-settings .card-slot:hover {
     background-color: var(--bg-hover);
-}
-.homepage-settings .card-slot.drag-over {
-    border-color: var(--primary) !important;
-    background: var(--primary-light);
 }
 .homepage-settings .dashboard-card {
     width: 100%;
@@ -214,16 +201,6 @@
 {{ super() }}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    var homepageArea = document.getElementById('homepageArea');
-    var availableArea = document.getElementById('availableArea');
-    var draggedEl = null;
-    var draggedType = null;
-
-    function getCsrfToken() {
-        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
-               document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '';
-    }
-
     function savePositions() {
         var positions = {};
         document.querySelectorAll('#homepageArea .card-slot').forEach(function(slot) {
@@ -236,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCsrfToken()
+                'X-CSRFToken': window.FFE.getCsrfToken()
             },
             credentials: 'include',
             body: JSON.stringify({ positions: positions })
@@ -266,101 +243,53 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    document.addEventListener('dragstart', function(e) {
-        var card = e.target.closest('.dashboard-card, .available-card');
-        if (!card) return;
-        
-        draggedEl = card;
-        draggedType = card.classList.contains('dashboard-card') ? 'homepage' : 'available';
-        card.classList.add('dragging');
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', card.dataset.module);
-    });
-
-    document.addEventListener('dragend', function() {
-        if (draggedEl) {
-            draggedEl.classList.remove('dragging');
-        }
-        document.querySelectorAll('.card-slot, .available-area').forEach(function(el) {
-            el.classList.remove('drag-over');
-        });
-        draggedEl = null;
-        draggedType = null;
-    });
-
-    document.addEventListener('dragenter', function(e) {
-        var target = e.target.closest('.card-slot, .available-area');
-        if (target) {
-            e.preventDefault();
-            target.classList.add('drag-over');
-        }
-    });
-
-    document.addEventListener('dragleave', function(e) {
-        var target = e.target.closest('.card-slot, .available-area');
-        if (target && !target.contains(e.relatedTarget)) {
-            target.classList.remove('drag-over');
-        }
-    });
-
-    document.addEventListener('dragover', function(e) {
-        var target = e.target.closest('.card-slot, .available-area');
-        if (target) {
-            e.preventDefault();
-        }
-    });
-
-    document.addEventListener('drop', function(e) {
-        e.preventDefault();
-        var target = e.target.closest('.card-slot, .available-area');
-        if (!target || !draggedEl) return;
-
-        if (target.classList.contains('card-slot')) {
-            if (draggedType === 'available') {
-                var existing = target.querySelector('.dashboard-card');
+    function onDrop(draggingCard, toSlot) {
+        if (toSlot.classList.contains('card-slot')) {
+            if (draggingCard.classList.contains('available-card')) {
+                var existing = toSlot.querySelector('.dashboard-card');
                 if (existing) existing.remove();
                 
-                var emptySlot = target.querySelector('.empty-slot');
+                var emptySlot = toSlot.querySelector('.empty-slot');
                 if (emptySlot) emptySlot.remove();
                 
                 var newCard = document.createElement('div');
                 newCard.className = 'dashboard-card';
                 newCard.draggable = true;
-                newCard.dataset.module = draggedEl.dataset.module;
-                newCard.dataset.name = draggedEl.dataset.name;
-                newCard.dataset.icon = draggedEl.dataset.icon;
-                newCard.innerHTML = '<i class="bi ' + draggedEl.dataset.icon + '"></i><span>' + draggedEl.dataset.name + '</span>';
-                target.appendChild(newCard);
-            } else if (draggedType === 'homepage') {
-                var fromSlot = draggedEl.closest('.card-slot');
-                if (fromSlot !== target) {
-                    var existing = target.querySelector('.dashboard-card');
-                    if (existing) {
-                        existing.remove();
-                        fromSlot.appendChild(existing);
-                    } else {
-                        var emptySlot = target.querySelector('.empty-slot');
-                        if (emptySlot) emptySlot.remove();
-                        fromSlot.innerHTML = '<div class="empty-slot">拖入卡片</div>';
-                    }
-                    target.appendChild(draggedEl);
+                newCard.dataset.module = draggingCard.dataset.module;
+                newCard.dataset.name = draggingCard.dataset.name;
+                newCard.dataset.icon = draggingCard.dataset.icon;
+                newCard.innerHTML = '<i class="bi ' + draggingCard.dataset.icon + '"></i><span>' + draggingCard.dataset.name + '</span>';
+                toSlot.appendChild(newCard);
+            } else if (draggingCard.classList.contains('dashboard-card')) {
+                var fromSlot = draggingCard.closest('.card-slot');
+                if (fromSlot === toSlot) return;
+                
+                var existing = toSlot.querySelector('.dashboard-card');
+                if (existing) {
+                    existing.remove();
+                    fromSlot.appendChild(existing);
+                } else {
+                    var emptySlot = toSlot.querySelector('.empty-slot');
+                    if (emptySlot) emptySlot.remove();
+                    fromSlot.innerHTML = '<div class="empty-slot">拖入卡片</div>';
                 }
+                toSlot.appendChild(draggingCard);
             }
-        } else if (target.classList.contains('available-area')) {
-            if (draggedType === 'homepage') {
-                var fromSlot = draggedEl.closest('.card-slot');
-                draggedEl.remove();
+        } else if (toSlot.classList.contains('available-area')) {
+            if (draggingCard.classList.contains('dashboard-card')) {
+                var fromSlot = draggingCard.closest('.card-slot');
+                draggingCard.remove();
                 fromSlot.innerHTML = '<div class="empty-slot">拖入卡片</div>';
             }
         }
 
-        target.classList.remove('drag-over');
-        
         setTimeout(function() {
             updateVisibility();
             savePositions();
         }, 0);
-    });
+    }
+
+    window.FFE.DragDrop.makeSortable('.card-slot, .available-area', '.dashboard-card, .available-card', '.card-slot, .available-area', onDrop);
 
     updateVisibility();
 });

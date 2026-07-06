@@ -38,7 +38,6 @@
 """
 
 
-
 def colored(text: str, color: str = "white") -> str:
     """终端颜色辅助函数"""
     colors = {
@@ -86,21 +85,22 @@ def ask_reset_mode(db_path: str) -> bool:
     while True:
         try:
             choice = input(colored("请选择 (1/2): ", "cyan")).strip()
-            if choice == '1':
+            if choice == "1":
                 return True
-            elif choice == '2':
+            elif choice == "2":
                 return False
             else:
                 print(colored("无效选择，请输入 1 或 2", "red"))
         except (KeyboardInterrupt, EOFError):
             print(colored("\n用户取消操作", "yellow"))
             import sys  # noqa: PLC0415
+
             sys.exit(0)
 
 
 def _has_pending_migrations() -> bool:
     """检查是否有待执行的迁移（带缓存优化）"""
-    if hasattr(_has_pending_migrations, '_cached_result'):
+    if hasattr(_has_pending_migrations, "_cached_result"):
         return _has_pending_migrations._cached_result
 
     from io import StringIO  # noqa: PLC0415
@@ -108,9 +108,9 @@ def _has_pending_migrations() -> bool:
     from django.core.management import call_command  # noqa: PLC0415
 
     out = StringIO()
-    call_command('showmigrations', '--plan', stdout=out)
-    lines = out.getvalue().strip().split('\n')
-    result = any(line.startswith('[ ]') for line in lines)
+    call_command("showmigrations", "--plan", stdout=out)
+    lines = out.getvalue().strip().split("\n")
+    result = any(line.startswith("[ ]") for line in lines)
 
     # 缓存结果（本次执行期间有效）
     _has_pending_migrations._cached_result = result
@@ -132,18 +132,18 @@ def verify_module_taxonomies() -> list[str]:
     modules = Module.objects.filter(is_installed=True)
 
     for module in modules:
-        module_info = ModuleService._load_module_info(module.path)
+        module_info = ModuleService.load_module_info(module.path)
         if not module_info:
             continue
 
-        taxonomies_config = module_info.get('taxonomies', [])
+        taxonomies_config = module_info.get("taxonomies", [])
         if not taxonomies_config:
             continue
 
         for tax_data in taxonomies_config:
-            slug = tax_data.get('slug')
-            name = tax_data.get('name', '')
-            items = tax_data.get('items', [])
+            slug = tax_data.get("slug")
+            name = tax_data.get("name", "")
+            items = tax_data.get("items", [])
 
             if not slug:
                 continue
@@ -155,12 +155,14 @@ def verify_module_taxonomies() -> list[str]:
                 continue
 
             # 验证词汇项是否完整
-            existing_items = set(taxonomy.items.values_list('name', flat=True))
+            existing_items = set(taxonomy.items.values_list("name", flat=True))
             expected_items = set(items)
             missing_items = expected_items - existing_items
 
             if missing_items:
-                errors.append(f"模块 '{module.name}': 词汇表 '{slug}' 缺少 {len(missing_items)} 个词汇项: {', '.join(sorted(missing_items))}")
+                errors.append(
+                    f"模块 '{module.name}': 词汇表 '{slug}' 缺少 {len(missing_items)} 个词汇项: {', '.join(sorted(missing_items))}"
+                )
 
     return errors
 
@@ -175,7 +177,7 @@ def verify_smtp_tables() -> bool:
     from django.db import connection  # noqa: PLC0415
 
     tables = connection.introspection.table_names()
-    required_tables = ['email_templates', 'email_logs']
+    required_tables = ["email_templates", "email_logs"]
     missing = [t for t in required_tables if t not in tables]
 
     return not missing

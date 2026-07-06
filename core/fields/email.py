@@ -15,27 +15,29 @@ from .base import BaseField
 
 
 class EmailField(BaseField):
-    name = 'email'
-    label = '邮箱'
-    widget = 'input'
-    properties = ['value']
+    name = "email"
+    label = "邮箱"
+    widget = "input"
+    properties = ["value"]
 
-    def render(self, value: dict, mode: str = 'edit') -> str:
-        if mode == 'view':
-            email = value.get('value', '')
-            return f'<a href="mailto:{email}">{email}</a>' if email else ''
+    def render(self, value: dict, mode: str = "edit") -> str:
+        if mode == "view":
+            email = value.get("value", "")
+            return f'<a href="mailto:{email}">{email}</a>' if email else ""
 
-        required = self.field_config.get('required', False)
-        placeholder = self.field_config.get('placeholder', 'example@domain.com')
+        required = self.field_config.get("required", False)
+        placeholder = self.field_config.get("placeholder", "example@domain.com")
 
-        return f'<input type="email" name="{self.field_name}" value="{value.get("value", "")}" ' \
-               f'class="form-control" placeholder="{placeholder}" {"required" if required else ""}>'
+        return (
+            f'<input type="email" name="{self.field_name}" value="{value.get("value", "")}" '
+            f'class="form-control" placeholder="{placeholder}" {"required" if required else ""}>'
+        )
 
     def validate(self, value: dict) -> list:
         errors = []
-        email = value.get('value', '')
-        if self.field_config.get('required') and not email:
-            errors.append(f'{self.field_config.get("label")} 为必填项')
-        if email and '@' not in email:
-            errors.append(f'{self.field_config.get("label")} 格式不正确')
+        email = value.get("value", "")
+        if self.field_config.get("required") and not email:
+            errors.append(f"{self.field_config.get('label')} 为必填项")
+        if email and "@" not in email:
+            errors.append(f"{self.field_config.get('label')} 格式不正确")
         return errors

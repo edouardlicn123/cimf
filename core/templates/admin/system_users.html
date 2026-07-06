@@ -83,9 +83,7 @@
                             </td>
                         </tr>
                         {% else %}
-                        <tr>
-                            <td colspan="7" class="text-center text-muted">暂无用户</td>
-                        </tr>
+                        {% set empty_type = "table" %}{% set empty_colspan = 7 %}{% set empty_message = "暂无用户" %}{% include "includes/empty_state.html" %}
                         {% endfor %}
                     </tbody>
                 </table>

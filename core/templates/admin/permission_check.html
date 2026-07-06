@@ -52,17 +52,12 @@
     </div>
     <div class="card-body">
         <div class="d-flex align-items-end gap-2" style="margin-bottom:-1px">
-            <div class="nav nav-pills nav-pills-outline gap-1 ms-auto">
-                <a href="?filter=all" class="nav-link {% if filter_status == 'all' %}active{% endif %}">
-                    全部 <span class="badge ms-1" style="background:#f57c00">{{ total_count }}</span>
-                </a>
-                <a href="?filter=restricted" class="nav-link {% if filter_status == 'restricted' %}active{% endif %}">
-                    已限制 <span class="badge ms-1" style="background:#f57c00">{{ restricted_count }}</span>
-                </a>
-                <a href="?filter=unrestricted" class="nav-link {% if filter_status == 'unrestricted' %}active{% endif %}">
-                    未限制 <span class="badge ms-1" style="background:#f57c00">{{ unrestricted_count }}</span>
-                </a>
-            </div>
+            {% set pills = [
+                {"label": "全部", "filter": "all", "active": filter_status == "all", "count": total_count},
+                {"label": "已限制", "filter": "restricted", "active": filter_status == "restricted", "count": restricted_count},
+                {"label": "未限制", "filter": "unrestricted", "active": filter_status == "unrestricted", "count": unrestricted_count}
+            ] %}
+            {% include "includes/nav_pills.html" %}
         </div>
         <div class="log-table-wrap table-responsive">
             <table class="table table-hover mb-0">
@@ -87,9 +82,7 @@
                         </td>
                     </tr>
                     {% else %}
-                    <tr>
-                        <td colspan="3" class="text-center text-muted">暂无数据</td>
-                    </tr>
+                    {% set empty_type = "table" %}{% set empty_colspan = 3 %}{% set empty_message = "暂无数据" %}{% include "includes/empty_state.html" %}
                     {% endfor %}
                 </tbody>
             </table>

@@ -47,7 +47,6 @@
 """
 
 
-
 def verify_module_taxonomies() -> list[str]:
     """
     验证所有已安装模块的词汇表是否正确创建
@@ -63,18 +62,18 @@ def verify_module_taxonomies() -> list[str]:
     modules = Module.objects.filter(is_installed=True)
 
     for module in modules:
-        module_info = ModuleService._load_module_info(module.path)
+        module_info = ModuleService.load_module_info(module.path)
         if not module_info:
             continue
 
-        taxonomies_config = module_info.get('taxonomies', [])
+        taxonomies_config = module_info.get("taxonomies", [])
         if not taxonomies_config:
             continue
 
         for tax_data in taxonomies_config:
-            slug = tax_data.get('slug')
-            name = tax_data.get('name', '')
-            items = tax_data.get('items', [])
+            slug = tax_data.get("slug")
+            name = tax_data.get("name", "")
+            items = tax_data.get("items", [])
 
             if not slug:
                 continue
@@ -86,12 +85,14 @@ def verify_module_taxonomies() -> list[str]:
                 continue
 
             # 验证词汇项是否完整
-            existing_items = set(taxonomy.items.values_list('name', flat=True))
+            existing_items = set(taxonomy.items.values_list("name", flat=True))
             expected_items = set(items)
             missing_items = expected_items - existing_items
 
             if missing_items:
-                errors.append(f"模块 '{module.name}': 词汇表 '{slug}' 缺少 {len(missing_items)} 个词汇项: {', '.join(sorted(missing_items))}")
+                errors.append(
+                    f"模块 '{module.name}': 词汇表 '{slug}' 缺少 {len(missing_items)} 个词汇项: {', '.join(sorted(missing_items))}"
+                )
 
     return errors
 
@@ -106,12 +107,12 @@ def verify_smtp_tables() -> tuple[bool, str]:
     from django.db import connection  # noqa: PLC0415
 
     tables = connection.introspection.table_names()
-    required_tables = ['email_templates', 'email_logs']
+    required_tables = ["email_templates", "email_logs"]
     missing = [t for t in required_tables if t not in tables]
 
     if missing:
         return (False, f"SMTP 表缺失: {', '.join(missing)}")
-    return (True, 'SMTP 表验证通过')
+    return (True, "SMTP 表验证通过")
 
 
 def verify_admin_user() -> tuple[bool, str]:

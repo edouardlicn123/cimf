@@ -18,12 +18,13 @@
     - settings: Django 设置
 """
 
+
 class VersionService:
     """版本服务类"""
 
-    VERSION = '1.0.0'
-    API_VERSION = 'v1'
-    BUILD_DATE = '2026-04-09'
+    VERSION = "2.001"
+    API_VERSION = "v1"
+    BUILD_DATE = "2026-07-05"
 
     @classmethod
     def get_version(cls):
@@ -44,9 +45,9 @@ class VersionService:
     def get_info(cls):
         """获取完整的版本信息"""
         return {
-            'version': cls.VERSION,
-            'api_version': cls.API_VERSION,
-            'build_date': cls.BUILD_DATE,
+            "version": cls.VERSION,
+            "api_version": cls.API_VERSION,
+            "build_date": cls.BUILD_DATE,
         }
 
     @classmethod
@@ -55,11 +56,11 @@ class VersionService:
         if not client_version:
             return False
 
-        if client_version.startswith('v'):
+        if client_version.startswith("v"):
             client_version = client_version[1:]
 
         try:
-            major = int(client_version.split('.')[0])
+            major = int(client_version.split(".")[0])
             return major >= 1
         except (ValueError, IndexError):
             return False
@@ -67,4 +68,4 @@ class VersionService:
     @classmethod
     def get_supported_versions(cls) -> list:
         """获取支持的 API 版本列表"""
-        return ['v1']
+        return ["v1"]

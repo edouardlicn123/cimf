@@ -2,6 +2,7 @@
 自定义 Django 检查：自动检测缺少认证的视图
 运行：./venv/bin/python manage.py check
 """
+
 import os
 import re
 from pathlib import Path
@@ -16,25 +17,25 @@ def check_auth_decorators(_app_configs, **_kwargs):
 
     # 需要检查的视图目录
     view_dirs = [
-        Path(__file__).parent / 'views',
-        Path(__file__).parent.parent / 'modules',
+        Path(__file__).parent / "views",
+        Path(__file__).parent.parent / "modules",
     ]
 
     # 有效的认证装饰器
-    auth_decorators = ['login_required', 'login_required_json', 'admin_required']
+    auth_decorators = ["login_required", "login_required_json", "admin_required"]
     # API 函数应该使用的装饰器
-    api_decorators = ['login_required_json', 'admin_required']
+    api_decorators = ["login_required_json", "admin_required"]
 
     for view_dir in view_dirs:
         if not view_dir.exists():
             continue
 
         for root, _dirs, files in os.walk(view_dir):
-            if 'venv' in root:
+            if "venv" in root:
                 continue
 
             for file in files:
-                if file == 'views.py':
+                if file == "views.py":
                     filepath = Path(root) / file
                     errors.extend(_check_file_auth(filepath, auth_decorators, api_decorators))
 
@@ -51,26 +52,26 @@ def _check_file_auth(filepath, _auth_decorators, api_decorators):
 
         # 提取所有视图函数及其装饰器
         func_dec_map = {}
-        lines = content.split('\n')
+        lines = content.split("\n")
         current_decorators = []
 
         for line in lines:
             stripped = line.strip()
             # 收集装饰器
-            if stripped.startswith('@'):
-                deco_match = re.match(r'@(\w+)', stripped)
+            if stripped.startswith("@"):
+                deco_match = re.match(r"@(\w+)", stripped)
                 if deco_match:
                     current_decorators.append(deco_match.group(1))
             # 遇到函数定义，保存映射
-            elif stripped.startswith('def '):
-                func_match = re.match(r'def (\w+)\(', stripped)
+            elif stripped.startswith("def "):
+                func_match = re.match(r"def (\w+)\(", stripped)
                 if func_match:
                     func_name = func_match.group(1)
-                    if not func_name.startswith('_'):
+                    if not func_name.startswith("_"):
                         func_dec_map[func_name] = current_decorators[:]
                     current_decorators = []
             # 非装饰器非函数定义，清空装饰器缓存
-            elif not stripped.startswith('#'):
+            elif not stripped.startswith("#"):
                 current_decorators = []
 
         # 检查每个函数
@@ -79,27 +80,27 @@ def _check_file_auth(filepath, _auth_decorators, api_decorators):
 
             # 检查1：是否有装饰器
             if not decorators:
-                if not func_name.startswith('api_'):
+                if not func_name.startswith("api_"):
                     errors.append(
                         Warning(
-                            f'视图函数 {func_name}() 可能缺少认证装饰器',
-                            hint='添加 @login_required 或确保全局中间件已启用',
+                            f"视图函数 {func_name}() 可能缺少认证装饰器",
+                            hint="添加 @login_required 或确保全局中间件已启用",
                             obj=rel_path,
-                            id='CIMF_W001',
+                            id="CIMF_W001",
                         )
                     )
                 continue
 
             # 检查2：api_ 函数必须使用 JSON 装饰器
-            if func_name.startswith('api_'):
+            if func_name.startswith("api_"):
                 has_json_deco = any(d in api_decorators for d in decorators)
                 if not has_json_deco:
                     errors.append(
                         Warning(
-                            f'API 函数 {func_name}() 应使用 JSON 装饰器',
-                            hint='使用 @login_required_json 或 @admin_required',
+                            f"API 函数 {func_name}() 应使用 JSON 装饰器",
+                            hint="使用 @login_required_json 或 @admin_required",
                             obj=rel_path,
-                            id='CIMF_W002',
+                            id="CIMF_W002",
                         )
                     )
 

@@ -35,38 +35,24 @@ class UserAdmin(BaseUserAdmin):
     - 支持搜索、过滤
     """
 
-    list_display = ['username', 'nickname', 'role', 'is_active', 'is_admin', 'last_login_at', 'created_at']
-    list_filter = ['role', 'is_active', 'is_admin', 'is_staff', 'created_at']
-    search_fields = ['username', 'nickname', 'email']
-    ordering = ['-id']
+    list_display = ["username", "nickname", "role", "is_active", "is_admin", "last_login_at", "created_at"]
+    list_filter = ["role", "is_active", "is_admin", "is_staff", "created_at"]
+    search_fields = ["username", "nickname", "email"]
+    ordering = ["-id"]
 
     fieldsets = (
-        ('基本信息', {
-            'fields': ('username', 'password', 'nickname', 'email')
-        }),
-        ('角色与权限', {
-            'fields': ('role', 'is_admin', 'is_active', 'is_staff', 'is_superuser', 'permissions')
-        }),
-        ('个人偏好', {
-            'fields': ('theme', 'notifications_enabled', 'preferred_language')
-        }),
-        ('安全设置', {
-            'fields': ('failed_login_attempts', 'locked_until')
-        }),
-        ('时间记录', {
-            'fields': ('last_login_at', 'created_at', 'updated_at')
-        }),
+        ("基本信息", {"fields": ("username", "password", "nickname", "email")}),
+        ("角色与权限", {"fields": ("role", "is_admin", "is_active", "is_staff", "is_superuser", "permissions")}),
+        ("个人偏好", {"fields": ("theme", "notifications_enabled", "preferred_language")}),
+        ("安全设置", {"fields": ("failed_login_attempts", "locked_until")}),
+        ("时间记录", {"fields": ("last_login_at", "created_at", "updated_at")}),
     )
 
-    readonly_fields = ['failed_login_attempts', 'locked_until', 'last_login_at', 'created_at', 'updated_at']
+    readonly_fields = ["failed_login_attempts", "locked_until", "last_login_at", "created_at", "updated_at"]
 
     add_fieldsets = (
-        ('基本信息', {
-            'fields': ('username', 'password1', 'password2', 'nickname', 'email')
-        }),
-        ('角色与权限', {
-            'fields': ('role', 'is_admin', 'is_active')
-        }),
+        ("基本信息", {"fields": ("username", "password1", "password2", "nickname", "email")}),
+        ("角色与权限", {"fields": ("role", "is_admin", "is_active")}),
     )
 
 
@@ -80,27 +66,24 @@ class SystemSettingAdmin(admin.ModelAdmin):
     - 支持搜索、编辑
     """
 
-    list_display = ['key', 'value', 'description', 'updated_at']
-    search_fields = ['key', 'description']
-    ordering = ['key']
+    list_display = ["key", "value", "description", "updated_at"]
+    search_fields = ["key", "description"]
+    ordering = ["key"]
 
-    fieldsets = (
-        ('配置信息', {
-            'fields': ('key', 'value', 'description')
-        }),
-    )
+    fieldsets = (("配置信息", {"fields": ("key", "value", "description")}),)
 
-    readonly_fields = ['updated_at']
+    readonly_fields = ["updated_at"]
 
 
 class TaxonomyItemInline(admin.TabularInline):
     """
     词汇项内联编辑
     """
+
     model = TaxonomyItem
     extra = 1
-    fields = ['name', 'description', 'weight']
-    ordering = ['weight', 'name']
+    fields = ["name", "description", "weight"]
+    ordering = ["weight", "name"]
 
 
 @admin.register(Taxonomy)
@@ -113,17 +96,13 @@ class TaxonomyAdmin(admin.ModelAdmin):
     - 支持内联编辑词汇项
     """
 
-    list_display = ['name', 'slug', 'description', 'created_at']
-    search_fields = ['name', 'slug', 'description']
-    ordering = ['name']
+    list_display = ["name", "slug", "description", "created_at"]
+    search_fields = ["name", "slug", "description"]
+    ordering = ["name"]
 
-    fieldsets = (
-        ('词汇表信息', {
-            'fields': ('name', 'slug', 'description')
-        }),
-    )
+    fieldsets = (("词汇表信息", {"fields": ("name", "slug", "description")}),)
 
-    readonly_fields = ['created_at', 'updated_at']
+    readonly_fields = ["created_at", "updated_at"]
 
     inlines = [TaxonomyItemInline]
 
@@ -134,15 +113,11 @@ class TaxonomyItemAdmin(admin.ModelAdmin):
     词汇项管理后台配置
     """
 
-    list_display = ['name', 'taxonomy', 'weight', 'description', 'created_at']
-    list_filter = ['taxonomy']
-    search_fields = ['name', 'description']
-    ordering = ['taxonomy', 'weight', 'name']
+    list_display = ["name", "taxonomy", "weight", "description", "created_at"]
+    list_filter = ["taxonomy"]
+    search_fields = ["name", "description"]
+    ordering = ["taxonomy", "weight", "name"]
 
-    fieldsets = (
-        ('词汇项信息', {
-            'fields': ('taxonomy', 'name', 'description', 'weight')
-        }),
-    )
+    fieldsets = (("词汇项信息", {"fields": ("taxonomy", "name", "description", "weight")}),)
 
-    readonly_fields = ['created_at', 'updated_at']
+    readonly_fields = ["created_at", "updated_at"]

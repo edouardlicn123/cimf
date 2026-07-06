@@ -26,12 +26,12 @@ def get_database_config():
         dict: Django DATABASES 配置
     """
 
-    config_path = BASE_DIR / 'config.env'
+    config_path = BASE_DIR / "config.env"
     db_config = _load_config(config_path)
 
-    db_type = db_config.get('DJANGO_DB_TYPE', 'sqlite').lower().strip()
+    db_type = db_config.get("DJANGO_DB_TYPE", "sqlite").lower().strip()
 
-    if db_type == 'mysql':
+    if db_type == "mysql":
         return _get_mysql_config(db_config)
     else:
         return _get_sqlite_config()
@@ -52,14 +52,14 @@ def _load_config(config_path: Path) -> dict:
     if not config_path.exists():
         return config
 
-    with config_path.open(encoding='utf-8') as f:
+    with config_path.open(encoding="utf-8") as f:
         for raw_line in f:
             line = raw_line.strip()
-            if not line or line.startswith('#'):
+            if not line or line.startswith("#"):
                 continue
 
-            if '=' in line:
-                key, value = line.split('=', 1)
+            if "=" in line:
+                key, value = line.split("=", 1)
                 config[key.strip()] = value.strip()
 
     return config
@@ -67,16 +67,16 @@ def _load_config(config_path: Path) -> dict:
 
 def _get_sqlite_config() -> dict:
     """获取 SQLite 配置"""
-    db_path = BASE_DIR / 'instance' / 'django.db'
+    db_path = BASE_DIR / "instance" / "django.db"
     # 确保 instance 目录存在
     db_path.parent.mkdir(parents=True, exist_ok=True)
 
     return {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': db_path,
-        'OPTIONS': {
-            'timeout': 30,
-            'init_command': 'PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;',
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": db_path,
+        "OPTIONS": {
+            "timeout": 30,
+            "init_command": "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;",
         },
     }
 
@@ -84,14 +84,14 @@ def _get_sqlite_config() -> dict:
 def _get_mysql_config(config: dict) -> dict:
     """获取 MySQL 配置"""
     return {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': config.get('DJANGO_DB_NAME', 'cimf'),
-        'USER': config.get('DJANGO_DB_USER', 'root'),
-        'PASSWORD': config.get('DJANGO_DB_PASSWORD', ''),
-        'HOST': config.get('DJANGO_DB_HOST', 'localhost'),
-        'PORT': config.get('DJANGO_DB_PORT', '3306'),
-        'OPTIONS': {
-            'charset': 'utf8mb4',
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": config.get("DJANGO_DB_NAME", "cimf"),
+        "USER": config.get("DJANGO_DB_USER", "root"),
+        "PASSWORD": config.get("DJANGO_DB_PASSWORD", ""),
+        "HOST": config.get("DJANGO_DB_HOST", "localhost"),
+        "PORT": config.get("DJANGO_DB_PORT", "3306"),
+        "OPTIONS": {
+            "charset": "utf8mb4",
         },
     }
 
@@ -104,27 +104,31 @@ def drop_database():
     MySQL: DROP DATABASE + CREATE DATABASE
     """
     db_config = get_database_config()
-    engine = db_config.get('ENGINE', '')
+    engine = db_config.get("ENGINE", "")
 
-    if 'sqlite3' in engine:
-        db_path = Path(db_config['NAME'])
+    if "sqlite3" in engine:
+        db_path = Path(db_config["NAME"])
         if db_path.exists():
             db_path.unlink()
             print(f"已删除 SQLite 数据库文件: {db_path}")
-    elif 'mysql' in engine:
+    elif "mysql" in engine:
         if pymysql is None:
             raise ImportError("使用 MySQL 需要安装 pymysql: pip install pymysql")
         # MySQL: DROP + CREATE DATABASE
-        db_name = db_config.get('NAME', 'cimf')
+        db_name = db_config.get("NAME", "cimf")
         conn = pymysql.connect(
-            host=db_config.get('HOST', 'localhost'),
-            port=int(db_config.get('PORT', 3306)),
-            user=db_config.get('USER', 'root'),
-            password=db_config.get('PASSWORD', ''),
+            host=db_config.get("HOST", "localhost"),
+            port=int(db_config.get("PORT", 3306)),
+            user=db_config.get("USER", "root"),
+            password=db_config.get("PASSWORD", ""),
         )
         with conn.cursor() as cursor:
-            cursor.execute(f"DROP DATABASE IF EXISTS {db_name}")
-            cursor.execute(f"CREATE DATABASE {db_name} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
+            cursor.execute("DROP DATABASE IF EXISTS `{}`".format(db_name.replace("`", "``")))
+            cursor.execute(
+                "CREATE DATABASE `{}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci".format(
+                    db_name.replace("`", "``")
+                )
+            )
         conn.commit()
         conn.close()
         print(f"已重建 MySQL 数据库: {db_name}")
@@ -138,24 +142,24 @@ def database_exists() -> bool:
         bool: 数据库是否存在
     """
     db_config = get_database_config()
-    engine = db_config.get('ENGINE', '')
+    engine = db_config.get("ENGINE", "")
 
-    if 'sqlite3' in engine:
-        db_path = Path(db_config['NAME'])
+    if "sqlite3" in engine:
+        db_path = Path(db_config["NAME"])
         return db_path.exists()
-    elif 'mysql' in engine:
+    elif "mysql" in engine:
         if pymysql is None:
             return False
         try:
             conn = pymysql.connect(
-                host=db_config.get('HOST', 'localhost'),
-                port=int(db_config.get('PORT', 3306)),
-                user=db_config.get('USER', 'root'),
-                password=db_config.get('PASSWORD', ''),
+                host=db_config.get("HOST", "localhost"),
+                port=int(db_config.get("PORT", 3306)),
+                user=db_config.get("USER", "root"),
+                password=db_config.get("PASSWORD", ""),
             )
-            db_name = db_config.get('NAME', 'cimf')
+            db_name = db_config.get("NAME", "cimf")
             with conn.cursor() as cursor:
-                cursor.execute(f"SHOW DATABASES LIKE '{db_name}'")
+                cursor.execute("SHOW DATABASES LIKE %s", (db_name,))
                 result = cursor.fetchone()
             conn.close()
             return result is not None

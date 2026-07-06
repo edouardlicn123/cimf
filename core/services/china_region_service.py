@@ -47,6 +47,7 @@ import requests
 from django.db import transaction
 
 from core.models import ChinaRegion
+from core.services.mixins import error_response, retry_with_fallbacks, success_response
 
 logger = logging.getLogger(__name__)
 
@@ -55,11 +56,11 @@ class ChinaRegionService:
     """中国行政区划服务"""
 
     DATA_SOURCE_URLS = [
-        'https://raw.githubusercontent.com/modood/Administrative-divisions-of-China/master/dist/pca-code.json',
-        'https://ghproxy.com/https://raw.githubusercontent.com/modood/Administrative-divisions-of-China/master/dist/pca-code.json',
-        'https://gitee.com/modood/Administrative-divisions-of-China/raw/master/dist/pca-code.json',
+        "https://raw.githubusercontent.com/modood/Administrative-divisions-of-China/master/dist/pca-code.json",
+        "https://ghproxy.com/https://raw.githubusercontent.com/modood/Administrative-divisions-of-China/master/dist/pca-code.json",
+        "https://gitee.com/modood/Administrative-divisions-of-China/raw/master/dist/pca-code.json",
     ]
-    DATA_FILE_PATH = Path(__file__).parent.parent / 'data' / 'china_regions.json'
+    DATA_FILE_PATH = Path(__file__).parent.parent / "data" / "china_regions.json"
 
     # ===== 数据导入 =====
 
@@ -70,36 +71,34 @@ class ChinaRegionService:
 
         try:
             if not Path(file_path).exists():
-                return {'success': False, 'error': f'文件不存在: {file_path}'}
+                return error_response(f"文件不存在: {file_path}")
 
-            with Path(file_path).open(encoding='utf-8') as f:
+            with Path(file_path).open(encoding="utf-8") as f:
                 data = json.load(f)
 
             logger.info(f"Loaded {len(data)} provinces from local file")
             return ChinaRegionService._import_data(data)
         except Exception as e:
             logger.error(f"从本地文件导入失败: {e}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return error_response(str(e))
 
     @staticmethod
     def import_from_url(url: str | None = None) -> dict:
         """从网络获取并导入数据"""
         urls = [url] if url else ChinaRegionService.DATA_SOURCE_URLS
 
-        last_error = None
-        for attempt_url in urls:
-            try:
-                response = requests.get(attempt_url, timeout=30)
-                response.raise_for_status()
-                data = response.json()
-                logger.info(f"Fetched {len(data)} provinces from {attempt_url[:50]}...")
-                return ChinaRegionService._import_data(data)
-            except Exception as e:
-                last_error = e
-                continue
-
-        logger.error(f"所有数据源都获取失败: {last_error}", exc_info=True)
-        return {'success': False, 'error': str(last_error)}
+        try:
+            data = retry_with_fallbacks(
+                urls,
+                lambda u, timeout: requests.get(u, timeout=timeout).json(),
+                max_retries=1,
+                timeout=30,
+            )
+            logger.info(f"Fetched {len(data)} provinces from data source")
+            return ChinaRegionService._import_data(data)
+        except Exception as e:
+            logger.error(f"所有数据源都获取失败: {e}", exc_info=True)
+            return error_response(str(e))
 
     @staticmethod
     def _import_data(data: list[dict]) -> dict:
@@ -116,12 +115,7 @@ class ChinaRegionService:
 
             for province_data in data:
                 province_count += 1
-                province = ChinaRegion(
-                    code=province_data['code'],
-                    name=province_data['name'],
-                    level=1,
-                    parent=None
-                )
+                province = ChinaRegion(code=province_data["code"], name=province_data["name"], level=1, parent=None)
                 regions_to_create.append(province)
                 code_to_region[province.code] = province
 
@@ -130,15 +124,10 @@ class ChinaRegionService:
             regions_to_create = []
 
             for province_data in data:
-                province = code_to_region[province_data['code']]
-                for city_data in province_data.get('children', []):
+                province = code_to_region[province_data["code"]]
+                for city_data in province_data.get("children", []):
                     city_count += 1
-                    city = ChinaRegion(
-                        code=city_data['code'],
-                        name=city_data['name'],
-                        level=2,
-                        parent=province
-                    )
+                    city = ChinaRegion(code=city_data["code"], name=city_data["name"], level=2, parent=province)
                     regions_to_create.append(city)
                     code_to_region[city.code] = city
 
@@ -147,15 +136,12 @@ class ChinaRegionService:
             regions_to_create = []
 
             for province_data in data:
-                for city_data in province_data.get('children', []):
-                    city = code_to_region[city_data['code']]
-                    for district_data in city_data.get('children', []):
+                for city_data in province_data.get("children", []):
+                    city = code_to_region[city_data["code"]]
+                    for district_data in city_data.get("children", []):
                         district_count += 1
                         district = ChinaRegion(
-                            code=district_data['code'],
-                            name=district_data['name'],
-                            level=3,
-                            parent=city
+                            code=district_data["code"], name=district_data["name"], level=3, parent=city
                         )
                         regions_to_create.append(district)
 
@@ -163,14 +149,14 @@ class ChinaRegionService:
 
         total = province_count + city_count + district_count
         logger.info(f"Import summary: {province_count} provinces, {city_count} cities, {district_count} districts")
-        return {'success': True, 'count': total, 'provinces': province_count, 'cities': city_count, 'districts': district_count}
+        return success_response(count=total, provinces=province_count, cities=city_count, districts=district_count)
 
     # ===== 查询方法 =====
 
     @staticmethod
     def get_provinces() -> list[ChinaRegion]:
         """获取所有省份"""
-        return list(ChinaRegion.objects.filter(level=1).order_by('code'))
+        return list(ChinaRegion.objects.filter(level=1).order_by("code"))
 
     @staticmethod
     def get_cities(province_code: str) -> list[ChinaRegion]:
@@ -178,7 +164,7 @@ class ChinaRegionService:
         province = ChinaRegion.objects.filter(code=province_code, level=1).first()
         if not province:
             return []
-        return list(province.children.filter(level=2).order_by('code'))
+        return list(province.children.filter(level=2).order_by("code"))
 
     @staticmethod
     def get_districts(city_code: str) -> list[ChinaRegion]:
@@ -186,7 +172,7 @@ class ChinaRegionService:
         city = ChinaRegion.objects.filter(code=city_code, level=2).first()
         if not city:
             return []
-        return list(city.children.filter(level=3).order_by('code'))
+        return list(city.children.filter(level=3).order_by("code"))
 
     @staticmethod
     def get_by_code(code: str) -> ChinaRegion | None:
@@ -196,44 +182,37 @@ class ChinaRegionService:
     @staticmethod
     def search(keyword: str, limit: int = 20) -> list[ChinaRegion]:
         """搜索行政区划"""
-        return list(ChinaRegion.objects.filter(
-            name__icontains=keyword
-        ).order_by('level', 'code')[:limit])
+        return list(ChinaRegion.objects.filter(name__icontains=keyword).order_by("level", "code")[:limit])
 
     @staticmethod
     def get_full_path(region_code: str) -> str:
         """获取完整路径（如：广东省-深圳市-南山区）"""
         region = ChinaRegion.objects.filter(code=region_code).first()
         if not region:
-            return ''
+            return ""
 
         return region.full_path
 
     @staticmethod
     def get_tree() -> list[dict]:
         """获取完整的树形结构"""
-        provinces = ChinaRegion.objects.filter(level=1).order_by('code')
+        provinces = ChinaRegion.objects.filter(level=1).order_by("code")
 
         result = []
         for province in provinces:
-            province_data = {
-                'code': province.code,
-                'name': province.name,
-                'level': 1,
-                'children': []
-            }
+            province_data = {"code": province.code, "name": province.name, "level": 1, "children": []}
 
-            for city in province.children.filter(level=2).order_by('code'):
+            for city in province.children.filter(level=2).order_by("code"):
                 city_data = {
-                    'code': city.code,
-                    'name': city.name,
-                    'level': 2,
-                    'children': [
-                        {'code': d.code, 'name': d.name, 'level': 3}
-                        for d in city.children.filter(level=3).order_by('code')
-                    ]
+                    "code": city.code,
+                    "name": city.name,
+                    "level": 2,
+                    "children": [
+                        {"code": d.code, "name": d.name, "level": 3}
+                        for d in city.children.filter(level=3).order_by("code")
+                    ],
                 }
-                province_data['children'].append(city_data)
+                province_data["children"].append(city_data)
 
             result.append(province_data)
 
@@ -243,10 +222,10 @@ class ChinaRegionService:
     def get_stats() -> dict:
         """获取统计信息"""
         return {
-            'total': ChinaRegion.objects.count(),
-            'provinces': ChinaRegion.objects.filter(level=1).count(),
-            'cities': ChinaRegion.objects.filter(level=2).count(),
-            'districts': ChinaRegion.objects.filter(level=3).count(),
+            "total": ChinaRegion.objects.count(),
+            "provinces": ChinaRegion.objects.filter(level=1).count(),
+            "cities": ChinaRegion.objects.filter(level=2).count(),
+            "districts": ChinaRegion.objects.filter(level=3).count(),
         }
 
     @staticmethod
@@ -254,26 +233,23 @@ class ChinaRegionService:
         """从网络下载数据并保存到本地文件"""
         urls = [url] if url else ChinaRegionService.DATA_SOURCE_URLS
 
-        last_error = None
-        for attempt_url in urls:
-            try:
-                response = requests.get(attempt_url, timeout=30)
-                response.raise_for_status()
-                data = response.json()
+        try:
+            data = retry_with_fallbacks(
+                urls,
+                lambda u, timeout: requests.get(u, timeout=timeout).json(),
+                max_retries=1,
+                timeout=30,
+            )
 
-                ChinaRegionService.DATA_FILE_PATH.parent.mkdir(parents=True, exist_ok=True)
-                with ChinaRegionService.DATA_FILE_PATH.open('w', encoding='utf-8') as f:
-                    json.dump(data, f, ensure_ascii=False, indent=2)
+            ChinaRegionService.DATA_FILE_PATH.parent.mkdir(parents=True, exist_ok=True)
+            with ChinaRegionService.DATA_FILE_PATH.open("w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
 
-                province_count = len(data)
-                return {
-                    'success': True,
-                    'message': f'成功下载 {province_count} 个省份数据到本地文件',
-                    'file_path': ChinaRegionService.DATA_FILE_PATH
-                }
-            except Exception as e:
-                last_error = e
-                continue
-
-        logger.error(f"下载数据失败: {last_error}", exc_info=True)
-        return {'success': False, 'error': str(last_error)}
+            province_count = len(data)
+            return success_response(
+                message=f"成功下载 {province_count} 个省份数据到本地文件",
+                file_path=ChinaRegionService.DATA_FILE_PATH,
+            )
+        except Exception as e:
+            logger.error(f"下载数据失败: {e}", exc_info=True)
+            return error_response(str(e))

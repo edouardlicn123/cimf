@@ -1171,3 +1171,79 @@
 3. 全部修复: node_delete PK类型/P2死代码竞态计数器/F()原子更新/字段白名单/narrow except/select_related
 4. 修复 ruff I001: 合并 django.views.decorators.http 导入组
 
+
+
+# 2026-06-01 修改记录
+
+1. WhatsApp 三模板随机发送功能：SendBatch 新增 template_ids JSONField、services.py 随机选模板逻辑、views.py api_send 接收数组、send.html 三选择器+三预览、迁移文件
+
+# 2026-06-07 修改记录
+
+1. 修复 whatsapp manage.html CSRF 问题：所有 fetch 调用添加 X-CSRFToken header 和 r.ok 检查（测试连接/删除模板/保存模板/保存设置）
+2. 修复 whatsapp send.html 和 logs.html CSRF 问题：发送消息和终止发送 fetch 添加 X-CSRFToken header 和 r.ok 检查
+3. whatsapp create_batch 支持追加：同 template_ids 运行中批次自动追加客户，无运行中批次则新建并立即发送第一条
+4. 新增 WABridge 健康检查+自动重启机制：WhatsAppService.check_health/restart_wabridge/ensure_healthy，集成到 create_batch 和 send_next_pending；新增 WABridgeRestartTask 每日重启
+5. 修复 runwabridge 7处 subprocess.run 缩进丢失; 添加 --login CLI; 修复 ruff 3个警告
+6. 添加 WhatsApp 号码检测功能: serve.js /check patch, CustomerFields.has_whatsapp, batch_check_whatsapp, 号码检测页面, 自动修正 customer_name 前缀（电话错误）
+7. 修复 batch_check_whatsapp: onWhatsApp 只返回有 WA 的号码, 未命中算 no_wa 而非 errors
+8. 客户列表：无 WhatsApp 用户后显示 X 标记
+9. 修复检测页面：检测后保持当前页不跳回第一页
+10. 检测页面：默认筛选未确认用户，筛选选项改为未确认/有/没有/全部
+11. 检测后跳转回「未确认」筛选第一页
+12. 修复 WhatsApp 检测：号码长度限制 10->8 位，支持巴林等短号国家
+13. 检测后保持当前筛选和页码，让用户直接看到检测结果
+14. 修复检测：提取纯数字处理韩国括号/EXT后缀等格式，错误时toast变警告色
+15. 修复号码清理：新增 _clean_phone 方法，正确截断分机号并去除括号横线
+16. 修复检测：无效号码客户标记为无WhatsApp，不再阻塞整页检测
+17. 发现 WABridge 不支持号码检测功能，需要替代方案
+18. 合并号码验证到检测功能：无效号码自动标记，WABridge 不可用时仍处理无效号码
+19. 号码格式检测：括号、横线、空格、EXT等格式异常号码自动标记为没有WhatsApp并加（电话错误）前缀
+
+# 2026-06-08 修改记录
+
+1. 修复 WABridge 安装位置冲突：删除 /usr/lib 错误版本，保留 /usr/local/lib 正确版本（含补丁），WhatsApp 检测功能恢复正常
+2. 修复号码长度验证：将 Python 端验证从 8-15 位改为 10-15 位，与 WABridge 保持一致，9 位号码被正确标记为无效
+3. WhatsApp 发送页面添加「仅显示有 WhatsApp」过滤器，翻页时保持过滤状态
+4. WhatsApp 检测不再修改客户名称，删除 3083 条记录的「电话错误」前缀
+5. WhatsApp 号码检测重构：添加一键验证全部号码功能，每号码检查3次，每批10个间隔60秒，新增验证日志页面（保留4000条）
+
+# 2026-06-10 修改记录
+
+1. 修复 WhatsApp 验证进度显示：total_count 在创建批次时即设置，避免显示 0
+2. 修复 WhatsApp 验证错误信息显示：正确获取 check_health() 返回的 error 字段
+
+
+
+# 2026-07-04 修改记录
+
+1. 全面代码审计修复：硬编码URL、tool路由、CustomerForm集成、迁移对齐、SQL拼接、路径遍历、export格式校验、tool_slug白名单、dead code清理、ARG001补全、返回值检查、user验证加固、frame死代码移除、console.log清理、文档更新、Ruff零告警
+
+# 2026-07-05 修改记录
+
+1. 后续代码审计修复：whatsapp未包裹.get()、OOM风险、DB级分页、log_service内存优化、删除遗留脚本
+2. 创建 core/templates/includes/ 下 10 个共享 Jinja2 模板组件
+3. 重构错误页面模板统一使用 error_base.html；BaseService 增加 create/update/delete CRUD 方法
+4. 重构 importexport views: 用 @permission_required 装饰器替换手动权限检查；添加 _get_node_type_or_redirect 辅助函数以消除 9 个视图中的重复代码
+5. 合并JS文件：统一CSRF Token/showToast/apiPost/DragDrop到common.js，简化toast_messages.html和dashboard_cards脚本
+6. 重构8个frame模板，提取sidebar和content_area结构到includes组件
+7. 代码清理：共享验证器模块创建、冗余toast容器/CSS移除、is_admin→@admin_required替换、console.log调试代码清理
+8. CSS: 新增 --bg-card/--bg-body/--border-light/--radius-md 变量声明到 variables.css 及所有主题; 文档: 表单 BootstrapFormMixin 使用清单
+9. 重构 customer/views.py: 提取 _load_customer_form_data() 消除3处重复的分类数据加载；ModuleService: 新增 load_module_info() 公开方法，消除 tools.py/permission_service.py/cards.py/settings.py 中4处重复的 MODULE_INFO 加载逻辑
+10. 分页增强、工具侧边栏去重、版本统一至2.001
+11. 大型可封装性重构实施：创建10个共享模板组件(sidebar/content_area/entry_card/table_card/status_badge/error_base/filter_bar/form_actions/alert/modal)；重构8个frame模板使用Include减少代码重复；importexport视图迁移@permission_required装饰器+_get_node_type_or_redirect辅助函数；错误页统一为error_base；BaseService扩展CRUD方法；JS统一(window.FFE.getCsrfToken/showToast/apiPost/handleFetchError/DragDrop)；合并dashboard_cards.js；移除冗余toast+flash隐藏CSS；clean_email/clean_username/密码验证共享化；admin_required替换手动is_admin；taxonomy数据加载封装；Module info加载合并；版本号统一v2.001；CSS变量补齐；增强分页组件；工具侧边栏加载合并；Ruff零告警
+12. 重构服务层和模型层：使用BaseService.get_by_id、提取_get_user_or_raise/auth_service去重、time_sync helper、水印POSITIONS常量、settings_service简化、db_index索引、模块URL缓存、cron_service拆分
+13. 清理JS和表单：硬编码API URL替换为url()标签、dashboard_cards.js使用FFE.apiPost、region_select.js拆分initRegionSelectWidgets、删除空main.js、实现setupGlobalAjaxError、表单Meta widgets去重
+14. 重构 Jinja2 模板：pagination/form_actions/modal 提取为 include；show_numbers 分页；frame_importexport 清理；permissions_table 提取；drag-and-drop 改用 makeSortable
+15. 重构 Django views/URLs/middleware: 修复中间件死代码, 新增change_password/profile路由, active_section上下文处理器, handle_form_errors装饰器, _get_taxonomy_or_404辅助函数, 聚合get_user_stats查询, 添加重定向URL names, 清理未使用导出
+16. CSS consolidation: extract duplicated theme blocks to base.css, replace hardcoded colors with CSS vars, deduplicate nav_cards/dashboard_cards CSS, remove welcome-bar/avatar-placeholder, add -ms-user-select to watermark
+17. 第二期全面封装重构：47项可封装机会全部执行。模板层：5模板改用pagination include、4模板改用form_actions、2模板改用modal include、提取system_permissions双表为共享include、4模板移除内联拖放改为window.FFE.DragDrop.makeSortable、移除frame_importexport未用admin_footer。视图层：修复middleware死代码、新增change_password/profile路由、active_section统一为context processor(13处手动移除)、@handle_form_errors装饰器+4视图应用、_get_taxonomy_or_404提取、get_user_stats聚合查询、3重定向添加name。服务层：8处user_service改用get_by_id、3处taxonomy_service改用get_by_id、auth_service login→authenticate去重查询、time_sync_service提取_helper、_get_user_or_raise提取6处替换、watermark POSITIONS常量提取、settings_service简化update_or_create。模型层：User.email/is_active/role + ChinaRegion.level添加db_index。模块层：get_installed_module_slugs添加缓存。CSS层：5公共块从6主题提取到base.css、hardcoded颜色替换为CSS变量、nav_cards/homepage CSS去重、welcome-bar/avatar-placeholder死类移除、-ms-user-select补齐。JS层：7处API URL改用url()、dashboard_cards.js改用apiPost、region_select.js拆分、main.js删除、setupGlobalAjaxError实现。表单层：UserCreateForm/UserEditForm widgets共享字典。Ruff零告警+199文件格式化+makemigrations无变更
+
+# 2026-07-06 修改记录
+
+1. 综合服务层封装：创建 mixins.py (SingletonMixin/CachedServiceMixin/工具函数)，扩展 BaseService (get_or_raise/get_first/get_or_none)，CronTask 基类添加默认 setting_key 属性并精简子类，重构 TaxonomyService/UserService/AuthService/SettingsService/PermissionService/ChinaRegionService 使用 mixins 工具函数
+2. 视图层封装重构：创建core/utils/response.py工具函数；重构errors/health/logs/users/taxonomy/regions/cards/time视图及装饰器/中间件；统一JsonResponse→json_success/json_error替换；应用composite decorators模式
+3. 全面模板层封装：创建 frame_sidebar_base/card_section/empty_state/form_switch/nav_pills/entry_card_grid/form_errors/stat_card/pagination 组件，重构 7 个 frame 模板扩展 chain，简化 pagination 调用，替换 card/empty/nav-pills/stat 模式到 include，清理 CSRF/Toast JS 重复
+4. CSS/Forms/JS consolidation: moved shared CSS patterns to base.css, extended BootstrapFormMixin with SelectMultiple, added UserAwareFormMixin/EmailCleanMixin/UsernameCleanMixin, moved _USER_FORM_WIDGETS to mixins, moved password length check to validator, replaced inline drag-drop with shared makeSortable, added apiGet helper, added populateSelect helper, added handleFetchResponse, moved toast style to CSS
+5. 基础设施封装：创建 redirect helpers、扩展 paginate_queryset 返回 page_range、重组 urls.py 使用 include、提取 STORAGE_DIR/LOGS_DIR 常量、合并模块扫描循环、修复 health.py 硬编码版本号、清理 config.env 重复行、优化中间件白名单逻辑、数据驱动旧路径重定向
+6. 第三期全面封装重构：116+项完成。视图层：JsonResponse→json_success/json_error统一(14文件)、_error_response工厂(4视图)、_run_check健康检查(7try块)、_parse_page_params(2重复)、_get_user_or_404/_protect_admin(users.py)、_require_fields/_get_taxonomy_item_or_404(taxonomy.py)、_require_param(4参数验证)、@api_get_view/@api_post_view/@admin_post_view复合装饰器(13处)。服务层：SingletonMixin/CachedServiceMixin创建、BaseService扩展get_or_raise/get_first/safe_execute/update_fields/clean_str、CronTask属性自动生成(4任务→3移除重复)、success_response/error_response标准化(4服务)、SettingsService扩展parse_json、retry_with_fallbacks(3网络请求)。模板层：frame_sidebar_base(7框架)、pagination自驱化(7调用)、创建8个新include(card_section/module_card/empty_state/form_switch/nav_pills/entry_card_grid/form_errors/stat_card)、22模板采用。CSS层：10+模式从8主题提取到base.css(admin-sidebar/accordion/btn-info/welcome-title/navbar/login-btn/dropdown/font-family/transition/alert/badge)。JS层：拖放合并→makeSortable、apiGet统一4GET+addErrorHandling、populateSelect消除3重复、setupGlobalAjaxError集成、toast样式移至CSS。表单层：BootstrapFormMixin推广到所有8表单、EmailCleanMixin/UsernameCleanMixin/UserAwareFormMixin、_USER_FORM_WIDGETS共享、密码长度检查合并到validator。基础设施：core/utils/views.py(redirect_with_error/redirect_with_success)、paginate_queryset返回page_range、settings.py扫描合并+STORAGE_DIR/LOGS_DIR常量、middleware whitelist修复、config.env重复移除、健康检查版本硬编码修复。Ruff零告警+202文件格式化+makemigrations无变更
+
