@@ -33,6 +33,7 @@
 
 from typing import Any
 
+from django.db import transaction
 from django.utils import timezone
 
 from core.models import User
@@ -83,9 +84,15 @@ class AuthService(BaseService):
         返回：
             包含 success、message、user 的字典
         """
-        user = cls.authenticate(username, password)
+        user = cls.get_first(username=username)
 
         if not user:
+            return error_response("用户名或密码错误", user=None)
+
+        if not user.check_password(password):
+            max_failures = cls.get_login_max_failures()
+            lock_minutes = cls.get_login_lock_minutes()
+            user.record_failed_attempt(max_failures, lock_minutes)
             return error_response("用户名或密码错误", user=None)
 
         if user.is_locked():
@@ -108,14 +115,10 @@ class AuthService(BaseService):
     @staticmethod
     def unlock_expired_accounts() -> int:
         """解锁过期的锁定账号"""
-        expired_users = User.objects.filter(locked_until__isnull=False, locked_until__lte=timezone.now())
-        count = expired_users.count()
-
-        for user in expired_users:
-            user.failed_login_attempts = 0
-            user.locked_until = None
-            user.save()
-
+        with transaction.atomic():
+            count = User.objects.filter(locked_until__isnull=False, locked_until__lte=timezone.now()).update(
+                failed_login_attempts=0, locked_until=None
+            )
         return count
 
     @staticmethod

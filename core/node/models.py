@@ -62,4 +62,4 @@ class Node(BaseModel):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"Node {self.id} ({self.node_type.slug})"
+        return f"Node {self.id} ({self.node_type_id})"

@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import redirect, render
+from django.views.decorators.http import require_POST
 
 from core.decorators import permission_required
 from core.importexport import ExportService, ImportService, TemplateGenerator
@@ -201,6 +202,7 @@ def export_exporting(request, node_type_slug):
 
 
 @login_required
+@require_POST
 @permission_required("importexport.view")
 def do_export(request, node_type_slug):
     """执行导出"""
@@ -352,6 +354,7 @@ def upload_preview(request, node_type_slug):
 
 
 @login_required
+@require_POST
 @permission_required("importexport.view")
 def do_import(request, node_type_slug):
     """执行导入"""

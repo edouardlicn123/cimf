@@ -27,7 +27,7 @@ def try_include_module(module_slug, prefix=""):
 
 def get_installed_module_slugs():
     """动态获取所有已安装模块的信息"""
-    cache_key = "installed_module_slugs"
+    cache_key = "modules.installed_slugs"
     slugs = cache.get(cache_key)
     if slugs is not None:
         return slugs

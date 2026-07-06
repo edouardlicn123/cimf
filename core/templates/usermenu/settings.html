@@ -11,8 +11,7 @@
 
 {% block admin_buttons_content %}{% endblock %}
 
-{% block head_extra %} 
-{% endblock %}
+{% block head_extra %}{{ super() }}{% endblock %}
 
 {% block admin_content %}
 <form method="POST" novalidate>

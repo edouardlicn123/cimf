@@ -259,7 +259,8 @@ def homepage_settings(request):
     if setting and setting.value:
         try:
             positions = json.loads(setting.value)
-        except Exception:
+        except Exception as e:
+            logger.warning(f"解析卡片位置配置失败: {e}", exc_info=True)
             positions = {}
     elif not setting:
         logger.debug("配置未找到: user_dashboard_card_positions，使用默认值")
@@ -283,8 +284,8 @@ def homepage_settings(request):
                         "icon": mod_info.get("icon", "bi-grid"),
                     }
                     available_modules.append(module_info)
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f"加载可用模块失败: {e}", exc_info=True)
 
     return render(
         request,

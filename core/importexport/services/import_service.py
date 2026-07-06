@@ -9,6 +9,7 @@ import io
 import re
 from typing import Any
 
+from django.db import transaction
 from django.http import HttpResponse
 from openpyxl import load_workbook
 
@@ -291,12 +292,13 @@ class ImportService:
                         continue
                     instance = existing
                 else:
-                    node = Node.objects.create(
-                        node_type=node_type,
-                        created_by=user,
-                        updated_by=user,
-                    )
-                    instance = model_class.objects.create(node=node)
+                    with transaction.atomic():
+                        node = Node.objects.create(
+                            node_type=node_type,
+                            created_by=user,
+                            updated_by=user,
+                        )
+                        instance = model_class.objects.create(node=node)
 
                 for key, value in transformed.items():
                     setattr(instance, key, value)

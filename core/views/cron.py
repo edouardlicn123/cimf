@@ -2,6 +2,7 @@
 
 import inspect
 import json
+import logging
 import re
 
 from django.shortcuts import render
@@ -11,6 +12,8 @@ from core.decorators import admin_post_view, admin_required
 from core.services import get_cron_service
 from core.utils.pagination import paginate_queryset
 from core.utils.response import json_success
+
+logger = logging.getLogger(__name__)
 
 
 @admin_required
@@ -169,8 +172,8 @@ def get_all_pages_with_permission_status():
     try:
         resolver = get_resolver()
         extract_patterns(resolver.url_patterns)
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f"提取URL模式失败: {e}", exc_info=True)
 
     return pages
 

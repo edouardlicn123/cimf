@@ -100,37 +100,40 @@ class CustomerService:
     @staticmethod
     def create(user, data: dict[str, Any]) -> CustomerFields:
         """创建客户"""
-        node = NodeService.create_node("customer", {}, user)
-        if not node:
-            raise ValueError("创建节点失败")
+        from django.db import transaction  # noqa: PLC0415
 
-        customer_code = data.get("customer_code")
-        if not customer_code:
-            customer_code = "CC" + "".join(random.choices(string.digits, k=6))
+        with transaction.atomic():
+            node = NodeService.create_node("customer", {}, user)
+            if not node:
+                raise ValueError("创建节点失败")
 
-        customer = CustomerFields.objects.create(
-            node=node,
-            customer_name=data.get("customer_name", ""),
-            customer_code=customer_code,
-            customer_type_id=data.get("customer_type_id"),
-            enterprise_name=data.get("enterprise_name"),
-            phone1=data.get("phone1"),
-            email1=data.get("email1"),
-            phone2=data.get("phone2"),
-            email2=data.get("email2"),
-            linkedin=data.get("linkedin"),
-            country_id=data.get("country_id"),
-            province=data.get("province"),
-            address=data.get("address"),
-            postal_code=data.get("postal_code"),
-            industry=data.get("industry"),
-            enterprise_type_id=data.get("enterprise_type_id"),
-            registered_capital=data.get("registered_capital"),
-            customer_level_id=data.get("customer_level_id"),
-            credit_limit=data.get("credit_limit"),
-            website=data.get("website"),
-            notes=data.get("notes"),
-        )
+            customer_code = data.get("customer_code")
+            if not customer_code:
+                customer_code = "CC" + "".join(random.choices(string.digits, k=6))
+
+            customer = CustomerFields.objects.create(
+                node=node,
+                customer_name=data.get("customer_name", ""),
+                customer_code=customer_code,
+                customer_type_id=data.get("customer_type_id"),
+                enterprise_name=data.get("enterprise_name"),
+                phone1=data.get("phone1"),
+                email1=data.get("email1"),
+                phone2=data.get("phone2"),
+                email2=data.get("email2"),
+                linkedin=data.get("linkedin"),
+                country_id=data.get("country_id"),
+                province=data.get("province"),
+                address=data.get("address"),
+                postal_code=data.get("postal_code"),
+                industry=data.get("industry"),
+                enterprise_type_id=data.get("enterprise_type_id"),
+                registered_capital=data.get("registered_capital"),
+                customer_level_id=data.get("customer_level_id"),
+                credit_limit=data.get("credit_limit"),
+                website=data.get("website"),
+                notes=data.get("notes"),
+            )
 
         return customer
 

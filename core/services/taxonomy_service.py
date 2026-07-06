@@ -35,7 +35,7 @@
 import logging
 
 from django.core.management import call_command
-from django.db import models
+from django.db import models, transaction
 
 from core.models import Taxonomy, TaxonomyItem
 from core.services.base_service import BaseService
@@ -106,12 +106,16 @@ class TaxonomyService(BaseService):
     @staticmethod
     def create_item(taxonomy_id: int, name: str, description: str = "", weight: int | None = None) -> models.Model:
         """创建词汇项"""
-        if weight is None:
-            max_weight = (
-                TaxonomyItem.objects.filter(taxonomy_id=taxonomy_id).aggregate(models.Max("weight"))["weight__max"] or 0
+        with transaction.atomic():
+            if weight is None:
+                max_weight = (
+                    TaxonomyItem.objects.filter(taxonomy_id=taxonomy_id).aggregate(models.Max("weight"))["weight__max"]
+                    or 0
+                )
+                weight = max_weight + 1
+            item = TaxonomyItem.objects.create(
+                taxonomy_id=taxonomy_id, name=name, description=description, weight=weight
             )
-            weight = max_weight + 1
-        item = TaxonomyItem.objects.create(taxonomy_id=taxonomy_id, name=name, description=description, weight=weight)
         return item
 
     @classmethod
@@ -136,8 +140,9 @@ class TaxonomyService(BaseService):
     @staticmethod
     def reorder_items(taxonomy_id: int, item_ids: list[int]) -> bool:
         """重新排序词汇项"""
-        for idx, item_id in enumerate(item_ids):
-            TaxonomyItem.objects.filter(id=item_id, taxonomy_id=taxonomy_id).update(weight=idx)
+        with transaction.atomic():
+            for idx, item_id in enumerate(item_ids):
+                TaxonomyItem.objects.filter(id=item_id, taxonomy_id=taxonomy_id).update(weight=idx)
         return True
 
     @staticmethod

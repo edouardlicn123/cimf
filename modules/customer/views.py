@@ -73,6 +73,32 @@ def _load_customer_form_data():
     return result
 
 
+def _build_customer_data(cd: dict) -> dict:
+    """从 cleaned_data 构建服务层数据字典"""
+    return {
+        "customer_name": cd.get("customer_name", "").strip(),
+        "customer_code": cd.get("customer_code", "").strip() or None,
+        "customer_type_id": cd.get("customer_type").id if cd.get("customer_type") else None,
+        "enterprise_name": cd.get("enterprise_name", "").strip() or None,
+        "phone1": cd.get("phone1", "").strip() or None,
+        "email1": cd.get("email1", "").strip() or None,
+        "phone2": cd.get("phone2", "").strip() or None,
+        "email2": cd.get("email2", "").strip() or None,
+        "linkedin": cd.get("linkedin", "").strip() or None,
+        "country_id": cd.get("country").id if cd.get("country") else None,
+        "province": cd.get("province", "").strip() or None,
+        "address": cd.get("address", "").strip() or None,
+        "postal_code": cd.get("postal_code", "").strip() or None,
+        "industry": cd.get("industry", "").strip() or None,
+        "enterprise_type_id": cd.get("enterprise_type").id if cd.get("enterprise_type") else None,
+        "registered_capital": cd.get("registered_capital"),
+        "customer_level_id": cd.get("customer_level").id if cd.get("customer_level") else None,
+        "credit_limit": cd.get("credit_limit"),
+        "website": cd.get("website", "").strip() or None,
+        "notes": cd.get("notes", "").strip() or None,
+    }
+
+
 @login_required
 def node_list(request):
     """海外客户列表"""
@@ -145,40 +171,18 @@ def node_create(request):
     if request.method == "POST":
         form = CustomerForm(request.POST)
         if form.is_valid():
-            cd = form.cleaned_data
-            data = {
-                "customer_name": cd.get("customer_name", "").strip(),
-                "customer_code": cd.get("customer_code", "").strip() or None,
-                "customer_type_id": cd.get("customer_type").id if cd.get("customer_type") else None,
-                "enterprise_name": cd.get("enterprise_name", "").strip() or None,
-                "phone1": cd.get("phone1", "").strip() or None,
-                "email1": cd.get("email1", "").strip() or None,
-                "phone2": cd.get("phone2", "").strip() or None,
-                "email2": cd.get("email2", "").strip() or None,
-                "linkedin": cd.get("linkedin", "").strip() or None,
-                "country_id": cd.get("country").id if cd.get("country") else None,
-                "province": cd.get("province", "").strip() or None,
-                "address": cd.get("address", "").strip() or None,
-                "postal_code": cd.get("postal_code", "").strip() or None,
-                "industry": cd.get("industry", "").strip() or None,
-                "enterprise_type_id": cd.get("enterprise_type").id if cd.get("enterprise_type") else None,
-                "registered_capital": cd.get("registered_capital"),
-                "customer_level_id": cd.get("customer_level").id if cd.get("customer_level") else None,
-                "credit_limit": cd.get("credit_limit"),
-                "website": cd.get("website", "").strip() or None,
-                "notes": cd.get("notes", "").strip() or None,
-            }
+            data = _build_customer_data(form.cleaned_data)
             try:
                 CustomerService.create(request.user, data)
                 messages.success(request, "客户创建成功")
                 return redirect("node:module_page", node_type_slug="customer")
             except ValueError as e:
                 messages.error(request, str(e))
-            else:
-                for field, errors in form.errors.items():
-                    label = form.fields[field].label or field
-                    for error in errors:
-                        messages.error(request, f"{label}: {error}")
+        else:
+            for field, errors in form.errors.items():
+                label = form.fields[field].label or field
+                for error in errors:
+                    messages.error(request, f"{label}: {error}")
 
     return render(
         request,
@@ -256,29 +260,7 @@ def node_edit(request, node_id: int):
     if request.method == "POST":
         form = CustomerForm(request.POST)
         if form.is_valid():
-            cd = form.cleaned_data
-            data = {
-                "customer_name": cd.get("customer_name", "").strip(),
-                "customer_code": cd.get("customer_code", "").strip() or None,
-                "customer_type_id": cd.get("customer_type").id if cd.get("customer_type") else None,
-                "enterprise_name": cd.get("enterprise_name", "").strip() or None,
-                "phone1": cd.get("phone1", "").strip() or None,
-                "email1": cd.get("email1", "").strip() or None,
-                "phone2": cd.get("phone2", "").strip() or None,
-                "email2": cd.get("email2", "").strip() or None,
-                "linkedin": cd.get("linkedin", "").strip() or None,
-                "country_id": cd.get("country").id if cd.get("country") else None,
-                "province": cd.get("province", "").strip() or None,
-                "address": cd.get("address", "").strip() or None,
-                "postal_code": cd.get("postal_code", "").strip() or None,
-                "industry": cd.get("industry", "").strip() or None,
-                "enterprise_type_id": cd.get("enterprise_type").id if cd.get("enterprise_type") else None,
-                "registered_capital": cd.get("registered_capital"),
-                "customer_level_id": cd.get("customer_level").id if cd.get("customer_level") else None,
-                "credit_limit": cd.get("credit_limit"),
-                "website": cd.get("website", "").strip() or None,
-                "notes": cd.get("notes", "").strip() or None,
-            }
+            data = _build_customer_data(form.cleaned_data)
             try:
                 CustomerService.update(customer.id, request.user, data)
                 messages.success(request, "客户更新成功")

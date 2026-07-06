@@ -643,8 +643,9 @@ except Exception as e:
             module_info = ModuleService._load_module_info(cid)
             dep_module = Module.objects.filter(module_id=cid).first()
             if not dep_module:
-                logger.warning(f"依赖模块未注册: {cid}")
-                return False, f"需要「{module_info.get('name', cid)}」已安装并启用（当前状态：未注册）", []
+                raise ValueError(
+                    f"需要「{module_info.get('name', cid)}」已安装并启用（当前状态：未注册）"
+                )
 
             info = {
                 "module_id": cid,
