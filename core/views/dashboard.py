@@ -15,16 +15,20 @@ def dashboard(request):
     stats = UserService.get_user_stats()
     settings = SettingsService.get_all_settings()
     user_display_name = request.user.nickname or request.user.username
-    settings['welcome_subtitle'] = settings.get('welcome_subtitle') or '让我们一起把项目完善吧。'
-    settings['welcome_intro'] = settings.get('welcome_intro') or '初始用户名：admin 初始密码：admin123'
+    settings["welcome_subtitle"] = settings.get("welcome_subtitle") or "让我们一起把项目完善吧。"
+    settings["welcome_intro"] = settings.get("welcome_intro") or "初始用户名：admin 初始密码：admin123"
 
-    return render(request, 'indexdashboard.html', {
-        'stats': stats,
-        'settings': settings,
-        'user_display_name': user_display_name,
-        'page_title': user_display_name,
-        'show_header': 'False',
-    })
+    return render(
+        request,
+        "indexdashboard.html",
+        {
+            "stats": stats,
+            "settings": settings,
+            "user_display_name": user_display_name,
+            "page_title": user_display_name,
+            "show_header": "False",
+        },
+    )
 
 
 @admin_required
@@ -36,8 +40,12 @@ def admin_dashboard(request):
     settings_count = SystemSetting.objects.count()
     taxonomy_count = Taxonomy.objects.count()
 
-    return render(request, 'admin/dashboard.html', {
-        'stats': stats,
-        'settings_count': settings_count,
-        'taxonomy_count': taxonomy_count,
-    })
+    return render(
+        request,
+        "admin/dashboard.html",
+        {
+            "stats": stats,
+            "settings_count": settings_count,
+            "taxonomy_count": taxonomy_count,
+        },
+    )

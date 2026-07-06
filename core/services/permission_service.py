@@ -33,23 +33,24 @@ import json
 
 from core.constants import UserRole
 from core.models import User
+from core.module.models import Module
 
 PERMISSIONS = [
-    ('system.settings.view', '系统设置 - 查看'),
-    ('system.settings.modify', '系统设置 - 修改'),
-    ('permissions.view', '权限管理 - 查看'),
-    ('permissions.modify', '权限管理 - 修改'),
-    ('user.create', '人员管理 - 创建'),
-    ('user.read', '人员管理 - 查看'),
-    ('user.update', '人员管理 - 修改'),
-    ('user.delete', '人员管理 - 删除'),
-    ('importexport.view', '数据导入导出 - 访问'),
+    ("system.settings.view", "系统设置 - 查看"),
+    ("system.settings.modify", "系统设置 - 修改"),
+    ("permissions.view", "权限管理 - 查看"),
+    ("permissions.modify", "权限管理 - 修改"),
+    ("user.create", "人员管理 - 创建"),
+    ("user.read", "人员管理 - 查看"),
+    ("user.update", "人员管理 - 修改"),
+    ("user.delete", "人员管理 - 删除"),
+    ("importexport.view", "数据导入导出 - 访问"),
 ]
 
 
 ROLE_DEFAULT_PERMISSIONS: dict[str, list[str]] = {
-    UserRole.MANAGER: ['importexport.view'],
-    UserRole.LEADER: ['importexport.view'],
+    UserRole.MANAGER: ["importexport.view"],
+    UserRole.LEADER: ["importexport.view"],
     UserRole.EMPLOYEE: [],
 }
 
@@ -69,38 +70,38 @@ class PermissionService:
     def get_system_permissions() -> dict[str, dict]:
         """获取系统权限，按模块分组"""
         return {
-            'system_settings': {
-                'name': '系统设置',
-                'icon': 'bi-gear',
-                'permissions': [
-                    ('system.settings.view', '系统设置 - 查看'),
-                    ('system.settings.modify', '系统设置 - 修改'),
-                ]
+            "system_settings": {
+                "name": "系统设置",
+                "icon": "bi-gear",
+                "permissions": [
+                    ("system.settings.view", "系统设置 - 查看"),
+                    ("system.settings.modify", "系统设置 - 修改"),
+                ],
             },
-            'permissions': {
-                'name': '权限管理',
-                'icon': 'bi-shield-lock',
-                'permissions': [
-                    ('permissions.view', '权限管理 - 查看'),
-                    ('permissions.modify', '权限管理 - 修改'),
-                ]
+            "permissions": {
+                "name": "权限管理",
+                "icon": "bi-shield-lock",
+                "permissions": [
+                    ("permissions.view", "权限管理 - 查看"),
+                    ("permissions.modify", "权限管理 - 修改"),
+                ],
             },
-            'user': {
-                'name': '人员管理',
-                'icon': 'bi-people',
-                'permissions': [
-                    ('user.create', '人员管理 - 创建'),
-                    ('user.read', '人员管理 - 查看'),
-                    ('user.update', '人员管理 - 修改'),
-                    ('user.delete', '人员管理 - 删除'),
-                ]
+            "user": {
+                "name": "人员管理",
+                "icon": "bi-people",
+                "permissions": [
+                    ("user.create", "人员管理 - 创建"),
+                    ("user.read", "人员管理 - 查看"),
+                    ("user.update", "人员管理 - 修改"),
+                    ("user.delete", "人员管理 - 删除"),
+                ],
             },
-            'importexport': {
-                'name': '数据导入导出',
-                'icon': 'bi-arrow-down-up',
-                'permissions': [
-                    ('importexport.view', '数据导入导出 - 访问'),
-                ]
+            "importexport": {
+                "name": "数据导入导出",
+                "icon": "bi-arrow-down-up",
+                "permissions": [
+                    ("importexport.view", "数据导入导出 - 访问"),
+                ],
             },
         }
 
@@ -112,34 +113,25 @@ class PermissionService:
     @staticmethod
     def get_role_permissions_from_db(role: str) -> list[str]:
         """从数据库获取角色权限（优先）或使用默认值"""
-        from core.models import SystemSetting  # noqa: PLC0415
+        from core.services import SettingsService  # noqa: PLC0415
 
-        setting_key = f'role_permissions_{role}'
-        setting = SystemSetting.objects.filter(key=setting_key).first()
+        setting_key = f"role_permissions_{role}"
+        value = SettingsService.get_setting(setting_key, parse_json=True)
 
-        if setting and setting.value:
-            try:
-                return json.loads(setting.value)
-            except (json.JSONDecodeError, TypeError):
-                pass
+        if value:
+            return value
 
         return ROLE_DEFAULT_PERMISSIONS.get(role, [])
 
     @staticmethod
     def save_role_permissions(role: str, permissions: list[str]) -> None:
         """保存角色权限到数据库"""
-        from core.models import SystemSetting  # noqa: PLC0415
+        from core.services import SettingsService  # noqa: PLC0415
 
-        setting_key = f'role_permissions_{role}'
+        setting_key = f"role_permissions_{role}"
         value = json.dumps(permissions)
-
-        SystemSetting.objects.update_or_create(
-            key=setting_key,
-            defaults={
-                'value': value,
-                'description': f'角色 [{UserRole.LABELS.get(role, role)}] 的默认权限'
-            }
-        )
+        label = UserRole.LABELS.get(role, role)
+        SettingsService.save_setting(setting_key, value, description=f"角色 [{label}] 的默认权限")
 
     @staticmethod
     def has_permission(user: User, permission: str) -> bool:
@@ -165,7 +157,7 @@ class PermissionService:
     def get_user_effective_permissions(user: User) -> list[str]:
         """获取用户的有效权限列表（考虑角色）"""
         if user.is_admin:
-            return ['*']
+            return ["*"]
 
         return PermissionService.get_role_permissions_from_db(user.role)
 
@@ -179,60 +171,43 @@ class PermissionService:
         """初始化角色默认权限到数据库（优化版：批量查询）"""
         from core.models import SystemSetting  # noqa: PLC0415
 
-        existing_keys = set(SystemSetting.objects.filter(
-            key__startswith='role_permissions_'
-        ).values_list('key', flat=True))
+        existing_keys = set(
+            SystemSetting.objects.filter(key__startswith="role_permissions_").values_list("key", flat=True)
+        )
 
         for role, perms in ROLE_DEFAULT_PERMISSIONS.items():
-            setting_key = f'role_permissions_{role}'
+            setting_key = f"role_permissions_{role}"
             if setting_key not in existing_keys:
                 PermissionService.save_role_permissions(role, perms)
 
     @staticmethod
     def get_node_permissions() -> dict[str, dict]:
         """获取节点权限，按节点类型分组（从模块配置动态读取）"""
-        from importlib import import_module  # noqa: PLC0415
-
-        from core.module.models import Module  # noqa: PLC0415
-
         node_permissions = {}
 
         # 获取已安装且已启用的模块
-        active_modules = Module.objects.filter(
-            is_installed=True,
-            is_active=True,
-            module_type='node'
-        )
+        active_modules = Module.objects.filter(is_installed=True, is_active=True, module_type="node")
 
         for module in active_modules:
             # 基础权限（自动添加）
             perms = [
-                (f'node.{module.module_id}.create', f'{module.name} - 创建'),
-                (f'node.{module.module_id}.read', f'{module.name} - 查看'),
-                (f'node.{module.module_id}.update', f'{module.name} - 修改'),
-                (f'node.{module.module_id}.delete', f'{module.name} - 删除'),
+                (f"node.{module.module_id}.create", f"{module.name} - 创建"),
+                (f"node.{module.module_id}.read", f"{module.name} - 查看"),
+                (f"node.{module.module_id}.update", f"{module.name} - 修改"),
+                (f"node.{module.module_id}.delete", f"{module.name} - 删除"),
             ]
 
             # 从 module.py 读取自定义权限
-            icon = 'bi-folder'
-            try:
-                mod = import_module(f'modules.{module.path}.module')
-                if hasattr(mod, 'MODULE_INFO'):
-                    module_info = mod.MODULE_INFO
-                    icon = module_info.get('icon', 'bi-folder')
+            from core.module.services.module_service import ModuleService  # noqa: PLC0415
 
-                    # 添加模块自定义权限
-                    perms.extend(
-                        (f'node.{module.module_id}.{perm["key"]}', f'{module.name} - {perm["name"]}')
-                        for perm in module_info.get('permissions', [])
-                    )
-            except (ImportError, ModuleNotFoundError, AttributeError):
-                pass
+            module_info = ModuleService.load_module_info(module.path)
+            icon = module_info.get("icon", "bi-folder") if module_info else "bi-folder"
+            if module_info:
+                perms.extend(
+                    (f"node.{module.module_id}.{perm['key']}", f"{module.name} - {perm['name']}")
+                    for perm in module_info.get("permissions", [])
+                )
 
-            node_permissions[module.module_id] = {
-                'name': module.name,
-                'icon': icon,
-                'permissions': perms
-            }
+            node_permissions[module.module_id] = {"name": module.name, "icon": icon, "permissions": perms}
 
         return node_permissions

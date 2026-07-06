@@ -11,104 +11,64 @@
 <form method="post">
     {% include "includes/csrf.html" %}
     
-    <!-- 角色名称设置 -->
-    <div class="card card-structure mb-4">
-        <div class="card-header">
-            <h5 class="mb-0"><i class="bi bi-mask me-2"></i>角色名称设置</h5>
+    {% set section_title %}<i class="bi bi-mask me-2"></i>角色名称设置{% endset %}
+    {% set section_body %}
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label class="form-label">一类用户</label>
+            <input type="text" name="role_name_manager" class="form-control" value="{{ role_labels.get('manager', '') if role_labels else '' }}">
         </div>
-        <div class="card-body">
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label">一类用户</label>
-                    <input type="text" name="role_name_manager" class="form-control" value="{{ role_labels.get('manager', '') if role_labels else '' }}">
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">二类用户</label>
-                    <input type="text" name="role_name_leader" class="form-control" value="{{ role_labels.get('leader', '') if role_labels else '' }}">
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">三类用户</label>
-                    <input type="text" name="role_name_employee" class="form-control" value="{{ role_labels.get('employee', '') if role_labels else '' }}">
-                </div>
-            </div>
+        <div class="col-md-4">
+            <label class="form-label">二类用户</label>
+            <input type="text" name="role_name_leader" class="form-control" value="{{ role_labels.get('leader', '') if role_labels else '' }}">
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">三类用户</label>
+            <input type="text" name="role_name_employee" class="form-control" value="{{ role_labels.get('employee', '') if role_labels else '' }}">
         </div>
     </div>
+    {% endset %}
+    {% include "includes/card_section.html" %}
     
     <!-- 系统权限卡片 -->
     {% if system_permissions %}
+    {% set perm_role_labels = ["一类用户", "二类用户", "三类用户"] %}
     {% for key, data in system_permissions.items() %}
-    <div class="card card-structure mb-3">
-        <div class="card-header">
-            <h5 class="mb-0"><i class="bi {{ data.icon }} me-2"></i>{{ data.name }}</h5>
-        </div>
-        <div class="card-body">
-            <table class="table table-bordered table-hover mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col" style="min-width: 200px;">权限名称</th>
-                        <th scope="col" class="text-center" style="width: 120px;">一类用户</th>
-                        <th scope="col" class="text-center" style="width: 120px;">二类用户</th>
-                        <th scope="col" class="text-center" style="width: 120px;">三类用户</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for perm_key, perm_label in data.permissions %}
-                    <tr>
-                        <td style="min-width: 200px;"><span class="form-check-label">{{ perm_label }}</span></td>
-                        <td class="text-center" style="width: 120px;">
-                            <input type="checkbox" class="form-check-input" name="permissions_manager" value="{{ perm_key }}" {% if perm_key in role_permissions.get('manager', []) %}checked{% endif %}>
-                        </td>
-                        <td class="text-center" style="width: 120px;">
-                            <input type="checkbox" class="form-check-input" name="permissions_leader" value="{{ perm_key }}" {% if perm_key in role_permissions.get('leader', []) %}checked{% endif %}>
-                        </td>
-                        <td class="text-center" style="width: 120px;">
-                            <input type="checkbox" class="form-check-input" name="permissions_employee" value="{{ perm_key }}" {% if perm_key in role_permissions.get('employee', []) %}checked{% endif %}>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+    {% set perm_table_title = data.name %}
+    {% set perm_rows = [] %}
+    {% for perm_key, perm_label in data.permissions %}
+    {% set _ = perm_rows.append((
+        perm_key,
+        perm_label,
+        [
+            perm_key in role_permissions.get('manager', []),
+            perm_key in role_permissions.get('leader', []),
+            perm_key in role_permissions.get('employee', [])
+        ]
+    )) %}
+    {% endfor %}
+    {% include "includes/permissions_table.html" %}
     {% endfor %}
     {% endif %}
     
     <!-- 节点权限卡片 -->
     {% if node_permissions %}
+    {% set perm_role_labels = ["一类用户", "二类用户", "三类用户"] %}
     {% for slug, data in node_permissions.items() %}
-    <div class="card card-structure mb-3">
-        <div class="card-header">
-            <h5 class="mb-0"><i class="bi {{ data.icon }} me-2"></i>{{ data.name }}</h5>
-        </div>
-        <div class="card-body">
-            <table class="table table-bordered table-hover mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col" style="min-width: 200px;">权限名称</th>
-                        <th scope="col" class="text-center" style="width: 120px;">一类用户</th>
-                        <th scope="col" class="text-center" style="width: 120px;">二类用户</th>
-                        <th scope="col" class="text-center" style="width: 120px;">三类用户</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for perm_key, perm_label in data.permissions %}
-                    <tr>
-                        <td style="min-width: 200px;"><span class="form-check-label">{{ perm_label }}</span></td>
-                        <td class="text-center" style="width: 120px;">
-                            <input type="checkbox" class="form-check-input" name="permissions_manager" value="{{ perm_key }}" {% if perm_key in role_permissions.get('manager', []) %}checked{% endif %}>
-                        </td>
-                        <td class="text-center" style="width: 120px;">
-                            <input type="checkbox" class="form-check-input" name="permissions_leader" value="{{ perm_key }}" {% if perm_key in role_permissions.get('leader', []) %}checked{% endif %}>
-                        </td>
-                        <td class="text-center" style="width: 120px;">
-                            <input type="checkbox" class="form-check-input" name="permissions_employee" value="{{ perm_key }}" {% if perm_key in role_permissions.get('employee', []) %}checked{% endif %}>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+    {% set perm_table_title = data.name %}
+    {% set perm_rows = [] %}
+    {% for perm_key, perm_label in data.permissions %}
+    {% set _ = perm_rows.append((
+        perm_key,
+        perm_label,
+        [
+            perm_key in role_permissions.get('manager', []),
+            perm_key in role_permissions.get('leader', []),
+            perm_key in role_permissions.get('employee', [])
+        ]
+    )) %}
+    {% endfor %}
+    {% include "includes/permissions_table.html" %}
     {% endfor %}
     {% endif %}
     

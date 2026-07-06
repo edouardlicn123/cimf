@@ -51,8 +51,6 @@
 <!-- 自定义 Toast 脚本 -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const container = document.getElementById('customToastContainer');
-
     // 处理 Django messages 框架的消息
     {% if messages %}
     (function() {
@@ -71,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
             else if (msg.level === 30) type = 'warning';
             else if (msg.level === 40 || msg.level === 50) type = 'danger';
             
-            createCustomToast(msg.message, type);
+            window.FFE.showToast(msg.message, type);
         });
     })();
     {% endif %}
@@ -100,36 +98,8 @@ document.addEventListener('DOMContentLoaded', function () {
             else if (el.classList.contains('alert-danger') || el.classList.contains('alert-error')) type = 'danger';
 
             const messageText = el.textContent.trim();
-            createCustomToast(messageText, type);
+            window.FFE.showToast(messageText, type);
         });
     }, 300);
-
-    function createCustomToast(message, type = 'info', delay = 3000) {
-        const toast = document.createElement('div');
-        toast.className = `custom-toast ${type}`;
-        const span = document.createElement('span');
-        span.className = 'fw-medium';
-        span.textContent = message;
-        toast.appendChild(span);
-        const closeBtn = document.createElement('button');
-        closeBtn.className = 'close-btn';
-        closeBtn.setAttribute('aria-label', '关闭');
-        closeBtn.textContent = '×';
-        toast.appendChild(closeBtn);
-
-        container.appendChild(toast);
-
-        setTimeout(() => toast.classList.add('show'), 100);
-
-        toast.querySelector('.close-btn').addEventListener('click', () => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 300);
-        });
-
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 300);
-        }, delay);
-    }
 });
 </script>

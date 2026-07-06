@@ -10,7 +10,7 @@ from core.node.services import NodeTypeService
 
 
 class Command(BaseCommand):
-    help = '初始化节点类型数据（从模块配置动态读取）'
+    help = "初始化节点类型数据（从模块配置动态读取）"
 
     def handle(self, *args, **options):  # noqa: ARG002
         # 从模块配置中动态获取节点类型定义
@@ -22,8 +22,8 @@ class Command(BaseCommand):
 
         count = 0
         for data in node_types:
-            slug = data.get('slug')
-            name = data.get('name', slug)
+            slug = data.get("slug")
+            name = data.get("name", slug)
 
             if not slug:
                 self.stdout.write(self.style.WARNING(f"跳过无效配置: {data}"))
@@ -36,8 +36,8 @@ class Command(BaseCommand):
             NodeType.objects.create(
                 name=name,
                 slug=slug,
-                icon=data.get('icon', 'bi-folder'),
-                description=data.get('description', ''),
+                icon=data.get("icon", "bi-folder"),
+                description=data.get("description", ""),
                 is_active=True,
             )
             count += 1

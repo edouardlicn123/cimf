@@ -1,0 +1,2 @@
+{% set badge_colors = {"active": "bg-success", "inactive": "bg-secondary", "error": "bg-danger", "pending": "bg-warning text-dark"} %}
+<span class="badge {{ badge_colors.get(status, 'bg-secondary') }}">{{ status }}</span>

@@ -19,87 +19,74 @@
     <form method="post">
     {% include "includes/csrf.html" %}
     
-    {% if form.non_field_errors %}
-    <div class="alert alert-danger">
-        {% for error in form.non_field_errors %}
-        {{ error }}{% if not loop.last %}<br>{% endif %}
-        {% endfor %}
+    {% include "includes/form_errors.html" %}
+    
+    {% set card_class = "card mb-4" %}
+    {% set section_title %}基本信息{% endset %}
+    {% set section_body %}
+    <div class="mb-3">
+        <label class="form-label">用户名 *</label>
+        {{ form.username }}
+        {% if form.username.errors %}
+        <div class="text-danger small">{{ form.username.errors[0] }}</div>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        <label class="form-label">昵称</label>
+        {{ form.nickname }}
+        {% if form.nickname.errors %}
+        <div class="text-danger small">{{ form.nickname.errors[0] }}</div>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        <label class="form-label">邮箱</label>
+        {{ form.email }}
+        {% if form.email.errors %}
+        <div class="text-danger small">{{ form.email.errors[0] }}</div>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        <label class="form-label">{% if is_create %}密码 *{% else %}新密码{% endif %}</label>
+        {{ form.password }}
+        {% if form.password.errors %}
+        <div class="text-danger small">{{ form.password.errors[0] }}</div>
+        {% endif %}
+    </div>
+    {% if is_create %}
+    <div class="mb-3">
+        <label class="form-label">确认密码 *</label>
+        {{ form.confirm_password }}
+        {% if form.confirm_password.errors %}
+        <div class="text-danger small">{{ form.confirm_password.errors[0] }}</div>
+        {% endif %}
     </div>
     {% endif %}
+    {% endset %}
+    {% include "includes/card_section.html" %}
     
-    <div class="card mb-4">
-        <div class="card-header">
-            <h5 class="mb-0">基本信息</h5>
-        </div>
-        <div class="card-body">
-            <div class="mb-3">
-                <label class="form-label">用户名 *</label>
-                {{ form.username }}
-                {% if form.username.errors %}
-                <div class="text-danger small">{{ form.username.errors[0] }}</div>
-                {% endif %}
-            </div>
-            <div class="mb-3">
-                <label class="form-label">昵称</label>
-                {{ form.nickname }}
-                {% if form.nickname.errors %}
-                <div class="text-danger small">{{ form.nickname.errors[0] }}</div>
-                {% endif %}
-            </div>
-            <div class="mb-3">
-                <label class="form-label">邮箱</label>
-                {{ form.email }}
-                {% if form.email.errors %}
-                <div class="text-danger small">{{ form.email.errors[0] }}</div>
-                {% endif %}
-            </div>
-            <div class="mb-3">
-                <label class="form-label">{% if is_create %}密码 *{% else %}新密码{% endif %}</label>
-                {{ form.password }}
-                {% if form.password.errors %}
-                <div class="text-danger small">{{ form.password.errors[0] }}</div>
-                {% endif %}
-            </div>
-            {% if is_create %}
-            <div class="mb-3">
-                <label class="form-label">确认密码 *</label>
-                {{ form.confirm_password }}
-                {% if form.confirm_password.errors %}
-                <div class="text-danger small">{{ form.confirm_password.errors[0] }}</div>
-                {% endif %}
-            </div>
-            {% endif %}
-        </div>
+    {% set card_class = "card mb-4" %}
+    {% set section_title %}角色与权限{% endset %}
+    {% set section_body %}
+    <div class="mb-3">
+        <label class="form-label">角色</label>
+        {{ form.role }}
+        {% if form.role.errors %}
+        <div class="text-danger small">{{ form.role.errors[0] }}</div>
+        {% endif %}
     </div>
+    <div class="form-check">
+        {{ form.is_admin }}
+        <label class="form-check-label" for="{{ form.is_admin.id_for_label }}">系统管理员</label>
+    </div>
+    {% if not is_create %}
+    <div class="form-check mt-3">
+        {{ form.is_active }}
+        <label class="form-check-label" for="{{ form.is_active.id_for_label }}">账号启用</label>
+    </div>
+    {% endif %}
+    {% endset %}
+    {% include "includes/card_section.html" %}
     
-    <div class="card mb-4">
-        <div class="card-header">
-            <h5 class="mb-0">角色与权限</h5>
-        </div>
-        <div class="card-body">
-            <div class="mb-3">
-                <label class="form-label">角色</label>
-                {{ form.role }}
-                {% if form.role.errors %}
-                <div class="text-danger small">{{ form.role.errors[0] }}</div>
-                {% endif %}
-            </div>
-            <div class="form-check">
-                {{ form.is_admin }}
-                <label class="form-check-label" for="{{ form.is_admin.id_for_label }}">系统管理员</label>
-            </div>
-            {% if not is_create %}
-            <div class="form-check mt-3">
-                {{ form.is_active }}
-                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">账号启用</label>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-    
-    <div class="text-end">
-        <a href="{{ url('core:system_users') }}" class="btn btn-secondary">取消</a>
-        <button type="submit" class="btn btn-primary">保存</button>
-    </div>
+    {% set cancel_url = url('core:system_users') %}{% include "includes/form_actions.html" %}
 </form>
 {% endblock %}

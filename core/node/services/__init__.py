@@ -3,4 +3,4 @@
 from .node_service import NodeService
 from .node_type_service import NodeTypeService
 
-__all__ = ['NodeService', 'NodeTypeService']
+__all__ = ["NodeService", "NodeTypeService"]

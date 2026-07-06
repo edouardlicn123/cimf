@@ -82,13 +82,11 @@
     // =============================================
     // 示例：如果以后使用 fetch，可在此统一处理 401、403 等错误
     function setupGlobalAjaxError() {
-        // 目前留空，待后续引入 axios 或其他库时实现
-        // 示例代码：
-        // document.addEventListener('ajaxError', (e) => {
-        //     if (e.detail.status === 401) {
-        //         window.location.href = '/auth/login';
-        //     }
-        // });
+        document.addEventListener('ajaxError', function(e) {
+            if (e.detail && e.detail.status === 401) {
+                window.location.href = '/accounts/login/';
+            }
+        });
     }
 
 
@@ -96,7 +94,7 @@
     // 5. 页面加载完成后统一初始化
     // =============================================
     document.addEventListener('DOMContentLoaded', () => {
-        console.log('FFE 项目跟进系统 - common.js 已加载');
+        // FFE 项目跟进系统 - common.js 已加载
 
         // 初始化导航栏滚动效果
         initNavbarScroll();
@@ -119,11 +117,11 @@
 
 
     // =============================================
-    // 6. 暴露全局工具函数（可选）
+    // 6. 暴露全局工具函数
     // =============================================
     window.FFE = window.FFE || {};
 
-    // 示例：格式化日期
+    // 格式化日期
     window.FFE.formatDate = function(date) {
         return date.toLocaleDateString('zh-CN', {
             year: 'numeric',
@@ -132,9 +130,9 @@
         });
     };
 
-    // 示例：显示成功提示（后续可结合 sweetalert2）
+    // 显示成功提示
     window.FFE.showSuccess = function(message) {
-        alert(message); // 临时使用 alert，后续可替换为美观组件
+        alert(message);
     };
 
     // 获取并显示北京时间
@@ -142,8 +140,7 @@
         const timeElement = document.getElementById('current-beijing-time');
         if (!timeElement) return;
 
-        // 从后端API获取时间
-        fetch('/api/v1/time/current')
+        window.FFE.apiGet('/api/v1/time/current')
             .then(response => response.json())
             .then(data => {
                 if (data.time) {
@@ -151,8 +148,6 @@
                 }
             })
             .catch(error => {
-                console.error('获取时间失败:', error);
-                // 降级使用本地时间
                 const now = new Date();
                 const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
                 const year = now.getFullYear();
@@ -164,6 +159,154 @@
                 const seconds = String(now.getSeconds()).padStart(2, '0');
                 timeElement.textContent = `${year}-${month}-${day} ${weekday} ${hours}:${minutes}:${seconds}`;
             });
+    };
+
+    // 从 Cookie 获取 CSRF Token
+    window.FFE.getCsrfToken = function() {
+        var name = 'csrftoken';
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    };
+
+    // 显示自定义 Toast 通知
+    window.FFE.showToast = function(message, type, delay) {
+        type = type || 'info';
+        delay = delay || 3000;
+        var container = document.getElementById('customToastContainer');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'customToastContainer';
+            container.className = 'custom-toast-container';
+            document.body.appendChild(container);
+        }
+        var toast = document.createElement('div');
+        toast.className = 'custom-toast ' + type;
+        var span = document.createElement('span');
+        span.className = 'fw-medium';
+        span.textContent = message;
+        toast.appendChild(span);
+        var closeBtn = document.createElement('button');
+        closeBtn.className = 'close-btn';
+        closeBtn.setAttribute('aria-label', '关闭');
+        closeBtn.textContent = '×';
+        toast.appendChild(closeBtn);
+        container.appendChild(toast);
+        setTimeout(function() { toast.classList.add('show'); }, 100);
+        toast.querySelector('.close-btn').addEventListener('click', function() {
+            toast.classList.remove('show');
+            setTimeout(function() { toast.remove(); }, 300);
+        });
+        setTimeout(function() {
+            toast.classList.remove('show');
+            setTimeout(function() { toast.remove(); }, 300);
+        }, delay);
+    };
+
+    // 统一的 POST 请求（带 CSRF）
+    window.FFE.apiPost = function(url, data) {
+        return fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': window.FFE.getCsrfToken()
+            },
+            body: JSON.stringify(data),
+            credentials: 'include'
+        });
+    };
+
+    // 统一的 GET 请求
+    window.FFE.apiGet = function(url) {
+        return fetch(url, {
+            credentials: 'include'
+        });
+    };
+
+    // 统一的 fetch 错误处理
+    window.FFE.handleFetchError = function(error, showToast_) {
+        if (showToast_ !== false) {
+            console.error('请求失败:', error);
+            window.FFE.showToast('操作失败，请重试', 'danger');
+        }
+    };
+
+    // 统一的 fetch 响应处理（含 401 重定向和错误 toast）
+    window.FFE.handleFetchResponse = function(response) {
+        if (response.status === 401) {
+            window.location.href = '/accounts/login/';
+            return null;
+        }
+        if (!response.ok) {
+            return response.json().then(function(data) {
+                window.FFE.showToast(data.error || '请求失败', 'danger');
+                return null;
+            });
+        }
+        return response.json();
+    };
+
+    // 拖放工具
+    window.FFE.DragDrop = {
+        draggingCard: null,
+
+        makeSortable: function(containerSelector, cardSelector, slotSelector, onDropCallback) {
+            var cards = document.querySelectorAll(cardSelector);
+            var slots = document.querySelectorAll(slotSelector);
+
+            cards.forEach(function(card) {
+                card.addEventListener('dragstart', function(e) {
+                    window.FFE.DragDrop.draggingCard = e.target.closest(cardSelector);
+                    window.FFE.DragDrop.draggingCard.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', '');
+                });
+                card.addEventListener('dragend', function(e) {
+                    if (window.FFE.DragDrop.draggingCard) {
+                        window.FFE.DragDrop.draggingCard.classList.remove('dragging');
+                    }
+                    document.querySelectorAll(slotSelector).forEach(function(slot) {
+                        slot.classList.remove('drag-over');
+                    });
+                });
+            });
+
+            slots.forEach(function(slot) {
+                slot.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                });
+                slot.addEventListener('dragenter', function(e) {
+                    e.preventDefault();
+                    var s = e.target.closest(slotSelector);
+                    if (s) s.classList.add('drag-over');
+                });
+                slot.addEventListener('dragleave', function(e) {
+                    var s = e.target.closest(slotSelector);
+                    if (s && !s.contains(e.relatedTarget)) {
+                        s.classList.remove('drag-over');
+                    }
+                });
+                slot.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    var toSlot = e.target.closest(slotSelector);
+                    var draggingCard = window.FFE.DragDrop.draggingCard;
+                    if (!toSlot || !draggingCard) return;
+                    if (onDropCallback) {
+                        onDropCallback(draggingCard, toSlot);
+                    }
+                });
+            });
+        }
     };
 
 })();

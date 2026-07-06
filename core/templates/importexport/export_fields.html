@@ -15,36 +15,30 @@
 <form method="post">
     {% include "includes/csrf.html" %}
     
-    <div class="card card-structure mb-4">
-        <div class="card-header">
-            <h5 class="mb-0">选择字段</h5>
-        </div>
-        <div class="card-body">
-            <div class="text-end mb-3">
-                <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectAll()">全选</button>
-                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="selectNone()">全不选</button>
-            </div>
-            <div class="row">
-                {% for field in fields %}
-                <div class="col-md-4">
-                    <div class="form-check">
-                        <input class="form-check-input field-checkbox" type="checkbox" name="field_{{ loop.index }}" 
-                               value="{{ field.name }}" id="field_{{ loop.index }}" checked>
-                        <label class="form-check-label" for="field_{{ loop.index }}">
-                            {{ field.label }}
-                        </label>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
+    {% set section_title %}选择字段{% endset %}
+    {% set section_body %}
+    <div class="text-end mb-3">
+        <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectAll()">全选</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="selectNone()">全不选</button>
     </div>
-    
-    <div class="card card-structure mb-4">
-        <div class="card-header">
-            <h5 class="mb-0">筛选条件（可选）</h5>
+    <div class="row">
+        {% for field in fields %}
+        <div class="col-md-4">
+            <div class="form-check">
+                <input class="form-check-input field-checkbox" type="checkbox" name="field_{{ loop.index }}" 
+                       value="{{ field.name }}" id="field_{{ loop.index }}" checked>
+                <label class="form-check-label" for="field_{{ loop.index }}">
+                    {{ field.label }}
+                </label>
+            </div>
         </div>
-        <div class="card-body">
+        {% endfor %}
+    </div>
+    {% endset %}
+    {% include "includes/card_section.html" %}
+    
+    {% set section_title %}筛选条件（可选）{% endset %}
+    {% set section_body %}
             <div id="filterContainer">
                 <div class="row mb-2 filter-row">
                     <div class="col-md-5">
@@ -81,20 +75,17 @@
                 </div>
             </div>
             {% endif %}
-        </div>
-    </div>
+    {% endset %}
+    {% include "includes/card_section.html" %}
     
-    <div class="card card-structure mb-4">
-        <div class="card-header">
-            <h5 class="mb-0">导出格式</h5>
-        </div>
-        <div class="card-body">
+    {% set section_title %}导出格式{% endset %}
+    {% set section_body %}
             <select name="format" class="form-select" style="width: auto;">
                 <option value="csv">CSV</option>
                 <option value="xlsx">Excel (XLSX)</option>
             </select>
-        </div>
-    </div>
+    {% endset %}
+    {% include "includes/card_section.html" %}
     
     <div class="mb-3">
         <button type="submit" class="btn btn-primary">下一步</button>

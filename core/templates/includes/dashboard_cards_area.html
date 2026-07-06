@@ -16,16 +16,6 @@
 </div>
 
 <style>
-.card-slot {
-    height: 150px;
-    min-height: 150px;
-    border: 1px solid var(--border);
-    background-color: var(--bg-surface);
-}
-.card-slot.drag-over {
-    border-color: var(--primary);
-    background-color: var(--primary-light);
-}
 .module-card {
     height: 100%;
     width: 100%;
@@ -50,7 +40,6 @@
 (function() {
     'use strict';
 
-    var draggingCard = null;
     var cardPositions = {};
 
     // 农历数据
@@ -142,22 +131,6 @@
         return { lunar: yearStem + yearBranch + ' ' + zodiac + '年 ' + monthName + dayName };
     }
 
-    function getCsrfToken() {
-        var name = 'csrftoken';
-        var cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
     function saveCardPositions() {
         var positions = {};
         var slots = document.querySelectorAll('.card-slot');
@@ -170,11 +143,11 @@
             }
         });
         
-        fetch('/api/v1/user/dashboard/cards/save/', {
+        fetch('{{ url('api:api_dashboard_cards_save') }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCsrfToken()
+                'X-CSRFToken': window.FFE.getCsrfToken()
             },
             body: JSON.stringify({ positions: positions }),
             credentials: 'include'
@@ -220,7 +193,7 @@
         var typeMap = window._moduleTypes || {};
         var type = typeMap[moduleId];
         if (type === 'node') return '/nodes/';
-        if (type === 'tool') return '/tools/';
+        if (type === 'tool') return '/modules/';
         if (type === 'system') return '/modules/system/';
         return '/modules/';
     }
@@ -327,7 +300,7 @@
     var serverTimeData = { timestamp: 0, recvTime: 0 };
 
     function fetchServerTime() {
-        return fetch('/api/v1/time/current/')
+        return fetch('{{ url('api:api_time_current') }}')
             .then(function(r) { return r.json(); })
             .then(function(data) {
                 serverTimeData.timestamp = data.timestamp;
@@ -368,7 +341,7 @@
     function renderCards() {
         var slots = document.querySelectorAll('.card-slot');
         
-        fetch('/api/v1/user/dashboard/cards/', {credentials: 'include'})
+        fetch('{{ url('api:api_dashboard_cards') }}', {credentials: 'include'})
             .then(function(response) { return response.json(); })
             .then(function(data) {
                 if (data.success && data.data) {
@@ -418,96 +391,34 @@
             });
     }
 
-    function initDragAndDrop() {
-        var cards = document.querySelectorAll('.module-card');
-        var slots = document.querySelectorAll('.card-slot');
-        
-        cards.forEach(function(card) {
-            card.addEventListener('dragstart', onDragStart);
-            card.addEventListener('dragend', onDragEnd);
-        });
-        
-        slots.forEach(function(slot) {
-            slot.addEventListener('dragover', onDragOver);
-            slot.addEventListener('drop', onDrop);
-            slot.addEventListener('dragenter', onDragEnter);
-            slot.addEventListener('dragleave', onDragLeave);
-        });
-    }
-
-    function onDragStart(e) {
-        draggingCard = e.target.closest('.module-card');
-        draggingCard.classList.add('dragging');
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', '');
-    }
-
-    function onDragEnd(e) {
-        if (draggingCard) {
-            draggingCard.classList.remove('dragging');
-        }
-        document.querySelectorAll('.card-slot').forEach(function(slot) {
-            slot.classList.remove('drag-over');
-        });
-    }
-
-    function onDragOver(e) {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-    }
-
-    function onDragEnter(e) {
-        e.preventDefault();
-        var slot = e.target.closest('.card-slot');
-        if (slot) slot.classList.add('drag-over');
-    }
-
-    function onDragLeave(e) {
-        var slot = e.target.closest('.card-slot');
-        if (slot && !slot.contains(e.relatedTarget)) {
-            slot.classList.remove('drag-over');
-        }
-    }
-
-    function onDrop(e) {
-        e.preventDefault();
-        var toSlot = e.target.closest('.card-slot');
-        if (!toSlot || !draggingCard) return;
-        
+    function onCardDrop(draggingCard, toSlot) {
         var fromSlot = draggingCard.closest('.card-slot');
         if (fromSlot === toSlot) return;
         
-        // 获取目标槽位中的卡片（如果有）
         var toCard = toSlot.querySelector('.module-card');
         var newPosition = parseInt(toSlot.dataset.position);
         var fromPosition = parseInt(fromSlot.dataset.position);
         
-        // 将拖拽的卡片放到目标槽位
         toSlot.innerHTML = '';
         toSlot.appendChild(draggingCard);
         
-        // 如果目标槽位有卡片，将其放到源槽位（交换）
         if (toCard) {
             fromSlot.innerHTML = '';
             fromSlot.appendChild(toCard);
             
-            // 交换两个卡片在数据中的位置
             var tempModule = cardPositions[fromPosition];
             cardPositions[fromPosition] = cardPositions[newPosition];
             cardPositions[newPosition] = tempModule;
         } else {
-            // 目标槽位为空，更新数据
             cardPositions[newPosition] = cardPositions[fromPosition];
             cardPositions[fromPosition] = {module: null, size: 'medium', config: {}};
         }
         
-        draggingCard.classList.remove('dragging');
-        
         saveCardPositions();
-        
-        setTimeout(function() {
-            draggingCard.classList.remove('dragging');
-        }, 10);
+    }
+
+    function initDragAndDrop() {
+        window.FFE.DragDrop.makeSortable('.card-slot', '.module-card', '.card-slot', onCardDrop);
     }
 
     // 初始化

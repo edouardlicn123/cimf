@@ -1,0 +1,7 @@
+<div class="form-check form-switch">
+  <input class="form-check-input" type="checkbox" name="{{ switch_name }}" id="{{ switch_id }}" role="switch"
+    {% if switch_checked %}checked{% endif %}
+    {% if switch_value is defined %}value="{{ switch_value }}"{% endif %}
+    {% if switch_extra is defined %}{{ switch_extra }}{% endif %}>
+  <label class="form-check-label" for="{{ switch_id }}">{{ switch_label }}</label>
+</div>

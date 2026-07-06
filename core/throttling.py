@@ -24,29 +24,32 @@ from rest_framework.throttling import SimpleRateThrottle
 
 class LoginRateThrottle(SimpleRateThrottle):
     """登录频率限制：防止暴力破解"""
-    scope = 'login'
+
+    scope = "login"
 
     def get_cache_key(self, request, _view):
-        if request.method != 'POST':
+        if request.method != "POST":
             return None
         return self.get_ident(request)
 
 
 class AdminRateThrottle(SimpleRateThrottle):
     """管理后台频率限制：高权限用户"""
-    scope = 'admin'
+
+    scope = "admin"
 
     def get_cache_key(self, request, _view):
         if not request.user or not request.user.is_authenticated:
             return None
-        if not getattr(request.user, 'is_admin', False):
+        if not getattr(request.user, "is_admin", False):
             return None
         return f"throttle_admin_{request.user.pk}"
 
 
 class IPRateThrottle(SimpleRateThrottle):
     """IP 级别频率限制：更严格的限制"""
-    scope = 'ip'
+
+    scope = "ip"
 
     def get_cache_key(self, request, _view):
         return self.get_ident(request)

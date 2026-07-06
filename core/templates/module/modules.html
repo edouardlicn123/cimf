@@ -243,41 +243,8 @@
 
 <!-- 分页控件 -->
 {% if page_obj and page_obj.paginator.num_pages > 1 %}
-<nav aria-label="模块分页" class="mt-4">
-    <ul class="pagination justify-content-center">
-        {% if page_obj.has_previous() %}
-        <li class="page-item">
-            <a class="page-link" href="{{ base_query }}page={{ page_obj.previous_page_number() }}">
-                上一页
-            </a>
-        </li>
-        {% else %}
-        <li class="page-item disabled">
-            <span class="page-link">上一页</span>
-        </li>
-        {% endif %}
-        
-        {% for p in page_range %}
-        <li class="page-item {% if p == current_page %}active{% endif %}">
-            <a class="page-link" href="{{ base_query }}page={{ p }}">
-                {{ p }}
-            </a>
-        </li>
-        {% endfor %}
-        
-        {% if page_obj.has_next() %}
-        <li class="page-item">
-            <a class="page-link" href="{{ base_query }}page={{ page_obj.next_page_number() }}">
-                下一页
-            </a>
-        </li>
-        {% else %}
-        <li class="page-item disabled">
-            <span class="page-link">下一页</span>
-        </li>
-        {% endif %}
-    </ul>
-</nav>
+{% set extra_params = base_query.replace('?', '&') if '?' in base_query else '' %}
+{% include "includes/pagination.html" %}
 {% endif %}
 
 {% else %}

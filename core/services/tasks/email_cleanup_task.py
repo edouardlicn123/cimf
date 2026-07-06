@@ -33,14 +33,6 @@ class EmailCleanupTask(CronTask):
 
     default_interval = 86400  # 24小时
 
-    @property
-    def setting_key_enabled(self) -> str:
-        return "cron_email_cleanup_enabled"
-
-    @property
-    def setting_key_interval(self) -> str:
-        return "cron_email_cleanup_interval"
-
     def execute(self):
         """执行日志清理"""
         from core.smtp.services import EmailService  # noqa: PLC0415

@@ -59,9 +59,7 @@
                             </td>
                         </tr>
                         {% else %}
-                        <tr>
-                            <td colspan="4" class="text-center text-muted">暂无词汇项</td>
-                        </tr>
+                        {% set empty_type = "table" %}{% set empty_colspan = 4 %}{% set empty_message = "暂无词汇项" %}{% include "includes/empty_state.html" %}
                         {% endfor %}
                     </tbody>
                 </table>
@@ -72,93 +70,51 @@
 
 <!-- 编辑词汇项 Modal -->
 {% for item in items %}
-<div class="modal fade" id="editItemModal{{ item.id }}" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">编辑词汇项</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="post" action="{{ url('core:taxonomy_item_update', taxonomy.id, item.id) }}">
-                {% include "includes/csrf.html" %}
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">名称 *</label>
-                        <input type="text" name="name" class="form-control" value="{{ item.name }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">描述</label>
-                        <input type="text" name="description" class="form-control" value="{{ item.description|default('') }}">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="submit" class="btn btn-primary">保存</button>
-                </div>
-            </form>
-        </div>
+{% set modal_id = "editItemModal" + item.id|string %}
+{% set modal_title = "编辑词汇项" %}
+{% set modal_body %}
+<form method="post" action="{{ url('core:taxonomy_item_update', taxonomy.id, item.id) }}">
+    {% include "includes/csrf.html" %}
+    <div class="mb-3">
+        <label class="form-label">名称 *</label>
+        <input type="text" name="name" class="form-control" value="{{ item.name }}" required>
     </div>
-</div>
+    <div class="mb-3">
+        <label class="form-label">描述</label>
+        <input type="text" name="description" class="form-control" value="{{ item.description|default('') }}">
+    </div>
+</form>
+{% endset %}
+{% set modal_footer %}
+<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+<button type="submit" class="btn btn-primary">保存</button>
+{% endset %}
+{% include "includes/modal.html" %}
 {% endfor %}
 
 {% if page_obj and page_obj.paginator.num_pages > 1 %}
-<nav aria-label="词汇项分页" class="mt-4">
-    <ul class="pagination justify-content-center">
-        {% if page_obj.has_previous() %}
-        <li class="page-item">
-            <a class="page-link" href="{{ url('core:taxonomy_view', taxonomy.id) }}?page={{ page_obj.previous_page_number() }}">上一页</a>
-        </li>
-        {% else %}
-        <li class="page-item disabled">
-            <span class="page-link">上一页</span>
-        </li>
-        {% endif %}
-        
-        {% for p in page_obj.paginator.page_range %}
-        <li class="page-item {% if p == page_obj.number %}active{% endif %}">
-            <a class="page-link" href="{{ url('core:taxonomy_view', taxonomy.id) }}?page={{ p }}">{{ p }}</a>
-        </li>
-        {% endfor %}
-        
-        {% if page_obj.has_next() %}
-        <li class="page-item">
-            <a class="page-link" href="{{ url('core:taxonomy_view', taxonomy.id) }}?page={{ page_obj.next_page_number() }}">下一页</a>
-        </li>
-        {% else %}
-        <li class="page-item disabled">
-            <span class="page-link">下一页</span>
-        </li>
-        {% endif %}
-    </ul>
-</nav>
+{% include "includes/pagination.html" %}
 {% endif %}
 
 <!-- 新增词汇项 Modal -->
-<div class="modal fade" id="addItemModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">新增词汇项</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="post" action="{{ url('core:taxonomy_item_create', taxonomy.id) }}">
-                {% include "includes/csrf.html" %}
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">名称 *</label>
-                        <input type="text" name="name" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">描述</label>
-                        <input type="text" name="description" class="form-control">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="submit" class="btn btn-primary">保存</button>
-                </div>
-            </form>
-        </div>
+{% set modal_id = "addItemModal" %}
+{% set modal_title = "新增词汇项" %}
+{% set modal_body %}
+<form method="post" action="{{ url('core:taxonomy_item_create', taxonomy.id) }}">
+    {% include "includes/csrf.html" %}
+    <div class="mb-3">
+        <label class="form-label">名称 *</label>
+        <input type="text" name="name" class="form-control" required>
     </div>
-</div>
+    <div class="mb-3">
+        <label class="form-label">描述</label>
+        <input type="text" name="description" class="form-control">
+    </div>
+</form>
+{% endset %}
+{% set modal_footer %}
+<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+<button type="submit" class="btn btn-primary">保存</button>
+{% endset %}
+{% include "includes/modal.html" %}
 {% endblock %}

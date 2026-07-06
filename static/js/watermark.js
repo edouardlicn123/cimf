@@ -92,6 +92,4 @@
     `;
     document.head.appendChild(style);
 
-    console.log('[Watermark] 水印防护已启用');
-
 })();

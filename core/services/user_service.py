@@ -32,12 +32,12 @@
     - core.services.permission_service: 权限服务
 """
 
-
-from django.db.models import Q
+from django.db.models import Count, Q
 
 from core.constants import UserRole
 from core.models import User
 from core.services.base_service import BaseService
+from core.services.mixins import clean_optional_str, clean_str, update_fields
 from core.services.permission_service import PermissionService
 
 
@@ -46,26 +46,35 @@ class UserService(BaseService):
     用户服务层：封装所有与用户相关的数据库操作和业务规则
     路由层不应直接操作 User 模型
     """
+
     model_class = User
 
-    @staticmethod
-    def get_user_by_id(user_id: int) -> User | None:
+    @classmethod
+    def get_user_by_id(cls, user_id: int) -> User | None:
         """根据 ID 获取用户（排除系统管理员 ID=1）"""
         if user_id == 1:
             return None
-        return User.objects.filter(id=user_id).first()
+        return super().get_by_id(user_id)
 
     @staticmethod
-    def get_user_by_username(username: str) -> User | None:
+    def _protect_admin(user_id: int):
+        """保护系统管理员账号"""
+        if user_id == 1:
+            raise PermissionError("系统管理员账号（ID=1）禁止编辑")
+
+    @classmethod
+    def _get_user_or_raise(cls, user_id: int) -> User:
+        """获取用户，不存在则抛出 ValueError"""
+        return cls.get_or_raise(user_id, f"用户不存在 (ID: {user_id})")
+
+    @classmethod
+    def get_user_by_username(cls, username: str) -> User | None:
         """通过用户名精确查找用户"""
-        return User.objects.filter(username=username.strip()).first()
+        return cls.get_first(username=clean_str(username))
 
     @staticmethod
     def get_user_list(
-        search_term: str | None = None,
-        only_active: bool = True,
-        exclude_admin: bool = True,
-        role: str | None = None
+        search_term: str | None = None, only_active: bool = True, exclude_admin: bool = True, role: str | None = None
     ) -> list[User]:
         """获取用户列表"""
         queryset = User.objects.all()
@@ -75,9 +84,7 @@ class UserService(BaseService):
 
         if search_term:
             search = search_term.strip()
-            queryset = queryset.filter(
-                Q(username__icontains=search) | Q(nickname__icontains=search)
-            )
+            queryset = queryset.filter(Q(username__icontains=search) | Q(nickname__icontains=search))
 
         if only_active:
             queryset = queryset.filter(is_active=True)
@@ -85,21 +92,16 @@ class UserService(BaseService):
         if role:
             queryset = queryset.filter(role=role)
 
-        return queryset.order_by('-created_at')
+        return queryset.order_by("-created_at")
 
     @staticmethod
     def create_user(
-        username: str,
-        nickname: str,
-        email: str | None,
-        password: str,
-        role: str = 'employee',
-        is_admin: bool = False
+        username: str, nickname: str, email: str | None, password: str, role: str = "employee", is_admin: bool = False
     ) -> User:
         """新建用户"""
-        username = username.strip()
-        nickname = (nickname or username).strip()
-        email = email.strip() if email else None
+        username = clean_str(username)
+        nickname = clean_str(nickname or username)
+        email = clean_str(email) if email else None
 
         if not password:
             raise ValueError("密码不能为空")
@@ -114,7 +116,7 @@ class UserService(BaseService):
             raise ValueError("邮箱已存在")
 
         if role == UserRole.MANAGER:
-            permissions = ['*']
+            permissions = ["*"]
             is_admin = True
         else:
             permissions = PermissionService.get_role_permissions_from_db(role)
@@ -132,8 +134,9 @@ class UserService(BaseService):
 
         return user
 
-    @staticmethod
+    @classmethod
     def update_user(
+        cls,
         user_id: int,
         username: str | None = None,
         nickname: str | None = None,
@@ -141,29 +144,26 @@ class UserService(BaseService):
         password: str | None = None,
         role: str | None = None,
         is_admin: bool | None = None,
-        is_active: bool | None = None
+        is_active: bool | None = None,
     ) -> User:
         """更新用户信息，严格保护 ID=1"""
-        if user_id == 1:
-            raise PermissionError("系统管理员账号（ID=1）禁止编辑")
+        cls._protect_admin(user_id)
 
-        user = User.objects.filter(id=user_id).first()
-        if not user:
-            raise ValueError(f"用户不存在 (ID: {user_id})")
+        user = cls._get_user_or_raise(user_id)
 
-        if username and username.strip() != user.username:
+        if username and clean_str(username) != user.username:
             if User.objects.filter(username=username).exclude(id=user_id).exists():
                 raise ValueError("用户名已存在")
-            user.username = username.strip()
+            user.username = clean_str(username)
 
         if nickname:
-            user.nickname = nickname.strip()
+            user.nickname = clean_str(nickname)
 
         if email is not None:
             if email:
                 if User.objects.filter(email=email).exclude(id=user_id).exists():
                     raise ValueError("邮箱已存在")
-                user.email = email.strip()
+                user.email = clean_str(email)
             else:
                 user.email = None
 
@@ -173,7 +173,7 @@ class UserService(BaseService):
         if role is not None:
             user.role = role
             if role == UserRole.MANAGER:
-                user.permissions = ['*']
+                user.permissions = ["*"]
             else:
                 user.permissions = PermissionService.get_role_permissions_from_db(role)
 
@@ -186,15 +186,12 @@ class UserService(BaseService):
         user.save()
         return user
 
-    @staticmethod
-    def toggle_user_active(user_id: int, active: bool = True) -> User:
+    @classmethod
+    def toggle_user_active(cls, user_id: int, active: bool = True) -> User:
         """切换用户启用/禁用状态，保护 ID=1"""
-        if user_id == 1:
-            raise PermissionError("系统管理员账号（ID=1）禁止启用/禁用")
+        cls._protect_admin(user_id)
 
-        user = User.objects.filter(id=user_id).first()
-        if not user:
-            raise ValueError(f"用户不存在 (ID: {user_id})")
+        user = cls._get_user_or_raise(user_id)
 
         if user.is_active == active:
             return user
@@ -206,105 +203,87 @@ class UserService(BaseService):
     @staticmethod
     def get_user_stats() -> dict:
         """获取用户统计数据"""
-        total = User.objects.count()
-        active = User.objects.filter(is_active=True).count()
-        managers = User.objects.filter(role=UserRole.MANAGER).count()
-        leaders = User.objects.filter(role=UserRole.LEADER).count()
-        employees = User.objects.filter(role=UserRole.EMPLOYEE).count()
-
+        total = User.objects.filter(is_active=True).count()
+        role_counts = User.objects.filter(is_active=True).values("role").annotate(count=Count("id"))
+        role_map = {r["role"]: r["count"] for r in role_counts}
         return {
-            'total_users': total,
-            'active_users': active,
-            'manager_users': managers,
-            'leader_users': leaders,
-            'employee_users': employees,
-            'active_percentage': round((active / total * 100), 1) if total > 0 else 0.0
+            "total": total,
+            "manager": role_map.get(UserRole.MANAGER, 0),
+            "leader": role_map.get(UserRole.LEADER, 0),
+            "employee": role_map.get(UserRole.EMPLOYEE, 0),
         }
 
-    @staticmethod
-    def update_profile(user_id: int, nickname: str | None = None, email: str | None = None) -> User:
+    @classmethod
+    def update_profile(cls, user_id: int, nickname: str | None = None, email: str | None = None) -> User:
         """更新用户个人信息（昵称、邮箱）"""
-        user = User.objects.filter(id=user_id).first()
-        if not user:
-            raise ValueError(f"用户不存在 (ID: {user_id})")
+        cls._protect_admin(user_id)
+        user = cls._get_user_or_raise(user_id)
 
         if nickname is not None:
-            user.nickname = nickname.strip() if nickname.strip() else None
+            cleaned = clean_optional_str(nickname)
+            user.nickname = cleaned if cleaned else None
 
         if email is not None:
             if email:
-                email = email.strip()
-                if User.objects.filter(email=email).exclude(id=user_id).exists():
+                cleaned_email = clean_str(email)
+                if User.objects.filter(email=cleaned_email).exclude(id=user_id).exists():
                     raise ValueError("该邮箱已被其他用户使用")
-                user.email = email
+                user.email = cleaned_email
             else:
                 user.email = None
 
         user.save()
         return user
 
-    @staticmethod
+    @classmethod
     def update_preferences(
+        cls,
         user_id: int,
         theme: str | None = None,
         notifications_enabled: bool | None = None,
-        preferred_language: str | None = None
+        preferred_language: str | None = None,
     ) -> User:
         """更新用户偏好设置"""
-        user = User.objects.filter(id=user_id).first()
-        if not user:
-            raise ValueError(f"用户不存在 (ID: {user_id})")
-
-        if theme is not None:
-            user.theme = theme
-
-        if notifications_enabled is not None:
-            user.notifications_enabled = notifications_enabled
-
-        if preferred_language is not None:
-            user.preferred_language = preferred_language
-
-        user.save()
+        user = cls._get_user_or_raise(user_id)
+        update_fields(
+            user, theme=theme, notifications_enabled=notifications_enabled, preferred_language=preferred_language
+        )
         return user
 
-    @staticmethod
-    def change_password(user_id: int, new_password: str) -> User:
+    @classmethod
+    def change_password(cls, user_id: int, new_password: str) -> User:
         """修改用户密码"""
-        user = User.objects.filter(id=user_id).first()
-        if not user:
-            raise ValueError(f"用户不存在 (ID: {user_id})")
+        user = cls._get_user_or_raise(user_id)
 
         user.set_password(new_password)
         user.save()
         return user
 
-    @staticmethod
-    def get_navigation_cards(user_id: int) -> list:
+    @classmethod
+    def get_navigation_cards(cls, user_id: int) -> list:
         """获取用户导航卡片，按position排序"""
-        user = User.objects.filter(id=user_id).first()
+        user = cls.get_by_id(user_id)
         if not user:
             return []
         cards = user.navigation_cards or []
-        return sorted(cards, key=lambda c: c.get('position', 0) or 99)
+        return sorted(cards, key=lambda c: c.get("position", 0) or 99)
 
-    @staticmethod
-    def save_navigation_cards(user_id: int, cards: list) -> User:
+    @classmethod
+    def save_navigation_cards(cls, user_id: int, cards: list) -> User:
         """保存用户导航卡片"""
-        user = User.objects.filter(id=user_id).first()
-        if not user:
-            raise ValueError(f"用户不存在 (ID: {user_id})")
+        user = cls._get_user_or_raise(user_id)
 
         if len(cards) > 12:
             raise ValueError("最多只能添加12个导航卡片")
 
         user.navigation_cards = cards
-        user.save(update_fields=['navigation_cards'])
+        user.save(update_fields=["navigation_cards"])
         return user
 
     @staticmethod
     def assign_position(cards: list) -> int:
         """为新卡片分配第一个空position"""
-        used_positions = [c.get('position') for c in cards if c.get('position')]
+        used_positions = [c.get("position") for c in cards if c.get("position")]
         for i in range(1, 13):
             if i not in used_positions:
                 return i

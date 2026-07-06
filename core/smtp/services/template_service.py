@@ -26,7 +26,7 @@ class TemplateService:
             return Template(template_text).render(**context)
         except UndefinedError as e:
             logger.error(f"邮件模板渲染错误: {e}")
-            return ''
+            return ""
 
     @classmethod
     def render_subject(cls, template: EmailTemplate, context: dict) -> str:
@@ -43,7 +43,7 @@ class TemplateService:
     @classmethod
     def list_templates(cls) -> list[EmailTemplate]:
         """列出所有模板"""
-        return list(EmailTemplate.objects.filter(is_active=True).order_by('-created_at'))
+        return list(EmailTemplate.objects.filter(is_active=True).order_by("-created_at"))
 
     @classmethod
     def create_template(
@@ -51,8 +51,8 @@ class TemplateService:
         name: str,
         subject: str,
         html_body: str,
-        text_body: str = '',
-        description: str = '',
+        text_body: str = "",
+        description: str = "",
     ) -> EmailTemplate:
         """创建模板"""
         return EmailTemplate.objects.create(
@@ -102,10 +102,10 @@ class TemplateService:
         """
         default_templates = [
             {
-                'name': 'verification_code',
-                'subject': '【CIMF系统】您的验证码',
-                'description': '用户注册、登录验证码邮件模板',
-                'html_body': '''<!DOCTYPE html>
+                "name": "verification_code",
+                "subject": "【CIMF系统】您的验证码",
+                "description": "用户注册、登录验证码邮件模板",
+                "html_body": """<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -142,8 +142,8 @@ class TemplateService:
         </div>
     </div>
 </body>
-</html>''',
-                'text_body': '''{{ system_name | default('CIMF系统') }}
+</html>""",
+                "text_body": """{{ system_name | default('CIMF系统') }}
 
 验证码
 
@@ -160,13 +160,13 @@ class TemplateService:
 
 ---
 此邮件由系统自动发送，请勿回复。
-&copy; {{ year | default('2026') }} {{ system_name | default('CIMF系统') }}''',
+&copy; {{ year | default('2026') }} {{ system_name | default('CIMF系统') }}""",
             },
             {
-                'name': 'password_reset',
-                'subject': '【CIMF系统】密码重置链接',
-                'description': '密码重置邮件模板',
-                'html_body': '''<!DOCTYPE html>
+                "name": "password_reset",
+                "subject": "【CIMF系统】密码重置链接",
+                "description": "密码重置邮件模板",
+                "html_body": """<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -205,8 +205,8 @@ class TemplateService:
         </div>
     </div>
 </body>
-</html>''',
-                'text_body': '''{{ system_name | default('CIMF系统') }}
+</html>""",
+                "text_body": """{{ system_name | default('CIMF系统') }}
 
 密码重置
 
@@ -225,13 +225,13 @@ class TemplateService:
 
 ---
 此邮件由系统自动发送，请勿回复。
-&copy; {{ year | default('2026') }} {{ system_name | default('CIMF系统') }}''',
+&copy; {{ year | default('2026') }} {{ system_name | default('CIMF系统') }}""",
             },
             {
-                'name': 'notification',
-                'subject': '【CIMF系统】{{ title }}',
-                'description': '通用通知邮件模板',
-                'html_body': '''<!DOCTYPE html>
+                "name": "notification",
+                "subject": "【CIMF系统】{{ title }}",
+                "description": "通用通知邮件模板",
+                "html_body": """<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -265,8 +265,8 @@ class TemplateService:
         </div>
     </div>
 </body>
-</html>''',
-                'text_body': '''{{ system_name | default('CIMF系统') }}
+</html>""",
+                "text_body": """{{ system_name | default('CIMF系统') }}
 
 {{ title }}
 
@@ -278,25 +278,27 @@ class TemplateService:
 
 ---
 此邮件由系统自动发送，请勿回复。
-&copy; {{ year | default('2026') }} {{ system_name | default('CIMF系统') }}''',
+&copy; {{ year | default('2026') }} {{ system_name | default('CIMF系统') }}""",
             },
         ]
 
         # 批量查询已存在的模板名称（优化：避免循环查询）
-        existing_names = set(EmailTemplate.objects.values_list('name', flat=True))
+        existing_names = set(EmailTemplate.objects.values_list("name", flat=True))
 
         templates_to_create = []
         for tmpl in default_templates:
-            if tmpl['name'] not in existing_names:
-                templates_to_create.append(EmailTemplate(
-                    name=tmpl['name'],
-                    subject=tmpl['subject'],
-                    description=tmpl['description'],
-                    html_body=tmpl['html_body'],
-                    text_body=tmpl.get('text_body', ''),
-                    is_active=True,
-                ))
-                existing_names.add(tmpl['name'])  # 更新内存缓存
+            if tmpl["name"] not in existing_names:
+                templates_to_create.append(
+                    EmailTemplate(
+                        name=tmpl["name"],
+                        subject=tmpl["subject"],
+                        description=tmpl["description"],
+                        html_body=tmpl["html_body"],
+                        text_body=tmpl.get("text_body", ""),
+                        is_active=True,
+                    )
+                )
+                existing_names.add(tmpl["name"])  # 更新内存缓存
 
         if templates_to_create:
             EmailTemplate.objects.bulk_create(templates_to_create, batch_size=10)

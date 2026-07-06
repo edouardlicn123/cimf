@@ -14,25 +14,26 @@ from urllib.parse import urlparse
 import requests
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-MARKETPLACE_CONFIG = BASE_DIR / 'marketplace' / 'marketplace.json'
-MODULES_DIR = BASE_DIR.parent / 'modules'
+MARKETPLACE_CONFIG = BASE_DIR / "marketplace" / "marketplace.json"
+MODULES_DIR = BASE_DIR.parent / "modules"
 
 # 安全限制
 MAX_DOWNLOAD_SIZE = 200 * 1024 * 1024  # 200MB
 MAX_EXTRACT_SIZE = 1024 * 1024 * 1024  # 1GB
 ALLOWED_DOWNLOAD_DOMAINS = [
-    'github.com', 'raw.githubusercontent.com',
-    'gitlab.com', 'gitee.com',
+    "github.com",
+    "raw.githubusercontent.com",
+    "gitlab.com",
+    "gitee.com",
 ]
 
 
 class MarketService:
-
     @classmethod
     def _compare_version_parts(cls, v1: str, v2: str) -> int:
         """比较两个版本字符串的部分，返回 -1, 0, 1"""
-        parts1 = [int(x) for x in v1.split('.') if x.isdigit()]
-        parts2 = [int(x) for x in v2.split('.') if x.isdigit()]
+        parts1 = [int(x) for x in v1.split(".") if x.isdigit()]
+        parts2 = [int(x) for x in v2.split(".") if x.isdigit()]
 
         max_len = max(len(parts1), len(parts2))
 
@@ -53,8 +54,8 @@ class MarketService:
         if local == remote:
             return 0
 
-        local_clean = local.strip().lstrip('vV')
-        remote_clean = remote.strip().lstrip('vV')
+        local_clean = local.strip().lstrip("vV")
+        remote_clean = remote.strip().lstrip("vV")
 
         return cls._compare_version_parts(local_clean, remote_clean)
 
@@ -65,9 +66,9 @@ class MarketService:
             return []
 
         try:
-            with MARKETPLACE_CONFIG.open(encoding='utf-8') as f:
+            with MARKETPLACE_CONFIG.open(encoding="utf-8") as f:
                 config = json.load(f)
-            return config.get('modules', [])
+            return config.get("modules", [])
         except (OSError, json.JSONDecodeError):
             return []
 
@@ -76,7 +77,7 @@ class MarketService:
         """获取指定模块"""
         modules = cls.get_modules()
         for module in modules:
-            if module.get('id') == module_id:
+            if module.get("id") == module_id:
                 return module
         return None
 
@@ -85,6 +86,7 @@ class MarketService:
         """从数据库获取已注册模块的版本"""
         try:
             from core.module.models import Module  # noqa: PLC0415
+
             module = Module.objects.filter(module_id=module_id).first()
             if module:
                 return module.version
@@ -95,25 +97,27 @@ class MarketService:
     @classmethod
     def is_installed(cls, module_id: str) -> bool:
         """检查模块是否已安装（目录存在）"""
-        module_dir = MODULES_DIR / module_id
-        module_py = module_dir / 'module.py'
+        safe_id = Path(module_id).name
+        module_dir = MODULES_DIR / safe_id
+        module_py = module_dir / "module.py"
         return module_dir.exists() and module_py.exists()
 
     @classmethod
     def get_module_status(cls, module_id: str) -> dict[str, Any]:
         """获取模块状态"""
-        market_module = cls.get_module(module_id)
+        safe_id = Path(module_id).name
+        market_module = cls.get_module(safe_id)
 
         if not market_module:
             return {
-                'exists': False,
-                'installed': False,
-                'has_update': False,
-                'market_version': None,
-                'installed_version': None,
+                "exists": False,
+                "installed": False,
+                "has_update": False,
+                "market_version": None,
+                "installed_version": None,
             }
 
-        market_version = market_module.get('version', '1.0')
+        market_version = market_module.get("version", "1.0")
         installed_version = cls.get_installed_module_version(module_id)
         is_installed = cls.is_installed(module_id)
 
@@ -122,11 +126,11 @@ class MarketService:
             has_update = cls.compare_versions(installed_version, market_version) < 0
 
         return {
-            'exists': True,
-            'installed': is_installed,
-            'has_update': has_update,
-            'market_version': market_version,
-            'installed_version': installed_version,
+            "exists": True,
+            "installed": is_installed,
+            "has_update": has_update,
+            "market_version": market_version,
+            "installed_version": installed_version,
         }
 
     @classmethod
@@ -134,9 +138,8 @@ class MarketService:
         """验证下载 URL 是否在允许域名内（SSRF 防护）"""
         try:
             parsed = urlparse(url)
-            domain = parsed.hostname or ''
-            return any(domain == allowed or domain.endswith('.' + allowed)
-                       for allowed in ALLOWED_DOWNLOAD_DOMAINS)
+            domain = parsed.hostname or ""
+            return any(domain == allowed or domain.endswith("." + allowed) for allowed in ALLOWED_DOWNLOAD_DOMAINS)
         except Exception:
             return False
 
@@ -145,35 +148,39 @@ class MarketService:
         """下载并解压模块，含安全限制"""
         module = cls.get_module(module_id)
         if not module:
-            return {'success': False, 'error': '模块不存在'}
+            return {"success": False, "error": "模块不存在"}
 
-        download_url = module.get('download_url')
+        download_url = module.get("download_url")
         if not download_url:
-            return {'success': False, 'error': '模块下载地址不存在'}
+            return {"success": False, "error": "模块下载地址不存在"}
 
         if not cls._validate_download_url(download_url):
-            return {'success': False, 'error': f'下载地址不被允许: {download_url}'}
+            return {"success": False, "error": f"下载地址不被允许: {download_url}"}
 
         temp_dir = tempfile.mkdtemp()
-        zip_path = Path(temp_dir) / f'{module_id}.zip'
+        zip_path = Path(temp_dir) / f"{module_id}.zip"
 
         try:
             response = requests.get(download_url, timeout=60, stream=True)
             if response.status_code != 200:
-                return {'success': False, 'error': f'下载失败: HTTP {response.status_code}'}
+                return {"success": False, "error": f"下载失败: HTTP {response.status_code}"}
 
             downloaded = 0
-            with Path(zip_path).open('wb') as f:
+            with Path(zip_path).open("wb") as f:
                 for chunk in response.iter_content(chunk_size=8192):
                     downloaded += len(chunk)
                     if downloaded > MAX_DOWNLOAD_SIZE:
-                        return {'success': False, 'error': f'下载文件过大（超过 {MAX_DOWNLOAD_SIZE // 1024 // 1024}MB 限制）'}
+                        return {
+                            "success": False,
+                            "error": f"下载文件过大（超过 {MAX_DOWNLOAD_SIZE // 1024 // 1024}MB 限制）",
+                        }
                     f.write(chunk)
 
-            module_dir = MODULES_DIR / module_id
+            safe_id = Path(module_id).name
+            module_dir = MODULES_DIR / safe_id
 
             total_extracted = 0
-            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            with zipfile.ZipFile(zip_path, "r") as zip_ref:
                 for member in zip_ref.namelist():
                     member_path = os.path.normpath(Path(temp_dir) / member)
                     if not member_path.startswith(os.path.normpath(temp_dir) + os.sep):
@@ -183,13 +190,16 @@ class MarketService:
                     info = zip_ref.getinfo(member)
                     total_extracted += info.file_size
                     if total_extracted > MAX_EXTRACT_SIZE:
-                        return {'success': False, 'error': f'解压文件过大（超过 {MAX_EXTRACT_SIZE // 1024 // 1024}GB 限制）'}
+                        return {
+                            "success": False,
+                            "error": f"解压文件过大（超过 {MAX_EXTRACT_SIZE // 1024 // 1024}GB 限制）",
+                        }
                     zip_ref.extract(member, temp_dir)
 
             items = list(Path(temp_dir).iterdir())
             extracted_dir = None
             for item in items:
-                if item.name != f'{module_id}.zip' and item.is_dir():
+                if item.name != f"{module_id}.zip" and item.is_dir():
                     extracted_dir = item
                     break
 
@@ -199,24 +209,25 @@ class MarketService:
                 shutil.move(str(extracted_dir), str(module_dir))
 
             # 更新数据库中的模块版本号
-            market_version = module.get('version', '1.0.0')
+            market_version = module.get("version", "1.0.0")
             try:
                 from core.module.models import Module  # noqa: PLC0415
+
                 existing = Module.objects.filter(module_id=module_id).first()
                 if existing:
                     existing.version = market_version
                     existing.save()
             except Exception as e:
-                return {'success': False, 'error': f'解压成功但更新版本失败: {e!s}'}
+                return {"success": False, "error": f"解压成功但更新版本失败: {e!s}"}
 
-            return {'success': True, 'message': '下载成功'}
+            return {"success": True, "message": "下载成功"}
 
         except requests.RequestException as e:
-            return {'success': False, 'error': f'下载失败: {e!s}'}
+            return {"success": False, "error": f"下载失败: {e!s}"}
         except zipfile.BadZipFile:
-            return {'success': False, 'error': '文件格式错误，不是有效的zip文件'}
+            return {"success": False, "error": "文件格式错误，不是有效的zip文件"}
         except Exception as e:
-            return {'success': False, 'error': f'解压失败: {e!s}'}
+            return {"success": False, "error": f"解压失败: {e!s}"}
         finally:
             if Path(temp_dir).exists():
                 shutil.rmtree(temp_dir)

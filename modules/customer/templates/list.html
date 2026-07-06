@@ -84,9 +84,13 @@
                             <td title="{{ customer.enterprise_name|default('') }}">{% if customer.enterprise_name %}{{ customer.enterprise_name[:20] + '...' if customer.enterprise_name|length > 20 else customer.enterprise_name }}{% else %}-{% endif %}</td>
                             <td>
                                 {% if customer.phone1 %}
-                                <a href="https://wa.me/{{ customer.phone1|replace(' ', '')|replace('+', '') }}" target="_blank" class="text-success me-1" title="WhatsApp">
+                                {% if customer.has_whatsapp is true %}
+                                <a href="https://wa.me/{{ customer.phone1|replace(' ', '')|replace('+', '') }}" target="_blank" class="text-success me-1" title="有 WhatsApp">
                                     <i class="bi bi-whatsapp"></i>
                                 </a>
+                                {% elif customer.has_whatsapp is false %}
+                                <span class="text-danger me-1" title="没有 WhatsApp"><i class="bi bi-x-lg"></i></span>
+                                {% endif %}
                                 {{ customer.phone1 }}
                                 {% else %}
                                 -

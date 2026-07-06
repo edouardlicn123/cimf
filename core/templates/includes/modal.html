@@ -1,0 +1,21 @@
+<div class="modal fade" id="{{ modal_id|default('modalDialog') }}" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ modal_title|default('确认') }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        {{ modal_body|safe if modal_body else '' }}
+      </div>
+      <div class="modal-footer">
+        {% if modal_footer %}
+        {{ modal_footer|safe }}
+        {% else %}
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-danger" id="modalConfirmBtn">确认</button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

@@ -73,35 +73,31 @@ def run_stage4(dry_run: bool = False) -> dict[str, Any]:
     from core.module.services import ModuleService  # noqa: PLC0415
 
     if dry_run:
-        return {'message': '[模拟] 将扫描并注册模块', 'success': True}
+        return {"message": "[模拟] 将扫描并注册模块", "success": True}
 
     # 使用通用函数，执行扫描+注册+安装
     # 初始化阶段尊重install_on_init设置，不自动安装该参数为False的模块
-    result = ModuleService.scan_register_install(
-        do_install=True,
-        dry_run=False,
-        respect_install_on_init=True
-    )
+    result = ModuleService.scan_register_install(do_install=True, dry_run=False, respect_install_on_init=True)
 
     # 转换为阶段4结果格式
     return {
-        'installed': result.get('installed', 0),
-        'skipped': result.get('skipped', 0),
-        'success': len(result.get('failed', [])) == 0,
-        'failed': result.get('failed', []),
+        "installed": result.get("installed", 0),
+        "skipped": result.get("skipped", 0),
+        "success": len(result.get("failed", [])) == 0,
+        "failed": result.get("failed", []),
     }
 
 
 def print_module_results(results: dict[str, Any]):
     """打印模块注册结果"""
     msg = "    ✓ 业务模块扫描注册完成"
-    if results.get('installed', 0) > 0:
+    if results.get("installed", 0) > 0:
         msg += f"，已注册 {results.get('installed')} 个"
-    if results.get('skipped', 0) > 0:
+    if results.get("skipped", 0) > 0:
         msg += f"，跳过 {results.get('skipped')} 个已注册模块"
     print(colored(msg, "green"))
 
-    if results.get('error'):
+    if results.get("error"):
         print(colored(f"    ⚠ 部分模块异常: {results.get('error')}", "yellow"))
 
 

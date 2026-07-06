@@ -6,13 +6,10 @@
     const CLOCK_API_URL = '/modules/system/clock/api/time/';
     let cardPositions = {};
     let availableModules = [];
-    let draggingCard = null;
 
     async function initDashboardCards() {
         try {
-            const response = await fetch('/api/v1/user/dashboard/cards/', {
-                credentials: 'include'
-            });
+            const response = await window.FFE.apiGet('/api/v1/user/dashboard/cards/');
             const data = await response.json();
             
             if (data.success) {
@@ -75,9 +72,7 @@
 
     async function updateClock(card) {
         try {
-            const response = await fetch(CLOCK_API_URL, {
-                credentials: 'include'
-            });
+            const response = await window.FFE.apiGet(CLOCK_API_URL);
             const data = await response.json();
             
             if (data.success) {
@@ -106,92 +101,26 @@
     }
 
     function initDragAndDrop() {
-        const cards = document.querySelectorAll('.clock-card');
-        const slots = document.querySelectorAll('.card-slot');
-        
-        cards.forEach(card => {
-            card.addEventListener('dragstart', onDragStart);
-            card.addEventListener('dragend', onDragEnd);
+        window.FFE.DragDrop.makeSortable('.card-slot', '.clock-card', '.card-slot', function(card, slot) {
+            var currentSlot = card.parentElement;
+            var targetSlot = slot;
+            if (currentSlot === targetSlot) return;
+            var targetCard = targetSlot.querySelector('.clock-card');
+            if (targetCard) {
+                targetSlot.insertBefore(card, targetCard);
+                currentSlot.appendChild(targetCard);
+            } else {
+                targetSlot.appendChild(card);
+            }
+            document.querySelectorAll('.clock-card').forEach(function(c, i) {
+                c.style.order = i;
+            });
         });
-        
-        slots.forEach(slot => {
-            slot.addEventListener('dragover', onDragOver);
-            slot.addEventListener('drop', onDrop);
-            slot.addEventListener('dragenter', onDragEnter);
-            slot.addEventListener('dragleave', onDragLeave);
-        });
-    }
-
-    function onDragStart(e) {
-        draggingCard = e.target;
-        e.target.classList.add('dragging');
-        e.dataTransfer.setData('text/plain', e.target.closest('.card-slot').dataset.position);
-        e.dataTransfer.effectAllowed = 'move';
-    }
-
-    function onDragEnd(e) {
-        e.target.classList.remove('dragging');
-        document.querySelectorAll('.card-slot').forEach(slot => {
-            slot.classList.remove('drag-over');
-        });
-    }
-
-    function onDragOver(e) {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-    }
-
-    function onDragEnter(e) {
-        e.preventDefault();
-        e.target.closest('.card-slot').classList.add('drag-over');
-    }
-
-    function onDragLeave(e) {
-        e.target.closest('.card-slot').classList.remove('drag-over');
-    }
-
-    function onDrop(e) {
-        e.preventDefault();
-        const fromPosition = e.dataTransfer.getData('text/plain');
-        const toSlot = e.target.closest('.card-slot');
-        const toPosition = toSlot.dataset.position;
-        
-        if (fromPosition === toPosition) return;
-        
-        const fromSlot = document.querySelector(`.card-slot[data-position="${fromPosition}"]`);
-        const toCard = toSlot.querySelector('.clock-card');
-        const fromCard = fromSlot.querySelector('.clock-card');
-        
-        if (toCard && fromCard) {
-            toSlot.appendChild(fromCard);
-            fromSlot.appendChild(toCard);
-            
-            swapPositions(fromPosition, toPosition);
-            saveCardPositions();
-        } else if (fromCard && !toCard) {
-            toSlot.appendChild(fromCard);
-            swapPositions(fromPosition, toPosition);
-            saveCardPositions();
-        }
-    }
-
-    function swapPositions(from, to) {
-        const temp = cardPositions[from];
-        cardPositions[from] = cardPositions[to];
-        cardPositions[to] = temp;
     }
 
     async function saveCardPositions() {
         try {
-            const response = await fetch('/api/v1/user/dashboard/cards/save/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCsrfToken(),
-                },
-                body: JSON.stringify({ positions: cardPositions }),
-                credentials: 'include',
-            });
+            const response = await window.FFE.apiPost('/api/v1/user/dashboard/cards/save/', { positions: cardPositions });
             const data = await response.json();
             if (!data.success) {
                 console.error('保存卡片布局失败:', data.error);
@@ -199,22 +128,6 @@
         } catch (error) {
             console.error('保存卡片布局失败:', error);
         }
-    }
-
-    function getCsrfToken() {
-        const name = 'csrftoken';
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
     }
 
     if (document.readyState === 'loading') {

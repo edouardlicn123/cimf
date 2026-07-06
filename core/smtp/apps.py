@@ -6,6 +6,6 @@ from django.apps import AppConfig
 
 
 class SmtpConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'core.smtp'
-    verbose_name = 'SMTP邮件服务'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "core.smtp"
+    verbose_name = "SMTP邮件服务"

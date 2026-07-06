@@ -81,44 +81,24 @@
             </table>
         </div>
         {% else %}
-        <div class="text-center text-muted py-4">
-            {% if log_type %}
-            暂无日志内容
-            {% else %}
-            选择上方日志文件查看内容
-            {% endif %}
-        </div>
+        {% set empty_type = "list" %}
+        {% if log_type %}{% set empty_message = "暂无日志内容" %}
+        {% else %}{% set empty_message = "选择上方日志文件查看内容" %}
+        {% endif %}
+        {% include "includes/empty_state.html" %}
         {% endif %}
     </div>
     {% if log_data and log_data.total_pages > 1 %}
     <div class="card-footer">
-        <nav>
-            <ul class="pagination justify-content-center mb-0">
-                {% if log_data.page > 1 %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ log_data.page - 1 }}&level={{ current_level }}">上一页</a>
-                </li>
-                {% else %}
-                <li class="page-item disabled">
-                    <span class="page-link">上一页</span>
-                </li>
-                {% endif %}
-                
-                <li class="page-item active">
-                    <span class="page-link">第 {{ log_data.page }} / {{ log_data.total_pages }} 页 (共 {{ log_data.total }} 条)</span>
-                </li>
-                
-                {% if log_data.page < log_data.total_pages %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ log_data.page + 1 }}&level={{ current_level }}">下一页</a>
-                </li>
-                {% else %}
-                <li class="page-item disabled">
-                    <span class="page-link">下一页</span>
-                </li>
-                {% endif %}
-            </ul>
-        </nav>
+        {% set current_page = log_data.page %}
+        {% set total_pages = log_data.total_pages %}
+        {% set has_prev = log_data.page > 1 %}
+        {% set has_next = log_data.page < log_data.total_pages %}
+        {% set prev_page = log_data.page - 1 if has_prev else 1 %}
+        {% set next_page = log_data.page + 1 if has_next else total_pages %}
+        {% set extra_params = '&level=' + current_level if current_level and current_level != 'all' else '' %}
+        {% set show_numbers = true %}
+        {% include "includes/pagination.html" %}
     </div>
     {% endif %}
 </div>

@@ -40,6 +40,8 @@
     --bg-secondary: ;
     --bg-tertiary: ;
     --bg-surface: ;           /* 卡片、表格等表面 */
+    --bg-card: ;              /* 卡片背景 */
+    --bg-body: ;              /* 页面背景 */
     --bg-hover: ;
     --bg-active: ;
 
@@ -57,6 +59,7 @@
     --border: ;
     --border-strong: ;
     --border-subtle: ;
+    --border-light: ;
     --divider: ;
 
     /* 阴影 */
@@ -69,6 +72,7 @@
     /* 圆角 */
     --radius-sm: ;
     --radius: ;
+    --radius-md: ;
     --radius-lg: ;
     --radius-pill: ;
 

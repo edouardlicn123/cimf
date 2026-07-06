@@ -28,9 +28,6 @@
         </div>
     </div>
     
-    <div class="text-end">
-        <a href="{{ url('core:taxonomies') }}" class="btn btn-secondary">取消</a>
-        <button type="submit" class="btn btn-primary">保存</button>
-    </div>
+    {% set cancel_url = url('core:taxonomies') %}{% include "includes/form_actions.html" %}
 </form>
 {% endblock %}

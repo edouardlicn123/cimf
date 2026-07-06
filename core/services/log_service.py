@@ -13,16 +13,20 @@ from pathlib import Path
 
 from django.conf import settings
 
+from core.services.mixins import error_response, safe_execute
+
+logger = logging.getLogger(__name__)
+
 
 class LogService:
     """统一日志服务"""
 
-    LOG_DIR = Path(settings.BASE_DIR) / 'storage' / 'logs'
+    LOG_DIR = Path(settings.BASE_DIR) / "storage" / "logs"
 
     LOG_FILES = {
-        'cimf': 'cimf.log',
-        'error': 'error.log',
-        'security': 'security.log',
+        "cimf": "cimf.log",
+        "error": "error.log",
+        "security": "security.log",
     }
 
     _security_logger = None
@@ -30,7 +34,7 @@ class LogService:
     @classmethod
     def _get_security_logger(cls):
         if cls._security_logger is None:
-            cls._security_logger = logging.getLogger('django.security')
+            cls._security_logger = logging.getLogger("django.security")
         return cls._security_logger
 
     # ===== 写日志功能 =====
@@ -38,10 +42,10 @@ class LogService:
     @staticmethod
     def get_client_ip(request) -> str:
         """获取客户端 IP"""
-        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
         if x_forwarded_for:
-            return x_forwarded_for.split(',')[0].strip()
-        return request.META.get('REMOTE_ADDR', 'unknown')
+            return x_forwarded_for.split(",")[0].strip()
+        return request.META.get("REMOTE_ADDR", "unknown")
 
     @classmethod
     def log_login_attempt(cls, request, username: str, success: bool, reason: str | None = None):
@@ -65,7 +69,7 @@ class LogService:
         """记录权限拒绝"""
         logger = cls._get_security_logger()
         ip = cls.get_client_ip(request)
-        username = user.username if user else 'anonymous'
+        username = user.username if user else "anonymous"
         message = f"Permission denied: user={username}, resource={resource}, ip={ip}"
         if reason:
             message += f", reason={reason}"
@@ -82,7 +86,7 @@ class LogService:
         """记录 API 访问"""
         logger = cls._get_security_logger()
         ip = cls.get_client_ip(request)
-        username = user.username if user else 'anonymous'
+        username = user.username if user else "anonymous"
         logger.info(f"API access: user={username}, endpoint={endpoint}, ip={ip}")
 
     @classmethod
@@ -90,19 +94,14 @@ class LogService:
         """记录数据导出"""
         logger = cls._get_security_logger()
         ip = cls.get_client_ip(request)
-        logger.info(
-            f"Data export: user={user.username}, type={export_type}, "
-            f"count={record_count}, ip={ip}"
-        )
+        logger.info(f"Data export: user={user.username}, type={export_type}, count={record_count}, ip={ip}")
 
     @classmethod
     def log_failed_validation(cls, request, form_name: str, errors: str):
         """记录验证失败"""
         logger = cls._get_security_logger()
         ip = cls.get_client_ip(request)
-        logger.warning(
-            f"Validation failed: form={form_name}, errors={errors}, ip={ip}"
-        )
+        logger.warning(f"Validation failed: form={form_name}, errors={errors}, ip={ip}")
 
     # ===== 读日志功能 =====
 
@@ -113,54 +112,53 @@ class LogService:
         for key, filename in cls.LOG_FILES.items():
             filepath = cls.LOG_DIR / filename
             info = {
-                'key': key,
-                'name': filename,
-                'exists': filepath.exists(),
-                'size': filepath.stat().st_size if filepath.exists() else 0,
+                "key": key,
+                "name": filename,
+                "exists": filepath.exists(),
+                "size": filepath.stat().st_size if filepath.exists() else 0,
             }
             files.append(info)
         return files
 
     @classmethod
-    def read_log(cls, log_type: str, page: int = 1, page_size: int = 100,
-                 level: str | None = None) -> dict:
+    def read_log(cls, log_type: str, page: int = 1, page_size: int = 100, level: str | None = None) -> dict:
         """读取日志，支持分页和级别筛选"""
         filename = cls.LOG_FILES.get(log_type)
         if not filename:
-            return {'lines': [], 'total': 0, 'page': page, 'page_size': page_size}
+            return error_response("无效的日志类型", lines=[], total=0, page=page, page_size=page_size)
 
         filepath = cls.LOG_DIR / filename
         if not filepath.exists():
-            return {'lines': [], 'total': 0, 'page': page, 'page_size': page_size}
+            return error_response("日志文件不存在", lines=[], total=0, page=page, page_size=page_size)
 
-        try:
-            with filepath.open(encoding='utf-8', errors='replace') as f:
-                all_lines = f.readlines()
-        except Exception:
-            return {'lines': [], 'total': 0, 'page': page, 'page_size': page_size, 'error': '无法读取文件'}
+        all_lines = safe_execute(
+            lambda: filepath.open(encoding="utf-8", errors="replace").readlines(),
+            error_return=None,
+            log_msg="读取日志文件失败",
+            logger=logger,
+        )
+        if all_lines is None:
+            return error_response("无法读取文件", lines=[], total=0, page=page, page_size=page_size)
 
-        if level and level != 'all':
-            filtered = [line for line in all_lines if level.upper() in line.upper()]
-        else:
-            filtered = all_lines
+        if level and level != "all":
+            all_lines = [line for line in all_lines if level.upper() in line.upper()]
 
-        total_filtered = len(filtered)
+        total_filtered = len(all_lines)
 
         start = (page - 1) * page_size
         end = start + page_size
-        page_lines = filtered[start:end]
+        page_lines = all_lines[start:end]
 
         parsed_lines = [
-            {'line_num': i, 'content': line.rstrip('\n')}
-            for i, line in enumerate(page_lines, start=start + 1)
+            {"line_num": i, "content": line.rstrip("\n")} for i, line in enumerate(page_lines, start=start + 1)
         ]
 
         return {
-            'lines': parsed_lines,
-            'total': total_filtered,
-            'page': page,
-            'page_size': page_size,
-            'total_pages': (total_filtered + page_size - 1) // page_size,
+            "lines": parsed_lines,
+            "total": total_filtered,
+            "page": page,
+            "page_size": page_size,
+            "total_pages": (total_filtered + page_size - 1) // page_size,
         }
 
     @classmethod
@@ -168,20 +166,23 @@ class LogService:
         """获取日志统计（总行数、各级别数量）"""
         filename = cls.LOG_FILES.get(log_type)
         if not filename:
-            return {'total': 0, 'levels': {}}
+            return {"total": 0, "levels": {}}
 
         filepath = cls.LOG_DIR / filename
         if not filepath.exists():
-            return {'total': 0, 'levels': {}}
+            return {"total": 0, "levels": {}}
 
-        try:
-            with filepath.open(encoding='utf-8', errors='replace') as f:
-                lines = f.readlines()
-        except Exception:
-            return {'total': 0, 'levels': {}}
+        lines = safe_execute(
+            lambda: filepath.open(encoding="utf-8", errors="replace").readlines(),
+            error_return=None,
+            log_msg="读取日志文件失败",
+            logger=logger,
+        )
+        if lines is None:
+            return {"total": 0, "levels": {}}
 
         total = len(lines)
-        levels = {'DEBUG': 0, 'INFO': 0, 'WARNING': 0, 'ERROR': 0}
+        levels = {"DEBUG": 0, "INFO": 0, "WARNING": 0, "ERROR": 0}
 
         for line in lines:
             for lvl in levels:
@@ -189,7 +190,7 @@ class LogService:
                     levels[lvl] += 1
                     break
 
-        return {'total': total, 'levels': levels}
+        return {"total": total, "levels": levels}
 
 
 # 兼容旧导入方式

@@ -16,14 +16,14 @@ from .base import BaseField
 
 
 class TextField(BaseField):
-    name = 'text'
-    label = '带格式文本'
-    widget = 'rich_text'
-    properties = ['value', 'format']
+    name = "text"
+    label = "带格式文本"
+    widget = "rich_text"
+    properties = ["value", "format"]
 
-    def render(self, value: dict, mode: str = 'edit') -> str:
-        if mode == 'view':
-            return value.get('value', '')
+    def render(self, value: dict, mode: str = "edit") -> str:
+        if mode == "view":
+            return value.get("value", "")
         return self._render_textarea(rows=5)
 
     def validate(self, _value: dict) -> list:

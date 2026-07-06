@@ -36,14 +36,6 @@ class CacheCleanupTask(CronTask):
 
     default_interval = 10800  # 3小时
 
-    @property
-    def setting_key_enabled(self) -> str:
-        return "cron_cache_cleanup_enabled"
-
-    @property
-    def setting_key_interval(self) -> str:
-        return "cron_cache_cleanup_interval"
-
     def execute(self):
         """执行缓存清理"""
         if self._last_run and (now() - self._last_run) < timedelta(seconds=10):
@@ -51,5 +43,6 @@ class CacheCleanupTask(CronTask):
             return
 
         from core.services import SettingsService  # noqa: PLC0415
+
         SettingsService.clear_cache()
         logger.info("缓存清理任务执行完成")

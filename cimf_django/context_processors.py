@@ -25,15 +25,15 @@ def system_settings(_request):
     try:
         settings = SettingsService.get_all_settings()
         return {
-            'system_name': settings.get('system_name', 'CIMF'),
-            'system_settings': settings,
-            'timestamp': int(time.time()),
+            "system_name": settings.get("system_name", "CIMF"),
+            "system_settings": settings,
+            "timestamp": int(time.time()),
         }
     except Exception:
         return {
-            'system_name': 'CIMF',
-            'system_settings': {},
-            'timestamp': int(time.time()),
+            "system_name": "CIMF",
+            "system_settings": {},
+            "timestamp": int(time.time()),
         }
 
 
@@ -41,12 +41,10 @@ def user_permissions(request):
     """
     为所有模板提供用户权限信息
     """
-    if not hasattr(request, 'user') or not request.user.is_authenticated:
-        return {'user_permissions': []}
+    if not hasattr(request, "user") or not request.user.is_authenticated:
+        return {"user_permissions": []}
 
-    return {
-        'user_permissions': PermissionService.get_user_effective_permissions(request.user)
-    }
+    return {"user_permissions": PermissionService.get_user_effective_permissions(request.user)}
 
 
 def csrf_token(request):
@@ -54,4 +52,39 @@ def csrf_token(request):
     为 Jinja2 模板提供 CSRF token 值（仅返回 token，不包含 HTML）
     HTML 渲染由 jinja2.py 中的函数处理
     """
-    return {'csrf_token_value': get_token(request)}
+    return {"csrf_token_value": get_token(request)}
+
+
+def active_section(request):
+    """从URL名称自动推断 active_section"""
+    url_name = request.resolver_match.url_name if request.resolver_match else None
+    mapping = {
+        "system_settings": "settings",
+        "system_users": "users",
+        "system_permissions": "permissions",
+        "cron_manager": "cron",
+        "permission_check": "permission_check",
+        "smtp_config": "smtp",
+        "logs_index": "logs",
+        "logs_view": "logs",
+        "structure_dashboard": "dashboard",
+        "node_types_list": "node_types",
+        "taxonomies": "taxonomies",
+        "taxonomy_create": "taxonomies",
+        "taxonomy_view": "taxonomies",
+        "taxonomy_edit": "taxonomies",
+        "tools_index": "dashboard",
+        "importexport_dashboard": "dashboard",
+        "export_list": "export",
+        "import_list": "import",
+        "module_list": "modules_manage",
+        "market_index": "market",
+        "profile_view": "profile",
+        "profile_settings": "preferences",
+        "homepage_settings": "homepage",
+        "navigation_settings": "nav_cards",
+    }
+    section = mapping.get(url_name)
+    if section:
+        return {"active_section": section}
+    return {}

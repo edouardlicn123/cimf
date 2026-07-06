@@ -33,14 +33,6 @@ class EmailSendingTask(CronTask):
 
     default_interval = 100  # 默认100秒
 
-    @property
-    def setting_key_enabled(self) -> str:
-        return "cron_email_sending_enabled"
-
-    @property
-    def setting_key_interval(self) -> str:
-        return "smtp_send_interval"
-
     def execute(self):
         """执行邮件发送"""
         from core.smtp.services import EmailService  # noqa: PLC0415

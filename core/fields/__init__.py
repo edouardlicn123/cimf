@@ -65,32 +65,32 @@ from .text_with_summary import TextWithSummaryField
 from .timestamp import TimestampField
 
 FIELD_TYPES = {
-    'string': StringField,
-    'string_long': StringLongField,
-    'text': TextField,
-    'text_long': TextLongField,
-    'text_with_summary': TextWithSummaryField,
-    'boolean': BooleanField,
-    'integer': IntegerField,
-    'decimal': DecimalField,
-    'float': FloatField,
-    'entity_reference': EntityReferenceField,
-    'file': FileField,
-    'image': ImageField,
-    'link': LinkField,
-    'email': EmailField,
-    'telephone': TelephoneField,
-    'datetime': DatetimeField,
-    'timestamp': TimestampField,
-    'geolocation': GeolocationField,
-    'color': ColorField,
-    'ai_tags': AITagsField,
-    'identity': IdentityField,
-    'masked': MaskedField,
-    'biometric': BiometricField,
-    'address': AddressField,
-    'gis': GISField,
-    'region_select': RegionSelectField,
+    "string": StringField,
+    "string_long": StringLongField,
+    "text": TextField,
+    "text_long": TextLongField,
+    "text_with_summary": TextWithSummaryField,
+    "boolean": BooleanField,
+    "integer": IntegerField,
+    "decimal": DecimalField,
+    "float": FloatField,
+    "entity_reference": EntityReferenceField,
+    "file": FileField,
+    "image": ImageField,
+    "link": LinkField,
+    "email": EmailField,
+    "telephone": TelephoneField,
+    "datetime": DatetimeField,
+    "timestamp": TimestampField,
+    "geolocation": GeolocationField,
+    "color": ColorField,
+    "ai_tags": AITagsField,
+    "identity": IdentityField,
+    "masked": MaskedField,
+    "biometric": BiometricField,
+    "address": AddressField,
+    "gis": GISField,
+    "region_select": RegionSelectField,
 }
 
 
@@ -108,10 +108,10 @@ def get_field_type_info(name: str) -> dict:
     """获取字段类型详细信息"""
     field_class = FIELD_TYPES.get(name, StringField)
     return {
-        'name': field_class.name,
-        'label': field_class.label,
-        'widget': field_class.widget,
-        'properties': field_class.properties,
+        "name": field_class.name,
+        "label": field_class.label,
+        "widget": field_class.widget,
+        "properties": field_class.properties,
     }
 
 

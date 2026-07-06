@@ -85,37 +85,37 @@ def run_stage3(force: bool = False, dry_run: bool = False) -> bool:
     from core.constants import UserRole  # noqa: PLC0415
     from core.models import User  # noqa: PLC0415
 
-    admin_username = os.environ.get('DJANGO_ADMIN_USERNAME', 'admin')
-    admin_nickname = os.environ.get('DJANGO_ADMIN_NICKNAME', '系统管理员')
-    admin_password = os.environ.get('DJANGO_ADMIN_PASSWORD')  # 生产环境必须设置
+    admin_username = os.environ.get("DJANGO_ADMIN_USERNAME", "admin")
+    admin_nickname = os.environ.get("DJANGO_ADMIN_NICKNAME", "系统管理员")
+    admin_password = os.environ.get("DJANGO_ADMIN_PASSWORD")  # 生产环境必须设置
     if not admin_password:
-        if os.environ.get('DJANGO_ENV', 'development') == 'production':
+        if os.environ.get("DJANGO_ENV", "development") == "production":
             print("❌ 错误：生产环境必须设置 DJANGO_ADMIN_PASSWORD 环境变量！")
             return False
         else:
-            admin_password = 'admin123'  # 仅开发环境默认值
+            admin_password = "admin123"  # 仅开发环境默认值
             print("⚠️ 警告：使用默认密码，生产环境请设置 DJANGO_ADMIN_PASSWORD")
-    admin_email = os.environ.get('DJANGO_ADMIN_EMAIL', 'admin@example.com')
-    admin_theme = os.environ.get('DJANGO_ADMIN_THEME', 'default')
-    admin_notifications = os.environ.get('DJANGO_ADMIN_NOTIFICATIONS', 'true').lower() in ('true', '1', 'yes', 'on')
-    admin_language = os.environ.get('DJANGO_ADMIN_PREFERRED_LANGUAGE', 'zh')
+    admin_email = os.environ.get("DJANGO_ADMIN_EMAIL", "admin@example.com")
+    admin_theme = os.environ.get("DJANGO_ADMIN_THEME", "default")
+    admin_notifications = os.environ.get("DJANGO_ADMIN_NOTIFICATIONS", "true").lower() in ("true", "1", "yes", "on")
+    admin_language = os.environ.get("DJANGO_ADMIN_PREFERRED_LANGUAGE", "zh")
 
-    env = os.environ.get('DJANGO_ENV', 'development')
+    env = os.environ.get("DJANGO_ENV", "development")
 
     # 生产环境安全限制
-    if env == 'production' and not os.environ.get('DJANGO_ALLOW_SEED_PROD'):
+    if env == "production" and not os.environ.get("DJANGO_ALLOW_SEED_PROD"):
         print(colored("【生产环境安全限制】禁止自动插入初始数据！", "red"))
         print(colored("如需强制执行，请设置环境变量 DJANGO_DJANGO_ALLOW_SEED_PROD=1 （极度不推荐）"))
         return False
 
-    if env == 'production' and len(admin_password) < 10:
+    if env == "production" and len(admin_password) < 10:
         print(colored("错误：管理员密码长度不足 10 位！请通过环境变量 DJANGO_ADMIN_PASSWORD 设置更强密码", "red"))
         return False
 
     try:
         existing_admin = User.objects.filter(username=admin_username).first()
     except Exception as e:
-        if 'no such table' in str(e) or 'does not exist' in str(e):
+        if "no such table" in str(e) or "does not exist" in str(e):
             print(colored("✗ 数据库表不存在，请先运行阶段1完成数据库迁移：", "red"))
             print(colored("  ./venv/bin/python init_db.py --stage 1", "yellow"))
             return False
@@ -134,11 +134,35 @@ def run_stage3(force: bool = False, dry_run: bool = False) -> bool:
 
     if not dry_run:
         DEFAULT_NAV_CARDS = [
-            {"id": "default-1", "name": "必应搜索", "url": "https://www.bing.com", "bg_color": "#3584e4", "position": 1},
+            {
+                "id": "default-1",
+                "name": "必应搜索",
+                "url": "https://www.bing.com",
+                "bg_color": "#3584e4",
+                "position": 1,
+            },
             {"id": "default-2", "name": "豆包", "url": "https://www.doubao.com", "bg_color": "#2ec27e", "position": 2},
-            {"id": "default-3", "name": "千问", "url": "https://tongyi.aliyun.com", "bg_color": "#9141ac", "position": 3},
-            {"id": "default-4", "name": "百度地图", "url": "https://map.baidu.com", "bg_color": "#2932e1", "position": 4},
-            {"id": "default-5", "name": "哔哩哔哩", "url": "https://www.bilibili.com", "bg_color": "#00a1d6", "position": 5},
+            {
+                "id": "default-3",
+                "name": "千问",
+                "url": "https://tongyi.aliyun.com",
+                "bg_color": "#9141ac",
+                "position": 3,
+            },
+            {
+                "id": "default-4",
+                "name": "百度地图",
+                "url": "https://map.baidu.com",
+                "bg_color": "#2932e1",
+                "position": 4,
+            },
+            {
+                "id": "default-5",
+                "name": "哔哩哔哩",
+                "url": "https://www.bilibili.com",
+                "bg_color": "#00a1d6",
+                "position": 5,
+            },
             {"id": "default-6", "name": "36氪", "url": "https://36kr.com", "bg_color": "#f85959", "position": 6},
         ]
         admin = User.objects.create_user(

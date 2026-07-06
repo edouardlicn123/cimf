@@ -126,6 +126,48 @@ html, body {
 }
 
 
+/* ── Dashboard 卡片槽位（从模板提取） ── */
+.card-slot {
+    height: 150px;
+    min-height: 150px;
+    border: 1px solid var(--border);
+    background-color: var(--bg-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+.card-slot.drag-over {
+    border-color: var(--primary) !important;
+    background-color: var(--primary-light) !important;
+}
+
+/* ── 导航卡片槽位（从模板提取） ── */
+.nav-slot {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+.nav-slot.drag-over {
+    border-color: var(--primary) !important;
+    background-color: var(--primary-light) !important;
+}
+.nav-card, .nav-card-setting {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 500;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.nav-card.dragging, .nav-card-setting.dragging {
+    opacity: 0.5;
+}
+
 /* ── 基本卡片（共享结构）── */
 .card:has(.card-header:not(.d-flex)) {
     border-radius: var(--radius);
@@ -232,7 +274,7 @@ html, body {
 
 /* ── 日志文件选择 - 描边过滤标签 ── */
 .nav-pills-outline .nav-link {
-    background: #fff;
+    background: var(--bg-surface);
     border: 1px solid var(--primary);
     color: var(--primary);
     border-radius: 6px 6px 0 0;
@@ -242,11 +284,11 @@ html, body {
 }
 .nav-pills-outline .nav-link.active {
     background: var(--primary);
-    color: #fff !important;
+    color: var(--text-inverse) !important;
 }
 .nav-pills-outline .nav-link.active .badge {
-    background: #f57c00 !important;
-    color: #000 !important;
+    background: var(--warning) !important;
+    color: var(--text-primary) !important;
 }
 
 /* ── 日志表格边框 ── */
@@ -297,31 +339,31 @@ html, body {
 .btn-primary {
     --btn-lighter: color-mix(in srgb, var(--primary), white 20%);
     background-image: linear-gradient(135deg, var(--btn-lighter) 0%, var(--primary) 30% 70%, var(--btn-lighter) 100%) !important;
-    color: #fff !important;
+    color: var(--text-inverse) !important;
 }
 
 .btn-success {
     --btn-lighter: color-mix(in srgb, var(--success), white 20%);
     background-image: linear-gradient(135deg, var(--btn-lighter) 0%, var(--success) 30% 70%, var(--btn-lighter) 100%) !important;
-    color: #fff !important;
+    color: var(--text-inverse) !important;
 }
 
 .btn-danger {
     --btn-lighter: color-mix(in srgb, var(--danger), white 20%);
     background-image: linear-gradient(135deg, var(--btn-lighter) 0%, var(--danger) 30% 70%, var(--btn-lighter) 100%) !important;
-    color: #fff !important;
+    color: var(--text-inverse) !important;
 }
 
 .btn-warning {
     --btn-lighter: color-mix(in srgb, var(--warning), white 20%);
     background-image: linear-gradient(135deg, var(--btn-lighter) 0%, var(--warning) 30% 70%, var(--btn-lighter) 100%) !important;
-    color: #000 !important;
+    color: var(--text-primary) !important;
 }
 
 .btn-info {
     --btn-lighter: color-mix(in srgb, var(--info), white 20%);
     background-image: linear-gradient(135deg, var(--btn-lighter) 0%, var(--info) 30% 70%, var(--btn-lighter) 100%) !important;
-    color: #fff !important;
+    color: var(--text-inverse) !important;
 }
 
 

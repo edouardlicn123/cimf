@@ -10,7 +10,9 @@ from .services import ClockService
 @login_required_json
 def api_time(request):  # noqa: ARG001
     """获取当前时间 API"""
-    return JsonResponse({
-        'success': True,
-        'data': ClockService.get_current_time(),
-    })
+    return JsonResponse(
+        {
+            "success": True,
+            "data": ClockService.get_current_time(),
+        }
+    )

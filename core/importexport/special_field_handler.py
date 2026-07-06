@@ -41,7 +41,7 @@ class SpecialFieldPool:
     def _default_export(_field_name: str, value: Any) -> str:
         """默认导出处理"""
         if value is None:
-            return ''
+            return ""
         if isinstance(value, (dict, list)):
             return json.dumps(value, ensure_ascii=False)
         return str(value)
@@ -52,7 +52,7 @@ class SpecialFieldPool:
         if not value:
             return None
 
-        if field_name == 'region':
+        if field_name == "region":
             try:
                 if isinstance(value, str):
                     return json.loads(value)
@@ -60,7 +60,7 @@ class SpecialFieldPool:
             except json.JSONDecodeError:
                 return None
 
-        if field_name in ('registered_capital', 'credit_limit'):
+        if field_name in ("registered_capital", "credit_limit"):
             try:
                 return float(value)
             except (ValueError, TypeError):
@@ -76,7 +76,7 @@ class RegionFieldHandler:
     def handle_export(cls, value: Any) -> str:
         """导出：JSON -> 字符串"""
         if not value:
-            return ''
+            return ""
         if isinstance(value, str):
             return value
         return json.dumps(value, ensure_ascii=False)
@@ -93,7 +93,7 @@ class RegionFieldHandler:
         try:
             return json.loads(value)
         except json.JSONDecodeError:
-            return {'raw': value}
+            return {"raw": value}
 
 
-SpecialFieldPool.register('region', RegionFieldHandler())
+SpecialFieldPool.register("region", RegionFieldHandler())

@@ -20,21 +20,8 @@
                 <p class="mb-4 small opacity-75">{{ settings.welcome_intro if settings else '初始用户名：admin 初始密码：admin123' }}</p>
             </div>
 
-            <!-- Flash 消息 – 推到底部 -->
-            {% if messages %}
-                <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
-                    {% for message in messages %}
-                        <div class="toast show" role="alert">
-                            <div class="toast-body">
-                                {{ message }}
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <!-- 无消息时占位，确保布局稳定 -->
-                <div class="mt-auto"></div>
-            {% endif %}
+            <!-- 无消息时占位，确保布局稳定 -->
+            <div class="mt-auto"></div>
         </div>
 
         <!-- 右侧登录表单面板 -->
@@ -159,10 +146,6 @@
         margin-bottom: 1rem;
     }
     
-    /* 隐藏传统 flash 消息，只显示 toast */
-    .alert, .flash-message, .flashed-messages {
-        display: none !important;
-    }
 </style>
 
 {% endblock %}

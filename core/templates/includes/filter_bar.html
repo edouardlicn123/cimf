@@ -1,0 +1,21 @@
+<form method="GET" action="{{ filter_action }}" class="row g-2 mb-3 align-items-end">
+  {% for field in filter_fields %}
+  <div class="col-auto">
+    <label class="form-label small mb-1">{{ field.label }}</label>
+    {% if field.type == "select" and field.options %}
+    <select name="{{ field.name }}" class="form-select form-select-sm">
+      <option value="">全部</option>
+      {% for opt in field.options %}
+      <option value="{{ opt.value }}" {% if request.GET.get(field.name) == opt.value %}selected{% endif %}>{{ opt.label }}</option>
+      {% endfor %}
+    </select>
+    {% else %}
+    <input type="text" name="{{ field.name }}" class="form-control form-control-sm" value="{{ request.GET.get(field.name, '') }}" placeholder="{{ field.label }}">
+    {% endif %}
+  </div>
+  {% endfor %}
+  <div class="col-auto">
+    <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-search me-1"></i>搜索</button>
+    <a href="{{ filter_action }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-x-circle me-1"></i>清除</a>
+  </div>
+</form>

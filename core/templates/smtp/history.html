@@ -22,20 +22,14 @@
     </div>
     <div class="card-body">
         <div class="d-flex align-items-end gap-2" style="margin-bottom:-1px">
-            <div class="nav nav-pills nav-pills-outline gap-1 ms-auto">
-                <a href="?status=all" class="nav-link {% if filter_status == 'all' %}active{% endif %}">
-                    全部 <span class="badge ms-1" style="background:#f57c00;color:#fff">{{ total_count }}</span>
-                </a>
-                <a href="?status=sent" class="nav-link {% if filter_status == 'sent' %}active{% endif %}">
-                    成功 <span class="badge ms-1" style="background:#f57c00;color:#fff">{{ sent_count }}</span>
-                </a>
-                <a href="?status=failed" class="nav-link {% if filter_status == 'failed' %}active{% endif %}">
-                    失败 <span class="badge ms-1" style="background:#f57c00;color:#fff">{{ failed_count }}</span>
-                </a>
-                <a href="?status=pending" class="nav-link {% if filter_status == 'pending' %}active{% endif %}">
-                    待发送 <span class="badge ms-1" style="background:#f57c00;color:#fff">{{ pending_count }}</span>
-                </a>
-            </div>
+            {% set pills = [
+                {"label": "全部", "filter": "all", "active": filter_status == "all", "count": total_count},
+                {"label": "成功", "filter": "sent", "active": filter_status == "sent", "count": sent_count},
+                {"label": "失败", "filter": "failed", "active": filter_status == "failed", "count": failed_count},
+                {"label": "待发送", "filter": "pending", "active": filter_status == "pending", "count": pending_count}
+            ] %}
+            {% set filter_param = "status" %}
+            {% include "includes/nav_pills.html" %}
         </div>
         <div class="log-table-wrap table-responsive">
             <table class="table table-hover mb-0">
@@ -87,9 +81,7 @@
                         </td>
                     </tr>
                     {% else %}
-                    <tr>
-                        <td colspan="6" class="text-center text-muted">暂无数据</td>
-                    </tr>
+                    {% set empty_type = "table" %}{% set empty_colspan = 6 %}{% set empty_message = "暂无数据" %}{% include "includes/empty_state.html" %}
                     {% endfor %}
                 </tbody>
             </table>

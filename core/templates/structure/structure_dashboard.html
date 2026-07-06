@@ -12,62 +12,10 @@
 {% endblock %}
 
 {% block admin_content %}
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-  <div class="col">
-    <div class="entry-card h-100">
-      <div class="entry-card-figure">
-        <i class="bi bi-box-seam"></i>
-        <h5 class="entry-card-title">可用节点类型</h5>
-      </div>
-      <div class="entry-card-body">
-        <p class="entry-card-desc">
-          管理业务节点的类型定义，如客户、会员、项目等
-        </p>
-        <div class="entry-card-actions">
-          <a href="{{ url('core:node_types_list') }}" class="btn btn-primary btn-sm">
-            <i class="bi bi-arrow-right me-1"></i> 管理
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col">
-    <div class="entry-card h-100">
-      <div class="entry-card-figure">
-        <i class="bi bi-tags"></i>
-        <h5 class="entry-card-title">词汇表管理</h5>
-      </div>
-      <div class="entry-card-body">
-        <p class="entry-card-desc">
-          管理分类词汇，如国家、客户类型、行业等
-        </p>
-        <div class="entry-card-actions">
-          <a href="{{ url('core:taxonomies') }}" class="btn btn-primary btn-sm">
-            <i class="bi bi-arrow-right me-1"></i> 管理
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col">
-    <div class="entry-card h-100">
-      <div class="entry-card-figure">
-        <i class="bi bi-ui-checks"></i>
-        <h5 class="entry-card-title">字段类型</h5>
-      </div>
-      <div class="entry-card-body">
-        <p class="entry-card-desc">
-          查看系统支持的字段类型，如字符串、数字、日期等
-        </p>
-        <div class="entry-card-actions">
-          <a href="{{ url('core:field_types') }}" class="btn btn-primary btn-sm">
-            <i class="bi bi-arrow-right me-1"></i> 查看
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+{% set entries = [
+  {"icon": "bi-box-seam", "title": "可用节点类型", "description": "管理业务节点的类型定义，如客户、会员、项目等", "url": url('core:node_types_list'), "action_text": "管理"},
+  {"icon": "bi-tags", "title": "词汇表管理", "description": "管理分类词汇，如国家、客户类型、行业等", "url": url('core:taxonomies'), "action_text": "管理"},
+  {"icon": "bi-ui-checks", "title": "字段类型", "description": "查看系统支持的字段类型，如字符串、数字、日期等", "url": url('core:field_types'), "action_text": "查看"}
+] %}
+{% include "includes/entry_card_grid.html" %}
 {% endblock %}

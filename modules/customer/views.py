@@ -26,6 +26,7 @@ from django.views.decorators.http import require_POST
 from core.decorators import login_required_json
 from core.node.services import NodeService, NodeTypeService
 from core.services import PermissionService, TaxonomyService
+from modules.customer.forms import CustomerForm
 from modules.customer.services import CustomerService
 
 
@@ -50,34 +51,43 @@ def check_customer_permission(user, node, permission_type: str):
         return True, None
 
     perm_map = {
-        'view': 'node.customer.view_others',
-        'edit': 'node.customer.edit_others',
-        'delete': 'node.customer.delete_others',
+        "view": "node.customer.view_others",
+        "edit": "node.customer.edit_others",
+        "delete": "node.customer.delete_others",
     }
 
     perm = perm_map.get(permission_type)
     if perm and PermissionService.has_permission(user, perm):
         return True, None
 
-    return False, f'您没有权限{permission_type}别人的客户信息'
+    return False, f"您没有权限{permission_type}别人的客户信息"
+
+
+def _load_customer_form_data():
+    """加载客户表单所需的分类数据"""
+    slugs = ["customer_type", "customer_level", "economic_type", "country"]
+    result = {}
+    for slug in slugs:
+        tax = TaxonomyService.get_taxonomy_by_slug(slug)
+        result[slug] = TaxonomyService.get_items(tax.id) if tax else []
+    return result
 
 
 @login_required
 def node_list(request):
     """海外客户列表"""
-    node_type = NodeTypeService.get_by_slug('customer')
+    node_type = NodeTypeService.get_by_slug("customer")
     if not node_type:
-        raise Http404('节点类型不存在')
+        raise Http404("节点类型不存在")
 
-    search = request.GET.get('search', '')
-    customer_type_filter = request.GET.get('customer_type', '')
-    customer_level_filter = request.GET.get('customer_level', '')
+    search = request.GET.get("search", "")
+    customer_type_filter = request.GET.get("customer_type", "")
+    customer_level_filter = request.GET.get("customer_level", "")
     node_types = NodeTypeService.get_all()
 
-    customer_type_tax = TaxonomyService.get_taxonomy_by_slug('customer_type')
-    customer_types = [{'id': c.id, 'name': c.name} for c in TaxonomyService.get_items(customer_type_tax.id)] if customer_type_tax else []
-    customer_level_tax = TaxonomyService.get_taxonomy_by_slug('customer_level')
-    customer_levels = [{'id': c.id, 'name': c.name} for c in TaxonomyService.get_items(customer_level_tax.id)] if customer_level_tax else []
+    form_data = _load_customer_form_data()
+    customer_types = [{"id": c.id, "name": c.name} for c in form_data["customer_type"]]
+    customer_levels = [{"id": c.id, "name": c.name} for c in form_data["customer_level"]]
 
     customer_type_id = safe_int(customer_type_filter)
     customer_level_id = safe_int(customer_level_filter)
@@ -86,92 +96,104 @@ def node_list(request):
         search if search else None,
         customer_type_id=customer_type_id,
         customer_level_id=customer_level_id,
-        user=request.user
+        user=request.user,
     )
 
-    page_num = request.GET.get('page', 1)
+    page_num = request.GET.get("page", 1)
     paginator = Paginator(customers, 10)
     page_obj = paginator.get_page(page_num)
 
-    return render(request, 'list.html', {
-        'node_type': node_type,
-        'node_types': node_types,
-        'customers': page_obj.object_list,
-        'search': search,
-        'active_section': 'customer',
-        'filter_customer_type': customer_type_filter,
-        'filter_customer_level': customer_level_filter,
-        'customer_types': customer_types,
-        'customer_levels': customer_levels,
-        'page_obj': page_obj,
-        'current_page': page_obj.number,
-        'total_pages': paginator.num_pages,
-        'has_prev': page_obj.has_previous(),
-        'has_next': page_obj.has_next(),
-        'prev_page': page_obj.previous_page_number() if page_obj.has_previous() else None,
-        'next_page': page_obj.next_page_number() if page_obj.has_next() else None,
-    })
+    return render(
+        request,
+        "list.html",
+        {
+            "node_type": node_type,
+            "node_types": node_types,
+            "customers": page_obj.object_list,
+            "search": search,
+            "active_section": "customer",
+            "filter_customer_type": customer_type_filter,
+            "filter_customer_level": customer_level_filter,
+            "customer_types": customer_types,
+            "customer_levels": customer_levels,
+            "page_obj": page_obj,
+            "current_page": page_obj.number,
+            "total_pages": paginator.num_pages,
+            "has_prev": page_obj.has_previous(),
+            "has_next": page_obj.has_next(),
+            "prev_page": page_obj.previous_page_number() if page_obj.has_previous() else None,
+            "next_page": page_obj.next_page_number() if page_obj.has_next() else None,
+        },
+    )
 
 
 @login_required
 def node_create(request):
     """创建海外客户"""
-    node_type = NodeTypeService.get_by_slug('customer')
+    node_type = NodeTypeService.get_by_slug("customer")
     if not node_type:
-        raise Http404('节点类型不存在')
+        raise Http404("节点类型不存在")
 
     node_types = NodeTypeService.get_all()
 
-    customer_type_tax = TaxonomyService.get_taxonomy_by_slug('customer_type')
-    customer_types = TaxonomyService.get_items(customer_type_tax.id) if customer_type_tax else []
-    customer_level_tax = TaxonomyService.get_taxonomy_by_slug('customer_level')
-    customer_levels = TaxonomyService.get_items(customer_level_tax.id) if customer_level_tax else []
-    enterprise_type_tax = TaxonomyService.get_taxonomy_by_slug('economic_type')
-    enterprise_types = TaxonomyService.get_items(enterprise_type_tax.id) if enterprise_type_tax else []
-    country_tax = TaxonomyService.get_taxonomy_by_slug('country')
-    countries = [{'id': c.id, 'name': c.name} for c in TaxonomyService.get_items(country_tax.id)] if country_tax else []
+    form_data = _load_customer_form_data()
+    customer_types = form_data["customer_type"]
+    customer_levels = form_data["customer_level"]
+    enterprise_types = form_data["economic_type"]
+    countries = [{"id": c.id, "name": c.name} for c in form_data["country"]]
 
-    if request.method == 'POST':
-        data = {
-            'customer_name': request.POST.get('customer_name', '').strip(),
-            'customer_code': request.POST.get('customer_code', '').strip() or None,
-            'customer_type_id': request.POST.get('customer_type') or None,
-            'enterprise_name': request.POST.get('enterprise_name', '').strip() or None,
-            'phone1': request.POST.get('phone1', '').strip() or None,
-            'email1': request.POST.get('email1', '').strip() or None,
-            'phone2': request.POST.get('phone2', '').strip() or None,
-            'email2': request.POST.get('email2', '').strip() or None,
-            'linkedin': request.POST.get('linkedin', '').strip() or None,
-            'country_id': request.POST.get('country') or None,
-            'province': request.POST.get('province', '').strip() or None,
-            'address': request.POST.get('address', '').strip() or None,
-            'postal_code': request.POST.get('postal_code', '').strip() or None,
-            'industry': request.POST.get('industry', '').strip() or None,
-            'enterprise_type_id': request.POST.get('enterprise_type') or None,
-            'registered_capital': request.POST.get('registered_capital') or None,
-            'customer_level_id': request.POST.get('customer_level') or None,
-            'credit_limit': request.POST.get('credit_limit') or None,
-            'website': request.POST.get('website', '').strip() or None,
-            'notes': request.POST.get('notes', '').strip() or None,
-        }
+    if request.method == "POST":
+        form = CustomerForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            data = {
+                "customer_name": cd.get("customer_name", "").strip(),
+                "customer_code": cd.get("customer_code", "").strip() or None,
+                "customer_type_id": cd.get("customer_type").id if cd.get("customer_type") else None,
+                "enterprise_name": cd.get("enterprise_name", "").strip() or None,
+                "phone1": cd.get("phone1", "").strip() or None,
+                "email1": cd.get("email1", "").strip() or None,
+                "phone2": cd.get("phone2", "").strip() or None,
+                "email2": cd.get("email2", "").strip() or None,
+                "linkedin": cd.get("linkedin", "").strip() or None,
+                "country_id": cd.get("country").id if cd.get("country") else None,
+                "province": cd.get("province", "").strip() or None,
+                "address": cd.get("address", "").strip() or None,
+                "postal_code": cd.get("postal_code", "").strip() or None,
+                "industry": cd.get("industry", "").strip() or None,
+                "enterprise_type_id": cd.get("enterprise_type").id if cd.get("enterprise_type") else None,
+                "registered_capital": cd.get("registered_capital"),
+                "customer_level_id": cd.get("customer_level").id if cd.get("customer_level") else None,
+                "credit_limit": cd.get("credit_limit"),
+                "website": cd.get("website", "").strip() or None,
+                "notes": cd.get("notes", "").strip() or None,
+            }
+            try:
+                CustomerService.create(request.user, data)
+                messages.success(request, "客户创建成功")
+                return redirect("node:module_page", node_type_slug="customer")
+            except ValueError as e:
+                messages.error(request, str(e))
+            else:
+                for field, errors in form.errors.items():
+                    label = form.fields[field].label or field
+                    for error in errors:
+                        messages.error(request, f"{label}: {error}")
 
-        try:
-            CustomerService.create(request.user, data)
-            messages.success(request, '客户创建成功')
-            return redirect('node:module_page', node_type_slug='customer')
-        except ValueError as e:
-            messages.error(request, str(e))
-
-    return render(request, 'edit.html', {
-        'node_type': node_type,
-        'node_types': node_types,
-        'customer': None,
-        'active_section': 'customer',
-        'customer_types': customer_types,
-        'customer_levels': customer_levels,
-        'enterprise_types': enterprise_types,
-        'countries': countries,
-    })
+    return render(
+        request,
+        "edit.html",
+        {
+            "node_type": node_type,
+            "node_types": node_types,
+            "customer": None,
+            "active_section": "customer",
+            "customer_types": customer_types,
+            "customer_levels": customer_levels,
+            "enterprise_types": enterprise_types,
+            "countries": countries,
+        },
+    )
 
 
 @login_required
@@ -179,27 +201,31 @@ def node_view(request, node_id: int):
     """查看海外客户"""
     node = NodeService.get_by_id(node_id)
     if not node:
-        raise Http404('节点不存在')
+        raise Http404("节点不存在")
 
-    has_perm, error_msg = check_customer_permission(request.user, node, 'view')
+    has_perm, error_msg = check_customer_permission(request.user, node, "view")
     if not has_perm:
         messages.error(request, error_msg)
-        return redirect('node:module_page', node_type_slug='customer')
+        return redirect("node:module_page", node_type_slug="customer")
 
     node_types = NodeTypeService.get_all()
 
     customer = CustomerService.get_by_node_id(node_id)
     if not customer:
-        messages.error(request, '客户不存在')
-        return redirect('node:module_page', node_type_slug='customer')
+        messages.error(request, "客户不存在")
+        return redirect("node:module_page", node_type_slug="customer")
 
-    return render(request, 'view.html', {
-        'node_type': node.node_type,
-        'node_types': node_types,
-        'node': node,
-        'customer': customer,
-        'active_section': 'customer',
-    })
+    return render(
+        request,
+        "view.html",
+        {
+            "node_type": node.node_type,
+            "node_types": node_types,
+            "node": node,
+            "customer": customer,
+            "active_section": "customer",
+        },
+    )
 
 
 @login_required
@@ -207,71 +233,79 @@ def node_edit(request, node_id: int):
     """编辑海外客户"""
     node = NodeService.get_by_id(node_id)
     if not node:
-        raise Http404('节点不存在')
+        raise Http404("节点不存在")
 
-    has_perm, error_msg = check_customer_permission(request.user, node, 'edit')
+    has_perm, error_msg = check_customer_permission(request.user, node, "edit")
     if not has_perm:
         messages.error(request, error_msg)
-        return redirect('node:node_view', node_type_slug='customer', node_id=node_id)
+        return redirect("node:node_view", node_type_slug="customer", node_id=node_id)
 
     node_types = NodeTypeService.get_all()
 
     customer = CustomerService.get_by_node_id(node_id)
     if not customer:
-        messages.error(request, '客户不存在')
-        return redirect('node:module_page', node_type_slug='customer')
+        messages.error(request, "客户不存在")
+        return redirect("node:module_page", node_type_slug="customer")
 
-    customer_type_tax = TaxonomyService.get_taxonomy_by_slug('customer_type')
-    customer_types = TaxonomyService.get_items(customer_type_tax.id) if customer_type_tax else []
-    customer_level_tax = TaxonomyService.get_taxonomy_by_slug('customer_level')
-    customer_levels = TaxonomyService.get_items(customer_level_tax.id) if customer_level_tax else []
-    enterprise_type_tax = TaxonomyService.get_taxonomy_by_slug('economic_type')
-    enterprise_types = TaxonomyService.get_items(enterprise_type_tax.id) if enterprise_type_tax else []
-    country_tax = TaxonomyService.get_taxonomy_by_slug('country')
-    countries = [{'id': c.id, 'name': c.name} for c in TaxonomyService.get_items(country_tax.id)] if country_tax else []
+    form_data = _load_customer_form_data()
+    customer_types = form_data["customer_type"]
+    customer_levels = form_data["customer_level"]
+    enterprise_types = form_data["economic_type"]
+    countries = [{"id": c.id, "name": c.name} for c in form_data["country"]]
 
-    if request.method == 'POST':
-        data = {
-            'customer_name': request.POST.get('customer_name', '').strip(),
-            'customer_code': request.POST.get('customer_code', '').strip() or None,
-            'customer_type_id': request.POST.get('customer_type') or None,
-            'enterprise_name': request.POST.get('enterprise_name', '').strip() or None,
-            'phone1': request.POST.get('phone1', '').strip() or None,
-            'email1': request.POST.get('email1', '').strip() or None,
-            'phone2': request.POST.get('phone2', '').strip() or None,
-            'email2': request.POST.get('email2', '').strip() or None,
-            'linkedin': request.POST.get('linkedin', '').strip() or None,
-            'country_id': request.POST.get('country') or None,
-            'province': request.POST.get('province', '').strip() or None,
-            'address': request.POST.get('address', '').strip() or None,
-            'postal_code': request.POST.get('postal_code', '').strip() or None,
-            'industry': request.POST.get('industry', '').strip() or None,
-            'enterprise_type_id': request.POST.get('enterprise_type') or None,
-            'registered_capital': request.POST.get('registered_capital') or None,
-            'customer_level_id': request.POST.get('customer_level') or None,
-            'credit_limit': request.POST.get('credit_limit') or None,
-            'website': request.POST.get('website', '').strip() or None,
-            'notes': request.POST.get('notes', '').strip() or None,
-        }
+    if request.method == "POST":
+        form = CustomerForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            data = {
+                "customer_name": cd.get("customer_name", "").strip(),
+                "customer_code": cd.get("customer_code", "").strip() or None,
+                "customer_type_id": cd.get("customer_type").id if cd.get("customer_type") else None,
+                "enterprise_name": cd.get("enterprise_name", "").strip() or None,
+                "phone1": cd.get("phone1", "").strip() or None,
+                "email1": cd.get("email1", "").strip() or None,
+                "phone2": cd.get("phone2", "").strip() or None,
+                "email2": cd.get("email2", "").strip() or None,
+                "linkedin": cd.get("linkedin", "").strip() or None,
+                "country_id": cd.get("country").id if cd.get("country") else None,
+                "province": cd.get("province", "").strip() or None,
+                "address": cd.get("address", "").strip() or None,
+                "postal_code": cd.get("postal_code", "").strip() or None,
+                "industry": cd.get("industry", "").strip() or None,
+                "enterprise_type_id": cd.get("enterprise_type").id if cd.get("enterprise_type") else None,
+                "registered_capital": cd.get("registered_capital"),
+                "customer_level_id": cd.get("customer_level").id if cd.get("customer_level") else None,
+                "credit_limit": cd.get("credit_limit"),
+                "website": cd.get("website", "").strip() or None,
+                "notes": cd.get("notes", "").strip() or None,
+            }
+            try:
+                CustomerService.update(customer.id, request.user, data)
+                messages.success(request, "客户更新成功")
+                return redirect("node:node_view", node_type_slug="customer", node_id=node_id)
+            except ValueError as e:
+                messages.error(request, str(e))
+        else:
+            for field, errors in form.errors.items():
+                label = form.fields[field].label or field
+                for error in errors:
+                    messages.error(request, f"{label}: {error}")
 
-        try:
-            CustomerService.update(customer.id, request.user, data)
-            messages.success(request, '客户更新成功')
-            return redirect('node:node_view', node_type_slug='customer', node_id=node_id)
-        except ValueError as e:
-            messages.error(request, str(e))
-
-    return render(request, 'edit.html', {
-        'node_type': node.node_type,
-        'node_types': node_types,
-        'node': node,
-        'customer': customer,
-        'active_section': 'customer',
-        'customer_types': customer_types,
-        'customer_levels': customer_levels,
-        'enterprise_types': enterprise_types,
-        'countries': countries,
-    })
+    return render(
+        request,
+        "edit.html",
+        {
+            "node_type": node.node_type,
+            "node_types": node_types,
+            "node": node,
+            "customer": customer,
+            "active_section": "customer",
+            "customer_types": customer_types,
+            "customer_levels": customer_levels,
+            "enterprise_types": enterprise_types,
+            "countries": countries,
+        },
+    )
 
 
 @login_required
@@ -280,18 +314,18 @@ def node_delete(request, node_id: int):
     """删除海外客户"""
     node = NodeService.get_by_id(node_id)
     if node:
-        has_perm, error_msg = check_customer_permission(request.user, node, 'delete')
+        has_perm, error_msg = check_customer_permission(request.user, node, "delete")
         if not has_perm:
             messages.error(request, error_msg)
         else:
             customer = CustomerService.get_by_node_id(node_id)
             if customer:
                 CustomerService.delete(customer.id)
-                messages.success(request, '客户已删除')
+                messages.success(request, "客户已删除")
             else:
-                messages.error(request, '客户不存在')
+                messages.error(request, "客户不存在")
 
-    return redirect('node:module_page', node_type_slug='customer')
+    return redirect("node:module_page", node_type_slug="customer")
 
 
 @login_required_json
@@ -300,10 +334,12 @@ def api_stats(request):  # noqa: ARG001
     total = CustomerService.get_count()
     recent = CustomerService.get_recent_count(days=7)
 
-    return JsonResponse({
-        'success': True,
-        'data': {
-            'total': total,
-            'recent': recent,
+    return JsonResponse(
+        {
+            "success": True,
+            "data": {
+                "total": total,
+                "recent": recent,
+            },
         }
-    })
+    )

@@ -22,6 +22,7 @@ import re
 
 class BaseField:
     """字段类型基类"""
+
     name = None
     label = None
     widget = None
@@ -33,21 +34,21 @@ class BaseField:
 
     # ========== 通用渲染方法 ==========
 
-    def _render_input(self, input_type='text', **kwargs) -> str:
+    def _render_input(self, input_type="text", **kwargs) -> str:
         """通用输入框渲染
 
         参数：
             input_type: input 类型 (text, password, email, tel, number 等)
             **kwargs: 额外属性 (max_length, placeholder, required, disabled 等)
         """
-        value = self.field_config.get('value', '')
-        required = self.field_config.get('required', False)
-        placeholder = self.field_config.get('placeholder', '')
-        max_length = self.field_config.get('max_length', '')
+        value = self.field_config.get("value", "")
+        required = self.field_config.get("required", False)
+        placeholder = self.field_config.get("placeholder", "")
+        max_length = self.field_config.get("max_length", "")
 
         attrs = 'class="form-control" '
         if required:
-            attrs += 'required '
+            attrs += "required "
         if placeholder:
             attrs += f'placeholder="{placeholder}" '
         if max_length:
@@ -65,12 +66,12 @@ class BaseField:
             rows: 行数
             **kwargs: 额外属性
         """
-        value = self.field_config.get('value', '')
-        required = self.field_config.get('required', False)
+        value = self.field_config.get("value", "")
+        required = self.field_config.get("required", False)
 
         attrs = f'class="form-control" rows="{rows}" '
         if required:
-            attrs += 'required '
+            attrs += "required "
         for k, v in kwargs.items():
             attrs += f'{k}="{v}" '
 
@@ -83,17 +84,16 @@ class BaseField:
             choices: [(value, label), ...] 选项列表
             **kwargs: 额外属性
         """
-        value = self.field_config.get('value', '')
-        required = self.field_config.get('required', False)
+        value = self.field_config.get("value", "")
+        required = self.field_config.get("required", False)
 
-        options = ''.join(
-            f'<option value="{c[0]}" {"selected" if str(c[0]) == str(value) else ""}>{c[1]}</option>'
-            for c in choices
+        options = "".join(
+            f'<option value="{c[0]}" {"selected" if str(c[0]) == str(value) else ""}>{c[1]}</option>' for c in choices
         )
 
         attrs = 'class="form-control" '
         if required:
-            attrs += 'required '
+            attrs += "required "
         for k, v in kwargs.items():
             attrs += f'{k}="{v}" '
 
@@ -105,9 +105,9 @@ class BaseField:
         参数：
             label: 显示标签
         """
-        value = self.field_config.get('value', False)
-        checked = 'checked' if value else ''
-        label_text = label or self.field_config.get('label', self.field_name)
+        value = self.field_config.get("value", False)
+        checked = "checked" if value else ""
+        label_text = label or self.field_config.get("label", self.field_name)
 
         return f'''<div class="form-check">
             <input type="checkbox" name="{self.field_name}" class="form-check-input" id="{self.field_name}" {checked}>
@@ -120,9 +120,9 @@ class BaseField:
         参数：
             choices: [(value, label), ...] 选项列表
         """
-        value = self.field_config.get('value', '')
+        value = self.field_config.get("value", "")
 
-        options = ''.join(
+        options = "".join(
             f'''<div class="form-check">
                 <input type="radio" name="{self.field_name}" class="form-check-input"
                        id="{self.field_name}_{c[0]}" value="{c[0]}" {"checked" if str(c[0]) == str(value) else ""}>
@@ -141,9 +141,9 @@ class BaseField:
         参数：
             field_name: 自定义字段名称（可选）
         """
-        if self.field_config.get('required') and not self.field_config.get('value'):
-            label = field_name or self.field_config.get('label', self.field_name)
-            return [f'{label} 为必填项']
+        if self.field_config.get("required") and not self.field_config.get("value"):
+            label = field_name or self.field_config.get("label", self.field_name)
+            return [f"{label} 为必填项"]
         return []
 
     def _validate_length(self, min_length=None, max_length=None) -> list:
@@ -153,24 +153,24 @@ class BaseField:
             min_length: 最小长度
             max_length: 最大长度
         """
-        value = self.field_config.get('value', '')
+        value = self.field_config.get("value", "")
         errors = []
 
         if min_length and len(value) < min_length:
-            errors.append(f'长度不能少于 {min_length} 个字符')
+            errors.append(f"长度不能少于 {min_length} 个字符")
         if max_length and len(value) > max_length:
-            errors.append(f'长度不能超过 {max_length} 个字符')
+            errors.append(f"长度不能超过 {max_length} 个字符")
 
         return errors
 
-    def _validate_pattern(self, pattern: str, message: str = '格式不正确') -> list:
+    def _validate_pattern(self, pattern: str, message: str = "格式不正确") -> list:
         """通用正则验证
 
         参数：
             pattern: 正则表达式
             message: 错误提示信息
         """
-        value = self.field_config.get('value', '')
+        value = self.field_config.get("value", "")
 
         if value and not re.match(pattern, value):
             return [message]
@@ -184,21 +184,21 @@ class BaseField:
             max_value: 最大值
         """
         try:
-            value = float(self.field_config.get('value', 0))
+            value = float(self.field_config.get("value", 0))
         except (ValueError, TypeError):
             return []
 
         errors = []
         if min_value is not None and value < min_value:
-            errors.append(f'值不能小于 {min_value}')
+            errors.append(f"值不能小于 {min_value}")
         if max_value is not None and value > max_value:
-            errors.append(f'值不能大于 {max_value}')
+            errors.append(f"值不能大于 {max_value}")
 
         return errors
 
     # ========== 原有方法保持兼容 ==========
 
-    def render(self, value: dict, mode: str = 'edit') -> str:
+    def render(self, value: dict, mode: str = "edit") -> str:
         """渲染字段表单控件
 
         参数：

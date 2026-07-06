@@ -1,0 +1,8 @@
+<div class="flex-grow-1 overflow-auto px-4 py-4 py-md-5" style="background: var(--bg-body, #ffffff);">
+  <div class="d-flex justify-content-between align-items-center mb-2 flex-nowrap">
+    <h1 class="h2 mb-0 flex-grow-1 pe-3">{{ content_title|default('') }}</h1>
+    <div class="ms-auto ps-4">{{ content_buttons|default('') }}</div>
+  </div>
+  <div class="pb-4">{{ content_body|default('') }}</div>
+  {{ content_footer|default('') }}
+</div>

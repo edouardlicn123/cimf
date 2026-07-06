@@ -1,0 +1,11 @@
+<div class="nav nav-pills nav-pills-outline gap-1 ms-auto">
+  {% set _param = filter_param|default('filter') %}
+  {% for pill in pills %}
+  <a href="?{{ _param }}={{ pill.filter }}" class="nav-link {% if pill.active %}active{% endif %}">
+    {{ pill.label }}
+    {% if pill.count is defined %}
+    <span class="badge ms-1 nav-pill-badge">{{ pill.count }}</span>
+    {% endif %}
+  </a>
+  {% endfor %}
+</div>
