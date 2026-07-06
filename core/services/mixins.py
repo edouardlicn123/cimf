@@ -68,10 +68,13 @@ def safe_execute(fn, error_return=None, log_msg="操作失败", logger=None):
         return error_return
 
 
+_sentinel = object()
+
+
 def update_fields(instance, **fields):
     changed = False
     for key, value in fields.items():
-        if value is not None and getattr(instance, key) != value:
+        if getattr(instance, key) != value:
             setattr(instance, key, value)
             changed = True
     if changed:

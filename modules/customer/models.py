@@ -25,9 +25,9 @@ class CustomerFields(BaseModel):
     )
     enterprise_name = models.CharField(max_length=200, blank=True, null=True, verbose_name="企业名称")
 
-    phone1 = models.CharField(max_length=20, blank=True, null=True, verbose_name="电话1")
+    phone1 = models.CharField(max_length=50, blank=True, null=True, verbose_name="电话1")
     email1 = models.EmailField(blank=True, null=True, verbose_name="邮箱1")
-    phone2 = models.CharField(max_length=20, blank=True, null=True, verbose_name="电话2")
+    phone2 = models.CharField(max_length=50, blank=True, null=True, verbose_name="电话2")
     email2 = models.EmailField(blank=True, null=True, verbose_name="邮箱2")
     linkedin = models.URLField(max_length=200, blank=True, null=True, verbose_name="领英")
 

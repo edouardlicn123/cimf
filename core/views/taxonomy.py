@@ -45,6 +45,9 @@ def taxonomy_create(request):
         if not name or not slug:
             return redirect_with_error(request, "名称和标识不能为空", "core:taxonomies")
 
+        if Taxonomy.objects.filter(slug=slug).exists():
+            return redirect_with_error(request, f"标识 '{slug}' 已被使用", "core:taxonomies")
+
         Taxonomy.objects.create(
             name=name,
             slug=slug,
@@ -95,6 +98,9 @@ def taxonomy_edit(request, taxonomy_id: int):
 
         if not taxonomy.name or not taxonomy.slug:
             return redirect_with_error(request, "名称和标识不能为空", "core:taxonomy_edit", taxonomy_id)
+
+        if Taxonomy.objects.filter(slug=taxonomy.slug).exclude(id=taxonomy_id).exists():
+            return redirect_with_error(request, f"标识 '{taxonomy.slug}' 已被使用", "core:taxonomy_edit", taxonomy_id)
 
         taxonomy.save()
 

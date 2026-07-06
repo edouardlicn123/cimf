@@ -32,6 +32,7 @@
     - core.services.permission_service: 权限服务
 """
 
+from django.db import transaction
 from django.db.models import Count, Q
 
 from core.constants import UserRole
@@ -109,28 +110,29 @@ class UserService(BaseService):
         if len(password) < 10:
             raise ValueError("密码长度至少 10 个字符")
 
-        if User.objects.filter(username=username).exists():
-            raise ValueError("用户名已存在")
-
-        if email and User.objects.filter(email=email).exists():
-            raise ValueError("邮箱已存在")
-
         if role == UserRole.MANAGER:
             permissions = ["*"]
             is_admin = True
         else:
             permissions = PermissionService.get_role_permissions_from_db(role)
 
-        user = User.objects.create_user(
-            username=username,
-            password=password,
-            nickname=nickname,
-            email=email,
-            role=role,
-            permissions=permissions,
-            is_admin=is_admin,
-            is_active=True,
-        )
+        with transaction.atomic():
+            if User.objects.filter(username=username).exists():
+                raise ValueError("用户名已存在")
+
+            if email and User.objects.filter(email=email).exists():
+                raise ValueError("邮箱已存在")
+
+            user = User.objects.create_user(
+                username=username,
+                password=password,
+                nickname=nickname,
+                email=email,
+                role=role,
+                permissions=permissions,
+                is_admin=is_admin,
+                is_active=True,
+            )
 
         return user
 

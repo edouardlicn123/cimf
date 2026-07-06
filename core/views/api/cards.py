@@ -25,7 +25,8 @@ def api_dashboard_cards(request):  # noqa: ARG001
     if setting_value:
         try:
             positions = json.loads(setting_value)
-        except Exception:
+        except Exception as e:
+            logger.warning(f"解析卡片位置配置失败: {e}", exc_info=True)
             positions = {}
     else:
         logger.warning("配置未找到: user_dashboard_card_positions")

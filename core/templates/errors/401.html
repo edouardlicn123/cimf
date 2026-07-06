@@ -1,1 +1,5 @@
 {% extends "includes/error_base.html" %}
+{% set error_code = 401 %}
+{% set error_title = '未授权' %}
+{% set error_message = '您没有访问该页面的权限，请先登录。' %}
+{% set error_icon = 'bi-shield-lock' %}

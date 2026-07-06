@@ -47,6 +47,9 @@ class ArithmeticEvaluator(ast.NodeVisitor):
     def visit_Expression(self, node):
         return self.visit(node.body)
 
+    def generic_visit(self, node):
+        raise ValueError(f"不支持的语法: {type(node).__name__}")
+
     def evaluate(self, expression: str):
         tree = ast.parse(expression.strip(), mode="eval")
         return self.visit(tree)
@@ -92,6 +95,8 @@ def calculate(request):
             return JsonResponse({"result": result})
         except ZeroDivisionError:
             return JsonResponse({"error": "不能除以零"}, status=400)
+        except ValueError as e:
+            return JsonResponse({"error": str(e)}, status=400)
         except Exception:
             return JsonResponse({"error": "表达式格式错误"}, status=400)
 

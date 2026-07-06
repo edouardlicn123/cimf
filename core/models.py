@@ -167,17 +167,16 @@ class User(AbstractUser):
         self.locked_until = None
         self.save(update_fields=["last_login_at", "failed_login_attempts", "locked_until"])
 
-    def record_failed_attempt(self) -> None:
-        """记录登录失败，达到阈值后锁定账号"""
-        from core.services import AuthService  # noqa: PLC0415
+    def record_failed_attempt(self, max_failures: int = 5, lock_minutes: int = 30) -> None:
+        """记录登录失败，达到阈值后锁定账号
 
-        LOCK_THRESHOLD = AuthService.get_login_max_failures()
-        LOCK_MINUTES = AuthService.get_login_lock_minutes()
-
+        Args:
+            max_failures: 允许的最大失败次数
+            lock_minutes: 锁定分钟数
+        """
         self.failed_login_attempts += 1
-
-        if self.failed_login_attempts >= LOCK_THRESHOLD:
-            self.locked_until = timezone.now() + timedelta(minutes=LOCK_MINUTES)
+        if self.failed_login_attempts >= max_failures:
+            self.locked_until = timezone.now() + timedelta(minutes=lock_minutes)
         self.save(update_fields=["failed_login_attempts", "locked_until"])
 
     def reset_failed_attempts(self) -> None:
@@ -261,6 +260,7 @@ class TaxonomyItem(BaseModel):
         verbose_name = "词汇项"
         verbose_name_plural = "词汇项"
         ordering = ["weight", "name"]
+        unique_together = [["taxonomy", "name"]]
 
     def __str__(self):
         return self.name

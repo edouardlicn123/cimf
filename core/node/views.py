@@ -16,6 +16,7 @@ from core.fields import get_all_field_types_info
 from core.module.models import Module
 from core.node.models import Node, NodeType
 from core.node.services import NodeService, NodeTypeService
+from core.utils.pagination import paginate_queryset
 from core.utils.response import json_error, json_success
 
 logger = logging.getLogger(__name__)
@@ -89,12 +90,15 @@ def node_list(request, node_type_slug: str):
         return redirect("node:index")
 
     nodes = NodeService.get_nodes(node_type_slug)
+    page_obj, page_range = paginate_queryset(request, nodes, per_page=20)
     return render(
         request,
         "node/node_list.html",
         {
             "node_type": node_type,
-            "nodes": nodes,
+            "nodes": page_obj.object_list,
+            "page_obj": page_obj,
+            "page_range": page_range,
         },
     )
 
@@ -226,6 +230,10 @@ def module_dispatch(request, node_type_slug: str, node_id: int | None = None, ac
 
     try:
         module_views = __import__(f"modules.{module_path}.views", fromlist=[""])
+
+        if action in ("create", "edit", "delete") and not request.user.is_admin:
+            messages.error(request, "需要管理员权限")
+            return redirect("node:module_page", node_type_slug=node_type_slug)
 
         if action == "create":
             if hasattr(module_views, "node_create"):

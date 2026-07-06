@@ -18,7 +18,7 @@ class CoreConfig(AppConfig):
 
     def ready(self):
         logger.info("CoreConfig.ready() 被调用")
-        connection_created.connect(_enable_sqlite_wal)
+        connection_created.connect(_enable_sqlite_wal, dispatch_uid="enable_sqlite_wal")
         # 启动时同步 SMTP 配置到 Django 运行时设置
         try:
             from core.smtp.services.smtp_service import SmtpService  # noqa: PLC0415

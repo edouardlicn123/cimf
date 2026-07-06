@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.shortcuts import redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.http import require_POST
 
 from core.services import AuthService, SettingsService
 
@@ -48,6 +49,7 @@ def login_view(request):
     )
 
 
+@require_POST
 def logout_view(request):
     """用户登出"""
     logout(request)

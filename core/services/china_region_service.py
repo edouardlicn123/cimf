@@ -41,6 +41,7 @@
 
 import json
 import logging
+from collections import defaultdict
 from pathlib import Path
 
 import requests
@@ -195,21 +196,31 @@ class ChinaRegionService:
 
     @staticmethod
     def get_tree() -> list[dict]:
-        """获取完整的树形结构"""
-        provinces = ChinaRegion.objects.filter(level=1).order_by("code")
+        """获取完整的树形结构（1次查询，避免 N+1）"""
+        all_regions = ChinaRegion.objects.all().order_by("code")
+
+        children_map: dict[int, list[ChinaRegion]] = defaultdict(list)
+        for region in all_regions:
+            if region.parent_id:
+                children_map[region.parent_id].append(region)
 
         result = []
-        for province in provinces:
-            province_data = {"code": province.code, "name": province.name, "level": 1, "children": []}
+        for province in all_regions:
+            if province.level != 1:
+                continue
+            province_data: dict = {"code": province.code, "name": province.name, "level": 1, "children": []}
 
-            for city in province.children.filter(level=2).order_by("code"):
-                city_data = {
+            for city in children_map.get(province.id, []):
+                if city.level != 2:
+                    continue
+                city_data: dict = {
                     "code": city.code,
                     "name": city.name,
                     "level": 2,
                     "children": [
                         {"code": d.code, "name": d.name, "level": 3}
-                        for d in city.children.filter(level=3).order_by("code")
+                        for d in children_map.get(city.id, [])
+                        if d.level == 3
                     ],
                 }
                 province_data["children"].append(city_data)

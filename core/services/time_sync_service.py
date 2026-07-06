@@ -99,7 +99,7 @@ class TimeSyncService(SingletonMixin):
             with urlopen(url, timeout=3) as response:
                 if response.status == 200:
                     data = json.loads(response.read().decode("utf-8"))
-                    date_str = data.get("date") or data.get("datetime", "").split("+")[0]
+                    date_str = data.get("date") or data.get("datetime", "").split("+")[0].replace("T", " ")
                     if date_str:
                         return datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S").replace(tzinfo=None)
             return None
@@ -160,6 +160,9 @@ class TimeSyncService(SingletonMixin):
 
             if synced_str and monotonic_str:
                 synced = datetime.fromisoformat(synced_str)
+                if synced.tzinfo is None:
+                    from django.utils.timezone import make_aware
+                    synced = make_aware(synced)
                 mono = float(monotonic_str)
                 elapsed = time.monotonic() - mono
                 if elapsed >= 0:

@@ -43,6 +43,7 @@ import json
 from typing import Any
 
 from django.core.cache import cache
+from django.db import transaction
 
 from core.models import SystemSetting
 from core.services.mixins import CachedServiceMixin
@@ -267,16 +268,17 @@ class SettingsService(CachedServiceMixin):
             保存的设置项数量
         """
         updated_count = 0
-        for key, value in settings_dict.items():
-            if key == "web_watermark_content" and isinstance(value, list):
-                value_str = ",".join(value)
-            else:
-                value_str = str(value).strip()
+        with transaction.atomic():
+            for key, value in settings_dict.items():
+                if key == "web_watermark_content" and isinstance(value, list):
+                    value_str = ",".join(value)
+                else:
+                    value_str = str(value).strip()
 
-            SystemSetting.objects.update_or_create(
-                key=key, defaults={"value": value_str, "description": f"系统设置 - {key}"}
-            )
-            updated_count += 1
+                SystemSetting.objects.update_or_create(
+                    key=key, defaults={"value": value_str, "description": f"系统设置 - {key}"}
+                )
+                updated_count += 1
 
         if updated_count:
             cls.clear_cache()
