@@ -82,7 +82,7 @@ def run_stage3(force: bool = False, dry_run: bool = False) -> bool:
 
     import os  # noqa: PLC0415
 
-    from core.constants import UserRole  # noqa: PLC0415
+    from core.constants import DEFAULT_NAV_CARDS, UserRole  # noqa: PLC0415
     from core.models import User  # noqa: PLC0415
 
     admin_username = os.environ.get("DJANGO_ADMIN_USERNAME", "admin")
@@ -133,38 +133,6 @@ def run_stage3(force: bool = False, dry_run: bool = False) -> bool:
             existing_admin.delete()
 
     if not dry_run:
-        DEFAULT_NAV_CARDS = [
-            {
-                "id": "default-1",
-                "name": "必应搜索",
-                "url": "https://www.bing.com",
-                "bg_color": "#3584e4",
-                "position": 1,
-            },
-            {"id": "default-2", "name": "豆包", "url": "https://www.doubao.com", "bg_color": "#2ec27e", "position": 2},
-            {
-                "id": "default-3",
-                "name": "千问",
-                "url": "https://tongyi.aliyun.com",
-                "bg_color": "#9141ac",
-                "position": 3,
-            },
-            {
-                "id": "default-4",
-                "name": "百度地图",
-                "url": "https://map.baidu.com",
-                "bg_color": "#2932e1",
-                "position": 4,
-            },
-            {
-                "id": "default-5",
-                "name": "哔哩哔哩",
-                "url": "https://www.bilibili.com",
-                "bg_color": "#00a1d6",
-                "position": 5,
-            },
-            {"id": "default-6", "name": "36氪", "url": "https://36kr.com", "bg_color": "#f85959", "position": 6},
-        ]
         admin = User.objects.create_user(
             username=admin_username,
             nickname=admin_nickname,

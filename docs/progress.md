@@ -320,4 +320,7 @@
 13. 全面代码检查和封装重构：修复7个Bug+常量集中+ModuleService拆分+服务层重构+视图去重+导航宏+URL缓存TTL优化
 14. Fix 8 bugs: dynamic_import_view 'modules.' prefix, sample_data_service customer_cn import crash, _load_module_info 'id' validation, dead except handlers, module_dependency public API, importexport login_required_json, users.py exception leak, dead code cleanup
 15. Fix 6 real bugs in ruff report: unused import/variables, missing import in get_dependency_chain, unused loop variable
+16. 修复：时钟卡片 Invalid Date（JS 访问 data.data.timestamp）; 修复：链接卡片不显示（默认导航卡片回退）
+17. 修复：链接卡片不显示 - nav_cards_area.html 中 makeSortable 在 FFE 未加载时立即执行导致 IIFE 中断
+18. 修复：链接卡片拖动一次后失效 - onNavCardDrop 改用直接 DOM 交换而非重建
 
