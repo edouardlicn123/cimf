@@ -10,7 +10,7 @@ from typing import Any
 
 from django.apps import apps
 from django.conf import settings
-from django.db import connection
+from django.db import connection, transaction
 from django.utils import timezone
 
 from core.models import Taxonomy, TaxonomyItem
@@ -381,6 +381,28 @@ except Exception as e:
             return False, f"依赖安装异常: {e!s}"
 
     @staticmethod
+    def _verify_model_tables(module_id: str, module_info: dict | None) -> str | None:
+        """验证模块的所有模型表已创建，返回错误信息或 None"""
+        if not module_info or not module_info.get("models"):
+            return None
+
+        existing_tables = set(connection.introspection.table_names())
+
+        for model_name in module_info["models"]:
+            try:
+                app_label = module_id
+                model = apps.get_model(app_label, model_name)
+                real_table_name = model._meta.db_table
+
+                if real_table_name not in existing_tables:
+                    return f"模型 {model_name} 的表未创建（期望表名: {real_table_name}）"
+            except LookupError:
+                expected_table = f"{module_id}_{model_name.lower()}"
+                if expected_table not in existing_tables:
+                    return f"模型 {model_name} 的表未创建（期望表名: {expected_table}）"
+        return None
+
+    @staticmethod
     def install_module(module_id: str) -> tuple:
         module = Module.objects.filter(module_id=module_id).first()
         if not module:
@@ -407,40 +429,20 @@ except Exception as e:
         models_path = module_path / "models.py"
         has_models = models_path.exists()
 
-        # 如果没有模型文件，跳过迁移步骤，直接标记为安装成功
-        if not has_models:
-            pass
-        else:
+        if has_models:
             # 执行迁移（subprocess方式，Django限制：无法运行时动态重初始化apps）
             migration_errors = ModuleService._run_migration_subprocess(module_id, app_name)
             if migration_errors:
                 error_msg = "; ".join(migration_errors)
                 return False, f"模块 {module_id} 安装失败: {error_msg}"
 
-        # 没有模型文件的模块，跳过表检查
-        if not has_models:
-            pass
-        elif not ModuleService._check_tables_exist(module_id):
-            return False, f"迁移后表仍未创建，模块 {module_id} 可能配置不正确"
+            if not ModuleService._check_tables_exist(module_id):
+                return False, f"迁移后表仍未创建，模块 {module_id} 可能配置不正确"
 
         # 验证 models 字段中列出的所有模型表
-        if module_info and module_info.get("models"):
-            existing_tables = set(connection.introspection.table_names())
-
-            for model_name in module_info["models"]:
-                try:
-                    # 使用Django的模型元数据获取真实表名
-                    app_label = module_id
-                    model = apps.get_model(app_label, model_name)
-                    real_table_name = model._meta.db_table
-
-                    if real_table_name not in existing_tables:
-                        return False, f"模型 {model_name} 的表未创建（期望表名: {real_table_name}）"
-                except LookupError:
-                    # 如果找不到模型，回退到默认规则
-                    expected_table = f"{module_id}_{model_name.lower()}"
-                    if expected_table not in existing_tables:
-                        return False, f"模型 {model_name} 的表未创建（期望表名: {expected_table}）"
+        err = ModuleService._verify_model_tables(module_id, module_info)
+        if err:
+            return False, err
 
         if module.module_type == "node":
             ModuleService.sync_node_type(module)
@@ -448,11 +450,8 @@ except Exception as e:
             ModuleService.sync_tool_type(module)
 
         try:
-            # 检查模块是否配置了词汇表
             has_taxonomies_config = module_info and module_info.get("taxonomies")
-
             created_count = ModuleService.create_module_taxonomies(module)
-            # 只在配置了词汇表但创建失败时才警告
             if has_taxonomies_config and created_count == 0:
                 logger.warning(f"模块 {module_id} 未创建任何词汇表（可能已存在）")
         except Exception as e:
@@ -465,15 +464,10 @@ except Exception as e:
         module.installed_at = timezone.now()
         module.save()
 
-        # 注册 cron 任务
-        info = ModuleService._load_module_info(module.path) or {}
-        for task_path in info.get("cron_tasks", []):
-            try:
-                from core.services.cron_service import _register_single_task  # noqa: PLC0415
-
-                _register_single_task(task_path)
-            except Exception as e:
-                return False, f"cron 任务注册失败: {e}"
+        try:
+            ModuleService._handle_cron_tasks(module, register=True)
+        except Exception as e:
+            return False, f"cron 任务注册失败: {e}"
 
         return True, "安装成功"
 
@@ -503,6 +497,30 @@ except Exception as e:
             if not module.is_active:
                 ModuleService.enable_module(module_info["id"])
         return module
+
+    @staticmethod
+    def get_frontpage_modules() -> list[dict]:
+        """获取所有支持首页卡片的活跃模块信息"""
+        from core.module.models import Module  # noqa: PLC0415
+
+        result = []
+        try:
+            active_modules = Module.objects.filter(is_active=True)
+            for node_module in active_modules:
+                mod_info = ModuleService.load_module_info(node_module.path)
+                if mod_info and mod_info.get("frontpage_card", False) and "dashboard_cards" in mod_info:
+                    result.append({
+                        "id": node_module.module_id,
+                        "name": mod_info.get("name", node_module.module_id),
+                        "icon": mod_info.get("icon", "bi-grid"),
+                        "module_type": node_module.module_type,
+                        "clickable": mod_info.get("frontpage_card_clickable", True),
+                        "dashboard_cards": mod_info.get("dashboard_cards", []),
+                        "dashboard_stats": mod_info.get("dashboard_stats", False),
+                    })
+        except Exception as e:
+            logging.getLogger(__name__).warning(f"加载首页卡片模块失败: {e}", exc_info=True)
+        return result
 
     @staticmethod
     def create_module_taxonomies(module: Module) -> int:
@@ -667,6 +685,39 @@ except Exception as e:
         return chain[1:] if len(chain) > 1 else []
 
     @staticmethod
+    def _handle_cron_tasks(module: Module, register: bool = True) -> None:
+        """注册或注销模块的 cron 任务"""
+        info = ModuleService._load_module_info(module.path) or {}
+        for task_path in info.get("cron_tasks", []):
+            if register:
+                from core.services.cron_service import _register_single_task  # noqa: PLC0415
+
+                _register_single_task(task_path)
+            else:
+                from core.services.cron_service import _unregister_single_task  # noqa: PLC0415
+
+                _unregister_single_task(task_path)
+
+    @staticmethod
+    def _update_type_active_status(module: Module, is_active: bool) -> bool:
+        """更新模块对应的 NodeType/ToolType 激活状态"""
+        if module.module_type == "node":
+            type_obj = NodeType.objects.filter(slug=module.module_id).first()
+            if not type_obj:
+                logger.warning(f"节点类型未找到: {module.module_id}")
+                return False
+            type_obj.is_active = is_active
+            type_obj.save(update_fields=["is_active"])
+        elif module.module_type == "tool":
+            type_obj = ToolType.objects.filter(slug=module.module_id).first()
+            if not type_obj:
+                logger.warning(f"工具类型未找到: {module.module_id}")
+                return False
+            type_obj.is_active = is_active
+            type_obj.save(update_fields=["is_active"])
+        return True
+
+    @staticmethod
     def enable_module(module_id: str) -> Module | None:
         try:
             module = Module.objects.get(module_id=module_id)
@@ -675,34 +726,18 @@ except Exception as e:
             return None
 
         try:
-            if module.is_installed:
-                module.is_active = True
-                module.activated_at = timezone.now()
-                module.save(update_fields=["is_active", "activated_at"])
+            with transaction.atomic():
+                if module.is_installed:
+                    module.is_active = True
+                    module.activated_at = timezone.now()
+                    module.save(update_fields=["is_active", "activated_at"])
 
-                # 注册 cron 任务
-                info = ModuleService._load_module_info(module.path) or {}
-                for task_path in info.get("cron_tasks", []):
-                    from core.services.cron_service import _register_single_task  # noqa: PLC0415
+                    ModuleService._handle_cron_tasks(module, register=True)
 
-                    _register_single_task(task_path)
-
-                if module.module_type == "node":
-                    node_type = NodeType.objects.filter(slug=module.module_id).first()
-                    if not node_type:
-                        logger.warning(f"节点类型未找到: {module.module_id}")
+                    if not ModuleService._update_type_active_status(module, True):
                         return None
-                    node_type.is_active = True
-                    node_type.save(update_fields=["is_active"])
-                elif module.module_type == "tool":
-                    tool_type = ToolType.objects.filter(slug=module.module_id).first()
-                    if not tool_type:
-                        logger.warning(f"工具类型未找到: {module.module_id}")
-                        return None
-                    tool_type.is_active = True
-                    tool_type.save(update_fields=["is_active"])
 
-                return module
+                    return module
         except Module.DoesNotExist:
             pass
         return None
@@ -716,32 +751,16 @@ except Exception as e:
             return None
 
         try:
-            module.is_active = False
-            module.save(update_fields=["is_active"])
+            with transaction.atomic():
+                module.is_active = False
+                module.save(update_fields=["is_active"])
 
-            # 注销 cron 任务
-            info = ModuleService._load_module_info(module.path) or {}
-            for task_path in info.get("cron_tasks", []):
-                from core.services.cron_service import _unregister_single_task  # noqa: PLC0415
+                ModuleService._handle_cron_tasks(module, register=False)
 
-                _unregister_single_task(task_path)
-
-            if module.module_type == "node":
-                node_type = NodeType.objects.filter(slug=module.module_id).first()
-                if not node_type:
-                    logger.warning(f"节点类型未找到: {module.module_id}")
+                if not ModuleService._update_type_active_status(module, False):
                     return None
-                node_type.is_active = False
-                node_type.save(update_fields=["is_active"])
-            elif module.module_type == "tool":
-                tool_type = ToolType.objects.filter(slug=module.module_id).first()
-                if not tool_type:
-                    logger.warning(f"工具类型未找到: {module.module_id}")
-                    return None
-                tool_type.is_active = False
-                tool_type.save(update_fields=["is_active"])
 
-            return module
+                return module
         except Module.DoesNotExist:
             pass
         return None
@@ -780,14 +799,15 @@ except Exception as e:
         # 调用者必须检查返回值是否为None
 
     @staticmethod
-    def sync_node_type(module: Module) -> NodeType:
+    def _sync_type(module: Module, model_class, default_icon: str):
+        """同步模块类型（node/tool）的激活状态和属性"""
         module_info = ModuleService._load_module_info(module.path)
-        icon = module_info.get("icon", "bi-folder") if module_info else "bi-folder"
+        icon = module_info.get("icon", default_icon) if module_info else default_icon
 
-        node_type = NodeType.objects.filter(slug=module.module_id).first()
+        type_obj = model_class.objects.filter(slug=module.module_id).first()
 
-        if not node_type:
-            node_type = NodeType.objects.create(
+        if not type_obj:
+            type_obj = model_class.objects.create(
                 name=module.name,
                 slug=module.module_id,
                 description=module.description or "",
@@ -795,37 +815,21 @@ except Exception as e:
                 is_active=module.is_active,
             )
         else:
-            node_type.name = module.name
-            node_type.description = module.description or ""
-            node_type.icon = icon
-            node_type.is_active = module.is_active
-            node_type.save()
+            type_obj.name = module.name
+            type_obj.description = module.description or ""
+            type_obj.icon = icon
+            type_obj.is_active = module.is_active
+            type_obj.save()
 
-        return node_type
+        return type_obj
+
+    @staticmethod
+    def sync_node_type(module: Module) -> NodeType:
+        return ModuleService._sync_type(module, NodeType, "bi-folder")
 
     @staticmethod
     def sync_tool_type(module: Module) -> ToolType:
-        module_info = ModuleService._load_module_info(module.path)
-        icon = module_info.get("icon", "bi-wrench") if module_info else "bi-wrench"
-
-        tool_type = ToolType.objects.filter(slug=module.module_id).first()
-
-        if not tool_type:
-            tool_type = ToolType.objects.create(
-                name=module.name,
-                slug=module.module_id,
-                description=module.description or "",
-                icon=icon,
-                is_active=module.is_active,
-            )
-        else:
-            tool_type.name = module.name
-            tool_type.description = module.description or ""
-            tool_type.icon = icon
-            tool_type.is_active = module.is_active
-            tool_type.save()
-
-        return tool_type
+        return ModuleService._sync_type(module, ToolType, "bi-wrench")
 
     @staticmethod
     def create_module(

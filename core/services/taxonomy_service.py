@@ -55,6 +55,24 @@ class TaxonomyService(BaseService):
         """获取所有词汇表"""
         return Taxonomy.objects.all().order_by("id")
 
+    @staticmethod
+    def get_taxonomy_list(search: str = "") -> list:
+        """获取词汇表列表，支持搜索"""
+        queryset = Taxonomy.objects.all()
+        if search:
+            queryset = queryset.filter(name__icontains=search)
+        return queryset.order_by("id")
+
+    @staticmethod
+    def check_slug_exists(slug: str) -> bool:
+        """检查词汇表标识是否已存在"""
+        return Taxonomy.objects.filter(slug=slug).exists()
+
+    @staticmethod
+    def check_slug_exists_exclude(slug: str, exclude_id: int) -> bool:
+        """检查词汇表标识是否已存在（排除指定 ID）"""
+        return Taxonomy.objects.filter(slug=slug).exclude(id=exclude_id).exists()
+
     @classmethod
     def get_taxonomy_by_id(cls, taxonomy_id: int):
         """获取词汇表详情"""

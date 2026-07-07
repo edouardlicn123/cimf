@@ -26,6 +26,13 @@ Agent 在以下情况应读取最新报告：
 
 注意：检查 Bug 时若不提及 Ruff，则不读取此报告，仅按下方 Bug 排查规范执行。
 
+**增量 Ruff 扫描（省 token）：**
+- 日常修改后首选：`git diff --name-only HEAD \| xargs ruff check`
+- 仅扫描变更文件，避免全库 202 文件格式化
+- 全量扫描仅在以下情况执行：
+  - 用户明确要求"全面 Ruff 检查"
+  - 有新的 ruff.toml 规则引入时
+
 **⚠️ Ruff 修复注意事项：**
 - **Django signal handler 的 `sender` 参数名不可修改！** Signal dispatcher 以 `receiver(sender=..., connection=...)` 关键字形式传参，`sender` 必须保持原名。若被 ruff 的 ARG 规则重命名为 `_sender`，将导致 TypeError。
 - **`unsafe-fixes = false`** 必须设置在 `ruff.toml` 顶层（不在 `[lint]` 下），否则 ARG 自动重命名规则不会被阻止。
@@ -84,17 +91,28 @@ Agent 应在以下情况检查该文档：
 - 使用 `lsof -ti:<port>` 杀后端服务时，**必须**加 `-sTCP:LISTEN` 过滤，只杀监听端口的进程，避免误杀浏览器的 ESTABLISHED 连接
 - 示例：`lsof -ti:8000 -sTCP:LISTEN | xargs -r kill -9`
 
+**Bug 扫描并行化（省 token）：**
+- 大规模 Bug 检查时，使用 `task` 工具分发 `explore` 子 agent 并行扫描各层
+- 推荐划分：服务层 ✓ 视图层 ✓ 模板层 ✓ 模型层 ✓ 各分配一个 agent
+- 每个 agent 只扫描负责的层级，返回问题列表，主 session 汇总修复结果
+- 避免单次 session 顺序扫描全库导致上下文过度膨胀
+
 **Bug 排查规范：**
 
-进行 Bug 检查时（未提及 Ruff），仅按 A08 规范执行系统化检查，不读取 ruff 报告：
+进行 Bug 检查时（未提及 Ruff），按以下优先级执行：
 
 | 层级 | 优先级 | 检查内容 |
 |------|--------|----------|
-| 服务层检查 | 🔴 高 | `.first()` 返回值、外键访问、查询逻辑、datetime→timezone |
-| 视图层检查 | 🔴 高 | `@login_required`/`@admin_required`/`@require_POST`、参数验证 |
-| 模板层检查 | 🟡 中 | Jinja2语法、csrf_token、外键None、block名称 |
-| 模型层检查 | 🟡 中 | JSONField default、ForeignKey on_delete、`__str__` |
-| 配置层检查 | 🟡 中 | 环境变量名、APP_DIRS、WAL模式 |
+| 服务层检查 | 🔴 高（默认必查） | `.first()` 返回值、外键访问、查询逻辑、datetime→timezone |
+| 视图层检查 | 🔴 高（默认必查） | `@login_required`/`@admin_required`/`@require_POST`、参数验证 |
+| 模板层检查 | 🟡 中（按需） | 仅涉及模板修改时检查：Jinja2语法、csrf_token、外键None、block名称 |
+| 模型层检查 | 🟡 中（按需） | 仅涉及模型修改时检查：JSONField default、ForeignKey on_delete、`__str__` |
+| 配置层检查 | 🟡 中（按需） | 仅涉及配置修改时检查：环境变量名、APP_DIRS、WAL模式 |
+
+**代码快照（省 token）：**
+- 项目维护了 `docs/code_snapshot.md`，记录了模型字段、服务层方法签名、已知遗留问题
+- 非全量分析时，优先读取快照而非扫描全库
+- 快照在每次大规模重构/分析后更新
 
 ---
 
@@ -104,7 +122,7 @@ Agent 应在以下情况检查该文档：
 
 **当前阶段：Stage 4**
 
-计划文档存放位置：`docs/stage4/`
+计划文档存放位置：`docs/stage5/`
 
 ### 技术规范
 

@@ -154,6 +154,7 @@ class LogService:
         ]
 
         return {
+            "success": True,
             "lines": parsed_lines,
             "total": total_filtered,
             "page": page,
