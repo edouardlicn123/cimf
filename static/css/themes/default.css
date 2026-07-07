@@ -60,7 +60,7 @@
   --text-primary:      #000000;
   --text-secondary:    #333333;
   --text-muted:        #666666;
-  --text-inverted:     #FFFFFF;
+  --text-inverse:      #f0f0f0;
   --text-nav:          #FFFFFF;          /* 主菜单文字强制白色 */
   --text-nav-active:   #FFFFFF;
 
@@ -193,7 +193,7 @@ body {
 .primary-btn {
   background-color: var(--primary) !important;
   border-color: var(--primary) !important;
-  color: white !important;
+  color: var(--text-inverse) !important;
 }
 
 /* hover / focus */
