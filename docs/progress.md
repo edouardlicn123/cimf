@@ -323,4 +323,14 @@
 16. 修复：时钟卡片 Invalid Date（JS 访问 data.data.timestamp）; 修复：链接卡片不显示（默认导航卡片回退）
 17. 修复：链接卡片不显示 - nav_cards_area.html 中 makeSortable 在 FFE 未加载时立即执行导致 IIFE 中断
 18. 修复：链接卡片拖动一次后失效 - onNavCardDrop 改用直接 DOM 交换而非重建
+19. 修复：绿岛森林(kajima)主题按钮字体黑色问题 - 修正 --text-inverse 变量名
+20. 统一所有8个主题的 btn-secondary 样式，跟随各主题 --text-muted/--text-secondary/--text-primary
+21. btn-secondary 改用 color-mix 方案，混合主色60%白作为辅助色
+22. btn-secondary 加入 frame.css 的 border: none，尺寸与其它按钮一致
+23. 橙红(savawoku)主题：修正 --text-inverse 变量名，btn-primary hover/active 添加白色字体
+24. 踊/梵紫/靛蓝/中国红主题：修正 --text-inverse 变量名，补齐 btn-primary color
+25. 客户列表查看按钮图标从 bi-eye 改为 bi-search
+26. 客户列表查看/编辑/删除三个按钮统一为 btn-primary 风格
+27. 客户列表操作按钮放大1.5倍
+28. 客户列表操作按钮改为圆角正方形
 

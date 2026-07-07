@@ -64,7 +64,7 @@
   --text-primary:         #2d2438;
   --text-secondary:       #5a4f63;
   --text-muted:           #8a7f93;
-  --text-inverted:        #ffffff;
+    --text-inverse:         #f0f0f0;
   --text-nav:             #ffffff;
   --text-nav-active:      #ef8bae;
   --text-on-accent:       #ffffff;
@@ -218,6 +218,25 @@ a:hover:not(.btn):not(.nav-link):not(.dropdown-item):not(.page-link) {
 .primary-btn.active {
   background-color: var(--primary-active) !important;
   border-color: var(--primary-active) !important;
+  color: white !important;
+}
+
+/* btn-secondary 跟随主题 */
+.btn-secondary {
+  background-color: color-mix(in srgb, var(--primary), white 60%) !important;
+  border-color: color-mix(in srgb, var(--primary), white 60%) !important;
+  color: var(--primary) !important;
+}
+.btn-secondary:hover,
+.btn-secondary:focus {
+  background-color: color-mix(in srgb, var(--primary), white 40%) !important;
+  border-color: color-mix(in srgb, var(--primary), white 40%) !important;
+  color: white !important;
+}
+.btn-secondary:active,
+.btn-secondary.active {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
   color: white !important;
 }
 
