@@ -43,7 +43,6 @@ import json
 from typing import Any
 
 from django.core.cache import cache
-from django.db import transaction
 
 from core.models import SystemSetting
 from core.services.mixins import CachedServiceMixin
@@ -85,7 +84,7 @@ class SettingsService(CachedServiceMixin):
         路由层和业务层不应直接操作 SystemSetting 模型。
 
     类属性：
-        DEFAULT_SETTINGS: Dict[str, str] - 默认设置项和值
+        SETTINGS_META: dict - 设置项元数据（default + type）
         CACHE_KEY: str - 缓存键名
         CACHE_TTL: int - 缓存过期时间（秒）
 
@@ -98,76 +97,69 @@ class SettingsService(CachedServiceMixin):
         clear_cache(): 清除缓存
     """
 
-    DEFAULT_SETTINGS = {
-        "system_name": "仙芙CIMF",
-        "site_logo_enabled": "true",
-        "site_logo_path": "",
-        "welcome_title": "欢迎！",
-        "welcome_subtitle": "让我们一起把项目完善吧。",
-        "welcome_intro": "初始用户名：admin 初始密码：admin123",
-        "upload_max_size_mb": "12",
-        "upload_max_files": "20",
-        "upload_allowed_extensions": "pdf,doc,docx,xls,xlsx,jpg,png,jpeg,zip,rar",
-        "session_timeout_minutes": "30",
-        "login_max_failures": "5",
-        "login_lock_minutes": "30",
-        "enable_audit_log": "true",
-        "log_retention_days": "90",
-        "enable_web_watermark": "false",
-        "web_watermark_content": "username,system_name,datetime",
-        "web_watermark_custom_text": "自定义文字",
-        "web_watermark_opacity": "0.15",
-        "enable_watermark_console_detection": "false",
-        "enable_watermark_shortcut_block": "false",
-        "enable_export_watermark": "false",
-        "enable_time_sync": "true",
-        "time_server_url": "https://api.uuni.cn/api/time",
-        "time_zone": "Asia/Shanghai",
-        "time_sync_interval": "15",
-        "time_sync_max_retries": "5",
-        "system_synced_time": "",
-        "system_sync_monotonic": "0",
-        "cron_time_sync_enabled": "true",
-        "cron_cache_cleanup_enabled": "true",
-        "cron_email_sending_enabled": "false",
-        "smtp_send_interval": "240",
-        "cron_email_cleanup_enabled": "false",
-        "cron_email_cleanup_interval": "86400",
-        "maintenance_mode": "false",
-        "allow_registration": "false",
-        "smtp_enabled": "false",
-        "smtp_provider": "gmail_tls",
-        "smtp_host": "smtp.gmail.com",
-        "smtp_port": "587",
-        "smtp_use_ssl": "false",
-        "smtp_use_tls": "true",
-        "smtp_username": "",
-        "smtp_from_email": "",
-        "smtp_from_name": "仙芙CIMF",
-        "smtp_timeout": "30",
-        "smtp_skip_verify": "false",
-        "smtp_password": "",
-        "smtp_retry_count": "3",
-        "smtp_batch_size": "10",
-        "smtp_log_days": "30",
-        "smtp_failed_notify": "false",
-        "smtp_notify_email": "",
-        "smtp_system_url": "",
-        "smtp_proxy_host": "127.0.0.1",
-        "smtp_proxy_port": "10808",
-        "smtp_use_proxy": "false",
+    SETTINGS_META = {
+        "system_name": {"default": "仙芙CIMF", "type": str},
+        "site_logo_enabled": {"default": "true", "type": bool},
+        "site_logo_path": {"default": "", "type": str},
+        "welcome_title": {"default": "欢迎！", "type": str},
+        "welcome_subtitle": {"default": "让我们一起把项目完善吧。", "type": str},
+        "welcome_intro": {"default": "初始用户名：admin 初始密码：admin123", "type": str},
+        "upload_max_size_mb": {"default": "12", "type": int},
+        "upload_max_files": {"default": "20", "type": int},
+        "upload_allowed_extensions": {"default": "pdf,doc,docx,xls,xlsx,jpg,png,jpeg,zip,rar", "type": str},
+        "session_timeout_minutes": {"default": "30", "type": int},
+        "login_max_failures": {"default": "5", "type": int},
+        "login_lock_minutes": {"default": "30", "type": int},
+        "enable_audit_log": {"default": "true", "type": bool},
+        "log_retention_days": {"default": "90", "type": int},
+        "enable_web_watermark": {"default": "false", "type": bool},
+        "web_watermark_content": {"default": "username,system_name,datetime", "type": str},
+        "web_watermark_custom_text": {"default": "自定义文字", "type": str},
+        "web_watermark_opacity": {"default": "0.15", "type": float},
+        "enable_watermark_console_detection": {"default": "false", "type": bool},
+        "enable_watermark_shortcut_block": {"default": "false", "type": bool},
+        "enable_export_watermark": {"default": "false", "type": bool},
+        "enable_time_sync": {"default": "true", "type": bool},
+        "time_server_url": {"default": "https://api.uuni.cn/api/time", "type": str},
+        "time_zone": {"default": "Asia/Shanghai", "type": str},
+        "time_sync_interval": {"default": "15", "type": int},
+        "time_sync_max_retries": {"default": "5", "type": int},
+        "system_synced_time": {"default": "", "type": str},
+        "system_sync_monotonic": {"default": "0", "type": int},
+        "cron_time_sync_enabled": {"default": "true", "type": bool},
+        "cron_cache_cleanup_enabled": {"default": "true", "type": bool},
+        "cron_email_sending_enabled": {"default": "false", "type": bool},
+        "smtp_send_interval": {"default": "240", "type": int},
+        "cron_email_cleanup_enabled": {"default": "false", "type": bool},
+        "cron_email_cleanup_interval": {"default": "86400", "type": int},
+        "maintenance_mode": {"default": "false", "type": bool},
+        "allow_registration": {"default": "false", "type": bool},
+        "smtp_enabled": {"default": "false", "type": bool},
+        "smtp_provider": {"default": "gmail_tls", "type": str},
+        "smtp_host": {"default": "smtp.gmail.com", "type": str},
+        "smtp_port": {"default": "587", "type": int},
+        "smtp_use_ssl": {"default": "false", "type": bool},
+        "smtp_use_tls": {"default": "true", "type": bool},
+        "smtp_username": {"default": "", "type": str},
+        "smtp_from_email": {"default": "", "type": str},
+        "smtp_from_name": {"default": "仙芙CIMF", "type": str},
+        "smtp_timeout": {"default": "30", "type": int},
+        "smtp_skip_verify": {"default": "false", "type": bool},
+        "smtp_password": {"default": "", "type": str},
+        "smtp_retry_count": {"default": "3", "type": int},
+        "smtp_batch_size": {"default": "10", "type": int},
+        "smtp_log_days": {"default": "30", "type": int},
+        "smtp_failed_notify": {"default": "false", "type": bool},
+        "smtp_notify_email": {"default": "", "type": str},
+        "smtp_system_url": {"default": "", "type": str},
+        "smtp_proxy_host": {"default": "127.0.0.1", "type": str},
+        "smtp_proxy_port": {"default": "10808", "type": int},
+        "smtp_use_proxy": {"default": "false", "type": bool},
     }
 
-    BOOL_SETTINGS = {
-        "enable_audit_log",
-        "enable_web_watermark",
-        "enable_watermark_console_detection",
-        "enable_watermark_shortcut_block",
-        "enable_export_watermark",
-        "cron_time_sync_enabled",
-        "cron_cache_cleanup_enabled",
-        "site_logo_enabled",
-    }
+    @classmethod
+    def _get_default_settings(cls) -> dict[str, str]:
+        return {k: v["default"] for k, v in cls.SETTINGS_META.items()}
 
     CACHE_KEY = "system_settings_all"
     CACHE_TTL = 60
@@ -192,7 +184,7 @@ class SettingsService(CachedServiceMixin):
             return cached if as_dict else SystemSetting.objects.all()
 
         settings = SystemSetting.objects.all()
-        result = dict(cls.DEFAULT_SETTINGS)
+        result = cls._get_default_settings()
 
         for setting in settings:
             result[setting.key] = _convert_setting_value(setting.value)
@@ -226,7 +218,7 @@ class SettingsService(CachedServiceMixin):
             except (json.JSONDecodeError, TypeError):
                 return default
         all_settings = cls.get_all_settings()
-        return all_settings.get(key, cls.DEFAULT_SETTINGS.get(key, default))
+        return all_settings.get(key, cls._get_default_settings().get(key, default))
 
     @classmethod
     def save_setting(cls, key: str, value: Any, description: str | None = None) -> SystemSetting:
@@ -254,36 +246,19 @@ class SettingsService(CachedServiceMixin):
         return setting
 
     @classmethod
-    def save_settings_bulk(cls, settings_dict: dict[str, Any]) -> int:
+    def save_settings_bulk(cls, settings_dict: dict[str, Any]) -> None:
         """
         批量保存系统设置
 
         说明：
-            批量保存多个设置项，最后统一清除缓存。
+            批量保存多个设置项，委托给 save_setting 逐项保存。
 
         参数：
             settings_dict: 设置字典
-
-        返回：
-            保存的设置项数量
         """
-        updated_count = 0
-        with transaction.atomic():
-            for key, value in settings_dict.items():
-                if key == "web_watermark_content" and isinstance(value, list):
-                    value_str = ",".join(value)
-                else:
-                    value_str = str(value).strip()
-
-                SystemSetting.objects.update_or_create(
-                    key=key, defaults={"value": value_str, "description": f"系统设置 - {key}"}
-                )
-                updated_count += 1
-
-        if updated_count:
-            cls.clear_cache()
-
-        return updated_count
+        for key, raw_val in settings_dict.items():
+            actual_val = ",".join(raw_val) if key == "web_watermark_content" and isinstance(raw_val, list) else raw_val
+            cls.save_setting(key, actual_val)
 
     @classmethod
     def reset_to_default(cls, key: str | None = None) -> int:
@@ -301,8 +276,9 @@ class SettingsService(CachedServiceMixin):
             重置的设置项数量
         """
         if key:
-            if key in cls.DEFAULT_SETTINGS:
-                cls.save_setting(key, cls.DEFAULT_SETTINGS[key])
+            defaults = cls._get_default_settings()
+            if key in defaults:
+                cls.save_setting(key, defaults[key])
                 return 1
             return 0
 
@@ -312,7 +288,7 @@ class SettingsService(CachedServiceMixin):
     def _reset_to_default_bulk(cls) -> int:
         """批量重置所有设置到默认值"""
         updated = 0
-        for key, default_value in cls.DEFAULT_SETTINGS.items():
+        for key, default_value in cls._get_default_settings().items():
             _, _created = SystemSetting.objects.update_or_create(
                 key=key, defaults={"value": str(default_value).strip(), "description": f"系统设置 - {key}"}
             )

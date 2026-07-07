@@ -1,7 +1,10 @@
 from core.node.models import Node, NodeType
+from core.services.base_service import BaseService
 
 
-class NodeService:
+class NodeService(BaseService):
+    model_class = Node
+
     @staticmethod
     def get_nodes(node_type_slug: str) -> list[Node]:
         node_type = NodeType.objects.filter(slug=node_type_slug).first()
@@ -12,11 +15,6 @@ class NodeService:
     @staticmethod
     def get_node(node_type_slug: str, node_id: int) -> Node | None:
         return Node.objects.filter(id=node_id, node_type__slug=node_type_slug).first()
-
-    @staticmethod
-    def get_by_id(node_id: int) -> Node | None:
-        """根据 ID 获取节点"""
-        return Node.objects.filter(id=node_id).first()
 
     @staticmethod
     def create_node(node_type_slug: str, _data: dict, user) -> Node | None:
@@ -38,14 +36,6 @@ class NodeService:
                 setattr(node, key, value)
         node.save()
         return node
-
-    @staticmethod
-    def delete_node(node_id: int) -> bool:
-        node = Node.objects.filter(id=node_id).first()
-        if node:
-            node.delete()
-            return True
-        return False
 
     @staticmethod
     def get_list(node_type_slug: str, search: str | None = None) -> list[Node]:

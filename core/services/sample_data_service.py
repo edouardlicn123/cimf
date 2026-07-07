@@ -10,8 +10,6 @@ class SampleDataService:
     def init_sample_customers() -> dict[str, int]:
         """初始化客户样本数据"""
         from django.db import transaction  # noqa: PLC0415
-        from modules.customer_cn.models import CustomerCnFields  # noqa: PLC0415
-        from modules.customer_cn.sample_data import DOMESTIC_CUSTOMERS  # noqa: PLC0415
 
         from core.models import User  # noqa: PLC0415
         from core.node.models import Node, NodeType  # noqa: PLC0415
@@ -27,6 +25,14 @@ class SampleDataService:
 
         if not admin_user:
             return results
+
+        has_customer_cn = False
+        try:
+            from modules.customer_cn.models import CustomerCnFields  # noqa: PLC0415
+            from modules.customer_cn.sample_data import DOMESTIC_CUSTOMERS  # noqa: PLC0415
+            has_customer_cn = True
+        except (ImportError, ModuleNotFoundError):
+            pass
 
         with transaction.atomic():
             if customer_node_type:
@@ -53,7 +59,7 @@ class SampleDataService:
                     )
                     results["overseas"] += 1
 
-            if customer_cn_node_type:
+            if has_customer_cn and customer_cn_node_type:
                 for data in DOMESTIC_CUSTOMERS:
                     if CustomerCnFields.objects.filter(customer_name=data["customer_name"]).exists():
                         continue

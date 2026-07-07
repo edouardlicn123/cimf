@@ -1,8 +1,8 @@
 """
-================================================================================
+===============================================================================
 文件：views.py
 路径：/home/edo/cimf-v2/modules/customer/views.py
-================================================================================
+===============================================================================
 
 功能说明：
     海外客户模块视图
@@ -18,7 +18,6 @@
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
 from django.http import Http404, JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
@@ -26,6 +25,7 @@ from django.views.decorators.http import require_POST
 from core.decorators import login_required_json
 from core.node.services import NodeService, NodeTypeService
 from core.services import PermissionService, TaxonomyService
+from core.utils.pagination import paginate_queryset
 from modules.customer.forms import CustomerForm
 from modules.customer.services import CustomerService
 
@@ -38,6 +38,28 @@ def safe_int(value: str, default=None):
         return int(value)
     except (ValueError, TypeError):
         return default
+
+
+def _get_node_or_404(node_id):
+    node = NodeService.get_by_id(node_id)
+    if not node:
+        raise Http404("节点不存在")
+    return node
+
+
+def _get_customer_context(node_type, customer=None, node=None):
+    form_data = _load_customer_form_data()
+    return {
+        "node_type": node_type,
+        "node_types": NodeTypeService.get_all(),
+        "node": node,
+        "customer": customer,
+        "active_section": "customer",
+        "customer_types": form_data["customer_type"],
+        "customer_levels": form_data["customer_level"],
+        "enterprise_types": form_data["economic_type"],
+        "countries": [{"id": c.id, "name": c.name} for c in form_data["country"]],
+    }
 
 
 def check_customer_permission(user, node, permission_type: str):
@@ -99,6 +121,28 @@ def _build_customer_data(cd: dict) -> dict:
     }
 
 
+def _process_customer_form(request, customer=None, node=None):
+    form = CustomerForm(request.POST)
+    if form.is_valid():
+        data = _build_customer_data(form.cleaned_data)
+        try:
+            if customer:
+                CustomerService.update(customer.id, request.user, data)
+                messages.success(request, "客户更新成功")
+                return redirect("node:node_view", node_type_slug="customer", node_id=node.id)
+            CustomerService.create(request.user, data)
+            messages.success(request, "客户创建成功")
+            return redirect("node:module_page", node_type_slug="customer")
+        except ValueError as e:
+            messages.error(request, str(e))
+    else:
+        for field, errors in form.errors.items():
+            label = form.fields[field].label or field
+            for error in errors:
+                messages.error(request, f"{label}: {error}")
+    return None
+
+
 @login_required
 def node_list(request):
     """海外客户列表"""
@@ -125,9 +169,7 @@ def node_list(request):
         user=request.user,
     )
 
-    page_num = request.GET.get("page", 1)
-    paginator = Paginator(customers, 10)
-    page_obj = paginator.get_page(page_num)
+    page_obj, _ = paginate_queryset(request, customers, per_page=10)
 
     return render(
         request,
@@ -143,12 +185,6 @@ def node_list(request):
             "customer_types": customer_types,
             "customer_levels": customer_levels,
             "page_obj": page_obj,
-            "current_page": page_obj.number,
-            "total_pages": paginator.num_pages,
-            "has_prev": page_obj.has_previous(),
-            "has_next": page_obj.has_next(),
-            "prev_page": page_obj.previous_page_number() if page_obj.has_previous() else None,
-            "next_page": page_obj.next_page_number() if page_obj.has_next() else None,
         },
     )
 
@@ -160,52 +196,18 @@ def node_create(request):
     if not node_type:
         raise Http404("节点类型不存在")
 
-    node_types = NodeTypeService.get_all()
-
-    form_data = _load_customer_form_data()
-    customer_types = form_data["customer_type"]
-    customer_levels = form_data["customer_level"]
-    enterprise_types = form_data["economic_type"]
-    countries = [{"id": c.id, "name": c.name} for c in form_data["country"]]
-
     if request.method == "POST":
-        form = CustomerForm(request.POST)
-        if form.is_valid():
-            data = _build_customer_data(form.cleaned_data)
-            try:
-                CustomerService.create(request.user, data)
-                messages.success(request, "客户创建成功")
-                return redirect("node:module_page", node_type_slug="customer")
-            except ValueError as e:
-                messages.error(request, str(e))
-        else:
-            for field, errors in form.errors.items():
-                label = form.fields[field].label or field
-                for error in errors:
-                    messages.error(request, f"{label}: {error}")
+        response = _process_customer_form(request)
+        if response:
+            return response
 
-    return render(
-        request,
-        "edit.html",
-        {
-            "node_type": node_type,
-            "node_types": node_types,
-            "customer": None,
-            "active_section": "customer",
-            "customer_types": customer_types,
-            "customer_levels": customer_levels,
-            "enterprise_types": enterprise_types,
-            "countries": countries,
-        },
-    )
+    return render(request, "edit.html", _get_customer_context(node_type))
 
 
 @login_required
 def node_view(request, node_id: int):
     """查看海外客户"""
-    node = NodeService.get_by_id(node_id)
-    if not node:
-        raise Http404("节点不存在")
+    node = _get_node_or_404(node_id)
 
     has_perm, error_msg = check_customer_permission(request.user, node, "view")
     if not has_perm:
@@ -235,59 +237,24 @@ def node_view(request, node_id: int):
 @login_required
 def node_edit(request, node_id: int):
     """编辑海外客户"""
-    node = NodeService.get_by_id(node_id)
-    if not node:
-        raise Http404("节点不存在")
+    node = _get_node_or_404(node_id)
 
     has_perm, error_msg = check_customer_permission(request.user, node, "edit")
     if not has_perm:
         messages.error(request, error_msg)
         return redirect("node:node_view", node_type_slug="customer", node_id=node_id)
 
-    node_types = NodeTypeService.get_all()
-
     customer = CustomerService.get_by_node_id(node_id)
     if not customer:
         messages.error(request, "客户不存在")
         return redirect("node:module_page", node_type_slug="customer")
 
-    form_data = _load_customer_form_data()
-    customer_types = form_data["customer_type"]
-    customer_levels = form_data["customer_level"]
-    enterprise_types = form_data["economic_type"]
-    countries = [{"id": c.id, "name": c.name} for c in form_data["country"]]
-
     if request.method == "POST":
-        form = CustomerForm(request.POST)
-        if form.is_valid():
-            data = _build_customer_data(form.cleaned_data)
-            try:
-                CustomerService.update(customer.id, request.user, data)
-                messages.success(request, "客户更新成功")
-                return redirect("node:node_view", node_type_slug="customer", node_id=node_id)
-            except ValueError as e:
-                messages.error(request, str(e))
-        else:
-            for field, errors in form.errors.items():
-                label = form.fields[field].label or field
-                for error in errors:
-                    messages.error(request, f"{label}: {error}")
+        response = _process_customer_form(request, customer, node)
+        if response:
+            return response
 
-    return render(
-        request,
-        "edit.html",
-        {
-            "node_type": node.node_type,
-            "node_types": node_types,
-            "node": node,
-            "customer": customer,
-            "active_section": "customer",
-            "customer_types": customer_types,
-            "customer_levels": customer_levels,
-            "enterprise_types": enterprise_types,
-            "countries": countries,
-        },
-    )
+    return render(request, "edit.html", _get_customer_context(node.node_type, customer, node))
 
 
 @login_required

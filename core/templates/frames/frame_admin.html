@@ -2,54 +2,12 @@
 
 {% block sidebar_nav %}
           <ul class="nav flex-column mb-auto">
-            <li class="nav-item">
-              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'settings' %}active{% endif %}" 
-                 href="{{ url('core:system_settings') }}">
-                <i class="bi bi-gear me-2 fs-6"></i>
-                系统设置
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'users' %}active{% endif %}" 
-                 href="{{ url('core:system_users') }}">
-                <i class="bi bi-people me-2 fs-6"></i>
-                人员管理
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'permissions' %}active{% endif %}" 
-                 href="{{ url('core:system_permissions') }}">
-                <i class="bi bi-shield-lock me-2 fs-6"></i>
-                权限管理
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'cron' %}active{% endif %}" 
-                 href="{{ url('core:cron_manager') }}">
-                <i class="bi bi-clock me-2 fs-6"></i>
-                Cron 调度
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'permission_check' %}active{% endif %}" 
-                 href="{{ url('core:permission_check') }}">
-                <i class="bi bi-shield-check me-2 fs-6"></i>
-                权限检测
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'smtp' %}active{% endif %}" 
-                 href="{{ url('core:smtp_config') }}">
-                <i class="bi bi-envelope me-2 fs-6"></i>
-                SMTP 配置
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'logs' %}active{% endif %}" 
-                 href="{{ url('core:logs_index') }}">
-                <i class="bi bi-file-text me-2 fs-6"></i>
-                日志管理
-              </a>
-            </li>
+{% set section, icon, label, url_name = 'settings', 'bi-gear', '系统设置', 'core:system_settings' %}{% include "includes/nav_item.html" %}
+{% set section, icon, label, url_name = 'users', 'bi-people', '人员管理', 'core:system_users' %}{% include "includes/nav_item.html" %}
+{% set section, icon, label, url_name = 'permissions', 'bi-shield-lock', '权限管理', 'core:system_permissions' %}{% include "includes/nav_item.html" %}
+{% set section, icon, label, url_name = 'cron', 'bi-clock', 'Cron 调度', 'core:cron_manager' %}{% include "includes/nav_item.html" %}
+{% set section, icon, label, url_name = 'permission_check', 'bi-shield-check', '权限检测', 'core:permission_check' %}{% include "includes/nav_item.html" %}
+{% set section, icon, label, url_name = 'smtp', 'bi-envelope', 'SMTP 配置', 'core:smtp_config' %}{% include "includes/nav_item.html" %}
+{% set section, icon, label, url_name = 'logs', 'bi-file-text', '日志管理', 'core:logs_index' %}{% include "includes/nav_item.html" %}
           </ul>
 {% endblock %}

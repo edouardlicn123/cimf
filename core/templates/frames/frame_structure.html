@@ -2,37 +2,13 @@
 
 {% block sidebar_nav %}
           <ul class="nav flex-column mb-auto">
-            <li class="nav-item">
-              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'dashboard' %}active{% endif %}" 
-                 href="{{ url('core:structure_dashboard') }}">
-                <i class="bi bi-house me-2 fs-6"></i>
-                内容结构
-              </a>
-            </li>
+{% set section, icon, label, url_name = 'dashboard', 'bi-house', '内容结构', 'core:structure_dashboard' %}{% include "includes/nav_item.html" %}
           </ul>
           {% if user.is_authenticated and user.is_admin %}
           <ul class="nav flex-column mb-auto">
-            <li class="nav-item">
-              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'node_types' %}active{% endif %}" 
-                 href="{{ url('core:node_types_list') }}">
-                <i class="bi bi-box-seam me-2 fs-6"></i>
-                可用节点类型
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'taxonomies' %}active{% endif %}" 
-                 href="{{ url('core:taxonomies') }}">
-                <i class="bi bi-tags me-2 fs-6"></i>
-                词汇表管理
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'field_types' %}active{% endif %}" 
-                 href="{{ url('core:field_types') }}">
-                <i class="bi bi-ui-checks me-2 fs-6"></i>
-                字段类型
-              </a>
-            </li>
+{% set section, icon, label, url_name = 'node_types', 'bi-box-seam', '可用节点类型', 'core:node_types_list' %}{% include "includes/nav_item.html" %}
+{% set section, icon, label, url_name = 'taxonomies', 'bi-tags', '词汇表管理', 'core:taxonomies' %}{% include "includes/nav_item.html" %}
+{% set section, icon, label, url_name = 'field_types', 'bi-ui-checks', '字段类型', 'core:field_types' %}{% include "includes/nav_item.html" %}
           </ul>
           {% endif %}
 {% endblock %}

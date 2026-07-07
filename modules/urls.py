@@ -36,7 +36,7 @@ def get_installed_module_slugs():
         slugs = [(m.module_id, m.module_type) for m in modules]
     except Exception:
         slugs = []
-    cache.set(cache_key, slugs, 300)
+    cache.set(cache_key, slugs, 30)
     return slugs
 
 

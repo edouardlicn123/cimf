@@ -26,8 +26,8 @@ def system_settings(request):
     if request.method == "POST":
         settings_dict = {}
 
-        for key in SettingsService.DEFAULT_SETTINGS:
-            if key in SettingsService.BOOL_SETTINGS:
+        for key in SettingsService.SETTINGS_META:
+            if SettingsService.SETTINGS_META[key]["type"] is bool:
                 value = "true" if request.POST.get(key) else "false"
             elif key == "web_watermark_content":
                 values = request.POST.getlist(key)

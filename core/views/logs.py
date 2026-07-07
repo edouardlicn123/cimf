@@ -5,7 +5,7 @@
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 
-from core.decorators import admin_required
+from core.decorators import admin_required, admin_required_json
 from core.services.log_service import LogService
 from core.utils.response import json_error
 
@@ -53,7 +53,7 @@ def logs_view(request, log_type):
 
 
 # TODO: logs_api 已定义但未注册路由，预留用于前端 AJAX 日志加载功能
-@admin_required
+@admin_required_json
 def logs_api(request, log_type):
     """日志 API - JSON 接口（未注册路由，预留功能）"""
     page, page_size = _parse_page_params(request)

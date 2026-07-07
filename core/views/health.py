@@ -12,7 +12,7 @@ from django.http import JsonResponse
 from django.utils import timezone
 
 from core.constants import VERSION_MAJOR, VERSION_MINOR
-from core.decorators import login_required
+from core.decorators import login_required_json
 from core.services import VersionService
 
 
@@ -27,7 +27,7 @@ def _run_check(checks, name, fn, on_error_status="degraded"):
     return overall
 
 
-@login_required
+@login_required_json
 def health_check(request):  # noqa: ARG001
     start_time = time.time()
 
@@ -70,7 +70,7 @@ def health_check(request):  # noqa: ARG001
     return JsonResponse(checks, status=status_code)
 
 
-@login_required
+@login_required_json
 def detailed_health_check(request):  # noqa: ARG001
     start_time = time.time()
 
@@ -132,7 +132,7 @@ def detailed_health_check(request):  # noqa: ARG001
     return JsonResponse(checks, status=status_code)
 
 
-@login_required
+@login_required_json
 def api_version(request):  # noqa: ARG001
     """API 版本信息"""
     return JsonResponse(VersionService.get_info())
