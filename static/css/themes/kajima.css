@@ -53,7 +53,7 @@
   --text-primary:      #2a2a2a;
   --text-secondary:    #4a4a4a;
   --text-muted:        #7a7a7a;
-  --text-inverted:     #ffffff;
+    --text-inverse:      #f0f0f0;
   --text-nav:          #ffffff;
   --text-nav-active:   #ffffff;
 
@@ -184,4 +184,23 @@ body {
 .btn-warning:focus-visible,
 .btn-info:focus-visible {
   outline-color: var(--gold) !important;
+}
+
+/* btn-secondary 跟随主题 */
+.btn-secondary {
+  background-color: color-mix(in srgb, var(--primary), white 60%) !important;
+  border-color: color-mix(in srgb, var(--primary), white 60%) !important;
+  color: var(--primary) !important;
+}
+.btn-secondary:hover,
+.btn-secondary:focus {
+  background-color: color-mix(in srgb, var(--primary), white 40%) !important;
+  border-color: color-mix(in srgb, var(--primary), white 40%) !important;
+  color: white !important;
+}
+.btn-secondary:active,
+.btn-secondary.active {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: white !important;
 }

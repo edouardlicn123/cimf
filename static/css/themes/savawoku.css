@@ -49,7 +49,7 @@
   --text-primary:      #242424;
   --text-secondary:    #555555;
   --text-muted:        #888888;
-  --text-inverted:     #FFFFFF;
+    --text-inverse:      #f0f0f0;
   --text-nav:          #FFFFFF;
   --text-nav-active:   #FFFFFF;
 
@@ -131,12 +131,14 @@
   background-position: right center !important;
   border-color: transparent !important;
   box-shadow: 0 4px 12px rgba(208, 15, 49, 0.30) !important;
+  color: white !important;
 }
 
 .btn-primary:active {
   background: linear-gradient(90deg, #B00D2A 0%, #E07E1E 100%) !important;
   background-size: 200% 100% !important;
   background-position: left center !important;
+  color: white !important;
 }
 
 /* primary-btn 卡片按钮同步渐变 */
@@ -152,6 +154,25 @@
   background-position: right center !important;
   border-color: transparent !important;
   box-shadow: 0 4px 12px rgba(208, 15, 49, 0.30) !important;
+}
+
+/* btn-secondary 跟随主题 */
+.btn-secondary {
+  background-color: color-mix(in srgb, var(--primary), white 60%) !important;
+  border-color: color-mix(in srgb, var(--primary), white 60%) !important;
+  color: var(--primary) !important;
+}
+.btn-secondary:hover,
+.btn-secondary:focus {
+  background-color: color-mix(in srgb, var(--primary), white 40%) !important;
+  border-color: color-mix(in srgb, var(--primary), white 40%) !important;
+  color: white !important;
+}
+.btn-secondary:active,
+.btn-secondary.active {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: white !important;
 }
 
 /* 卡片 - 干净白底 */
