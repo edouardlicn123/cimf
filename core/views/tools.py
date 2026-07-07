@@ -23,6 +23,7 @@ from django.shortcuts import redirect, render
 from core.constants import ModuleType
 from core.module.models import Module
 from core.module.services.module_service import ModuleService
+from core.utils.views import dynamic_import_view
 
 
 def _get_tools_list() -> list:
@@ -63,18 +64,15 @@ def tools_page(request, tool_slug: str, tool_id: int | None = None):
     if not any(t["slug"] == tool_slug for t in tools):
         return redirect("core:tools_index")
 
-    try:
-        tool_views = __import__(f"modules.{tool_slug}.views", fromlist=[""])
-        if hasattr(tool_views, "tool_view"):
-            sig = inspect.signature(tool_views.tool_view)
-            if len(sig.parameters) == 1:
-                return tool_views.tool_view(request)
-            return tool_views.tool_view(request, tool_id)
-        elif hasattr(tool_views, "detail_view") and tool_id:
-            return tool_views.detail_view(request, tool_id)
-        elif hasattr(tool_views, "list_view"):
-            return tool_views.list_view(request)
-    except ImportError:
-        pass
+    view = dynamic_import_view(tool_slug, "tool_view")
+    if not view and tool_id is not None:
+        view = dynamic_import_view(tool_slug, "detail_view")
+    if not view:
+        view = dynamic_import_view(tool_slug, "list_view")
+    if view:
+        sig = inspect.signature(view)
+        if len(sig.parameters) == 1:
+            return view(request)
+        return view(request, tool_id)
 
     return redirect("core:tools_index")

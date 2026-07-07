@@ -37,6 +37,12 @@ class LogService:
             cls._security_logger = logging.getLogger("django.security")
         return cls._security_logger
 
+    @classmethod
+    def _log_event(cls, message: str, level: int = logging.INFO):
+        """记录日志事件的通用方法"""
+        logger = cls._get_security_logger()
+        logger.log(level, message)
+
     # ===== 写日志功能 =====
 
     @staticmethod
@@ -50,58 +56,51 @@ class LogService:
     @classmethod
     def log_login_attempt(cls, request, username: str, success: bool, reason: str | None = None):
         """记录登录尝试"""
-        logger = cls._get_security_logger()
         level = logging.INFO if success else logging.WARNING
         ip = cls.get_client_ip(request)
         message = f"Login attempt: user={username}, success={success}, ip={ip}"
         if reason:
             message += f", reason={reason}"
-        logger.log(level, message)
+        cls._log_event(message, level)
 
     @classmethod
     def log_logout(cls, _user, username: str, ip: str):
         """记录登出"""
-        logger = cls._get_security_logger()
-        logger.info(f"Logout: user={username}, ip={ip}")
+        cls._log_event(f"Logout: user={username}, ip={ip}")
 
     @classmethod
     def log_permission_denied(cls, request, user, resource: str, reason: str | None = None):
         """记录权限拒绝"""
-        logger = cls._get_security_logger()
         ip = cls.get_client_ip(request)
         username = user.username if user else "anonymous"
         message = f"Permission denied: user={username}, resource={resource}, ip={ip}"
         if reason:
             message += f", reason={reason}"
-        logger.warning(message)
+        cls._log_event(message, logging.WARNING)
 
     @classmethod
     def log_security_event(cls, event_type: str, details: str, level=logging.INFO):
         """记录安全事件"""
-        logger = cls._get_security_logger()
-        logger.log(level, f"Security event: {event_type}, details={details}")
+        cls._log_event(f"Security event: {event_type}, details={details}", level)
 
     @classmethod
     def log_api_access(cls, request, endpoint: str, user=None):
         """记录 API 访问"""
-        logger = cls._get_security_logger()
         ip = cls.get_client_ip(request)
         username = user.username if user else "anonymous"
-        logger.info(f"API access: user={username}, endpoint={endpoint}, ip={ip}")
+        cls._log_event(f"API access: user={username}, endpoint={endpoint}, ip={ip}")
 
     @classmethod
     def log_data_export(cls, request, user, export_type: str, record_count: int):
         """记录数据导出"""
-        logger = cls._get_security_logger()
         ip = cls.get_client_ip(request)
-        logger.info(f"Data export: user={user.username}, type={export_type}, count={record_count}, ip={ip}")
+        cls._log_event(f"Data export: user={user.username}, type={export_type}, count={record_count}, ip={ip}")
 
     @classmethod
     def log_failed_validation(cls, request, form_name: str, errors: str):
         """记录验证失败"""
-        logger = cls._get_security_logger()
         ip = cls.get_client_ip(request)
-        logger.warning(f"Validation failed: form={form_name}, errors={errors}, ip={ip}")
+        cls._log_event(f"Validation failed: form={form_name}, errors={errors}, ip={ip}", logging.WARNING)
 
     # ===== 读日志功能 =====
 
@@ -194,12 +193,3 @@ class LogService:
         return {"total": total, "levels": levels}
 
 
-# 兼容旧导入方式
-log_login_attempt = LogService.log_login_attempt
-log_logout = LogService.log_logout
-log_permission_denied = LogService.log_permission_denied
-log_security_event = LogService.log_security_event
-log_api_access = LogService.log_api_access
-log_data_export = LogService.log_data_export
-log_failed_validation = LogService.log_failed_validation
-get_client_ip = LogService.get_client_ip

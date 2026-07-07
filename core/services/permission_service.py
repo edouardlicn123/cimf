@@ -139,19 +139,8 @@ class PermissionService:
         if user.is_admin:
             return True
 
-        if user.role == UserRole.MANAGER:
-            manager_perms = PermissionService.get_role_permissions_from_db(UserRole.MANAGER)
-            return permission in manager_perms
-
-        if user.role == UserRole.LEADER:
-            leader_perms = PermissionService.get_role_permissions_from_db(UserRole.LEADER)
-            return permission in leader_perms
-
-        if user.role == UserRole.EMPLOYEE:
-            emp_perms = PermissionService.get_role_permissions_from_db(UserRole.EMPLOYEE)
-            return permission in emp_perms
-
-        return False
+        perms = PermissionService.get_role_permissions_from_db(user.role)
+        return permission in perms
 
     @staticmethod
     def get_user_effective_permissions(user: User) -> list[str]:

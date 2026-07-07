@@ -10,7 +10,7 @@ from django.db import transaction
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
 
-from core.decorators import permission_required
+from core.decorators import login_required_json, permission_required
 from core.importexport import ExportService, ImportService, TemplateGenerator
 from core.node.services import NodeTypeService
 from core.utils.response import json_error, json_success
@@ -276,7 +276,7 @@ def download_template(request, node_type_slug):  # noqa: ARG001
     return TemplateGenerator.generate(node_type_slug)
 
 
-@login_required
+@login_required_json
 @require_POST
 @permission_required("importexport.view")
 def upload_preview(request, node_type_slug):

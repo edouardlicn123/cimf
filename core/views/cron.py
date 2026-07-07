@@ -7,8 +7,9 @@ import re
 
 from django.shortcuts import render
 from django.urls import get_resolver
+from django.views.decorators.http import require_POST
 
-from core.decorators import admin_post_view, admin_required
+from core.decorators import admin_required, admin_required_json
 from core.services import get_cron_service
 from core.utils.pagination import paginate_queryset
 from core.utils.response import json_success
@@ -43,14 +44,15 @@ def cron_manager(request):
     )
 
 
-@admin_required
+@admin_required_json
 def cron_status(request):  # noqa: ARG001
     """获取 Cron 状态 API"""
     cron = get_cron_service()
     return json_success(extra=cron.get_status())
 
 
-@admin_post_view
+@require_POST
+@admin_required_json
 def cron_run_task(request, task_name: str):  # noqa: ARG001
     """手动触发任务"""
     cron = get_cron_service()
@@ -58,7 +60,8 @@ def cron_run_task(request, task_name: str):  # noqa: ARG001
     return json_success(extra=result)
 
 
-@admin_post_view
+@require_POST
+@admin_required_json
 def cron_toggle_task(request, task_name: str):
     """切换任务启用状态"""
     try:
@@ -178,30 +181,4 @@ def get_all_pages_with_permission_status():
     return pages
 
 
-def check_view_has_admin_permission(view_func):
-    """检测视图函数是否有 admin 权限检查"""
-    try:
-        source = inspect.getsource(view_func)
-        return "can_access_admin" in source
-    except Exception:
-        return False
 
-
-def detect_app_from_url(url_str):
-    """从 URL 检测所属应用"""
-    url = url_str.lstrip("/")
-    if url.startswith("system/"):
-        return "system"
-    if url.startswith(("nodes/", "types/", "type/", "field-types")):
-        return "nodes"
-    if url.startswith(("taxonomies", "taxonomy")):
-        return "core"
-    if url.startswith("accounts/"):
-        return "auth"
-    if url.startswith("profile/"):
-        return "profile"
-    if url.startswith("api/"):
-        return "api"
-    if "node_type_slug" in url_str or "node_id" in url_str:
-        return "nodes"
-    return "other"

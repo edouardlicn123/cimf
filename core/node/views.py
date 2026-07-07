@@ -2,7 +2,9 @@
 Node 节点系统视图
 """
 
+import inspect
 import logging
+from importlib import import_module
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -18,6 +20,7 @@ from core.node.models import Node, NodeType
 from core.node.services import NodeService, NodeTypeService
 from core.utils.pagination import paginate_queryset
 from core.utils.response import json_error, json_success
+from core.utils.views import dynamic_import_view
 
 logger = logging.getLogger(__name__)
 
@@ -207,7 +210,7 @@ def module_custom_dispatch(request, node_type_slug: str, extra_path: str):
     if not Module.objects.filter(module_id=node_type_slug, is_installed=True, is_active=True).exists():
         raise Http404
     try:
-        module = __import__(f"modules.{node_type_slug}.urls", fromlist=["urlpatterns"])
+        module = import_module(f"modules.{node_type_slug}.urls")
         path_to_match = extra_path.strip("/")
         for pattern in module.urlpatterns:
             if isinstance(pattern, (URLResolver, URLPattern)):
@@ -229,43 +232,39 @@ def module_dispatch(request, node_type_slug: str, node_id: int | None = None, ac
     module_path = node_type_slug
 
     try:
-        module_views = __import__(f"modules.{module_path}.views", fromlist=[""])
-
-        if action in ("create", "edit", "delete") and not request.user.is_admin:
-            messages.error(request, "需要管理员权限")
-            return redirect("node:module_page", node_type_slug=node_type_slug)
-
-        if action == "create":
-            if hasattr(module_views, "node_create"):
-                return module_views.node_create(request)
-            elif hasattr(module_views, "create"):
-                return module_views.create(request)
-
-        if action == "delete":
-            if hasattr(module_views, "node_delete"):
-                return module_views.node_delete(request, node_id)
-            elif hasattr(module_views, "delete"):
-                return module_views.delete(request, node_id)
-
-        if action == "edit":
-            if hasattr(module_views, "node_edit"):
-                return module_views.node_edit(request, node_id)
-            elif hasattr(module_views, "edit"):
-                return module_views.edit(request, node_id)
-
-        if hasattr(module_views, "module_view"):
-            return module_views.module_view(request, node_id)
-        elif hasattr(module_views, "detail_view") and node_id:
-            return module_views.detail_view(request, node_id)
-        elif hasattr(module_views, "list_view"):
-            return module_views.list_view(request)
-        elif hasattr(module_views, "node_list") and not node_id:
-            return module_views.node_list(request)
-        elif hasattr(module_views, "node_view") and node_id:
-            return module_views.node_view(request, node_id)
-        elif hasattr(module_views, "node_edit") and node_id:
-            return module_views.node_edit(request, node_id)
+        import_module(f"modules.{module_path}.views")
     except ImportError:
-        pass
+        raise Http404(f"未找到模块: {node_type_slug}") from None
+
+    if action in ("create", "edit", "delete") and not request.user.is_admin:
+        messages.error(request, "需要管理员权限")
+        return redirect("node:module_page", node_type_slug=node_type_slug)
+
+    if action == "create":
+        view = dynamic_import_view(module_path, "node_create") or dynamic_import_view(module_path, "create")
+        if view:
+            return view(request)
+
+    if action == "delete":
+        view = dynamic_import_view(module_path, "node_delete") or dynamic_import_view(module_path, "delete")
+        if view:
+            return view(request, node_id)
+
+    if action == "edit":
+        view = dynamic_import_view(module_path, "node_edit") or dynamic_import_view(module_path, "edit")
+        if view:
+            return view(request, node_id)
+
+    view = (dynamic_import_view(module_path, "module_view") or
+            (dynamic_import_view(module_path, "detail_view") if node_id is not None else None) or
+            dynamic_import_view(module_path, "list_view") or
+            (dynamic_import_view(module_path, "node_list") if node_id is None else None) or
+            (dynamic_import_view(module_path, "node_view") if node_id is not None else None) or
+            (dynamic_import_view(module_path, "node_edit") if node_id is not None else None))
+    if view:
+        sig = inspect.signature(view)
+        if len(sig.parameters) == 1:
+            return view(request)
+        return view(request, node_id)
 
     raise Http404(f"未找到模块: {node_type_slug}")

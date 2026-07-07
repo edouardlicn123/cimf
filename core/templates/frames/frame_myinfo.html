@@ -2,33 +2,9 @@
 
 {% block sidebar_nav %}
           <ul class="nav flex-column mb-auto">
-            <li class="nav-item">
-              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'profile' %}active{% endif %}" 
-                 href="{{ url('core:profile_view') }}">
-                <i class="bi bi-person me-2 fs-6"></i>
-                个人信息
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'preferences' %}active{% endif %}" 
-                 href="{{ url('core:profile_settings') }}">
-                <i class="bi bi-sliders me-2 fs-6"></i>
-                偏好设置
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'homepage' %}active{% endif %}" 
-                 href="{{ url('core:homepage_settings') }}">
-                <i class="bi bi-grid me-2 fs-6"></i>
-                功能卡片
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'nav_cards' %}active{% endif %}" 
-                 href="{{ url('core:navigation_settings') }}">
-                <i class="bi bi-bookmark me-2 fs-6"></i>
-                导航卡片
-              </a>
-            </li>
+{% set section, icon, label, url_name = 'profile', 'bi-person', '个人信息', 'core:profile_view' %}{% include "includes/nav_item.html" %}
+{% set section, icon, label, url_name = 'preferences', 'bi-sliders', '偏好设置', 'core:profile_settings' %}{% include "includes/nav_item.html" %}
+{% set section, icon, label, url_name = 'homepage', 'bi-grid', '功能卡片', 'core:homepage_settings' %}{% include "includes/nav_item.html" %}
+{% set section, icon, label, url_name = 'nav_cards', 'bi-bookmark', '导航卡片', 'core:navigation_settings' %}{% include "includes/nav_item.html" %}
           </ul>
 {% endblock %}

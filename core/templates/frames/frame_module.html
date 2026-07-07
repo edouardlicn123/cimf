@@ -2,19 +2,7 @@
 
 {% block sidebar_nav %}
           <ul class="nav flex-column mb-auto">
-            <li class="nav-item">
-              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'modules_manage' %}active{% endif %}" 
-                 href="{{ url('module:list') }}">
-                <i class="bi bi-box-seam me-2 fs-6"></i>
-                模块管理
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'market' %}active{% endif %}" 
-                 href="{{ url('market:index') }}">
-                <i class="bi bi-shop me-2 fs-6"></i>
-                模块市场
-              </a>
-            </li>
+{% set section, icon, label, url_name = 'modules_manage', 'bi-box-seam', '模块管理', 'module:list' %}{% include "includes/nav_item.html" %}
+{% set section, icon, label, url_name = 'market', 'bi-shop', '模块市场', 'market:index' %}{% include "includes/nav_item.html" %}
           </ul>
 {% endblock %}

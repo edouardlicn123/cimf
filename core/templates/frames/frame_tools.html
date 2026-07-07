@@ -2,22 +2,10 @@
 
 {% block sidebar_nav %}
           <ul class="nav flex-column mb-auto">
-            <li class="nav-item">
-              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'dashboard' %}active{% endif %}" 
-                 href="{{ url('core:tools_index') }}">
-                <i class="bi bi-grid me-2 fs-6"></i>
-                工具总览
-              </a>
-            </li>
+{% set section, icon, label, url_name = 'dashboard', 'bi-grid', '工具总览', 'core:tools_index' %}{% include "includes/nav_item.html" %}
             
             {% for tool in tools %}
-            <li class="nav-item">
-              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == tool.slug %}active{% endif %}" 
-                 href="{{ url('core:tools_page', tool.slug) }}">
-                <i class="bi {{ tool.icon|default('bi-wrench') }} me-2 fs-6"></i>
-                {{ tool.name }}
-              </a>
-            </li>
+{% set section = tool.slug %}{% set icon = tool.icon|default('bi-wrench') %}{% set label = tool.name %}{% set url_name = 'core:tools_page' %}{% set url_args = tool.slug %}{% include "includes/nav_item.html" %}
             {% endfor %}
           </ul>
 {% endblock %}

@@ -25,6 +25,8 @@ from pathlib import Path
 VERSION_FILE = "core/constants.py"
 PROGRESS_FILE = "docs/progress.md"
 FOOTER_FILE = "core/templates/includes/footer.html"
+ARCHIVE_DIR = Path("docs/progress_archive")
+MAX_ENTRIES = 300
 
 
 def read_version():
@@ -128,6 +130,7 @@ def update_progress_append(content_text):
         new_section = f"# {today} 修改记录\n\n1. {content_text}\n"
         new_content = other_records + "\n\n" + new_section if other_records else new_section
 
+    new_content = ensure_archive_limit(new_content)
     Path(PROGRESS_FILE).write_text(new_content, encoding="utf-8")
 
 
@@ -142,6 +145,7 @@ def update_progress_overwrite(content_text):
 
     new_content = other_records + "\n\n" + new_section if other_records else new_section
 
+    new_content = ensure_archive_limit(new_content)
     Path(PROGRESS_FILE).write_text(new_content, encoding="utf-8")
 
 
@@ -152,6 +156,95 @@ def update_footer_version(new_version):
     footer_content = re.sub(r'(id="app-version">)v\d+\.\d+(</span>)', rf"\1{new_version}\2", footer_content)
 
     Path(FOOTER_FILE).write_text(footer_content, encoding="utf-8")
+
+
+def count_entries(content):
+    """统计 progress.md 中的记录条目数"""
+    return len(re.findall(r"^\d+\. ", content, re.MULTILINE))
+
+
+def get_date_blocks(content):
+    """将 progress.md 按日期分组，返回 [(date_str, block_text), ...]"""
+    pattern = re.compile(r"^# (\d{4}-\d{2}-\d{2}) 修改记录\n", re.MULTILINE)
+    matches = list(pattern.finditer(content))
+    if not matches:
+        return []
+
+    blocks = []
+    for i, m in enumerate(matches):
+        start = m.start()
+        end = matches[i + 1].start() if i + 1 < len(matches) else len(content)
+        blocks.append((m.group(1), content[start:end]))
+    return blocks
+
+
+def archive_oldest_block(content):
+    """将最旧的日期组归档到 docs/progress_archive/"""
+    blocks = get_date_blocks(content)
+    if not blocks:
+        return content
+
+    oldest_date, oldest_block = blocks[0]
+    month = oldest_date[:7]  # YYYY-MM
+
+    # Determine end of this month's data (find last block in same month)
+    end_date = oldest_date
+    for date_str, _ in blocks[1:]:
+        if date_str[:7] == month:
+            end_date = date_str
+        else:
+            break
+
+    ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Collect all blocks from this month
+    to_archive = []
+    remaining_blocks = list(blocks)
+    for date_str, block in list(blocks):
+        if date_str[:7] == month:
+            to_archive.append((date_str, block))
+            remaining_blocks.pop(0)
+        else:
+            break
+
+    archive_name = f"{month}.md"
+    archive_path = ARCHIVE_DIR / archive_name
+
+    if archive_path.exists():
+        existing = archive_path.read_text(encoding="utf-8")
+    else:
+        existing = f"# 历史修改记录 ({month})\n\n> 自动归档自 progress.md\n\n---\n\n"
+
+    for date_str, block in to_archive:
+        existing += "\n" + block.strip() + "\n"
+    archive_path.write_text(existing, encoding="utf-8")
+
+    print(f"  自动归档: 共 {len(to_archive)} 天 ({to_archive[0][0]} ~ {to_archive[-1][0]}) → {archive_name}")
+
+    # Reconstruct content without archived blocks
+    header_end = content.find("\n# ")
+    preamble = content[:header_end + 1] if header_end != -1 else ""
+    remaining = preamble + "\n".join(b for _, b in remaining_blocks) + "\n" if remaining_blocks else preamble + "\n"
+    return remaining
+
+    # Remove oldest block from content
+    remaining = content[len(oldest_block):].strip()
+    # Re-add preamble (everything before first date header)
+    header_end = content.find("\n# ")
+    if header_end != -1:
+        preamble = content[:header_end + 1]
+        remaining = preamble + "\n" + remaining
+    else:
+        remaining = content
+
+    return remaining
+
+
+def ensure_archive_limit(content):
+    """确保 progress.md 不超过 MAX_ENTRIES 条记录"""
+    while count_entries(content) > MAX_ENTRIES:
+        content = archive_oldest_block(content)
+    return content
 
 
 def main():

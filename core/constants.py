@@ -15,7 +15,7 @@
 版本历史：
     - 1.000: 初始版本（仅版本号）
     - 2.000: 2026-05-02 - 集中化常量定义
-    - 2.007: 2026-07-05
+    - 2.018: 2026-07-07
 """
 
 # ============================================================
@@ -23,7 +23,7 @@
 # ============================================================
 
 VERSION_MAJOR = "2"
-VERSION_MINOR = 4
+VERSION_MINOR = 18
 
 
 def get_version_display():
@@ -137,3 +137,22 @@ class Language:
         (ZH, "中文（简体）"),
         (EN, "English"),
     ]
+
+
+# ============================================================
+# 权限
+# ============================================================
+
+
+class Perm:
+    """权限标识符常量 — 集中管理，消除魔法字符串"""
+
+    IMPORTEXPORT_VIEW = "importexport.view"
+    SYSTEM_SETTINGS_VIEW = "system.settings.view"
+    SYSTEM_SETTINGS_MODIFY = "system.settings.modify"
+    USER_MANAGE = "user.manage"
+    LOG_VIEW = "log.view"
+
+    NODE_CUSTOMER_VIEW_OTHERS = "node.customer.view_others"
+    NODE_CUSTOMER_EDIT_OTHERS = "node.customer.edit_others"
+    NODE_CUSTOMER_DELETE_OTHERS = "node.customer.delete_others"

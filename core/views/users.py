@@ -122,5 +122,5 @@ def user_delete(request, user_id: int):
     try:
         user.delete()
         return redirect_with_success(request, "用户已删除", "core:system_users")
-    except Exception as e:
-        return redirect_with_error(request, f"删除用户失败: {e!s}", "core:system_users")
+    except Exception:
+        return redirect_with_error(request, "删除用户失败", "core:system_users")

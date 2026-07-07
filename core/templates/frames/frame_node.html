@@ -2,22 +2,10 @@
 
 {% block sidebar_nav %}
           <ul class="nav flex-column mb-auto">
-            <li class="nav-item">
-              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == 'dashboard' %}active{% endif %}" 
-                 href="{{ url('node:index') }}">
-                <i class="bi bi-grid me-2 fs-6"></i>
-                事务总览
-              </a>
-            </li>
+{% set section, icon, label, url_name = 'dashboard', 'bi-grid', '事务总览', 'node:index' %}{% include "includes/nav_item.html" %}
             
             {% for nt in node_types %}
-            <li class="nav-item">
-              <a class="nav-link d-flex align-items-center py-2 px-2 rounded {% if active_section == nt.slug %}active{% endif %}" 
-                 href="{{ url('node:module_page', nt.slug) }}">
-                <i class="bi {{ nt.icon|default('bi-folder') }} me-2 fs-6"></i>
-                {{ nt.name }}
-              </a>
-            </li>
+{% set section = nt.slug %}{% set icon = nt.icon|default('bi-folder') %}{% set label = nt.name %}{% set url_name = 'node:module_page' %}{% set url_args = nt.slug %}{% include "includes/nav_item.html" %}
             {% endfor %}
           </ul>
 {% endblock %}
