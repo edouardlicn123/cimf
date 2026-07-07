@@ -9,6 +9,7 @@ from importlib import import_module
 from django.shortcuts import render
 from django.template import engines
 
+from core.constants import DEFAULT_NAV_CARDS
 from core.decorators import api_get_view, api_post_view
 from core.module.models import Module
 from core.services import SettingsService, UserService
@@ -138,6 +139,8 @@ def api_nav_cards(request):
     """获取用户导航卡片"""
     try:
         cards = UserService.get_navigation_cards(request.user.id)
+        if not cards:
+            cards = DEFAULT_NAV_CARDS
         return json_success(extra={"cards": cards, "max": 12})
     except Exception as e:
         return json_error(str(e), 400)

@@ -86,15 +86,19 @@
     function onNavCardDrop(draggingCard, toSlot) {
         var fromSlot = draggingCard.closest('.nav-slot');
         if (fromSlot === toSlot) return;
-        
-        var fromPosition = parseInt(fromSlot.dataset.position);
-        var toPosition = parseInt(toSlot.dataset.position);
+
         var toCard = toSlot.querySelector('.nav-card');
-        
+
         var cardData = navCardsData.find(function(c) { return c.id == draggingCard.dataset.id; });
         if (!cardData) return;
-        
+
+        toSlot.innerHTML = '';
+        toSlot.appendChild(draggingCard);
+
         if (toCard) {
+            fromSlot.innerHTML = '';
+            fromSlot.appendChild(toCard);
+
             var toCardData = navCardsData.find(function(c) { return c.id == toCard.dataset.id; });
             if (toCardData) {
                 var tempPos = cardData.position;
@@ -102,15 +106,18 @@
                 toCardData.position = tempPos;
             }
         } else {
-            cardData.position = toPosition;
+            cardData.position = parseInt(toSlot.dataset.position);
         }
-        
-        updateNavCardsDisplay(navCardsData);
+
         saveNavCardsOrder();
     }
 
-    window.FFE.DragDrop.makeSortable('#navCardsArea', '.nav-card', '.nav-slot', onNavCardDrop);
-    
+    function initNavDragDrop() {
+        if (window.FFE && window.FFE.DragDrop) {
+            window.FFE.DragDrop.makeSortable('#navCardsArea', '.nav-card', '.nav-slot', onNavCardDrop);
+        }
+    }
+
     function saveNavCardsOrder() {
         fetch('{{ url("api:api_nav_cards_save") }}', {
             method: 'POST',
@@ -132,9 +139,11 @@
                     navCardsData = data.cards;
                     updateNavCardsDisplay(navCardsData);
                 }
+                initNavDragDrop();
             })
             .catch(function() {
                 console.error('加载导航卡片失败');
+                initNavDragDrop();
             });
     }
 

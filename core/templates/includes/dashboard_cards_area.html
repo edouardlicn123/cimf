@@ -301,11 +301,15 @@
 
     function fetchServerTime() {
         return fetch('{{ url('api:api_time_current') }}')
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                serverTimeData.timestamp = data.timestamp;
-                serverTimeData.recvTime = performance.now();
-            })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success && data.data && data.data.timestamp) {
+                serverTimeData.timestamp = data.data.timestamp;
+            } else {
+                serverTimeData.timestamp = Math.floor(Date.now() / 1000);
+            }
+            serverTimeData.recvTime = performance.now();
+        })
             .catch(function() {
                 serverTimeData.timestamp = Math.floor(Date.now() / 1000);
                 serverTimeData.recvTime = performance.now();
