@@ -277,12 +277,10 @@ def download_template(request, node_type_slug):  # noqa: ARG001
 
 
 @login_required
+@require_POST
 @permission_required("importexport.view")
 def upload_preview(request, node_type_slug):
     """上传并预览数据 - AJAX"""
-    if request.method != "POST":
-        return json_error("需要 POST 请求", 400)
-
     _node_type, response = _get_node_type_or_redirect(node_type_slug, "importexport:import_list")
     if response:
         return response
@@ -420,7 +418,10 @@ def download_errors(request, node_type_slug):
         return response
 
     errors_json = request.session.get("import_errors", "[]")
-    errors = json.loads(errors_json)
+    try:
+        errors = json.loads(errors_json)
+    except (json.JSONDecodeError, TypeError):
+        errors = []
 
     fields = ImportService.get_importable_fields(node_type_slug)
 

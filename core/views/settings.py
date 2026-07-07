@@ -15,7 +15,6 @@ from django.shortcuts import redirect, render
 from core.constants import Language, UserRole, UserTheme
 from core.decorators import admin_required, handle_form_errors
 from core.forms import ChangePasswordForm, PreferencesForm, ProfileForm
-from core.models import SystemSetting
 from core.services import PermissionService, SettingsService, UserService
 
 logger = logging.getLogger(__name__)
@@ -106,19 +105,17 @@ def system_permissions(request):
         for role in ["manager", "leader", "employee"]:
             role_name = request.POST.get(f"role_name_{role}", "").strip()
             if role_name:
-                SystemSetting.objects.update_or_create(
-                    key=f"role_name_{role}", defaults={"value": role_name, "description": f"{role} 角色显示名称"}
-                )
+                SettingsService.update_setting(f"role_name_{role}", role_name)
 
         messages.success(request, "权限已保存")
         return redirect("core:system_permissions")
 
     role_labels = dict(UserRole.LABELS)
     for role in ["manager", "leader", "employee"]:
-        setting = SystemSetting.objects.filter(key=f"role_name_{role}").first()
-        if setting and setting.value:
-            role_labels[role] = setting.value
-        elif not setting:
+        role_label = SettingsService.get_setting(f"role_name_{role}")
+        if role_label:
+            role_labels[role] = role_label
+        elif role_label is None:
             logger.debug(f"配置未找到: role_name_{role}，使用默认值")
 
     node_perms = PermissionService.get_node_permissions()
@@ -252,40 +249,22 @@ def profile_settings(request):
 @login_required
 def homepage_settings(request):
     """首页卡片设置"""
-    from core.module.models import Module  # noqa: PLC0415
+    from core.module.services.module_service import ModuleService  # noqa: PLC0415
 
-    setting = SystemSetting.objects.filter(key="user_dashboard_card_positions").first()
+    positions_str = SettingsService.get_setting("user_dashboard_card_positions")
     positions = {}
-    if setting and setting.value:
+    if positions_str:
         try:
-            positions = json.loads(setting.value)
+            positions = json.loads(positions_str)
         except Exception as e:
             logger.warning(f"解析卡片位置配置失败: {e}", exc_info=True)
             positions = {}
-    elif not setting:
+    elif positions_str is None:
         logger.debug("配置未找到: user_dashboard_card_positions，使用默认值")
 
     default_positions = {str(i): {"module": None} for i in range(1, 7)} | positions
 
-    available_modules = []
-
-    try:
-        active_modules = Module.objects.filter(is_active=True)
-        for node_module in active_modules:
-            module_path = node_module.path
-            if module_path:
-                from core.module.services.module_service import ModuleService  # noqa: PLC0415
-
-                mod_info = ModuleService.load_module_info(module_path)
-                if mod_info and mod_info.get("frontpage_card", False) and "dashboard_cards" in mod_info:
-                    module_info = {
-                        "id": node_module.module_id,
-                        "name": mod_info.get("name", node_module.module_id),
-                        "icon": mod_info.get("icon", "bi-grid"),
-                    }
-                    available_modules.append(module_info)
-    except Exception as e:
-        logger.warning(f"加载可用模块失败: {e}", exc_info=True)
+    available_modules = ModuleService.get_frontpage_modules()
 
     return render(
         request,

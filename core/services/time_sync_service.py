@@ -161,7 +161,7 @@ class TimeSyncService(SingletonMixin):
             if synced_str and monotonic_str:
                 synced = datetime.fromisoformat(synced_str)
                 if synced.tzinfo is None:
-                    from django.utils.timezone import make_aware
+                    from django.utils.timezone import make_aware  # noqa: PLC0415
                     synced = make_aware(synced)
                 mono = float(monotonic_str)
                 elapsed = time.monotonic() - mono

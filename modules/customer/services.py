@@ -140,54 +140,60 @@ class CustomerService:
     @staticmethod
     def update(customer_id: int, _user, data: dict[str, Any]) -> CustomerFields | None:
         """更新客户"""
-        customer = CustomerFields.objects.filter(id=customer_id).first()
-        if not customer:
-            return None
+        from django.db import transaction  # noqa: PLC0415
 
-        if not customer.node_id:
-            raise ValueError("客户关联节点不存在")
-        NodeService.update_node(customer.node_id, {})
+        with transaction.atomic():
+            customer = CustomerFields.objects.filter(id=customer_id).first()
+            if not customer:
+                return None
 
-        allowed_fields = {
-            "customer_name",
-            "customer_code",
-            "customer_type_id",
-            "enterprise_name",
-            "phone1",
-            "email1",
-            "phone2",
-            "email2",
-            "linkedin",
-            "country_id",
-            "province",
-            "address",
-            "postal_code",
-            "industry",
-            "enterprise_type_id",
-            "registered_capital",
-            "customer_level_id",
-            "credit_limit",
-            "website",
-            "notes",
-        }
-        for key, value in data.items():
-            if key in allowed_fields:
-                setattr(customer, key, value)
+            if not customer.node_id:
+                raise ValueError("客户关联节点不存在")
+            NodeService.update_node(customer.node_id, {})
 
-        customer.save()
-        return customer
+            allowed_fields = {
+                "customer_name",
+                "customer_code",
+                "customer_type_id",
+                "enterprise_name",
+                "phone1",
+                "email1",
+                "phone2",
+                "email2",
+                "linkedin",
+                "country_id",
+                "province",
+                "address",
+                "postal_code",
+                "industry",
+                "enterprise_type_id",
+                "registered_capital",
+                "customer_level_id",
+                "credit_limit",
+                "website",
+                "notes",
+            }
+            for key, value in data.items():
+                if key in allowed_fields:
+                    setattr(customer, key, value)
+
+            customer.save()
+            return customer
 
     @staticmethod
     def delete(customer_id: int) -> bool:
         """删除客户"""
-        customer = CustomerFields.objects.filter(id=customer_id).first()
-        if customer:
-            node = customer.node
-            customer.delete()
-            if node:
-                node.delete()
-            return True
-        return False
+        from django.db import transaction  # noqa: PLC0415
+
+        with transaction.atomic():
+            customer = CustomerFields.objects.filter(id=customer_id).first()
+            if customer:
+                node = customer.node
+                customer.delete()
+                if node:
+                    node.delete()
+                return True
+            return False
 
     @staticmethod
     def get_exportable_fields() -> list[dict]:

@@ -10,7 +10,6 @@ class SampleDataService:
     def init_sample_customers() -> dict[str, int]:
         """初始化客户样本数据"""
         from django.db import transaction  # noqa: PLC0415
-
         from modules.customer_cn.models import CustomerCnFields  # noqa: PLC0415
         from modules.customer_cn.sample_data import DOMESTIC_CUSTOMERS  # noqa: PLC0415
 

@@ -15,9 +15,7 @@ def taxonomies(request):
     """词汇表列表"""
     search = request.GET.get("search", "").strip()
 
-    queryset = Taxonomy.objects.all()
-    if search:
-        queryset = queryset.filter(name__icontains=search)
+    queryset = TaxonomyService.get_taxonomy_list(search)
 
     page_obj, page_range = paginate_queryset(request, queryset, per_page=10)
 
@@ -45,14 +43,10 @@ def taxonomy_create(request):
         if not name or not slug:
             return redirect_with_error(request, "名称和标识不能为空", "core:taxonomies")
 
-        if Taxonomy.objects.filter(slug=slug).exists():
+        if TaxonomyService.check_slug_exists(slug):
             return redirect_with_error(request, f"标识 '{slug}' 已被使用", "core:taxonomies")
 
-        Taxonomy.objects.create(
-            name=name,
-            slug=slug,
-            description=description,
-        )
+        TaxonomyService.create_taxonomy(name, slug, description)
         return redirect_with_success(request, "词汇表创建成功", "core:taxonomies")
 
     return render(
@@ -70,7 +64,7 @@ def taxonomy_view(request, taxonomy_id: int):
     """查看词汇表"""
     taxonomy = get_object_or_404(Taxonomy, id=taxonomy_id)
 
-    queryset = taxonomy.items.all().order_by("weight", "name")
+    queryset = TaxonomyService.get_items(taxonomy_id)
     page_obj, page_range = paginate_queryset(request, queryset, per_page=10)
 
     return render(
@@ -99,7 +93,7 @@ def taxonomy_edit(request, taxonomy_id: int):
         if not taxonomy.name or not taxonomy.slug:
             return redirect_with_error(request, "名称和标识不能为空", "core:taxonomy_edit", taxonomy_id)
 
-        if Taxonomy.objects.filter(slug=taxonomy.slug).exclude(id=taxonomy_id).exists():
+        if TaxonomyService.check_slug_exists_exclude(taxonomy.slug, taxonomy_id):
             return redirect_with_error(request, f"标识 '{taxonomy.slug}' 已被使用", "core:taxonomy_edit", taxonomy_id)
 
         taxonomy.save()
