@@ -335,4 +335,6 @@
 28. 客户列表操作按钮改为圆角正方形
 29. 操作按钮图标改为粗体
 30. 默认主题 btn-primary normal 色改为 #f0f0f0
+31. 修复 WhatsApp 模块 5 个 bug：slice过滤器、batch未定义、template_ids顺序、url()路径、api分页内存
+32. 修复 whatsapp 模板 url() 命名空间为 modules:whatsapp:
 
