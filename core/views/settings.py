@@ -107,14 +107,14 @@ def system_permissions(request):
 
     for role in COMMON_ROLES:
         role_name = request.POST.get(f"role_name_{role}", "").strip()
-            if role_name:
-                SettingsService.update_setting(f"role_name_{role}", role_name)
+        if role_name:
+            SettingsService.update_setting(f"role_name_{role}", role_name)
 
-        messages.success(request, "权限已保存")
-        return redirect("core:system_permissions")
+    messages.success(request, "权限已保存")
+    return redirect("core:system_permissions")
 
     role_labels = dict(UserRole.LABELS)
-    for role in ["manager", "leader", "employee"]:
+    for role in COMMON_ROLES:
         role_label = SettingsService.get_setting(f"role_name_{role}")
         if role_label:
             role_labels[role] = role_label
