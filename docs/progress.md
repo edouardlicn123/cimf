@@ -365,4 +365,5 @@
 7. M轻 批次A: M1-M5 共享函数抽取(csv_response, _read_log_file, _module_to_dict, update_fields, build_filter_summaries)
 8. M轻 批次B: M6 health.py _run_check简化, M8 login复用authenticate, M9 _convert_setting_value try/except, M10 get_system_url去request参数
 9. M轻 批次C: M11 Module.get_active_ids, M12 TaxonomyService.get_items_bulk, M13 CronTask缓存属性
+10. M轻 批次D: M14 SETTINGS_META分组注释, M15 迁移脚本常量提取
 

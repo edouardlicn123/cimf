@@ -255,15 +255,13 @@ def upload_preview(request, node_type_slug):
 
     filename = file.name
 
-    # 验证文件大小（最大 10MB）
-    max_size = 10 * 1024 * 1024  # 10MB
-    if file.size > max_size:
-        return json_error("文件大小不能超过 10MB", 400)
+    from core.utils.response import validate_upload  # noqa: PLC0415
 
-    # 验证文件扩展名
-    allowed_extensions = [".csv", ".xlsx", ".xls"]
-    if not any(filename.lower().endswith(ext) for ext in allowed_extensions):
-        return json_error("只允许上传 CSV 或 Excel 文件", 400)
+    valid, error_msg = validate_upload(
+        file, max_size=10 * 1024 * 1024, allowed_exts=[".csv", ".xlsx", ".xls"]
+    )
+    if not valid:
+        return json_error(error_msg, 400)
 
     format = "xlsx" if filename.lower().endswith((".xlsx", ".xls")) else "csv"
 

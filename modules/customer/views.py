@@ -53,29 +53,6 @@ def _get_customer_context(node_type, customer=None, node=None):
     }
 
 
-def check_customer_permission(user, node, permission_type: str):
-    """检查客户节点操作权限"""
-    if user.is_admin:
-        return True, None
-
-    is_creator = node.created_by_id == user.id
-
-    if is_creator:
-        return True, None
-
-    perm_map = {
-        "view": "node.customer.view_others",
-        "edit": "node.customer.edit_others",
-        "delete": "node.customer.delete_others",
-    }
-
-    perm = perm_map.get(permission_type)
-    if perm and PermissionService.has_permission(user, perm):
-        return True, None
-
-    return False, f"您没有权限{permission_type}别人的客户信息"
-
-
 def _load_customer_form_data():
     """加载客户表单所需的分类数据"""
     slugs = ["customer_type", "customer_level", "economic_type", "country"]
@@ -196,7 +173,7 @@ def node_view(request, node_id: int):
     """查看海外客户"""
     node = _get_node_or_404(node_id)
 
-    has_perm, error_msg = check_customer_permission(request.user, node, "view")
+    has_perm, error_msg = PermissionService.check_node_permission(request.user, node, "view")
     if not has_perm:
         messages.error(request, error_msg)
         return redirect("node:module_page", node_type_slug="customer")
@@ -226,7 +203,7 @@ def node_edit(request, node_id: int):
     """编辑海外客户"""
     node = _get_node_or_404(node_id)
 
-    has_perm, error_msg = check_customer_permission(request.user, node, "edit")
+    has_perm, error_msg = PermissionService.check_node_permission(request.user, node, "edit")
     if not has_perm:
         messages.error(request, error_msg)
         return redirect("node:node_view", node_type_slug="customer", node_id=node_id)
@@ -250,7 +227,7 @@ def node_delete(request, node_id: int):
     """删除海外客户"""
     node = NodeService.get_by_id(node_id)
     if node:
-        has_perm, error_msg = check_customer_permission(request.user, node, "delete")
+        has_perm, error_msg = PermissionService.check_node_permission(request.user, node, "delete")
         if not has_perm:
             messages.error(request, error_msg)
         else:
