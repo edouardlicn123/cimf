@@ -83,7 +83,4 @@ class BaseService:
             raise NotImplementedError("子类必须定义 model_class")
         return cls.model_class.objects.filter(**filters).first()
 
-    @classmethod
-    def get_or_none(cls, **filters) -> Any:
-        """根据条件获取第一个对象，不存在返回 None"""
-        return cls.get_first(**filters)
+

@@ -10,10 +10,6 @@ from core.utils.pagination import paginate_queryset
 from core.utils.views import redirect_with_error, redirect_with_success
 
 
-def _get_taxonomy_or_error(taxonomy_id):
-    return get_object_or_404(Taxonomy, id=taxonomy_id)
-
-
 def _handle_taxonomy_form(request, taxonomy=None):
     name = request.POST.get("name", "").strip()
     slug = request.POST.get("slug", "").strip()
@@ -91,7 +87,7 @@ def taxonomy_create(request):
 @admin_required
 def taxonomy_view(request, taxonomy_id: int):
     """查看词汇表"""
-    taxonomy = _get_taxonomy_or_error(taxonomy_id)
+    taxonomy = get_object_or_404(Taxonomy, id=taxonomy_id)
     queryset = TaxonomyService.get_items(taxonomy_id)
     page_obj, page_range = paginate_queryset(request, queryset, per_page=10)
     return render(
@@ -110,7 +106,7 @@ def taxonomy_view(request, taxonomy_id: int):
 @admin_required
 def taxonomy_edit(request, taxonomy_id: int):
     """编辑词汇表"""
-    taxonomy = _get_taxonomy_or_error(taxonomy_id)
+    taxonomy = get_object_or_404(Taxonomy, id=taxonomy_id)
     if request.method == "POST":
         return _handle_taxonomy_form(request, taxonomy)
     return render(
@@ -124,7 +120,7 @@ def taxonomy_edit(request, taxonomy_id: int):
 @require_POST
 def taxonomy_delete(request, taxonomy_id: int):
     """删除词汇表"""
-    taxonomy = _get_taxonomy_or_error(taxonomy_id)
+    taxonomy = get_object_or_404(Taxonomy, id=taxonomy_id)
     taxonomy.delete()
     return redirect_with_success(request, "词汇表已删除", "core:taxonomies")
 
@@ -132,7 +128,7 @@ def taxonomy_delete(request, taxonomy_id: int):
 @admin_required
 def taxonomy_item_create(request, taxonomy_id: int):
     """创建词汇项"""
-    _get_taxonomy_or_error(taxonomy_id)
+    get_object_or_404(Taxonomy, id=taxonomy_id)
     if request.method == "POST":
         return _handle_taxonomy_item_form(request, taxonomy_id)
     return redirect("core:taxonomy_view", taxonomy_id)
@@ -141,7 +137,7 @@ def taxonomy_item_create(request, taxonomy_id: int):
 @admin_required
 def taxonomy_item_update(request, taxonomy_id: int, item_id: int):
     """更新词汇项"""
-    _get_taxonomy_or_error(taxonomy_id)
+    get_object_or_404(Taxonomy, id=taxonomy_id)
     if request.method == "POST":
         return _handle_taxonomy_item_form(request, taxonomy_id, item_id)
     return redirect("core:taxonomy_view", taxonomy_id)

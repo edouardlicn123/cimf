@@ -15,7 +15,7 @@
 版本历史：
     - 1.000: 初始版本（仅版本号）
     - 2.000: 2026-05-02 - 集中化常量定义
-    - 2.050: 2026-07-09
+    - 2.053: 2026-07-09
 """
 
 # ============================================================
@@ -23,7 +23,7 @@
 # ============================================================
 
 VERSION_MAJOR = "2"
-VERSION_MINOR = 50
+VERSION_MINOR = 53
 
 
 def get_version_display():
@@ -206,3 +206,33 @@ DEFAULT_NAV_CARDS = [
         "position": 6,
     },
 ]
+
+# ============================================================
+# 活动区块 URL 映射
+# ============================================================
+URL_SECTION_MAPPING = {
+    "system_settings": "settings",
+    "system_users": "users",
+    "system_permissions": "permissions",
+    "cron_manager": "cron",
+    "permission_check": "permission_check",
+    "smtp_config": "smtp",
+    "logs_index": "logs",
+    "logs_view": "logs",
+    "structure_dashboard": "dashboard",
+    "node_types_list": "node_types",
+    "taxonomies": "taxonomies",
+    "taxonomy_create": "taxonomies",
+    "taxonomy_view": "taxonomies",
+    "taxonomy_edit": "taxonomies",
+    "tools_index": "dashboard",
+    "importexport_dashboard": "dashboard",
+    "export_list": "export",
+    "import_list": "import",
+    "module_list": "modules_manage",
+    "market_index": "market",
+    "profile_view": "profile",
+    "profile_settings": "preferences",
+    "homepage_settings": "homepage",
+    "navigation_settings": "nav_cards",
+}

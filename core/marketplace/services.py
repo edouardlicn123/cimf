@@ -2,7 +2,6 @@
 模块市场服务
 """
 
-import datetime
 import json
 import os
 import shutil
@@ -13,6 +12,7 @@ from typing import Any
 from urllib.parse import urlparse
 
 import requests
+from django.utils.timezone import now
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 MARKETPLACE_CONFIG = BASE_DIR / "marketplace" / "marketplace.json"
@@ -153,7 +153,7 @@ class MarketService:
         if not module_dir.exists():
             return None
 
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = now().strftime("%Y%m%d_%H%M%S")
         backup_path = BACKUP_DIR / f"{safe_id}_{timestamp}"
         BACKUP_DIR.mkdir(parents=True, exist_ok=True)
         shutil.copytree(str(module_dir), str(backup_path))
@@ -186,7 +186,7 @@ class MarketService:
         return None
 
     @classmethod
-    def _check_conflict(cls, module_id: str) -> dict[str, Any]:
+    def check_conflict(cls, module_id: str) -> dict[str, Any]:
         """检查模块是否已存在且是否可覆盖"""
         safe_id = Path(module_id).name
         module_dir = MODULES_DIR / safe_id
@@ -233,7 +233,7 @@ class MarketService:
         module_dir = MODULES_DIR / safe_id
 
         # 检查模块冲突
-        conflict = cls._check_conflict(module_id)
+        conflict = cls.check_conflict(module_id)
         if conflict.get("blocked"):
             return {
                 "success": False,

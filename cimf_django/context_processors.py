@@ -15,6 +15,7 @@ import time
 
 from django.middleware.csrf import get_token
 
+from core.constants import URL_SECTION_MAPPING
 from core.services import PermissionService, SettingsService
 
 
@@ -58,33 +59,7 @@ def csrf_token(request):
 def active_section(request):
     """从URL名称自动推断 active_section"""
     url_name = request.resolver_match.url_name if request.resolver_match else None
-    mapping = {
-        "system_settings": "settings",
-        "system_users": "users",
-        "system_permissions": "permissions",
-        "cron_manager": "cron",
-        "permission_check": "permission_check",
-        "smtp_config": "smtp",
-        "logs_index": "logs",
-        "logs_view": "logs",
-        "structure_dashboard": "dashboard",
-        "node_types_list": "node_types",
-        "taxonomies": "taxonomies",
-        "taxonomy_create": "taxonomies",
-        "taxonomy_view": "taxonomies",
-        "taxonomy_edit": "taxonomies",
-        "tools_index": "dashboard",
-        "importexport_dashboard": "dashboard",
-        "export_list": "export",
-        "import_list": "import",
-        "module_list": "modules_manage",
-        "market_index": "market",
-        "profile_view": "profile",
-        "profile_settings": "preferences",
-        "homepage_settings": "homepage",
-        "navigation_settings": "nav_cards",
-    }
-    section = mapping.get(url_name)
+    section = URL_SECTION_MAPPING.get(url_name)
     if section:
         return {"active_section": section}
     return {}

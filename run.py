@@ -24,6 +24,7 @@
 
 import os
 import socket
+import subprocess
 import sys
 import threading
 from datetime import datetime
@@ -56,7 +57,10 @@ def check_database():
         print(f"\n未检测到数据库文件: {db_path}")
         print("将创建新数据库...")
         print("执行 python manage.py migrate ...")
-        os.system("python manage.py migrate")
+        result = subprocess.run(["python", "manage.py", "migrate"], capture_output=True, text=True, check=False)
+        if result.returncode != 0:
+            print(f"迁移失败: {result.stderr}")
+            sys.exit(1)
         print("数据库初始化完成!")
     else:
         print(f"\n数据库路径: {db_path}")

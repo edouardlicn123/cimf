@@ -30,7 +30,7 @@ def api_time_test(request):  # noqa: ARG001
 
     time_sync = get_time_sync_service()
     server_url = time_sync.get_server_url()
-    server_time = time_sync._fetch_time_from_server(server_url)
+    server_time = time_sync.test_connection(server_url)
 
     return json_success(
         extra={

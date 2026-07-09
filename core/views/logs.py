@@ -52,7 +52,7 @@ def logs_view(request, log_type):
     )
 
 
-# TODO: logs_api 已定义但未注册路由，预留用于前端 AJAX 日志加载功能
+# TODO: logs_api 未注册路由，需在 core/urls.py 中添加 URL 映射。预留用于前端 AJAX 日志加载。
 @admin_required_json
 def logs_api(request, log_type):
     """日志 API - JSON 接口（未注册路由，预留功能）"""

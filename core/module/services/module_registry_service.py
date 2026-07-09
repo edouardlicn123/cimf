@@ -207,14 +207,14 @@ class ModuleRegistryService:
         existing = Module.objects.filter(module_id=module_id).first()
 
         if existing:
-            logger.info(f"更新现有模块: {module_id}")
-            existing.module_type = module_info.get("type", "node")
-            existing.name = module_info.get("name", existing.name)
-            existing.version = module_info.get("version", existing.version)
-            existing.description = module_info.get("description", existing.description)
-            existing.icon = module_info.get("icon", existing.icon)
-            existing.install_on_init = module_info.get("install_on_init", True)
-            existing.save()
+            new_version = module_info.get("version")
+            if new_version and new_version != existing.version:
+                logger.info("更新模块版本 %s: %s -> %s", module_id, existing.version, new_version)
+                existing.name = module_info.get("name", existing.name)
+                existing.version = new_version
+                existing.description = module_info.get("description", existing.description)
+                existing.icon = module_info.get("icon", existing.icon)
+                existing.save()
             return existing
 
         module = Module.objects.create(
@@ -245,8 +245,9 @@ class ModuleRegistryService:
                     return True
 
                 return all(model._meta.db_table in table_set for model in models)
-            except Exception:
-                pass
+            except Exception as e:
+                logger.warning("检查模块 %s 表结构时出错: %s", module_id, e)
+                return False
 
         module_prefix = f"{module_id}_"
         return any(table.startswith(module_prefix) for table in table_set)
@@ -451,9 +452,9 @@ except Exception as e:
                 init_func()
                 return True
         except (ImportError, ModuleNotFoundError):
-            pass
+            logger.debug("模块 %s 无 services 模块或服务未实现，跳过样本数据", module_id)
         except Exception as e:
-            logger.warning(f"初始化模块 {module_id} 样本数据失败: {e}")
+            logger.warning("初始化模块 %s 样本数据失败: %s", module_id, e)
         return False
 
     @staticmethod
@@ -471,8 +472,6 @@ except Exception as e:
 
     @staticmethod
     def get_frontpage_modules() -> list[dict]:
-        from core.module.models import Module  # noqa: PLC0415
-
         result = []
         try:
             active_modules = Module.objects.filter(is_active=True)

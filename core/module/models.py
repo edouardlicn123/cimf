@@ -6,7 +6,7 @@ from django.conf import settings
 from django.db import models
 
 from core.constants import ModuleType
-from core.models import BaseModel
+from core.models import BaseModel, IsActiveMixin
 
 
 class Module(BaseModel):
@@ -49,7 +49,7 @@ class Module(BaseModel):
         return f"{self.name} ({self.module_id})"
 
 
-class ToolType(BaseModel):
+class ToolType(BaseModel, IsActiveMixin):
     """工具类型模型"""
 
     name = models.CharField(max_length=100, verbose_name="工具名称")
@@ -57,7 +57,6 @@ class ToolType(BaseModel):
     description = models.CharField(max_length=500, blank=True, verbose_name="描述")
     icon = models.CharField(max_length=50, default="bi-wrench", verbose_name="图标")
     author = models.CharField(max_length=100, blank=True, verbose_name="作者")
-    is_active = models.BooleanField(default=True, verbose_name="是否启用")
 
     class Meta:
         db_table = "tool_types"

@@ -50,7 +50,7 @@
     - 默认数据库为 SQLite，不支持并发写入
 """
 
-from core.init_scripts.common import colored, print_section, print_step
+from core.init_scripts.common import _has_pending_migrations, colored, print_section, print_step
 
 
 def run_stage1(skip_migrate: bool, incremental: bool, db_exists: bool, dry_run: bool) -> bool:
@@ -102,21 +102,3 @@ def run_stage1(skip_migrate: bool, incremental: bool, db_exists: bool, dry_run: 
 
     return True
 
-
-def _has_pending_migrations() -> bool:
-    """检查是否有待执行的迁移（带缓存优化）"""
-    if hasattr(_has_pending_migrations, "_cached_result"):
-        return _has_pending_migrations._cached_result
-
-    from io import StringIO  # noqa: PLC0415
-
-    from django.core.management import call_command  # noqa: PLC0415
-
-    out = StringIO()
-    call_command("showmigrations", "--plan", stdout=out)
-    lines = out.getvalue().strip().split("\n")
-    result = any(line.startswith("[ ]") for line in lines)
-
-    # 缓存结果（本次执行期间有效）
-    _has_pending_migrations._cached_result = result
-    return result

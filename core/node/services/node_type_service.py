@@ -10,10 +10,6 @@ logger = logging.getLogger(__name__)
 
 class NodeTypeService:
     @staticmethod
-    def _get_node_type_or_none(node_type_id: int) -> NodeType | None:
-        return NodeType.objects.filter(id=node_type_id).first()
-
-    @staticmethod
     def get_all() -> list[NodeType]:
         return NodeType.objects.filter(is_active=True)
 
@@ -63,7 +59,7 @@ class NodeTypeService:
 
     @staticmethod
     def update(node_type_id: int, data: dict[str, Any]) -> NodeType | None:
-        node_type = NodeTypeService._get_node_type_or_none(node_type_id)
+        node_type = NodeTypeService.get_by_id(node_type_id)
         if node_type:
             for key, value in data.items():
                 if hasattr(node_type, key):
@@ -73,7 +69,7 @@ class NodeTypeService:
 
     @staticmethod
     def delete(node_type_id: int) -> bool:
-        node_type = NodeTypeService._get_node_type_or_none(node_type_id)
+        node_type = NodeTypeService.get_by_id(node_type_id)
         if node_type:
             node_type.is_active = False
             node_type.save()
@@ -82,7 +78,7 @@ class NodeTypeService:
 
     @staticmethod
     def enable(node_type_id: int) -> bool:
-        node_type = NodeTypeService._get_node_type_or_none(node_type_id)
+        node_type = NodeTypeService.get_by_id(node_type_id)
         if node_type:
             node_type.is_active = True
             node_type.save()
@@ -91,7 +87,7 @@ class NodeTypeService:
 
     @staticmethod
     def disable(node_type_id: int) -> bool:
-        node_type = NodeTypeService._get_node_type_or_none(node_type_id)
+        node_type = NodeTypeService.get_by_id(node_type_id)
         if node_type:
             node_type.is_active = False
             node_type.save()
@@ -100,7 +96,7 @@ class NodeTypeService:
 
     @staticmethod
     def toggle_active(node_type_id: int) -> bool:
-        node_type = NodeTypeService._get_node_type_or_none(node_type_id)
+        node_type = NodeTypeService.get_by_id(node_type_id)
         if node_type:
             node_type.is_active = not node_type.is_active
             node_type.save()

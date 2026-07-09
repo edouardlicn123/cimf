@@ -17,6 +17,7 @@ from core.decorators import admin_post_view, admin_required
 from core.fields import get_all_field_types_info
 from core.module.models import Module
 from core.node.models import Node, NodeType
+from core.models import Taxonomy
 from core.node.services import NodeService, NodeTypeService
 from core.utils.pagination import paginate_queryset
 from core.utils.response import json_error, json_success
@@ -40,12 +41,6 @@ def nodes_index(request):
             "active_section": "dashboard",
         },
     )
-
-
-@login_required
-def node_types(request):  # noqa: ARG001
-    """节点类型列表（重定向到 node_types_list）"""
-    return redirect("core:node_types_list")
 
 
 @admin_required
@@ -188,8 +183,6 @@ def field_types_api(request):  # noqa: ARG001
 @login_required
 def taxonomy_items_api(request):
     """获取词汇表项 API"""
-    from core.models import Taxonomy  # noqa: PLC0415
-
     taxonomy_slug = request.GET.get("taxonomy")
     if not taxonomy_slug:
         return json_error("缺少 taxonomy 参数", 400)

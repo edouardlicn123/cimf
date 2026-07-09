@@ -105,7 +105,7 @@ def run_stage3(force: bool = False, dry_run: bool = False) -> bool:
     # 生产环境安全限制
     if env == "production" and not os.environ.get("DJANGO_ALLOW_SEED_PROD"):
         print(colored("【生产环境安全限制】禁止自动插入初始数据！", "red"))
-        print(colored("如需强制执行，请设置环境变量 DJANGO_DJANGO_ALLOW_SEED_PROD=1 （极度不推荐）"))
+        print(colored("如需强制执行，请设置环境变量 DJANGO_ALLOW_SEED_PROD=1 （极度不推荐）"))
         return False
 
     if env == "production" and len(admin_password) < 10:

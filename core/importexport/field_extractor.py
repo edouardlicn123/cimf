@@ -31,6 +31,7 @@ class FieldDefExtractor:
         "ForeignKey": "fk",
     }
 
+    # FK 字段名 → Taxonomy slug 映射，用于导出时自动关联分类数据
     FK_TAXONOMY_MAP = {
         "customer_type": "customer_type",
         "customer_level": "customer_level",

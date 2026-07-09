@@ -56,7 +56,6 @@ def _get_node_type_or_redirect(node_type_slug, redirect_name="importexport:expor
     return node_type, None
 
 
-@login_required
 @permission_required("importexport.view")
 def export_list(request):
     """导出页 - 显示所有模块的导出入口"""
@@ -71,7 +70,6 @@ def export_list(request):
     )
 
 
-@login_required
 @permission_required("importexport.view")
 def export_select_fields(request, node_type_slug):
     """字段选择页"""
@@ -139,7 +137,6 @@ def export_select_fields(request, node_type_slug):
     )
 
 
-@login_required
 @permission_required("importexport.view")
 def export_confirm(request, node_type_slug):
     """确认页"""
@@ -179,7 +176,6 @@ def export_confirm(request, node_type_slug):
     )
 
 
-@login_required
 @permission_required("importexport.view")
 def export_exporting(request, node_type_slug):
     """导出中页"""
@@ -229,7 +225,6 @@ def do_export(request, node_type_slug):
         return redirect("importexport:export_select_fields", node_type_slug)
 
 
-@login_required
 @permission_required("importexport.view")
 def import_list(request):
     """导入页 - 显示所有模块的导入入口"""
@@ -244,7 +239,6 @@ def import_list(request):
     )
 
 
-@login_required
 @permission_required("importexport.view")
 def import_page(request, node_type_slug):
     """导入操作页"""
@@ -265,7 +259,6 @@ def import_page(request, node_type_slug):
     )
 
 
-@login_required
 @permission_required("importexport.view")
 def download_template(request, node_type_slug):  # noqa: ARG001
     """下载导入模板"""
@@ -410,7 +403,6 @@ def do_import(request, node_type_slug):
     )
 
 
-@login_required
 @permission_required("importexport.view")
 def download_errors(request, node_type_slug):
     """下载错误列表"""

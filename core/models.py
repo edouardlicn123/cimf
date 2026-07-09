@@ -40,6 +40,15 @@ class BaseModel(models.Model):
         abstract = True
 
 
+class IsActiveMixin(models.Model):
+    """提供 is_active 字段的抽象混入类"""
+
+    is_active = models.BooleanField(default=True, verbose_name="是否启用")
+
+    class Meta:
+        abstract = True
+
+
 class UserManager(BaseUserManager):
     """
     自定义用户管理器
@@ -150,6 +159,7 @@ class User(AbstractUser):
         db_table = "users"
         verbose_name = "用户"
         verbose_name_plural = "用户"
+        ordering = ["username"]
 
     def __str__(self):
         display_name = self.nickname or self.username
@@ -211,6 +221,7 @@ class SystemSetting(models.Model):
         db_table = "system_settings"
         verbose_name = "系统设置"
         verbose_name_plural = "系统设置"
+        ordering = ["key"]
 
     def __str__(self):
         return f"{self.key}: {self.value}"
@@ -285,7 +296,7 @@ class ChinaRegion(models.Model):
     level = models.IntegerField(choices=LEVEL_CHOICES, db_index=True, verbose_name="层级")
 
     parent = models.ForeignKey(
-        "self", on_delete=models.CASCADE, null=True, blank=True, related_name="children", verbose_name="父级行政区划"
+        "self", on_delete=models.PROTECT, null=True, blank=True, related_name="children", verbose_name="父级行政区划"
     )
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")

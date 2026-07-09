@@ -8,4 +8,9 @@ class ModuleService(
     ModuleRegistryService,
     ModuleTaxonomyService,
 ):
-    pass
+    """聚合 3 个子服务，通过多继承暴露统一接口。
+
+    ModuleDependencyService — 模块依赖解析
+    ModuleRegistryService  — 模块扫描、注册、安装、生命周期
+    ModuleTaxonomyService  — 模块分类同步
+    """

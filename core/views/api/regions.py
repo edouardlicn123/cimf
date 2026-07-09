@@ -7,7 +7,7 @@ from core.services import ChinaRegionService
 from core.utils.response import json_error, json_success
 
 
-def _require_param(params, param_name, error_message=None):  # noqa: ARG001
+def _require_param(params, param_name):
     value = params.get(param_name)
     if not value:
         return None
