@@ -1,4 +1,27 @@
-from django.http import JsonResponse
+import csv
+
+from django.http import HttpResponse, JsonResponse
+
+
+def csv_response(headers: list[str], rows: list[list], filename: str, sanitize: bool = True) -> HttpResponse:
+    response = HttpResponse(content_type="text/csv; charset=utf-8-sig")
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+
+    writer = csv.writer(response)
+    writer.writerow(headers)
+
+    for row in rows:
+        out_row = [_sanitize_csv_cell(cell) for cell in row] if sanitize else row
+        writer.writerow(out_row)
+
+    return response
+
+
+def _sanitize_csv_cell(value) -> str:
+    s = str(value)
+    if s and s[0] in ("=", "+", "-", "@"):
+        return "\t" + s
+    return s
 
 
 def json_success(data=None, message=None, status=200, extra=None):

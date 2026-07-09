@@ -16,6 +16,39 @@ from core.utils.response import json_error, json_success
 logger = logging.getLogger(__name__)
 
 
+def _module_to_dict(m, status, is_registered, error_msg=None):
+    """将模块对象或字典转换为模板所需的 dict 格式"""
+    if hasattr(m, "module_id"):
+        return {
+            "id": m.module_id,
+            "name": m.name,
+            "module_type": m.module_type,
+            "version": m.version,
+            "author": m.author,
+            "description": m.description,
+            "icon": getattr(m, "icon", "bi-wrench"),
+            "_status": status,
+            "is_registered": is_registered,
+            "dependencies": getattr(m, "dependencies", []),
+            "path": getattr(m, "path", None),
+            "error": error_msg,
+        }
+    return {
+        "id": m.get("id", ""),
+        "name": m.get("name", ""),
+        "module_type": m.get("type", ""),
+        "version": m.get("version", "1.0.0"),
+        "author": m.get("author", ""),
+        "description": m.get("description", ""),
+        "icon": m.get("icon", "bi-box-seam"),
+        "_status": status,
+        "is_registered": is_registered,
+        "dependencies": m.get("require", []),
+        "path": m.get("path", None),
+        "error": error_msg,
+    }
+
+
 @admin_required
 def modules_manage(request):
     """模块管理页面 - 卡片式 + 搜索/筛选/分页"""
@@ -34,37 +67,6 @@ def modules_manage(request):
         else:
             module.dependencies = []
 
-    def module_to_dict(m, status, is_registered, error_msg=None):
-        if hasattr(m, "module_id"):
-            return {
-                "id": m.module_id,
-                "name": m.name,
-                "module_type": m.module_type,
-                "version": m.version,
-                "author": m.author,
-                "description": m.description,
-                "icon": getattr(m, "icon", "bi-wrench"),
-                "_status": status,
-                "is_registered": is_registered,
-                "dependencies": getattr(m, "dependencies", []),
-                "path": getattr(m, "path", None),
-                "error": error_msg,
-            }
-        return {
-            "id": m.get("id", ""),
-            "name": m.get("name", ""),
-            "module_type": m.get("type", ""),
-            "version": m.get("version", "1.0.0"),
-            "author": m.get("author", ""),
-            "description": m.get("description", ""),
-            "icon": m.get("icon", "bi-box-seam"),
-            "_status": status,
-            "is_registered": is_registered,
-            "dependencies": m.get("require", []),
-            "path": m.get("path", None),
-            "error": error_msg,
-        }
-
     modules_list = []
 
     for m in registered:
@@ -82,9 +84,9 @@ def modules_manage(request):
                 status = "error"
                 error_msg = f"模块目录不存在: {m.path}"
 
-        modules_list.append(module_to_dict(m, status, True, error_msg))
+        modules_list.append(_module_to_dict(m, status, True, error_msg))
 
-    modules_list.extend(module_to_dict(m, "uninstalled", False) for m in all_modules if m["id"] not in registered_ids)
+    modules_list.extend(_module_to_dict(m, "uninstalled", False) for m in all_modules if m["id"] not in registered_ids)
 
     if search:
         modules_list = [

@@ -433,17 +433,16 @@ class ImportService:
     @classmethod
     def generate_error_csv(cls, errors: list[dict], _fields: list[dict]) -> HttpResponse:
         """生成错误列表 CSV"""
+        from core.utils.response import csv_response  # noqa: PLC0415
 
-        response = HttpResponse(content_type="text/csv; charset=utf-8-sig")
-        response["Content-Disposition"] = 'attachment; filename="import_errors.csv"'
+        headers = ["行号", "错误原因", "数据"]
+        data_rows = [
+            [
+                e.get("row", ""),
+                "; ".join(e.get("errors", [])),
+                str(e.get("data", "")),
+            ]
+            for e in errors
+        ]
 
-        writer = csv.writer(response)
-        writer.writerow(["行号", "错误原因", "数据"])
-
-        for error in errors:
-            row_num = error.get("row", "")
-            error_msgs = "; ".join(error.get("errors", []))
-            data = str(error.get("data", ""))
-            writer.writerow([row_num, error_msgs, data])
-
-        return response
+        return csv_response(headers, data_rows, "import_errors.csv", sanitize=False)

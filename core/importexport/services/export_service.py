@@ -6,7 +6,6 @@ ExportService - 导出服务
 """
 
 import contextlib
-import csv
 import json
 from importlib import import_module
 from typing import Any
@@ -155,26 +154,12 @@ class ExportService:
     @classmethod
     def _export_csv(cls, rows: list[dict], fields: list[dict], filename: str) -> HttpResponse:
         """导出为 CSV"""
+        from core.utils.response import csv_response  # noqa: PLC0415
 
-        response = HttpResponse(content_type="text/csv; charset=utf-8")
-        response["Content-Disposition"] = f'attachment; filename="{filename}"'
-        response.write("\ufeff")
+        headers = [f["label"] for f in fields]
+        data_rows = [[row.get(f["name"], "") for f in fields] for row in rows]
 
-        writer = csv.writer(response)
-        writer.writerow([f["label"] for f in fields])
-
-        for row in rows:
-            writer.writerow([ExportService._sanitize_csv_cell(row.get(f["name"], "")) for f in fields])
-
-        return response
-
-    @staticmethod
-    def _sanitize_csv_cell(value: Any) -> str:
-        """防止 CSV 注入：转义以 = + - @ 开头的单元格"""
-        s = str(value)
-        if s and s[0] in ("=", "+", "-", "@"):
-            return "\t" + s
-        return s
+        return csv_response(headers, data_rows, filename)
 
     @classmethod
     def _export_xlsx(cls, rows: list[dict], fields: list[dict], filename: str) -> HttpResponse:
@@ -305,7 +290,37 @@ class ExportService:
         if not filters:
             return queryset
 
-        return cls._apply_filters(queryset, filters, node_type_slug, model_class)
+    @classmethod
+    def build_filter_summaries(cls, node_type_slug: str, filters: list) -> list:
+        """构建过滤器摘要，用于导出预览页面的筛选条件展示"""
+        if not filters:
+            return []
+
+        all_fields = cls.get_exportable_fields(node_type_slug)
+        field_map = {f["name"]: f["label"] for f in all_fields}
+
+        summaries = []
+        for f in filters:
+            field = f.get("field", "")
+            value = f.get("value", "")
+
+            if field == "region":
+                try:
+                    region_data = json.loads(value) if isinstance(value, str) else value
+                except (json.JSONDecodeError, TypeError):
+                    region_data = {}
+                parts = [
+                    v
+                    for v in [region_data.get("province", ""), region_data.get("city", ""), region_data.get("district", "")]
+                    if v
+                ]
+                if parts:
+                    summaries.append({"label": "省市区", "value": " ".join(parts)})
+            else:
+                label = field_map.get(field, field)
+                summaries.append({"label": label, "value": value})
+
+        return summaries
 
     @classmethod
     def _apply_filters(

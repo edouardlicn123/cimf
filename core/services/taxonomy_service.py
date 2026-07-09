@@ -39,7 +39,6 @@ from django.db import models, transaction
 
 from core.models import Taxonomy, TaxonomyItem
 from core.services.base_service import BaseService
-from core.services.mixins import update_fields
 
 
 class TaxonomyService(BaseService):
@@ -98,7 +97,7 @@ class TaxonomyService(BaseService):
         """更新词汇表"""
         taxonomy = cls.get_by_id(taxonomy_id)
         if taxonomy:
-            update_fields(taxonomy, name=name, slug=slug, description=description)
+            BaseService.update_fields(taxonomy, name=name, slug=slug, description=description)
         return taxonomy
 
     @classmethod
@@ -138,7 +137,7 @@ class TaxonomyService(BaseService):
         """更新词汇项"""
         item = cls.get_item_by_id(item_id)
         if item:
-            update_fields(item, name=name, description=description, weight=weight)
+            BaseService.update_fields(item, name=name, description=description, weight=weight)
         return item
 
     @classmethod

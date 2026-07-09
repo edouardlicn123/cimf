@@ -122,22 +122,9 @@ class LogService:
     @classmethod
     def read_log(cls, log_type: str, page: int = 1, page_size: int = 100, level: str | None = None) -> dict:
         """读取日志，支持分页和级别筛选"""
-        filename = cls.LOG_FILES.get(log_type)
-        if not filename:
-            return error_response("无效的日志类型", lines=[], total=0, page=page, page_size=page_size)
-
-        filepath = cls.LOG_DIR / filename
-        if not filepath.exists():
-            return error_response("日志文件不存在", lines=[], total=0, page=page, page_size=page_size)
-
-        all_lines = safe_execute(
-            lambda: filepath.open(encoding="utf-8", errors="replace").readlines(),
-            error_return=None,
-            log_msg="读取日志文件失败",
-            logger=logger,
-        )
+        all_lines = cls._read_log_file(log_type)
         if all_lines is None:
-            return error_response("无法读取文件", lines=[], total=0, page=page, page_size=page_size)
+            return error_response("无法读取日志", lines=[], total=0, page=page, page_size=page_size)
 
         if level and level != "all":
             all_lines = [line for line in all_lines if level.upper() in line.upper()]
@@ -162,15 +149,15 @@ class LogService:
         }
 
     @classmethod
-    def get_log_stats(cls, log_type: str) -> dict:
-        """获取日志统计（总行数、各级别数量）"""
+    def _read_log_file(cls, log_type: str) -> list[str] | None:
+        """读取日志文件的原始行列表；文件不存在或读取失败时返回 None"""
         filename = cls.LOG_FILES.get(log_type)
         if not filename:
-            return {"total": 0, "levels": {}}
+            return None
 
         filepath = cls.LOG_DIR / filename
         if not filepath.exists():
-            return {"total": 0, "levels": {}}
+            return None
 
         lines = safe_execute(
             lambda: filepath.open(encoding="utf-8", errors="replace").readlines(),
@@ -178,6 +165,12 @@ class LogService:
             log_msg="读取日志文件失败",
             logger=logger,
         )
+        return lines
+
+    @classmethod
+    def get_log_stats(cls, log_type: str) -> dict:
+        """获取日志统计（总行数、各级别数量）"""
+        lines = cls._read_log_file(log_type)
         if lines is None:
             return {"total": 0, "levels": {}}
 

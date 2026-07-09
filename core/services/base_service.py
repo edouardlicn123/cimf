@@ -83,4 +83,16 @@ class BaseService:
             raise NotImplementedError("子类必须定义 model_class")
         return cls.model_class.objects.filter(**filters).first()
 
+    @staticmethod
+    def update_fields(instance, **fields):
+        """更新实例的指定字段，仅在值发生变化时保存"""
+        changed = False
+        for key, value in fields.items():
+            if getattr(instance, key) != value:
+                setattr(instance, key, value)
+                changed = True
+        if changed:
+            instance.save()
+        return instance
+
 
