@@ -24,6 +24,41 @@ class ModuleRegistryService:
     MODULES_DIR = "modules"
     _module_info_cache: dict[str, dict[str, Any]] = {}
 
+    MIGRATION_SCRIPT_TEMPLATE = """import os
+import sys
+sys.path.insert(0, {base_dir!r})
+
+os.environ['DJANGO_SETTINGS_MODULE'] = 'cimf_django.settings'
+
+import django
+django.setup()
+
+from django.core.management import call_command
+try:
+    call_command('migrate', {module_id!r}, verbosity=1, interactive=False)
+except Exception as e:
+    print(f'ERROR: {{e}}', file=sys.stderr)
+    sys.exit(1)
+"""
+
+    MAKEMIGRATIONS_SCRIPT_TEMPLATE = """import os
+import sys
+sys.path.insert(0, {base_dir!r})
+
+os.environ['DJANGO_SETTINGS_MODULE'] = 'cimf_django.settings'
+
+import django
+django.setup()
+
+from django.core.management import call_command
+try:
+    call_command('makemigrations', {module_id!r}, verbosity=1, interactive=False)
+    call_command('migrate', {module_id!r}, verbosity=1, interactive=False)
+except Exception as e:
+    print(f'ERROR: {{e}}', file=sys.stderr)
+    sys.exit(1)
+"""
+
     @staticmethod
     def scan_modules() -> list[dict[str, Any]]:
         modules = []
@@ -276,42 +311,13 @@ class ModuleRegistryService:
             )
 
         if has_migrations:
-            script_content = f"""
-import os
-import sys
-sys.path.insert(0, {base_dir!r})
-
-os.environ['DJANGO_SETTINGS_MODULE'] = 'cimf_django.settings'
-
-import django
-django.setup()
-
-from django.core.management import call_command
-try:
-    call_command('migrate', {module_id!r}, verbosity=1, interactive=False)
-except Exception as e:
-    print(f'ERROR: {{e}}', file=sys.stderr)
-    sys.exit(1)
-"""
+            script_content = ModuleRegistryService.MIGRATION_SCRIPT_TEMPLATE.format(
+                base_dir=repr(base_dir), module_id=repr(module_id)
+            )
         else:
-            script_content = f"""
-import os
-import sys
-sys.path.insert(0, {base_dir!r})
-
-os.environ['DJANGO_SETTINGS_MODULE'] = 'cimf_django.settings'
-
-import django
-django.setup()
-
-from django.core.management import call_command
-try:
-    call_command('makemigrations', {module_id!r}, verbosity=1, interactive=False)
-    call_command('migrate', {module_id!r}, verbosity=1, interactive=False)
-except Exception as e:
-    print(f'ERROR: {{e}}', file=sys.stderr)
-    sys.exit(1)
-"""
+            script_content = ModuleRegistryService.MAKEMIGRATIONS_SCRIPT_TEMPLATE.format(
+                base_dir=repr(base_dir), module_id=repr(module_id)
+            )
 
         with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False, encoding="utf-8") as f:
             f.write(script_content)
