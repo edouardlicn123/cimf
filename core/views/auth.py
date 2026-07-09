@@ -28,7 +28,7 @@ def login_view(request):
         username = request.POST.get("username", "").strip()
         password = request.POST.get("password", "")
 
-        result = AuthService.login(request, username, password)
+        result = AuthService.login(username, password)
 
         if result["success"]:
             user = result["user"]

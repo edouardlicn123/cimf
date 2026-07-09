@@ -117,11 +117,6 @@ class TaxonomyService(BaseService):
         return TaxonomyItem.objects.filter(id=item_id).first()
 
     @staticmethod
-    def get_item(item_id: int):
-        """获取词汇项详情"""
-        return TaxonomyService.get_item_by_id(item_id)
-
-    @staticmethod
     def create_item(taxonomy_id: int, name: str, description: str = "", weight: int | None = None) -> models.Model:
         """创建词汇项"""
         with transaction.atomic():

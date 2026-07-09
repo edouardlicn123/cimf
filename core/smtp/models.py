@@ -4,8 +4,10 @@ SMTP 邮件模块模型
 
 from django.db import models
 
+from core.models import IsActiveMixin
 
-class EmailTemplate(models.Model):
+
+class EmailTemplate(IsActiveMixin, models.Model):
     """邮件模板"""
 
     name = models.CharField(max_length=64, unique=True, verbose_name="模板标识")
@@ -13,7 +15,6 @@ class EmailTemplate(models.Model):
     html_body = models.TextField(verbose_name="HTML正文模板")
     text_body = models.TextField(blank=True, verbose_name="纯文本正文模板")
     description = models.CharField(max_length=255, blank=True, verbose_name="模板说明")
-    is_active = models.BooleanField(default=True, verbose_name="是否启用")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="更新时间")
 
@@ -21,6 +22,7 @@ class EmailTemplate(models.Model):
         db_table = "email_templates"
         verbose_name = "邮件模板"
         verbose_name_plural = "邮件模板"
+        ordering = ["name"]
 
     def __str__(self):
         return self.name

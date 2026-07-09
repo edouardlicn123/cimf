@@ -1,5 +1,6 @@
 {% extends "frames/frame_module.html" %}
 
+{% set active_section = 'market' %}
 {% set show_header = false %}
 
 {% block title %}模块市场 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
@@ -187,7 +188,7 @@
             fetch(INSTALL_URL.replace('__MID__', moduleId), {
                 method: 'POST',
                 headers: {
-                    'X-CSRFToken': '{{ csrf_token_value }}',
+                    'X-CSRFToken': window.FFE.getCsrfToken(),
                 },
                 body: 'module_id=' + encodeURIComponent(moduleId),
             })

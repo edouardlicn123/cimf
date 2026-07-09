@@ -66,6 +66,7 @@ class ModuleTaxonomyService:
         if items_to_create:
             TaxonomyItem.objects.bulk_create(items_to_create, ignore_conflicts=True)
 
+        all_taxonomies = {**existing_taxonomies, **created_taxonomies}
         for tax_data in taxonomies:
             slug = tax_data.get("slug")
             name = tax_data.get("name")
@@ -74,16 +75,18 @@ class ModuleTaxonomyService:
             if not slug or not name:
                 continue
 
-            taxonomy = Taxonomy.objects.filter(slug=slug).first()
+            taxonomy = all_taxonomies.get(slug)
             if not taxonomy:
                 raise RuntimeError(f"词汇表创建失败: {slug}")
 
-            existing_items = set(taxonomy.items.values_list("name", flat=True))
+            existing_item_names = {
+                name for (tid, name) in existing_items if tid == taxonomy.id
+            }
             expected_items = set(items)
-            missing_items = expected_items - existing_items
+            missing_items = expected_items - existing_item_names
 
             if missing_items:
-                logger.warning(f"词汇表 {slug} 缺少项目: {missing_items}，尝试补充")
+                logger.warning("词汇表 %s 缺少项目: %s，尝试补充", slug, missing_items)
                 for item_name in missing_items:
                     TaxonomyItem.objects.create(taxonomy=taxonomy, name=item_name, weight=0)
 

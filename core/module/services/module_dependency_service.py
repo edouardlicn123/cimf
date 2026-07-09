@@ -1,8 +1,4 @@
-import logging
-
 from core.module.models import Module
-
-logger = logging.getLogger(__name__)
 
 
 class ModuleDependencyService:

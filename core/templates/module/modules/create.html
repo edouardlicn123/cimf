@@ -78,6 +78,7 @@
 {% endblock %}
 
 {% block scripts %}
+{{ super() }}
 <script>
 document.getElementById('createModuleForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -89,7 +90,7 @@ document.getElementById('createModuleForm').addEventListener('submit', async fun
             method: 'POST',
             body: formData,
             headers: {
-                'X-CSRFToken': '{{ csrf_token_value }}'
+                'X-CSRFToken': window.FFE.getCsrfToken()
             }
         });
         

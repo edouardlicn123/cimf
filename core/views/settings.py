@@ -10,6 +10,7 @@ from django.conf import settings as django_settings
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 
 from core.constants import Language, UserRole, UserTheme
@@ -18,6 +19,8 @@ from core.forms import ChangePasswordForm, PreferencesForm, ProfileForm
 from core.services import PermissionService, SettingsService, UserService
 
 logger = logging.getLogger(__name__)
+
+COMMON_ROLES = ["manager", "leader", "employee"]
 
 
 @admin_required
@@ -102,8 +105,8 @@ def system_permissions(request):
         employee_perms = request.POST.getlist("permissions_employee")
         PermissionService.save_role_permissions("employee", employee_perms)
 
-        for role in ["manager", "leader", "employee"]:
-            role_name = request.POST.get(f"role_name_{role}", "").strip()
+    for role in COMMON_ROLES:
+        role_name = request.POST.get(f"role_name_{role}", "").strip()
             if role_name:
                 SettingsService.update_setting(f"role_name_{role}", role_name)
 
@@ -120,7 +123,7 @@ def system_permissions(request):
 
     node_perms = PermissionService.get_node_permissions()
     system_perms = PermissionService.get_system_permissions()
-    roles = ["manager", "leader", "employee"]
+    roles = COMMON_ROLES
     role_permissions = {role: PermissionService.get_role_permissions_from_db(role) for role in roles}
 
     return render(
@@ -136,20 +139,22 @@ def system_permissions(request):
     )
 
 
+def _handle_password_change(user_id: int, new_password: str, request) -> HttpResponseRedirect:
+    """执行密码修改并登出重定向到登录页"""
+    UserService.change_password(user_id, new_password)
+    messages.success(request, "密码修改成功，请使用新密码重新登录")
+    logout(request)
+    return redirect("core:login")
+
+
 @login_required
-@handle_form_errors
 def change_password(request):
     """修改密码页面（独立页面）"""
     if request.method == "POST":
         form = ChangePasswordForm(request.POST, user=request.user)
         if form.is_valid():
-            new_password = form.cleaned_data.get("new_password")
-            UserService.change_password(request.user.id, new_password)
-            messages.success(request, "密码修改成功，请使用新密码重新登录")
-            logout(request)
-            return redirect("core:login")
-        else:
-            messages.error(request, "表单验证失败")
+            return _handle_password_change(request.user.id, form.cleaned_data.get("new_password"), request)
+        messages.error(request, "表单验证失败")
     else:
         form = ChangePasswordForm(user=request.user)
 
@@ -209,11 +214,7 @@ def profile_settings(request):
             messages.success(request, "偏好设置已保存")
 
         elif "submit_password" in request.POST and pwd_form.is_valid():
-            new_password = pwd_form.cleaned_data.get("new_password")
-            UserService.change_password(request.user.id, new_password)
-            messages.success(request, "密码修改成功，请使用新密码重新登录")
-            logout(request)
-            return redirect("core:login")
+            return _handle_password_change(request.user.id, pwd_form.cleaned_data.get("new_password"), request)
 
         return redirect("core:profile_settings")
 

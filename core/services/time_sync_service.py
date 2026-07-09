@@ -92,6 +92,10 @@ class TimeSyncService(SingletonMixin):
         url = self._get_settings_value("time_server_url")
         return url or self.DEFAULT_SERVER_URL
 
+    def test_connection(self, url: str | None = None) -> datetime | None:
+        """测试时间服务器连接（公开入口）"""
+        return self._fetch_time_from_server(url or self.get_server_url())
+
     def _fetch_time_from_server(self, url: str) -> datetime | None:
         """从指定服务器获取时间"""
 

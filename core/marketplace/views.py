@@ -68,7 +68,7 @@ def market_index(request):
 def market_install(request, module_id: str):  # noqa: ARG001
     """下载安装模块"""
     # 安装前检查冲突
-    conflict = MarketService._check_conflict(module_id)
+    conflict = MarketService.check_conflict(module_id)
     if conflict.get("blocked"):
         return json_success(extra={"success": False, "error": conflict["reason"], "conflict": True})
 

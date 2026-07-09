@@ -72,18 +72,8 @@ class AuthService(BaseService):
         return user
 
     @classmethod
-    def login(cls, _request, username: str, password: str) -> dict[str, Any]:
-        """
-        处理用户登录
-
-        参数：
-            request: HTTP 请求对象
-            username: 用户名
-            password: 密码
-
-        返回：
-            包含 success、message、user 的字典
-        """
+    def login(cls, username: str, password: str) -> dict[str, Any]:
+        """处理用户登录"""
         user = cls.get_first(username=username)
 
         if not user:

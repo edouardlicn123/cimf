@@ -75,6 +75,7 @@ class CustomerFields(BaseModel):
         db_table = "customer_fields"
         verbose_name = "客户"
         verbose_name_plural = "客户"
+        ordering = ["customer_name"]
 
     @property
     def creator(self):

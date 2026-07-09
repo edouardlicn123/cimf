@@ -291,11 +291,11 @@ class ExportService:
     @classmethod
     def _get_filtered_queryset(cls, node_type_slug: str, filters: list[dict] | None = None):
         """获取应用筛选条件后的 QuerySet"""
-        from core.importexport.model_registry import ModelRegistry  # noqa: PLC0415
+        from core.importexport.model_registry import ModelRegistry  # noqa: PLC0415  # 惰性：避免循环导入
 
         model_class = ModelRegistry.get_model(node_type_slug)
         if not model_class:
-            from core.node.models import Node  # noqa: PLC0415
+            from core.node.models import Node  # noqa: PLC0415  # 惰性：node.models 会间接依赖本模块
 
             queryset = Node.objects.filter(node_type__slug=node_type_slug)
             return cls._apply_filters(queryset, filters, node_type_slug, None, None)

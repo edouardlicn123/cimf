@@ -5,10 +5,10 @@ Node 节点系统模型，包含节点类型和节点主表
 from django.conf import settings
 from django.db import models
 
-from core.models import BaseModel
+from core.models import BaseModel, IsActiveMixin
 
 
-class NodeType(BaseModel):
+class NodeType(BaseModel, IsActiveMixin):
     """节点类型模型"""
 
     name = models.CharField(max_length=100, verbose_name="节点类型名称")
@@ -17,7 +17,6 @@ class NodeType(BaseModel):
     icon = models.CharField(max_length=50, default="bi-folder", verbose_name="图标")
     author = models.CharField(max_length=100, blank=True, verbose_name="作者")
     fields_config = models.JSONField(default=list, verbose_name="字段配置")
-    is_active = models.BooleanField(default=True, verbose_name="是否启用")
 
     class Meta:
         db_table = "node_types"

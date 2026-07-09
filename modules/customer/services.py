@@ -1,40 +1,10 @@
-"""
-================================================================================
-文件：services.py
-路径：/home/edo/cimf-v2/modules/customer/services.py
-================================================================================
-
-功能说明：
-    海外客户管理服务，提供客户的 CRUD 操作
-
-    主要功能：
-    - 获取客户列表
-    - 创建/更新/删除客户
-    - 获取客户详情
-
-用法：
-    1. 获取客户列表：
-        customers = CustomerService.get_list(search='keyword')
-
-    2. 创建客户：
-        customer = CustomerService.create(user=request.user, data={})
-
-版本：
-    - 1.0: 从 Flask 迁移
-    - 1.1: 移动到 modules/customer/ 目录
-
-依赖：
-    - modules.models.CustomerFields: 客户字段模型
-    - core.node.services: NodeService
-    - core.services: PermissionService
-"""
-
 from datetime import timedelta
 from typing import Any
 
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import IntegerField, Q
+from django.db.models.functions import Cast, Substr
 from django.utils import timezone
 
 from core.node.models import Node, NodeType
@@ -46,6 +16,29 @@ from .sample_data import OVERSEAS_CUSTOMERS
 
 User = get_user_model()
 
+FIELD_MAPPING = {
+    "customer_name": str,
+    "customer_code": str,
+    "customer_type_id": int,
+    "enterprise_name": str,
+    "phone1": str,
+    "email1": str,
+    "phone2": str,
+    "email2": str,
+    "linkedin": str,
+    "country_id": int,
+    "province": str,
+    "address": str,
+    "postal_code": str,
+    "industry": str,
+    "enterprise_type_id": int,
+    "registered_capital": float,
+    "customer_level_id": int,
+    "credit_limit": float,
+    "website": str,
+    "notes": str,
+}
+
 
 class CustomerService:
     """海外客户管理服务"""
@@ -54,14 +47,6 @@ class CustomerService:
     def get_list(
         search: str | None = None, customer_type_id: int | None = None, customer_level_id: int | None = None, user=None
     ) -> list[CustomerFields]:
-        """获取客户列表
-
-        Args:
-            search: 搜索关键词
-            customer_type_id: 客户类型ID
-            customer_level_id: 客户等级ID
-            user: 当前用户，为None时返回所有客户
-        """
         queryset = CustomerFields.objects.select_related(
             "customer_type", "customer_level", "country", "enterprise_type", "node__created_by"
         )
@@ -87,30 +72,37 @@ class CustomerService:
 
     @staticmethod
     def get_by_id(customer_id: int) -> CustomerFields | None:
-        """根据 ID 获取客户"""
         return CustomerFields.objects.filter(id=customer_id).first()
 
     @staticmethod
     def get_by_node_id(node_id: int) -> CustomerFields | None:
-        """根据节点 ID 获取客户"""
         return CustomerFields.objects.filter(node_id=node_id).first()
 
     @staticmethod
     def _generate_unique_code() -> str:
-        """生成不重复的客户编码（cc + 8位序号，与现有数据格式一致）"""
         max_code = (
             CustomerFields.objects.filter(customer_code__startswith="cc")
-            .order_by("customer_code")
-            .last()
+            .annotate(code_num=Cast(Substr("customer_code", 3), IntegerField()))
+            .order_by("-code_num")
+            .first()
         )
-        next_num = int(max_code.customer_code[2:]) + 1 if max_code else 1
+        next_num = (max_code.code_num + 1) if max_code else 1
         return f"cc{next_num:08d}"
 
     @staticmethod
-    def create(user, data: dict[str, Any]) -> CustomerFields:
-        """创建客户"""
-        from django.db import transaction  # noqa: PLC0415
+    def _build_fields(data: dict, extra: dict) -> dict:
+        fields = dict(extra)
+        for field_name, _type in FIELD_MAPPING.items():
+            val = data.get(field_name)
+            if val is not None and val != "":
+                try:
+                    fields[field_name] = _type(val) if _type is not str else val
+                except (ValueError, TypeError):
+                    fields[field_name] = val
+        return fields
 
+    @staticmethod
+    def create(user, data: dict[str, Any]) -> CustomerFields:
         with transaction.atomic():
             node = NodeService.create_node("customer", {}, user)
             if not node:
@@ -120,52 +112,30 @@ class CustomerService:
             if not customer_code:
                 customer_code = CustomerService._generate_unique_code()
 
-            customer = CustomerFields.objects.create(
-                node=node,
-                customer_name=data.get("customer_name", ""),
-                customer_code=customer_code,
-                customer_type_id=data.get("customer_type_id"),
-                enterprise_name=data.get("enterprise_name"),
-                phone1=data.get("phone1"),
-                email1=data.get("email1"),
-                phone2=data.get("phone2"),
-                email2=data.get("email2"),
-                linkedin=data.get("linkedin"),
-                country_id=data.get("country_id"),
-                province=data.get("province"),
-                address=data.get("address"),
-                postal_code=data.get("postal_code"),
-                industry=data.get("industry"),
-                enterprise_type_id=data.get("enterprise_type_id"),
-                registered_capital=data.get("registered_capital"),
-                customer_level_id=data.get("customer_level_id"),
-                credit_limit=data.get("credit_limit"),
-                website=data.get("website"),
-                notes=data.get("notes"),
-            )
+            fields = CustomerService._build_fields(data, {"node": node, "customer_code": customer_code})
+            customer = CustomerFields.objects.create(**fields)
 
         return customer
 
     @staticmethod
     def import_row(data: dict, user) -> CustomerFields:
-        """导入一行客户数据，含 customer_code 自动生成"""
         customer_code = data.get("customer_code")
         if not customer_code:
             customer_code = CustomerService._generate_unique_code()
 
+        node_type = NodeType.objects.filter(slug="customer").first()
+        if not node_type:
+            raise ValueError("客户节点类型不存在，请确保已安装客户模块")
         node = Node.objects.create(
-            node_type=NodeType.objects.get(slug="customer"),
+            node_type=node_type,
             created_by=user,
             updated_by=user,
         )
-        return CustomerFields.objects.create(
-            node=node,
-            customer_code=customer_code,
-        )
+        fields = CustomerService._build_fields(data, {"node": node, "customer_code": customer_code})
+        return CustomerFields.objects.create(**fields)
 
     @staticmethod
     def update(customer_id: int, _user, data: dict[str, Any]) -> CustomerFields | None:
-        """更新客户"""
         from django.db import transaction  # noqa: PLC0415
 
         with transaction.atomic():
@@ -175,32 +145,9 @@ class CustomerService:
 
             if not customer.node_id:
                 raise ValueError("客户关联节点不存在")
-            NodeService.update_node(customer.node_id, {})
 
-            allowed_fields = {
-                "customer_name",
-                "customer_code",
-                "customer_type_id",
-                "enterprise_name",
-                "phone1",
-                "email1",
-                "phone2",
-                "email2",
-                "linkedin",
-                "country_id",
-                "province",
-                "address",
-                "postal_code",
-                "industry",
-                "enterprise_type_id",
-                "registered_capital",
-                "customer_level_id",
-                "credit_limit",
-                "website",
-                "notes",
-            }
             for key, value in data.items():
-                if key in allowed_fields:
+                if key in FIELD_MAPPING:
                     setattr(customer, key, value)
 
             customer.save()
@@ -208,7 +155,6 @@ class CustomerService:
 
     @staticmethod
     def delete(customer_id: int) -> bool:
-        """删除客户"""
         from django.db import transaction  # noqa: PLC0415
 
         with transaction.atomic():
@@ -223,7 +169,6 @@ class CustomerService:
 
     @staticmethod
     def get_exportable_fields() -> list[dict]:
-        """获取可导出的字段列表"""
         return [
             {"name": "customer_name", "label": "客户名称", "type": "string", "required": True},
             {"name": "customer_code", "label": "客户代码", "type": "string", "required": True},
@@ -249,18 +194,15 @@ class CustomerService:
 
     @staticmethod
     def get_count() -> int:
-        """获取客户总数"""
         return CustomerFields.objects.count()
 
     @staticmethod
     def get_recent_count(days: int = 7) -> int:
-        """获取最近N天新增的客户数量"""
         start_date = timezone.now() - timedelta(days=days)
         return CustomerFields.objects.filter(created_at__gte=start_date).count()
 
     @staticmethod
     def init_sample_data() -> int:
-        """初始化样本数据"""
         admin_user = User.objects.filter(is_admin=True).first()
         if not admin_user:
             return 0

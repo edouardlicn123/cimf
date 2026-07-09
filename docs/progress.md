@@ -358,4 +358,7 @@
 
 1. 创建 LINE 模块实施计划文档 docs/stage5/02_LINE模块实施计划.md
 2. 修复LINE模块实施计划的7个严重+5个中等问题
+3. Stage5-第四批次: 修复3个P0+11个P1+10个P2+10个封装重构; 删除core/views.py死代码、抽取IsActiveMixin、修复字典序bug、import_row字段映射、N+1查询优化等
+4. R2修复: change_password缺失@login_required+handle_password_decorator崩溃; datetime.now→timezone.now; 修复tools_dashboard.html坏URL; 消除_get_node_type_or_none重复; update()复用FIELD_MAPPING
+5. 创建 docs/stage5/05_全面封装重构计划_SML.md：34 项（S10 + M轻16 + M重7 + L1），预估 ~170min
 
