@@ -76,6 +76,13 @@ class CronTask(ABC):
         self._last_error: str | None = None
         self._run_count: int = 0
         self._app_ready: bool = False
+        self._enabled_cache: bool | None = None
+        self._interval_cache: int | None = None
+
+    def reset_cache(self):
+        """清空缓存，下次调用时重新从数据库读取"""
+        self._enabled_cache = None
+        self._interval_cache = None
 
     def set_app_ready(self, ready: bool = True):
         """
@@ -97,7 +104,10 @@ class CronTask(ABC):
         return f"cron_{self.name}_interval"
 
     def is_enabled(self) -> bool:
-        """检查任务是否启用"""
+        """检查任务是否启用（结果缓存在实例中）"""
+        if self._enabled_cache is not None:
+            return self._enabled_cache
+
         if not self._app_ready:
             logger.debug(f"任务 {self.name} 跳过：应用未就绪")
             return False
@@ -106,13 +116,17 @@ class CronTask(ABC):
             from core.services import SettingsService  # noqa: PLC0415
 
             setting = SettingsService.get_setting(self.setting_key_enabled)
-            return setting is None or setting is True or str(setting).lower() == "true"
+            self._enabled_cache = setting is None or setting is True or str(setting).lower() == "true"
         except Exception as e:
             logger.warning(f"任务 {self.name} 检查启用状态失败: {e}")
-            return self.enabled_by_default
+            self._enabled_cache = self.enabled_by_default
+        return self._enabled_cache
 
     def get_interval(self) -> int:
-        """获取执行间隔（秒）"""
+        """获取执行间隔（秒），结果缓存在 self 中"""
+        if self._interval_cache is not None:
+            return self._interval_cache
+
         if not self._app_ready:
             return self.default_interval
 
@@ -122,12 +136,14 @@ class CronTask(ABC):
             interval = SettingsService.get_setting(self.setting_key_interval)
             if interval:
                 try:
-                    return int(interval)
+                    self._interval_cache = int(interval)
+                    return self._interval_cache
                 except (TypeError, ValueError):
                     logger.warning(f"任务 {self.name} 间隔值 '{interval}' 无法转换为整数，使用默认间隔")
         except Exception as e:
             logger.warning(f"任务 {self.name} 获取间隔失败: {e}")
-        return self.default_interval
+        self._interval_cache = self.default_interval
+        return self._interval_cache
 
     @abstractmethod
     def execute(self):

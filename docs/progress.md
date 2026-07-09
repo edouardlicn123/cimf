@@ -363,4 +363,5 @@
 5. 创建 docs/stage5/05_全面封装重构计划_SML.md：34 项（S10 + M轻16 + M重7 + L1），预估 ~170min
 6. S5: settings.py COMMON_ROLES 常量替换 + 修复缩进
 7. M轻 批次A: M1-M5 共享函数抽取(csv_response, _read_log_file, _module_to_dict, update_fields, build_filter_summaries)
+8. M轻 批次B: M6 health.py _run_check简化, M8 login复用authenticate, M9 _convert_setting_value try/except, M10 get_system_url去request参数
 

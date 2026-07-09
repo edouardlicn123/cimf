@@ -79,11 +79,7 @@ def check_customer_permission(user, node, permission_type: str):
 def _load_customer_form_data():
     """加载客户表单所需的分类数据"""
     slugs = ["customer_type", "customer_level", "economic_type", "country"]
-    result = {}
-    for slug in slugs:
-        tax = TaxonomyService.get_taxonomy_by_slug(slug)
-        result[slug] = TaxonomyService.get_items(tax.id) if tax else []
-    return result
+    return TaxonomyService.get_items_bulk(slugs)
 
 
 def _build_customer_data(cd: dict) -> dict:

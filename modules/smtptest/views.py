@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 def tool_view(request):
     """SMTP测试工具页面"""
     # 必须传递 tools 变量（侧边栏需要）
-    module_ids = Module.objects.filter(module_type="tool", is_active=True).values_list("module_id", flat=True)
+    module_ids = Module.get_active_ids("tool")
     tools = ToolType.objects.filter(slug__in=module_ids, is_active=True)
 
     if request.method == "POST":

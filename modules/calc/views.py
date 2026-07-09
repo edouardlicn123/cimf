@@ -62,9 +62,7 @@ _evaluator = ArithmeticEvaluator()
 @login_required
 def tool_view(request):
     """计算器工具页面"""
-    tool_type_ids = Module.objects.filter(module_type=ModuleType.TOOL, is_active=True).values_list(
-        "module_id", flat=True
-    )
+    tool_type_ids = Module.get_active_ids(ModuleType.TOOL)
     tools = ToolType.objects.filter(slug__in=tool_type_ids, is_active=True)
 
     return render(
