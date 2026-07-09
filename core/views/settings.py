@@ -23,6 +23,43 @@ logger = logging.getLogger(__name__)
 COMMON_ROLES = ["manager", "leader", "employee"]
 
 
+def _handle_logo_upload(request, settings_dict) -> HttpResponseRedirect | None:
+    """处理 logo 上传，失败时返回 redirect，成功/无文件时返回 None"""
+    logo_file = request.FILES.get("site_logo_upload")
+    if not logo_file:
+        return None
+
+    from core.utils.response import validate_upload  # noqa: PLC0415
+
+    valid, error_msg = validate_upload(
+        logo_file,
+        allowed_mimes=["image/png", "image/jpeg", "image/gif", "image/webp"],
+        max_size=2 * 1024 * 1024,
+        allowed_exts=[".png", ".jpg", ".jpeg", ".gif", ".webp"],
+    )
+    if not valid:
+        messages.error(request, error_msg)
+        return redirect("core:system_settings")
+
+    upload_dir = Path(django_settings.MEDIA_ROOT) / "logos"
+    upload_dir.mkdir(parents=True, exist_ok=True)
+
+    old_path = upload_dir / "custom.png"
+    if old_path.exists():
+        old_path.unlink()
+
+    try:
+        with old_path.open("wb+") as destination:
+            for chunk in logo_file.chunks():
+                destination.write(chunk)
+    except Exception as e:
+        messages.error(request, f"文件保存失败: {e!s}")
+        return redirect("core:system_settings")
+
+    settings_dict["site_logo_path"] = "logos/custom.png"
+    return None
+
+
 @admin_required
 def system_settings(request):
     """系统设置页面"""
@@ -41,42 +78,9 @@ def system_settings(request):
             if value is not None:
                 settings_dict[key] = value
 
-        logo_file = request.FILES.get("site_logo_upload")
-        if logo_file:
-            # 验证文件类型
-            allowed_types = ["image/png", "image/jpeg", "image/gif", "image/webp"]
-            if logo_file.content_type not in allowed_types:
-                messages.error(request, "只允许上传图片文件（PNG/JPG/GIF/WEBP）")
-                return redirect("core:system_settings")
-
-            # 验证文件大小（最大 2MB）
-            if logo_file.size > 2 * 1024 * 1024:
-                messages.error(request, "文件大小不能超过 2MB")
-                return redirect("core:system_settings")
-
-            # 验证文件扩展名
-            allowed_exts = [".png", ".jpg", ".jpeg", ".gif", ".webp"]
-            ext = Path(logo_file.name).suffix.lower()
-            if ext not in allowed_exts:
-                messages.error(request, "文件扩展名不合法")
-                return redirect("core:system_settings")
-
-            upload_dir = Path(django_settings.MEDIA_ROOT) / "logos"
-            upload_dir.mkdir(parents=True, exist_ok=True)
-
-            old_path = upload_dir / "custom.png"
-            if old_path.exists():
-                old_path.unlink()
-
-            try:
-                with old_path.open("wb+") as destination:
-                    for chunk in logo_file.chunks():
-                        destination.write(chunk)
-            except Exception as e:
-                messages.error(request, f"文件保存失败: {e!s}")
-                return redirect("core:system_settings")
-
-            settings_dict["site_logo_path"] = "logos/custom.png"
+        response = _handle_logo_upload(request, settings_dict)
+        if response:
+            return response
 
         SettingsService.save_settings_bulk(settings_dict)
         messages.success(request, "系统设置已保存")

@@ -11,6 +11,7 @@ from core.utils.views import redirect_with_error, redirect_with_success
 
 
 def _handle_taxonomy_form(request, taxonomy=None):
+    """处理词汇表创建/更新表单提交"""
     name = request.POST.get("name", "").strip()
     slug = request.POST.get("slug", "").strip()
     description = request.POST.get("description", "").strip()
@@ -36,6 +37,7 @@ def _handle_taxonomy_form(request, taxonomy=None):
 
 
 def _handle_taxonomy_item_form(request, taxonomy_id, item_id=None):
+    """处理词汇项创建/更新表单提交"""
     name = request.POST.get("name", "").strip()
     description = request.POST.get("description", "").strip()
 

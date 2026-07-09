@@ -170,6 +170,26 @@ class PermissionService:
                 PermissionService.save_role_permissions(role, perms)
 
     @staticmethod
+    def check_node_permission(user: User, node, permission_type: str) -> tuple[bool, str | None]:
+        """检查用户对指定节点的操作权限"""
+        if user.is_admin:
+            return True, None
+
+        if node.created_by_id == user.id:
+            return True, None
+
+        perm_map = {
+            "view": f"node.{node.node_type.slug}.view_others",
+            "edit": f"node.{node.node_type.slug}.edit_others",
+            "delete": f"node.{node.node_type.slug}.delete_others",
+        }
+        perm = perm_map.get(permission_type)
+        if perm and PermissionService.has_permission(user, perm):
+            return True, None
+
+        return False, f"您没有权限{permission_type}别人的客户信息"
+
+    @staticmethod
     def get_node_permissions() -> dict[str, dict]:
         """获取节点权限，按节点类型分组（从模块配置动态读取）"""
         node_permissions = {}
