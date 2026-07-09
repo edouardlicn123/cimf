@@ -5,8 +5,10 @@
 import json
 import os
 import shutil
+import sys
 import tempfile
 import zipfile
+from importlib import import_module as _import_module
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
@@ -161,28 +163,23 @@ class MarketService:
 
     @classmethod
     def _read_local_version(cls, module_id: str) -> str | None:
-        """从本地 module.py 读取版本号"""
+        """从本地 module.py 读取版本号（动态导入）"""
         safe_id = Path(module_id).name
         module_py = MODULES_DIR / safe_id / "module.py"
         if not module_py.exists():
             return None
 
-        import re  # noqa: PLC0415
-
+        module_path = f"modules.{safe_id}.module"
         try:
-            text = module_py.read_text(encoding="utf-8")
-            match = re.search(r'MODULE_INFO\s*=\s*\{', text)
-            if not match:
-                return None
-
-            version_match = re.search(r'"version":\s*"([^"]+)"', text[match.start():])
-            if version_match:
-                return version_match.group(1)
-            version_match = re.search(r"'version':\s*'([^']+)'", text[match.start():])
-            if version_match:
-                return version_match.group(1)
-        except OSError:
+            if module_path in sys.modules:
+                del sys.modules[module_path]
+            mod = _import_module(module_path)
+            if hasattr(mod, "MODULE_INFO") and isinstance(mod.MODULE_INFO, dict):
+                return mod.MODULE_INFO.get("version")
+        except Exception:
             pass
+        finally:
+            sys.modules.pop(module_path, None)
         return None
 
     @classmethod
