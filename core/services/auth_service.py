@@ -73,16 +73,15 @@ class AuthService(BaseService):
 
     @classmethod
     def login(cls, username: str, password: str) -> dict[str, Any]:
-        """处理用户登录"""
-        user = cls.get_first(username=username)
+        """处理用户登录，复用 authenticate 进行凭据验证"""
+        user = cls.authenticate(username, password)
 
         if not user:
-            return error_response("用户名或密码错误", user=None)
-
-        if not user.check_password(password):
-            max_failures = cls.get_login_max_failures()
-            lock_minutes = cls.get_login_lock_minutes()
-            user.record_failed_attempt(max_failures, lock_minutes)
+            looked_up_user = cls.get_first(username=username)
+            if looked_up_user:
+                max_failures = cls.get_login_max_failures()
+                lock_minutes = cls.get_login_lock_minutes()
+                looked_up_user.record_failed_attempt(max_failures, lock_minutes)
             return error_response("用户名或密码错误", user=None)
 
         if user.is_locked():
