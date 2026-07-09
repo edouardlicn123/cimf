@@ -1,0 +1,89 @@
+{% extends "frames/frame_admin.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% block title %}权限管理 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}权限管理{% endblock %}
+
+{% block admin_content %}
+<form method="post">
+    {% include "includes/csrf.html" %}
+    
+    {% set section_title %}<i class="bi bi-mask me-2"></i>角色名称设置{% endset %}
+    {% set section_body %}
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label class="form-label">一类用户</label>
+            <input type="text" name="role_name_manager" class="form-control" value="{{ role_labels.get('manager', '') if role_labels else '' }}">
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">二类用户</label>
+            <input type="text" name="role_name_leader" class="form-control" value="{{ role_labels.get('leader', '') if role_labels else '' }}">
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">三类用户</label>
+            <input type="text" name="role_name_employee" class="form-control" value="{{ role_labels.get('employee', '') if role_labels else '' }}">
+        </div>
+    </div>
+    {% endset %}
+    {% include "includes/card_section.html" %}
+    
+    <!-- 系统权限卡片 -->
+    {% if system_permissions %}
+    {% set perm_role_labels = ["一类用户", "二类用户", "三类用户"] %}
+    {% for key, data in system_permissions.items() %}
+    {% set perm_table_title = data.name %}
+    {% set perm_rows = [] %}
+    {% for perm_key, perm_label in data.permissions %}
+    {% set _ = perm_rows.append((
+        perm_key,
+        perm_label,
+        [
+            perm_key in role_permissions.get('manager', []),
+            perm_key in role_permissions.get('leader', []),
+            perm_key in role_permissions.get('employee', [])
+        ]
+    )) %}
+    {% endfor %}
+    {% include "includes/permissions_table.html" %}
+    {% endfor %}
+    {% endif %}
+    
+    <!-- 节点权限卡片 -->
+    {% if node_permissions %}
+    {% set perm_role_labels = ["一类用户", "二类用户", "三类用户"] %}
+    {% for slug, data in node_permissions.items() %}
+    {% set perm_table_title = data.name %}
+    {% set perm_rows = [] %}
+    {% for perm_key, perm_label in data.permissions %}
+    {% set _ = perm_rows.append((
+        perm_key,
+        perm_label,
+        [
+            perm_key in role_permissions.get('manager', []),
+            perm_key in role_permissions.get('leader', []),
+            perm_key in role_permissions.get('employee', [])
+        ]
+    )) %}
+    {% endfor %}
+    {% include "includes/permissions_table.html" %}
+    {% endfor %}
+    {% endif %}
+    
+    <div class="alert alert-info mb-4">
+        <ol class="mb-0">
+            <li>本页可修改一类用户、二类用户和三类用户的角色名称（如"主管"、"经理"等）</li>
+            <li>本页可设置一类用户、二类用户和三类用户的业务权限（如查看、创建、编辑、删除等）</li>
+            <li>系统关键页面（系统设置、人员管理、权限管理、Cron调度）的访问权限由"系统管理员"开关控制，不在本页面设置</li>
+            <li>勾选后点击底部"保存设置"按钮一次性保存所有更改</li>
+            <li>未启用的节点的权限设置不显示</li>
+        </ol>
+    </div>
+    
+    <div class="text-end">
+        <button type="submit" class="btn btn-primary">保存设置</button>
+    </div>
+</form>
+{% endblock %}

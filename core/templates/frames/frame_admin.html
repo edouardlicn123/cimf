@@ -1,0 +1,13 @@
+{% extends "frames/frame_sidebar_base.html" %}
+
+{% block sidebar_nav %}
+          <ul class="nav flex-column mb-auto">
+{% set section, icon, label, url_name = 'settings', 'bi-gear', '系统设置', 'core:system_settings' %}{% include "includes/nav_item.html" %}
+{% set section, icon, label, url_name = 'users', 'bi-people', '人员管理', 'core:system_users' %}{% include "includes/nav_item.html" %}
+{% set section, icon, label, url_name = 'permissions', 'bi-shield-lock', '权限管理', 'core:system_permissions' %}{% include "includes/nav_item.html" %}
+{% set section, icon, label, url_name = 'cron', 'bi-clock', 'Cron 调度', 'core:cron_manager' %}{% include "includes/nav_item.html" %}
+{% set section, icon, label, url_name = 'permission_check', 'bi-shield-check', '权限检测', 'core:permission_check' %}{% include "includes/nav_item.html" %}
+{% set section, icon, label, url_name = 'smtp', 'bi-envelope', 'SMTP 配置', 'core:smtp_config' %}{% include "includes/nav_item.html" %}
+{% set section, icon, label, url_name = 'logs', 'bi-file-text', '日志管理', 'core:logs_index' %}{% include "includes/nav_item.html" %}
+          </ul>
+{% endblock %}

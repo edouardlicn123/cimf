@@ -1,0 +1,48 @@
+{% extends "frames/frame_structure.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+{% set active_section = 'node_types' %}
+
+{% block title %}可用节点类型 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}可用节点类型{% endblock %}
+
+{% block admin_buttons_content %}
+{% endblock %}
+
+{% block admin_content %}
+<div class="card card-structure-transparent">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-box-seam me-2"></i>可用节点类型</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="card-body-border">
+        <div class="list-group list-group-flush">
+            {% for nt in node_types %}
+            <div class="list-group-item list-group-item-action py-3 px-3">
+                <div class="d-flex align-items-center gap-3">
+                    <i class="bi {{ nt.icon|default('bi-folder') }} fs-4 text-primary flex-shrink-0"></i>
+                    <div class="flex-grow-1 min-width-0">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="fw-semibold">{{ nt.name }}</span>
+                            <code class="small">{{ nt.slug }}</code>
+                            {% if nt.is_active %}
+                                <span class="badge bg-success rounded-pill">启用</span>
+                            {% else %}
+                                <span class="badge bg-secondary rounded-pill">禁用</span>
+                            {% endif %}
+                        </div>
+                        <div class="text-muted small">{{ nt.description|default('暂无描述') }}</div>
+                        <div class="text-muted small mt-1">作者: {{ nt.author|default('-') }}</div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="list-group-item text-center text-muted py-5">暂无节点类型</div>
+            {% endfor %}
+        </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "frames/frame_admin.html" %}
+
+{% set active_section = 'dashboard' %}
+
+{% block admin_title_content %}管理后台{% endblock %}
+
+{% block admin_content %}
+<div class="row g-4">
+  <div class="col-12">
+    <h4 class="mb-3">概览</h4>
+  </div>
+  {% set stats_data = [
+    {"title": "用户总数", "value": stats.total, "color": "primary"},
+    {"title": "管理员", "value": stats.manager, "color": "success"},
+    {"title": "组长", "value": stats.leader, "color": "info"},
+    {"title": "员工", "value": stats.employee, "color": "warning"},
+    {"title": "系统设置", "value": settings_count, "color": "info"},
+    {"title": "词汇表", "value": taxonomy_count, "color": "warning"}
+  ] %}
+  {% for stat in stats_data %}
+    {% set stat_title = stat.title %}{% set stat_value = stat.value %}{% set stat_color = stat.color %}
+    {% include "includes/stat_card.html" %}
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,195 @@
+/*
+ * macaron.css
+ * FFE 项目跟进系统 - 马卡龙主题（Macaron Theme）
+ * 版本：2026-02-15 v7.1（修复导航高亮 + 按钮 hover 跟随主题）
+ * 
+ * 调整内容：
+ *   - 除文字外整体颜色加深（主色饱和/明度降低 10-20%，背景轻微加灰调）
+ *   - 保持马卡龙柔和软萌感，但更沉稳耐看
+ *   - 强制 navbar 不透明背景 + 轻微磨砂
+ *   - 统一圆角、阴影、过渡
+ *   - 彻底修复宽屏下右侧用户下拉菜单被挤压/右移/只显示一小块（v6 方案）
+ *   - dashboard 卡片等宽强制修复（card 320px + card-body 100% 撑满）
+ *   - 参考 uniqlo 极简风格优化卡片（圆角收窄、阴影轻微、hover 克制、过渡极简）
+ *   - 新增：左侧导航 .nav-link.active 跟随 --primary
+ *   - 新增：.primary-btn / .btn-primary hover 统一为 --primary-hover
+ */
+
+:root {
+  /* 主色系 - 开心果绿 */
+  --primary:           #7ACBB8;
+  --primary-hover:     #65B3A0;
+  --primary-active:    #4E9A88;
+  --primary-light:     rgba(122, 203, 184, 0.18);
+  --primary-extra-light: rgba(122, 203, 184, 0.08);
+
+  /* 信息 / 辅助 - 蓝莓紫 */
+  --info:              #89A9E8;
+  --info-hover:        #7295D0;
+  --info-light:        rgba(137, 169, 232, 0.18);
+
+  /* 成功 - 抹茶绿 */
+  --success:           #A8C88A;
+  --success-hover:     #8FB37A;
+
+  /* 警告 / 强调 - 柠檬黄 */
+  --warning:           #E8CC78;
+  --warning-hover:     #D1B566;
+  --warning-light:     rgba(232, 204, 120, 0.20);
+
+  /* 危险 - 草莓粉 */
+  --danger:            #E8889E;
+  --danger-hover:      #D17A8E;
+  --danger-light:      rgba(232, 136, 158, 0.18);
+
+  /* 背景 - 整体加深（从极浅 → 浅灰调） */
+  --bg-body:           #F8F4EE;     /* 原 #FFF8E7 → 轻微加灰 */
+  --bg-gradient:       linear-gradient(135deg, #F8F4EE 0%, #F0F4F8 100%);
+  --bg-surface:        #F5F3F0;
+  --bg-card:           #FFFFFF;
+  --bg-nav:            #7D71A0;     /* 原 #EDE8F5 → 加深为中紫灰 */
+  --bg-nav-fallback:   rgba(125, 113, 160, 0.96);
+  --bg-footer:         #F5F3F0;
+
+  /* 文字 - 不动，保持柔和深灰 */
+  --text-primary:      #4A536B;
+  --text-secondary:    #7D849A;
+  --text-muted:        #A8AEC1;
+  --text-inverted:     #FFFFFF;
+  --text-nav:          #FFFFFF;
+  --text-nav-active:   #FFFFFF;
+
+  /* 边框 & 分割 - 加深 */
+  --border:            #C8B8D8;
+  --border-light:      rgba(200, 184, 216, 0.60);
+  --border-focus:      #7ACBB8;
+
+  /* 阴影 - 参考 uniqlo 极轻微 + 加深基调 */
+  --shadow-sm:         0 1px 2px rgba(0, 0, 0, 0.08);
+  --shadow:            0 1px 4px rgba(0, 0, 0, 0.10);
+  --shadow-hover:      0 2px 8px rgba(0, 0, 0, 0.12);
+  --shadow-nav:        0 1px 3px rgba(0, 0, 0, 0.08);
+
+  /* 圆角 - 参考 uniqlo 极小 */
+  --radius-sm:         4px;
+  --radius:            6px;
+  --radius-md:         7px;
+  --radius-lg:         8px;
+  --radius-xl:         10px;
+  --radius-pill:       9999px;
+
+  /* 过渡 - 参考 uniqlo 非常克制 */
+  --transition:        all 0.15s ease;
+  --transition-slow:   all 0.20s ease;
+}
+
+body {
+  background: var(--bg-gradient);
+  color: var(--text-primary);
+  font-weight: 500;
+  min-height: 100vh;
+}
+
+/* ──────────────────────────────────────────────
+   导航栏 - 强制修复透明问题
+───────────────────────────────────────────────── */
+
+.navbar-macaron {
+  background-color: var(--bg-nav) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: var(--shadow-nav) !important;
+  border-radius: 0 !important;
+  transition: var(--transition-slow) !important;
+}
+
+.navbar-macaron,
+.navbar-macaron .navbar-brand,
+.navbar-macaron .nav-link,
+.navbar-macaron .nav-link:hover,
+.navbar-macaron .nav-link.active,
+.navbar-macaron .navbar-toggler-icon {
+  color: var(--text-nav) !important;
+}
+
+.navbar-macaron .dropdown-item {
+  color: var(--text-primary) !important;
+}
+
+.navbar-macaron .dropdown-item:hover,
+.navbar-macaron .dropdown-item:focus {
+  background-color: var(--primary-light) !important;
+  color: var(--primary) !important;
+}
+
+/* 汉堡菜单图标颜色匹配文字 */
+.navbar-macaron .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23FFFFFF' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
+.admin-sidebar .nav-link.active,
+.admin-sidebar .nav-link.active:hover,
+.admin-sidebar .nav-link.active:focus {
+  border-radius: var(--radius-sm) !important;
+}
+.admin-sidebar .nav-link:hover {
+  background-color: var(--primary-extra-light) !important;
+  color: var(--primary-hover) !important;
+}
+
+/* ──────────────────────────────────────────────
+/* 修复 btn-primary 跟随主题 - 使用 CSS 变量 */
+.btn-primary,
+.primary-btn {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: white !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary.focus,
+.primary-btn:hover,
+.primary-btn:focus {
+  background-color: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
+  color: white !important;
+  box-shadow: 0 0 0 0.25rem var(--primary-light) !important;
+}
+}
+
+.btn-primary:active,
+.btn-primary.active,
+.primary-btn:active,
+.primary-btn.active {
+  background-color: #4E9A88 !important;
+  border-color: #4E9A88 !important;
+  color: white !important;
+}
+
+/* 最终保险：防止其他地方覆盖成不协调色 */
+.btn-primary:hover:not(.disabled):not(:disabled),
+.primary-btn:hover:not(.disabled):not(:disabled) {
+  background-color: #65B3A0 !important;
+  color: white !important;
+}
+
+/* btn-secondary 跟随主题 */
+.btn-secondary {
+  background-color: color-mix(in srgb, var(--primary), white 60%) !important;
+  border-color: color-mix(in srgb, var(--primary), white 60%) !important;
+  color: var(--primary) !important;
+}
+.btn-secondary:hover,
+.btn-secondary:focus {
+  background-color: color-mix(in srgb, var(--primary), white 40%) !important;
+  border-color: color-mix(in srgb, var(--primary), white 40%) !important;
+  color: white !important;
+}
+.btn-secondary:active,
+.btn-secondary.active {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: white !important;
+}
+
+

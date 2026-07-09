@@ -1,0 +1,191 @@
+{% extends "frames/frame_node.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% block admin_title_content %}
+  {{ customer.customer_name|default('海外客户详情') }}
+{% endblock %}
+
+{% block admin_buttons_content %}
+<a href="{{ url('node:node_edit', node_type.slug, node.id) }}" class="btn btn-primary">编辑</a>
+<a href="{{ url('node:module_page', node_type.slug) }}" class="btn btn-secondary">返回列表</a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="row">
+    <!-- 基本信息 -->
+    <div class="col-12 mb-4">
+        <div class="card card-structure">
+            <div class="card-header">
+                <h5 class="mb-0">基本信息</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label text-muted">客户名称</label>
+                        <p class="mb-0">{{ customer.customer_name|default('-') }}</p>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label text-muted">客户代码</label>
+                        <p class="mb-0">{{ customer.customer_code|default('-') }}</p>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label text-muted">客户类型</label>
+                        <p class="mb-0">{% if customer.customer_type %}{{ customer.customer_type.name }}{% else %}-{% endif %}</p>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label text-muted">企业名称</label>
+                        <p class="mb-0">{{ customer.enterprise_name|default('-') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 联系信息 -->
+    <div class="col-12 mb-4">
+        <div class="card card-structure">
+            <div class="card-header">
+                <h5 class="mb-0">联系信息</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">电话1</label>
+                        <p class="mb-0">{{ customer.phone1|default('-') }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">邮箱1</label>
+                        <p class="mb-0">{{ customer.email1|default('-') }}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">电话2</label>
+                        <p class="mb-0">{{ customer.phone2|default('-') }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">邮箱2</label>
+                        <p class="mb-0">{{ customer.email2|default('-') }}</p>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted">领英</label>
+                    <p class="mb-0">
+                        {% if customer.linkedin %}
+                        <a href="{{ customer.linkedin|e }}" target="_blank" rel="noopener noreferrer">
+                            {{ customer.linkedin|e }}
+                            <i class="bi bi-box-arrow-up-right ms-1"></i>
+                        </a>
+                        {% else %}
+                        -
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 地址信息 -->
+    <div class="col-12 mb-4">
+        <div class="card card-structure">
+            <div class="card-header">
+                <h5 class="mb-0">地址信息</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label text-muted">国家</label>
+                        <p class="mb-0">{% if customer.country %}{{ customer.country.name|default('-') }}{% else %}-{% endif %}</p>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label text-muted">省份/城市</label>
+                        <p class="mb-0">{{ customer.province|default('-') }}</p>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label text-muted">邮政编码</label>
+                        <p class="mb-0">{{ customer.postal_code|default('-') }}</p>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label class="form-label text-muted">详细地址</label>
+                        <p class="mb-0">{{ customer.address|default('-') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 企业信息 -->
+    <div class="col-12 mb-4">
+        <div class="card card-structure">
+            <div class="card-header">
+                <h5 class="mb-0">企业信息</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label text-muted">所属行业</label>
+                        <p class="mb-0">{{ customer.industry|default('-') }}</p>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label text-muted">企业性质</label>
+                        <p class="mb-0">{% if customer.enterprise_type %}{{ customer.enterprise_type.name }}{% else %}-{% endif %}</p>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label text-muted">注册资本</label>
+                        <p class="mb-0">{{ customer.registered_capital|default('-') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 其他 -->
+    <div class="col-12 mb-4">
+        <div class="card card-structure">
+            <div class="card-header">
+                <h5 class="mb-0">其他</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label text-muted">客户等级</label>
+                        <p class="mb-0">{% if customer.customer_level %}{{ customer.customer_level.name }}{% else %}-{% endif %}</p>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label text-muted">信用额度</label>
+                        <p class="mb-0">{{ customer.credit_limit|default('-') }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">网站</label>
+                        <p class="mb-0">{% if customer.website %}<a href="{{ customer.website|e }}" target="_blank" rel="noopener noreferrer">{{ customer.website|e }}</a>{% else %}-{% endif %}</p>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label class="form-label text-muted">备注</label>
+                        <p class="mb-0">{{ customer.notes|default('-') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 时间信息 -->
+    <div class="col-12">
+        <div class="card card-structure">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">创建时间</label>
+                        <p class="mb-0">{{ customer.created_at.strftime('%Y-%m-%d %H:%M') if customer.created_at else '-' }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">更新时间</label>
+                        <p class="mb-0">{{ customer.updated_at.strftime('%Y-%m-%d %H:%M') if customer.updated_at else '-' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

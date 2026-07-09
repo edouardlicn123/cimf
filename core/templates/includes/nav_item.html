@@ -1,0 +1,7 @@
+<li class="nav-item">
+  <a class="nav-link d-flex align-items-center py-2 px-2 rounded{% if active_section == section %} active{% endif %}"
+     href="{% if url_args is defined %}{{ url(url_name, url_args) }}{% else %}{{ url(url_name) }}{% endif %}">
+    <i class="bi {{ icon }} me-2 fs-6"></i>
+    <span>{{ label }}</span>
+  </a>
+</li>

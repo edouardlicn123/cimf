@@ -1,0 +1,21 @@
+<!-- Bootstrap 5 CSS -->
+<link rel="stylesheet" href="{{ static('lib/bootstrap/css/bootstrap.min.css') }}?v={{ timestamp }}">
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="{{ static('lib/bootstrap-icons/css/bootstrap-icons.css') }}?v={{ timestamp }}">
+
+<!-- 全局字体声明（无 @import 链延迟） -->
+<link rel="stylesheet" href="{{ static('css/fonts.css') }}?v={{ timestamp }}">
+
+<!-- 项目自定义基础 CSS -->
+<link rel="stylesheet" href="{{ static('css/custom.css') }}?v={{ timestamp }}">
+
+<!-- 动态加载用户选择的主题 CSS -->
+{% if user.is_authenticated and user.theme %}
+    <link rel="stylesheet" href="{{ static('css/themes/' + user.theme + '.css') }}?v={{ timestamp }}">
+{% else %}
+    <link rel="stylesheet" href="{{ static('css/themes/default.css') }}?v={{ timestamp }}">
+{% endif %}
+
+<link rel="stylesheet" href="{{ static('css/frame.css') }}?v={{ timestamp }}">
+

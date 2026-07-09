@@ -1,0 +1,187 @@
+{% extends "frames/frame_node.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% block admin_title_content %}
+  {{ node_type.name }}
+{% endblock %}
+
+{% block admin_buttons_content %}
+<a href="{{ url('node:node_create', node_type.slug) }}" class="btn btn-primary">
+    <i class="bi bi-plus-lg"></i> 新建
+</a>
+{% endblock %}
+
+{% block admin_content %}
+<style>
+.action-cell .btn {
+    width: 2.25rem;
+    height: 2.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    padding: 0;
+    border-radius: 0.4rem;
+}
+.action-cell .btn i {
+    font-weight: 700;
+}
+</style>
+<div class="card card-structure mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">搜索筛选</h5>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label small text-muted">客户名称/企业名称</label>
+                <input type="text" name="search" class="form-control" placeholder="搜索..." value="{{ search }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small text-muted">客户类型</label>
+                <select name="customer_type" class="form-select">
+                    <option value="">全部</option>
+                    {% if customer_types %}
+                    {% for item in customer_types %}
+                    <option value="{{ item.id }}" {% if filter_customer_type and filter_customer_type == item.id|string %}selected{% endif %}>{{ item.name }}</option>
+                    {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small text-muted">客户等级</label>
+                <select name="customer_level" class="form-select">
+                    <option value="">全部</option>
+                    {% if customer_levels %}
+                    {% for item in customer_levels %}
+                    <option value="{{ item.id }}" {% if filter_customer_level and filter_customer_level == item.id|string %}selected{% endif %}>{{ item.name }}</option>
+                    {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i> 搜索
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card card-structure">
+            <div class="card-header">
+                <h5 class="mb-0">客户列表</h5>
+            </div>
+            <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>客户名称</th>
+                            <th>企业名称</th>
+                            <th>电话1</th>
+                            <th>电子邮件</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for customer in customers %}
+                        <tr>
+                            <td>
+                                <a href="{{ url('node:node_view', node_type.slug, customer.node_id) }}" class="text-decoration-none">
+                                    {{ customer.customer_name|default('-') }}
+                                </a>
+                            </td>
+                            <td title="{{ customer.enterprise_name|default('') }}">{% if customer.enterprise_name %}{{ customer.enterprise_name[:20] + '...' if customer.enterprise_name|length > 20 else customer.enterprise_name }}{% else %}-{% endif %}</td>
+                            <td>
+                                {% if customer.phone1 %}
+                                {% if customer.has_whatsapp is true %}
+                                <a href="https://wa.me/{{ customer.phone1|replace(' ', '')|replace('+', '') }}" target="_blank" class="text-success me-1" title="有 WhatsApp">
+                                    <i class="bi bi-whatsapp"></i>
+                                </a>
+                                {% elif customer.has_whatsapp is false %}
+                                <span class="text-danger me-1" title="没有 WhatsApp"><i class="bi bi-x-lg"></i></span>
+                                {% endif %}
+                                {{ customer.phone1 }}
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if customer.email1 %}
+                                <a href="mailto:{{ customer.email1 }}" title="{{ customer.email1 }}">{{ customer.email1[:20] + '...' if customer.email1|length > 20 else customer.email1 }}</a>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td class="text-nowrap action-cell">
+                                <a href="{{ url('node:node_view', node_type.slug, customer.node_id) }}" class="btn btn-sm btn-primary me-1" title="查看">
+                                    <i class="bi bi-search"></i>
+                                </a>
+                                <a href="{{ url('node:node_edit', node_type.slug, customer.node_id) }}" class="btn btn-sm btn-primary me-1" title="编辑">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="post" action="{{ url('node:node_delete', node_type.slug, customer.node_id) }}" style="display:inline" onsubmit="return confirm('确定删除?')">
+                                    {% include "includes/csrf.html" %}
+                                    <button type="submit" class="btn btn-sm btn-primary" title="删除">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">
+                                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                暂无数据
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+<nav aria-label="分页导航" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous() %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number() }}{% if search %}&search={{ search }}{% endif %}{% if filter_customer_type %}&customer_type={{ filter_customer_type }}{% endif %}{% if filter_customer_level %}&customer_level={{ filter_customer_level }}{% endif %}">上一页</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">上一页</span>
+        </li>
+        {% endif %}
+        
+        {% set start_page = page_obj.number - 2 %}
+        {% set end_page = page_obj.number + 2 %}
+        {% for p in page_obj.paginator.page_range %}
+        {% if p >= start_page and p <= end_page %}
+        <li class="page-item {% if p == page_obj.number %}active{% endif %}">
+            <a class="page-link" href="?page={{ p }}{% if search %}&search={{ search }}{% endif %}{% if filter_customer_type %}&customer_type={{ filter_customer_type }}{% endif %}{% if filter_customer_level %}&customer_level={{ filter_customer_level }}{% endif %}">{{ p }}</a>
+        </li>
+        {% endif %}
+        {% endfor %}
+        
+        {% if page_obj.has_next() %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number() }}{% if search %}&search={{ search }}{% endif %}{% if filter_customer_type %}&customer_type={{ filter_customer_type }}{% endif %}{% if filter_customer_level %}&customer_level={{ filter_customer_level }}{% endif %}">下一页</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">下一页</span>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "frames/frame_sidebar_base.html" %}
+
+{% block sidebar_nav %}
+          <ul class="nav flex-column mb-auto">
+{% set section, icon, label, url_name = 'dashboard', 'bi-house', '内容结构', 'core:structure_dashboard' %}{% include "includes/nav_item.html" %}
+          </ul>
+          {% if user.is_authenticated and user.is_admin %}
+          <ul class="nav flex-column mb-auto">
+{% set section, icon, label, url_name = 'node_types', 'bi-box-seam', '可用节点类型', 'core:node_types_list' %}{% include "includes/nav_item.html" %}
+{% set section, icon, label, url_name = 'taxonomies', 'bi-tags', '词汇表管理', 'core:taxonomies' %}{% include "includes/nav_item.html" %}
+{% set section, icon, label, url_name = 'field_types', 'bi-ui-checks', '字段类型', 'core:field_types' %}{% include "includes/nav_item.html" %}
+          </ul>
+          {% endif %}
+{% endblock %}

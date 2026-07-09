@@ -1,0 +1,103 @@
+{% extends "frames/frame_admin.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+{% set active_section = 'permission_check' %}
+
+{% block title %}权限检测 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}权限检测{% endblock %}
+
+{% block admin_buttons_content %}{% endblock %}
+
+{% block admin_content %}
+
+<div class="alert alert-info mb-4">
+    <i class="bi bi-info-circle me-2"></i>
+    自动检测系统中所有注册页面的权限状态。新增视图也会自动加入检测。
+</div>
+
+<!-- 统计信息 -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <div class="text-muted mb-1">全部页面</div>
+                <h3 class="mb-0 text-primary">{{ total_count }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <div class="text-muted mb-1">已限制仅admin</div>
+                <h3 class="mb-0 text-success">{{ restricted_count }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <div class="text-muted mb-1">未限制仅admin</div>
+                <h3 class="mb-0 text-warning">{{ unrestricted_count }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 列表、分页、说明合并卡片 -->
+<div class="card card-structure">
+    <div class="card-header">
+        <h5 class="mb-0">页面权限列表</h5>
+    </div>
+    <div class="card-body">
+        <div class="d-flex align-items-end gap-2" style="margin-bottom:-1px">
+            {% set pills = [
+                {"label": "全部", "filter": "all", "active": filter_status == "all", "count": total_count},
+                {"label": "已限制", "filter": "restricted", "active": filter_status == "restricted", "count": restricted_count},
+                {"label": "未限制", "filter": "unrestricted", "active": filter_status == "unrestricted", "count": unrestricted_count}
+            ] %}
+            {% include "includes/nav_pills.html" %}
+        </div>
+        <div class="log-table-wrap table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 60%;">URL</th>
+                        <th>名称</th>
+                        <th style="width: 120px;">权限状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for page in page_obj %}
+                    <tr>
+                        <td><code>{{ page.url }}</code></td>
+                        <td><span class="text-muted">{{ page.name }}</span></td>
+                        <td>
+                            {% if page.has_admin_check %}
+                            <span class="badge bg-success">已限制</span>
+                            {% else %}
+                            <span class="badge bg-warning">未限制</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    {% set empty_type = "table" %}{% set empty_colspan = 3 %}{% set empty_message = "暂无数据" %}{% include "includes/empty_state.html" %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="text-muted small">
+                <i class="bi bi-lightbulb me-1"></i>
+                检测视图源码中的 <code>can_access_admin</code> 调用 · 每页 20 条
+            </div>
+            {% set extra_params = "&filter=" ~ filter_status %}
+            {% include "includes/pagination.html" %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "frames/frame_structure.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'dashboard' %}
+
+{% block title %}内容结构 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}
+  内容结构
+{% endblock %}
+
+{% block admin_content %}
+{% set entries = [
+  {"icon": "bi-box-seam", "title": "可用节点类型", "description": "管理业务节点的类型定义，如客户、会员、项目等", "url": url('core:node_types_list'), "action_text": "管理"},
+  {"icon": "bi-tags", "title": "词汇表管理", "description": "管理分类词汇，如国家、客户类型、行业等", "url": url('core:taxonomies'), "action_text": "管理"},
+  {"icon": "bi-ui-checks", "title": "字段类型", "description": "查看系统支持的字段类型，如字符串、数字、日期等", "url": url('core:field_types'), "action_text": "查看"}
+] %}
+{% include "includes/entry_card_grid.html" %}
+{% endblock %}

@@ -1,0 +1,206 @@
+/*
+ * kajima.css
+ * CIMF - 鹿島ノ森主题（暖灰大地调）
+ * 版本：2026-05-09 v1.0
+ *
+ * 配色灵感：轻井泽 ホテル鹿島ノ森 https://kajimanomori.co.jp/
+ * 主色       #94634b   赭褐
+ * 导航栏     #364d3b   森林绿
+ * 背景       #d8d3ce / #e6e3e0 / #f4f2ee  暖灰系列
+ * 文字       #343434   近黑
+ */
+
+:root {
+  /* 主色系 - 赭褐 */
+  --primary:           #94634b;
+  --primary-hover:     #7a4f3e;
+  --primary-active:    #604032;
+  --primary-light:     rgba(148, 99, 75, 0.10);
+  --primary-extra-light: rgba(148, 99, 75, 0.05);
+
+  /* 信息 / 辅助 - 蓝 */
+  --info:              #2d539e;
+  --info-hover:        #244680;
+  --info-light:        rgba(45, 83, 158, 0.10);
+
+  /* 成功 - 暖橄榄（无绿方案下最接近的暖调） */
+  --success:           #8a7a50;
+  --success-hover:     #756845;
+
+  /* 警告 - 暖金 */
+  --warning:           #c49030;
+  --warning-hover:     #a87a28;
+  --warning-light:     rgba(196, 144, 48, 0.12);
+
+  /* 金色点缀 */
+  --gold:              #c49030;
+
+  /* 危险 - 玫瑰粉 */
+  --danger:            #b8606a;
+  --danger-hover:      #a4505a;
+  --danger-light:      rgba(184, 96, 106, 0.10);
+
+  /* 背景 - 暖白基底 */
+  --bg-body:           #f4f2ee;
+  --bg-gradient:       linear-gradient(to bottom, #f4f2ee 0%, #ffffff 100%);
+  --bg-surface:        #ffffff;
+  --bg-card:           #ffffff;
+  --bg-nav:            #364d3b;
+  --bg-nav-text:       #ffffff;
+  --bg-footer:         #343434;
+
+  /* 文字 */
+  --text-primary:      #2a2a2a;
+  --text-secondary:    #4a4a4a;
+  --text-muted:        #7a7a7a;
+    --text-inverse:      #f0f0f0;
+  --text-nav:          #ffffff;
+  --text-nav-active:   #ffffff;
+
+  /* 边框 & 分割 */
+  --border:            #d5d4cc;
+  --border-light:      #e8e6e0;
+  --border-focus:      #94634b;
+
+  /* 阴影 - 克制柔和的阴影 */
+  --shadow-sm:         0 1px 3px rgba(52, 52, 52, 0.06);
+  --shadow:            0 2px 6px rgba(52, 52, 52, 0.08);
+  --shadow-hover:      0 4px 12px rgba(52, 52, 52, 0.10);
+  --shadow-nav:        0 2px 4px rgba(52, 52, 52, 0.06);
+
+  /* 圆角 */
+  --radius-sm:         0px;
+  --radius:            4px;
+  --radius-md:         5px;
+  --radius-lg:         6px;
+  --radius-xl:         8px;
+  --radius-pill:       9999px;
+
+  /* 卡片渐变 */
+  --entry-card-gradient: linear-gradient(135deg, var(--primary) 0%, var(--warning) 100%);
+}
+
+body {
+  background: var(--bg-gradient);
+  color: var(--text-primary);
+  font-weight: 400;
+  min-height: 100vh;
+}
+
+/* ──────────────────────────────────────────────
+   导航栏 - 近黑背景 + 白色文字
+───────────────────────────────────────────────── */
+
+.navbar-kajima {
+  background-color: var(--bg-nav) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.12) !important;
+  box-shadow: 0 2px 0 var(--gold), var(--shadow-nav) !important;
+  border-radius: 0 !important;
+  transition: var(--transition) !important;
+}
+
+.navbar-kajima,
+.navbar-kajima .navbar-brand,
+.navbar-kajima .nav-link,
+.navbar-kajima .nav-link:hover,
+.navbar-kajima .nav-link.active,
+.navbar-kajima .navbar-toggler-icon {
+  color: var(--text-nav) !important;
+}
+
+.navbar-kajima .dropdown-item {
+  color: var(--text-primary) !important;
+}
+
+.navbar-kajima .dropdown-item:hover,
+.navbar-kajima .dropdown-item:focus {
+  background-color: var(--primary-light) !important;
+  color: var(--primary) !important;
+}
+
+.admin-sidebar .nav-link,
+.admin-sidebar .nav-item,
+.admin-sidebar .nav-link.active,
+.admin-sidebar .nav-link.active:hover,
+.admin-sidebar .nav-link.active:focus,
+.admin-sidebar .nav-link:hover,
+.admin-sidebar .nav-link:focus {
+  border-radius: 0 !important;
+}
+
+.admin-sidebar .nav-link.active,
+.admin-sidebar .nav-link.active:hover,
+.admin-sidebar .nav-link.active:focus {
+  border-left-color: var(--gold) !important;
+}
+
+.admin-sidebar .nav-link:hover {
+  background-color: var(--primary-extra-light) !important;
+  color: var(--primary-hover) !important;
+}
+
+.btn-primary,
+.primary-btn {
+  background-color: var(--primary) !important;
+  border-color: var(--gold) !important;
+  border-width: 2px !important;
+  color: white !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary.focus,
+.primary-btn:hover,
+.primary-btn:focus {
+  background-color: var(--primary-hover) !important;
+  border-color: var(--gold) !important;
+  border-width: 2px !important;
+  color: white !important;
+  box-shadow: 0 0 0 0.25rem rgba(196, 144, 48, 0.25) !important;
+}
+
+.btn-primary:active,
+.btn-primary.active,
+.primary-btn:active,
+.primary-btn.active {
+  background-color: #604032 !important;
+  border-color: var(--gold) !important;
+  border-width: 2px !important;
+  color: white !important;
+}
+
+.btn-primary:hover:not(.disabled):not(:disabled),
+.primary-btn:hover:not(.disabled):not(:disabled) {
+  background-color: #7a4f3e !important;
+  color: white !important;
+}
+
+/* ──────────────────────────────────────────────
+   按钮聚焦 - 金色外圈
+───────────────────────────────────────────────── */
+.btn-primary:focus-visible,
+.btn-success:focus-visible,
+.btn-danger:focus-visible,
+.btn-warning:focus-visible,
+.btn-info:focus-visible {
+  outline-color: var(--gold) !important;
+}
+
+/* btn-secondary 跟随主题 */
+.btn-secondary {
+  background-color: color-mix(in srgb, var(--primary), white 60%) !important;
+  border-color: color-mix(in srgb, var(--primary), white 60%) !important;
+  color: var(--primary) !important;
+}
+.btn-secondary:hover,
+.btn-secondary:focus {
+  background-color: color-mix(in srgb, var(--primary), white 40%) !important;
+  border-color: color-mix(in srgb, var(--primary), white 40%) !important;
+  color: white !important;
+}
+.btn-secondary:active,
+.btn-secondary.active {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: white !important;
+}

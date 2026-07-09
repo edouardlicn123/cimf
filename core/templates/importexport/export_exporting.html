@@ -1,0 +1,32 @@
+{% extends "frames/frame_importexport.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'export' %}
+
+{% block title %}正在导出 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}
+  正在导出 - {{ node_type.name }}
+{% endblock %}
+
+{% block admin_content %}
+<div class="card card-structure">
+    <div class="card-header">
+        <h5 class="mb-0">正在导出</h5>
+    </div>
+    <div class="card-body text-center">
+        <div class="spinner-border text-primary mb-3" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p>正在准备导出文件，请稍候...</p>
+    </div>
+</div>
+
+<script>
+    setTimeout(function() {
+        window.location.href = "{{ url('importexport:do_export', node_type.slug) }}";
+    }, 1000);
+</script>
+{% endblock %}

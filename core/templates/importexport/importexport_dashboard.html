@@ -1,0 +1,20 @@
+{% extends "frames/frame_importexport.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'dashboard' %}
+
+{% block title %}数据导入导出 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}
+  数据导入导出
+{% endblock %}
+
+{% block admin_content %}
+{% set entries = [
+  {"icon": "bi-database-down", "title": "数据导出", "description": "将已启用的节点模块数据导出为 CSV/XLSX 格式", "url": url('importexport:export_list'), "action_text": "进入"},
+  {"icon": "bi-database-up", "title": "数据导入", "description": "从 CSV/XLSX 文件导入数据到节点模块", "url": url('importexport:import_list'), "action_text": "进入"}
+] %}
+{% include "includes/entry_card_grid.html" %}
+{% endblock %}

@@ -1,0 +1,180 @@
+<!-- 导航卡片区域 -->
+<div class="card card-structure mt-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-link-45deg me-2"></i>常用链接</h5>
+    </div>
+    <div class="card-body p-0">
+        <div id="navCardsArea" class="row g-1 mx-0">
+            <div class="col-2 nav-slot" data-position="1"></div>
+            <div class="col-2 nav-slot" data-position="2"></div>
+            <div class="col-2 nav-slot" data-position="3"></div>
+            <div class="col-2 nav-slot" data-position="4"></div>
+            <div class="col-2 nav-slot" data-position="5"></div>
+            <div class="col-2 nav-slot" data-position="6"></div>
+            <div class="col-2 nav-slot" data-position="7"></div>
+            <div class="col-2 nav-slot" data-position="8"></div>
+            <div class="col-2 nav-slot" data-position="9"></div>
+            <div class="col-2 nav-slot" data-position="10"></div>
+            <div class="col-2 nav-slot" data-position="11"></div>
+            <div class="col-2 nav-slot" data-position="12"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+.nav-slot {
+    border: 1px solid var(--border);
+    border-radius: 0;
+    background-color: var(--bg-surface);
+}
+.nav-slot:empty {
+    border: 2px dashed var(--border);
+}
+.nav-card {
+    border-radius: 0;
+    text-decoration: none;
+}
+.nav-card:hover {
+    box-shadow: inset 0 0 0 1px #fff;
+    color: #fff;
+}
+</style>
+
+<script>
+(function() {
+    'use strict';
+
+    function updateNavCardsDisplay(cards) {
+        var slots = document.querySelectorAll('.nav-slot');
+        slots.forEach(function(slot) {
+            slot.innerHTML = '';
+        });
+        
+        var usedPositions = new Set();
+        
+        cards.forEach(function(card) {
+            var position = card.position || 1;
+            
+            if (usedPositions.has(position)) {
+                for (var i = 1; i <= 12; i++) {
+                    if (!usedPositions.has(i)) {
+                        position = i;
+                        break;
+                    }
+                }
+            }
+            
+            usedPositions.add(position);
+            
+            var slot = document.querySelector('.nav-slot[data-position="' + position + '"]');
+            if (slot) {
+                var link = document.createElement('a');
+                link.href = card.url;
+                link.target = '_blank';
+                link.className = 'nav-card';
+                link.draggable = true;
+                link.dataset.id = card.id;
+                link.style.backgroundColor = card.bg_color;
+                link.textContent = card.name;
+                slot.appendChild(link);
+            }
+        });
+    }
+    
+    var navCardsData = [];
+    
+    function onNavCardDrop(draggingCard, toSlot) {
+        var fromSlot = draggingCard.closest('.nav-slot');
+        if (fromSlot === toSlot) return;
+
+        var toCard = toSlot.querySelector('.nav-card');
+
+        var cardData = navCardsData.find(function(c) { return c.id == draggingCard.dataset.id; });
+        if (!cardData) return;
+
+        toSlot.innerHTML = '';
+        toSlot.appendChild(draggingCard);
+
+        if (toCard) {
+            fromSlot.innerHTML = '';
+            fromSlot.appendChild(toCard);
+
+            var toCardData = navCardsData.find(function(c) { return c.id == toCard.dataset.id; });
+            if (toCardData) {
+                var tempPos = cardData.position;
+                cardData.position = toCardData.position;
+                toCardData.position = tempPos;
+            }
+        } else {
+            cardData.position = parseInt(toSlot.dataset.position);
+        }
+
+        saveNavCardsOrder();
+    }
+
+    function initNavDragDrop() {
+        if (window.FFE && window.FFE.DragDrop) {
+            window.FFE.DragDrop.makeSortable('#navCardsArea', '.nav-card', '.nav-slot', onNavCardDrop);
+        }
+    }
+
+    function saveNavCardsOrder() {
+        fetch('{{ url("api:api_nav_cards_save") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': window.FFE.getCsrfToken()
+            },
+            body: JSON.stringify({ cards: navCardsData }),
+            credentials: 'include'
+        }).then(function(response) { return response.json(); })
+          .catch(function() { console.error('保存导航卡片顺序失败'); });
+    }
+
+    function renderNavCards() {
+        fetch('{{ url('api:api_nav_cards') }}', {credentials: 'include'})
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success && data.cards) {
+                    navCardsData = data.cards;
+                    updateNavCardsDisplay(navCardsData);
+                }
+                initNavDragDrop();
+            })
+            .catch(function() {
+                console.error('加载导航卡片失败');
+                initNavDragDrop();
+            });
+    }
+
+    // 初始化
+    function setupNavCardListeners() {
+        var channel = new BroadcastChannel('nav-cards-updated');
+        channel.addEventListener('message', function(event) {
+            renderNavCards();
+        });
+        
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'nav-cards-updated' && e.newValue) {
+                renderNavCards();
+            }
+        });
+        
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                renderNavCards();
+            }
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            renderNavCards();
+            setupNavCardListeners();
+        });
+    } else {
+        renderNavCards();
+        setupNavCardListeners();
+    }
+})();
+</script>

@@ -1,0 +1,81 @@
+/* themes/variables.css
+   =============================================================================
+   作用：声明所有 CSS 自定义属性（变量）的名称，不包含任何具体值。
+   所有主题文件（default.css, dark.css 等）都将基于这些变量名进行赋值。
+   此文件不应包含任何具体颜色、尺寸、阴影等值，仅作为“变量接口”。
+   ============================================================================= */
+
+/* 主色与交互态 */
+:root {
+    --primary: ;
+    --primary-dark: ;
+    --primary-darker: ;
+    --primary-light: ;
+    --primary-lighter: ;
+
+    /* 强调 / 辅助色 */
+    --accent: ;
+    --accent-dark: ;
+    --accent-light: ;
+
+    /* 状态色 */
+    --success: ;
+    --success-dark: ;
+    --warning: ;
+    --warning-dark: ;
+    --error: ;
+    --error-dark: ;
+    --info: ;
+    --info-dark: ;
+
+    /* 文字 */
+    --text-primary: ;
+    --text-secondary: ;
+    --text-tertiary: ;
+    --text-inverse: ;
+    --text-disabled: ;
+
+    /* 背景 */
+    --bg-main: ;
+    --bg-secondary: ;
+    --bg-tertiary: ;
+    --bg-surface: ;           /* 卡片、表格等表面 */
+    --bg-hover: ;
+    --bg-active: ;
+
+    /* 导航栏 / 头部 */
+    --navbar-bg: ;
+    --navbar-text: ;
+    --navbar-hover-bg: ;
+    --navbar-active-bg: ;
+
+    /* Footer */
+    --footer-bg: ;
+    --footer-text: ;
+
+    /* 边框 / 分割线 */
+    --border: ;
+    --border-strong: ;
+    --border-subtle: ;
+    --divider: ;
+
+    /* 阴影 */
+    --shadow-sm: ;
+    --shadow: ;
+    --shadow-md: ;
+    --shadow-lg: ;
+    --shadow-hover: ;
+
+    /* 圆角 */
+    --radius-sm: ;
+    --radius: ;
+    --radius-lg: ;
+    --radius-pill: ;
+
+    /* 其他常用 */
+    --hover-opacity: ;
+    --focus-ring: ;
+    --transition: ;
+    --gradient-primary: ;
+    --gradient-hero-overlay: ;
+}

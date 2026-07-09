@@ -1,0 +1,10 @@
+{% extends "frames/frame_sidebar_base.html" %}
+
+{% block sidebar_nav %}
+          <ul class="nav flex-column mb-auto">
+{% set section, icon, label, url_name = 'profile', 'bi-person', '个人信息', 'core:profile_view' %}{% include "includes/nav_item.html" %}
+{% set section, icon, label, url_name = 'preferences', 'bi-sliders', '偏好设置', 'core:profile_settings' %}{% include "includes/nav_item.html" %}
+{% set section, icon, label, url_name = 'homepage', 'bi-grid', '功能卡片', 'core:homepage_settings' %}{% include "includes/nav_item.html" %}
+{% set section, icon, label, url_name = 'nav_cards', 'bi-bookmark', '导航卡片', 'core:navigation_settings' %}{% include "includes/nav_item.html" %}
+          </ul>
+{% endblock %}

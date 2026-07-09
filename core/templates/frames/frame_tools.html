@@ -1,0 +1,11 @@
+{% extends "frames/frame_sidebar_base.html" %}
+
+{% block sidebar_nav %}
+          <ul class="nav flex-column mb-auto">
+{% set section, icon, label, url_name = 'dashboard', 'bi-grid', '工具总览', 'core:tools_index' %}{% include "includes/nav_item.html" %}
+            
+            {% for tool in tools %}
+{% set section = tool.slug %}{% set icon = tool.icon|default('bi-wrench') %}{% set label = tool.name %}{% set url_name = 'core:tools_page' %}{% set url_args = tool.slug %}{% include "includes/nav_item.html" %}
+            {% endfor %}
+          </ul>
+{% endblock %}

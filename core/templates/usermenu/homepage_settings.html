@@ -1,0 +1,297 @@
+{% extends "frames/frame_myinfo.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'homepage' %}
+
+{% block title %}导航卡片设置 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}导航卡片设置{% endblock %}
+
+{% block admin_buttons_content %}{% endblock %}
+
+{% block head_extra %}
+{{ super() }}
+<style>
+.homepage-settings {
+    user-select: none;
+}
+.homepage-settings .section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+}
+.homepage-settings .card-grid {
+    border: 1px solid var(--border) !important;
+    margin-bottom: 32px;
+    border-radius: var(--radius-md);
+}
+.homepage-settings .card-grid .row {
+    margin: 0 !important;
+}
+.homepage-settings .card-grid .col-4 {
+    padding: 0 !important;
+}
+.homepage-settings .card-slot:nth-child(odd) {
+    background-color: var(--bg-surface);
+}
+.homepage-settings .card-slot:nth-child(even) {
+    background-color: var(--primary-light);
+}
+.homepage-settings .card-slot:hover {
+    background-color: var(--bg-hover);
+}
+.homepage-settings .dashboard-card {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    background: var(--primary);
+    color: #fff;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow);
+}
+.homepage-settings .dashboard-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+.homepage-settings .dashboard-card:active {
+    cursor: grabbing;
+}
+.homepage-settings .dashboard-card.dragging {
+    opacity: 0.5;
+}
+.homepage-settings .dashboard-card.light-bg {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+.homepage-settings .dashboard-card i {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+.homepage-settings .dashboard-card span {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+.homepage-settings .empty-slot {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-align: center;
+}
+.homepage-settings .available-section {
+    margin-top: 24px;
+}
+.homepage-settings .available-area {
+    min-height: 80px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+.homepage-settings .available-area.drag-over {
+    border-color: var(--danger, #dc3545);
+    background: var(--danger-light, rgba(220, 53, 69, 0.05));
+}
+.homepage-settings .available-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid var(--border);
+    background: white;
+    cursor: grab;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    border-radius: var(--radius-md);
+}
+.homepage-settings .available-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+.homepage-settings .available-card:active {
+    cursor: grabbing;
+}
+.homepage-settings .available-card.dragging {
+    opacity: 0.5;
+}
+.homepage-settings .available-card i {
+    font-size: 1.1rem;
+    color: var(--primary);
+}
+</style>
+{% endblock %}
+
+{% block admin_content %}
+{% include "includes/csrf.html" %}
+<div class="homepage-settings">
+    <h5 class="section-title mb-3">
+        <i class="bi bi-grid-3x3-gap me-2"></i>快捷入口
+    </h5>
+    
+    <div class="card-grid" id="homepageArea">
+        <div class="row g-0">
+            {% for i in "123" %}
+            <div class="col-4">
+                <div class="card-slot" data-position="{{ i }}">
+                    {% if positions.get(i, {}).get('module') %}
+                        {% for module in available_modules %}
+                            {% if module.id == positions.get(i, {}).get('module') %}
+                            <div class="dashboard-card" draggable="true" data-module="{{ module.id }}" data-name="{{ module.name }}" data-icon="{{ module.icon }}">
+                                <i class="bi {{ module.icon }}"></i>
+                                <span>{{ module.name }}</span>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                    <div class="empty-slot">拖入卡片</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="row g-0 mt-0">
+            {% for i in "456" %}
+            <div class="col-4">
+                <div class="card-slot" data-position="{{ i }}">
+                    {% if positions.get(i, {}).get('module') %}
+                        {% for module in available_modules %}
+                            {% if module.id == positions.get(i, {}).get('module') %}
+                            <div class="dashboard-card" draggable="true" data-module="{{ module.id }}" data-name="{{ module.name }}" data-icon="{{ module.icon }}">
+                                <i class="bi {{ module.icon }}"></i>
+                                <span>{{ module.name }}</span>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                    <div class="empty-slot">拖入卡片</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="available-section">
+        <h5 class="section-title mb-3">
+            <i class="bi bi-collection me-2"></i>全部可用卡片
+        </h5>
+        <div class="available-area" id="availableArea">
+            {% for module in available_modules %}
+            <div class="available-card" draggable="true" data-module="{{ module.id }}" data-name="{{ module.name }}" data-icon="{{ module.icon }}">
+                <i class="bi {{ module.icon }}"></i>
+                <span>{{ module.name }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function savePositions() {
+        var positions = {};
+        document.querySelectorAll('#homepageArea .card-slot').forEach(function(slot) {
+            var pos = slot.dataset.position;
+            var card = slot.querySelector('.dashboard-card');
+            positions[pos] = { module: card ? card.dataset.module : null };
+        });
+        
+        fetch('{{ url("api:api_dashboard_cards_save") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': window.FFE.getCsrfToken()
+            },
+            credentials: 'include',
+            body: JSON.stringify({ positions: positions })
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            if (!data.success) {
+                console.error('保存失败:', data.error || '未知错误');
+            }
+        })
+        .catch(function(error) {
+            console.error('保存失败:', error);
+        });
+    }
+
+    function updateVisibility() {
+        var used = [];
+        document.querySelectorAll('#homepageArea .dashboard-card').forEach(function(c) {
+            used.push(c.dataset.module);
+        });
+        document.querySelectorAll('#availableArea .available-card').forEach(function(c) {
+            if (used.includes(c.dataset.module)) {
+                c.style.display = 'none';
+            } else {
+                c.style.display = 'inline-flex';
+            }
+        });
+    }
+
+    function onDrop(draggingCard, toSlot) {
+        if (toSlot.classList.contains('card-slot')) {
+            if (draggingCard.classList.contains('available-card')) {
+                var existing = toSlot.querySelector('.dashboard-card');
+                if (existing) existing.remove();
+                
+                var emptySlot = toSlot.querySelector('.empty-slot');
+                if (emptySlot) emptySlot.remove();
+                
+                var newCard = document.createElement('div');
+                newCard.className = 'dashboard-card';
+                newCard.draggable = true;
+                newCard.dataset.module = draggingCard.dataset.module;
+                newCard.dataset.name = draggingCard.dataset.name;
+                newCard.dataset.icon = draggingCard.dataset.icon;
+                newCard.innerHTML = '<i class="bi ' + draggingCard.dataset.icon + '"></i><span>' + draggingCard.dataset.name + '</span>';
+                toSlot.appendChild(newCard);
+            } else if (draggingCard.classList.contains('dashboard-card')) {
+                var fromSlot = draggingCard.closest('.card-slot');
+                if (fromSlot === toSlot) return;
+                
+                var existing = toSlot.querySelector('.dashboard-card');
+                if (existing) {
+                    existing.remove();
+                    fromSlot.appendChild(existing);
+                } else {
+                    var emptySlot = toSlot.querySelector('.empty-slot');
+                    if (emptySlot) emptySlot.remove();
+                    fromSlot.innerHTML = '<div class="empty-slot">拖入卡片</div>';
+                }
+                toSlot.appendChild(draggingCard);
+            }
+        } else if (toSlot.classList.contains('available-area')) {
+            if (draggingCard.classList.contains('dashboard-card')) {
+                var fromSlot = draggingCard.closest('.card-slot');
+                draggingCard.remove();
+                fromSlot.innerHTML = '<div class="empty-slot">拖入卡片</div>';
+            }
+        }
+
+        setTimeout(function() {
+            updateVisibility();
+            savePositions();
+        }, 0);
+    }
+
+    window.FFE.DragDrop.makeSortable('.card-slot, .available-area', '.dashboard-card, .available-card', '.card-slot, .available-area', onDrop);
+
+    updateVisibility();
+});
+</script>
+{% endblock %}

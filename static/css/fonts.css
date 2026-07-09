@@ -1,0 +1,48 @@
+/* static/css/fonts.css
+   全局 @font-face 声明，<link> 直接加载（无 @import 链延迟）
+============================================================================ */
+
+/* Inter - Regular */
+@font-face {
+    font-family: 'Inter';
+    src: url("../fonts/inter/web/Inter-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: block;
+}
+
+/* Inter - SemiBold (for entry-card titles etc.) */
+@font-face {
+    font-family: 'Inter';
+    src: url("../fonts/inter/web/Inter-SemiBold.woff2") format("woff2");
+    font-weight: 600;
+    font-style: normal;
+    font-display: block;
+}
+
+/* Inter - Bold */
+@font-face {
+    font-family: 'Inter';
+    src: url("../fonts/inter/web/Inter-Bold.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: block;
+}
+
+/* Noto Sans SC - Regular */
+@font-face {
+    font-family: 'Noto Sans SC';
+    src: url("../fonts/noto-sans-sc/NotoSansSC-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: block;
+}
+
+/* Noto Sans SC - Bold */
+@font-face {
+    font-family: 'Noto Sans SC';
+    src: url("../fonts/noto-sans-sc/NotoSansSC-Bold.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: block;
+}

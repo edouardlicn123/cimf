@@ -1,0 +1,274 @@
+{% extends "frames/frame_module.html" %}
+
+{% set show_header = false %}
+
+{% block title %}模块管理 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}模块管理{% endblock %}
+
+{% block admin_buttons_content %}
+<form method="POST" action="{{ url('module:scan') }}" style="display:inline;">
+    {% include "includes/csrf.html" %}
+    <button type="submit" class="btn btn-secondary">
+        <i class="bi bi-arrow-repeat"></i> 扫描模块
+    </button>
+</form>
+<a href="{{ url('module:create') }}" class="btn btn-primary">
+    <i class="bi bi-plus-lg"></i> 新建模块
+</a>
+{% endblock %}
+
+{% block admin_content %}
+<!-- 提示信息 -->
+<div class="alert alert-warning alert-dismissible fade show mb-4" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    安装或启用模块后，需要重启服务器才能正常使用。删除模块前必须先禁用。
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+
+<!-- 筛选和搜索栏 -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <!-- 搜索框 + 搜索按钮 -->
+            <div class="col-md-5">
+                <label class="form-label small text-muted">搜索模块</label>
+                <div class="input-group">
+                    <input type="text" name="search" class="form-control" 
+                           placeholder="输入模块名称或ID..." value="{{ search|default('') }}">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 类型筛选 -->
+            <div class="col-md-3">
+                <label class="form-label small text-muted">模块类型</label>
+                <select name="type" class="form-select">
+                    <option value="">全部类型</option>
+                    <option value="node" {% if type_filter == 'node' %}selected{% endif %}>Node（事务节点）</option>
+                    <option value="system" {% if type_filter == 'system' %}selected{% endif %}>System（系统模块）</option>
+                    <option value="tool" {% if type_filter == 'tool' %}selected{% endif %}>Tool（协作工具）</option>
+                </select>
+            </div>
+            
+            <!-- 状态筛选 -->
+            <div class="col-md-3">
+                <label class="form-label small text-muted">模块状态</label>
+                <select name="status" class="form-select">
+                    <option value="">全部状态</option>
+                    <option value="active" {% if status_filter == 'active' %}selected{% endif %}>已启用</option>
+                    <option value="installed" {% if status_filter == 'installed' %}selected{% endif %}>已安装（未启用）</option>
+                    <option value="uninstalled" {% if status_filter == 'uninstalled' %}selected{% endif %}>未安装</option>
+                    <option value="error" {% if status_filter == 'error' %}selected{% endif %}>错误</option>
+                </select>
+            </div>
+            
+            <!-- 清除筛选 -->
+            {% if search or type_filter or status_filter %}
+            <div class="col-md-12">
+                <a href="{{ url('module:list') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-x-circle"></i> 清除筛选
+                </a>
+                <span class="text-muted small ms-2">
+                    找到 {{ page_obj.paginator.count }} 个模块
+                </span>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<!-- 模块卡片列表 -->
+{% if modules %}
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+    {% for module in modules %}
+    {% set is_registered = module.is_registered %}
+    {% set mod_type = module.module_type %}
+    {% set mod_id = module.id %}
+    {% set mod_status = module._status %}
+    {% set mod_name = module.name %}
+    {% set mod_icon = module.icon|default('bi-box-seam') %}
+    {% set is_uninstalled = mod_status == 'uninstalled' %}
+    {% set mod_version = module.version %}
+    {% set mod_description = module.description|default('暂无描述') %}
+    {% set mod_dependencies = module.dependencies if is_registered else [] %}
+    
+    <div class="col">
+        <!-- 根据状态设置卡片样式 -->
+        {% if mod_status == 'active' %}
+        <div class="entry-card h-100 border-success">
+            <div class="entry-card-figure bg-success text-white">
+                <i class="bi {{ mod_icon }}"></i>
+                <h5 class="entry-card-title">{{ mod_name }}</h5>
+            </div>
+            <div class="entry-card-body d-flex flex-column">
+                <div class="mb-2 small">
+                    <code>{{ mod_id }}</code>
+                    <span class="badge bg-primary ms-1">{{ mod_type }}</span>
+                    <span class="badge bg-success ms-1">已启用</span>
+                    {% if mod_version %}
+                    <span class="badge bg-info ms-1">v{{ mod_version }}</span>
+                    {% endif %}
+                </div>
+                <p class="entry-card-desc small text-muted mb-3 flex-grow-1">
+                    {{ mod_description|truncatechars(60) }}
+                </p>
+                {% if mod_dependencies %}
+                <div class="small text-muted mb-2">
+                    <i class="bi bi-link-45deg"></i> 依赖:
+                    {% for dep in mod_dependencies[:3] %}
+                    <span class="badge bg-light text-dark me-1">{{ dep }}</span>
+                    {% endfor %}
+                    {% if mod_dependencies|length > 3 %}
+                    <span class="text-muted">+{{ mod_dependencies|length - 3 }}</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+                <div class="entry-card-actions mt-auto">
+                    <form method="POST" action="{{ url('module:disable', mod_id) }}" style="display:inline;">
+                        {% include "includes/csrf.html" %}
+                        <button type="submit" class="btn btn-sm btn-warning">
+                            <i class="bi bi-pause-circle"></i> 禁用
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% elif mod_status == 'installed' %}
+        <div class="entry-card h-100 border-secondary">
+            <div class="entry-card-figure bg-secondary text-white">
+                <i class="bi {{ mod_icon }}"></i>
+                <h5 class="entry-card-title">{{ mod_name }}</h5>
+            </div>
+            <div class="entry-card-body d-flex flex-column">
+                <div class="mb-2 small">
+                    <code>{{ mod_id }}</code>
+                    <span class="badge bg-primary ms-1">{{ mod_type }}</span>
+                    <span class="badge bg-secondary ms-1">已安装</span>
+                    {% if mod_version %}
+                    <span class="badge bg-info ms-1">v{{ mod_version }}</span>
+                    {% endif %}
+                </div>
+                <p class="entry-card-desc small text-muted mb-3 flex-grow-1">
+                    {{ mod_description|truncatechars(60) }}
+                </p>
+                {% if mod_dependencies %}
+                <div class="small text-muted mb-2">
+                    <i class="bi bi-link-45deg"></i> 依赖:
+                    {% for dep in mod_dependencies[:3] %}
+                    <span class="badge bg-light text-dark me-1">{{ dep }}</span>
+                    {% endfor %}
+                    {% if mod_dependencies|length > 3 %}
+                    <span class="text-muted">+{{ mod_dependencies|length - 3 }}</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+                <div class="entry-card-actions mt-auto">
+                    <form method="POST" action="{{ url('module:enable', mod_id) }}" style="display:inline;">
+                        {% include "includes/csrf.html" %}
+                        <button type="submit" class="btn btn-sm btn-success">
+                            <i class="bi bi-play-circle"></i> 启用
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% elif mod_status == 'error' %}
+        <div class="entry-card h-100 border-danger">
+            <div class="entry-card-figure bg-danger text-white">
+                <i class="bi {{ mod_icon }}"></i>
+                <h5 class="entry-card-title" style="opacity: 0.5;">{{ mod_name }}</h5>
+            </div>
+            <div class="entry-card-body d-flex flex-column">
+                <div class="mb-2 small">
+                    <code>{{ mod_id }}</code>
+                    <span class="badge bg-primary ms-1">{{ mod_type }}</span>
+                    <span class="badge bg-danger ms-1">错误</span>
+                    {% if mod_version %}
+                    <span class="badge bg-info ms-1">v{{ mod_version }}</span>
+                    {% endif %}
+                </div>
+                {% if module.error %}
+                <div class="alert alert-danger py-1 px-2 small mb-2">
+                    <i class="bi bi-exclamation-triangle"></i> {{ module.error }}
+                </div>
+                {% endif %}
+                <p class="entry-card-desc small text-muted mb-3 flex-grow-1">
+                    {{ mod_description|truncatechars(60) }}
+                </p>
+                <div class="entry-card-actions mt-auto">
+                    <form method="POST" action="{{ url('module:install', mod_id) }}" style="display:inline;">
+                        {% include "includes/csrf.html" %}
+                        <button type="submit" class="btn btn-sm btn-warning">
+                            <i class="bi bi-wrench"></i> 修复安装
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="entry-card h-100 border-dashed">
+            <div class="entry-card-figure bg-light text-dark">
+                <i class="bi {{ mod_icon }}"></i>
+                <h5 class="entry-card-title" style="opacity: 0.5;">{{ mod_name }}</h5>
+            </div>
+            <div class="entry-card-body d-flex flex-column">
+                <div class="mb-2 small">
+                    <code>{{ mod_id }}</code>
+                    <span class="badge bg-primary ms-1">{{ mod_type }}</span>
+                    <span class="badge bg-warning ms-1">未安装</span>
+                    {% if mod_version %}
+                    <span class="badge bg-info ms-1">v{{ mod_version }}</span>
+                    {% endif %}
+                </div>
+                <p class="entry-card-desc small text-muted mb-3 flex-grow-1">
+                    {{ mod_description|truncatechars(60) }}
+                </p>
+                <div class="entry-card-actions mt-auto">
+                    <form method="POST" action="{{ url('module:install', mod_id) }}" style="display:inline;">
+                        {% include "includes/csrf.html" %}
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="bi bi-download"></i> 安装
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+
+<!-- 分页控件 -->
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+{% set extra_params = base_query.replace('?', '&') if '?' in base_query else '' %}
+{% include "includes/pagination.html" %}
+{% endif %}
+
+{% else %}
+<!-- 无结果提示 -->
+<div class="text-center py-5">
+    <div class="mb-4">
+        <i class="bi bi-inbox" style="font-size: 4rem; color: #dee2e6;"></i>
+    </div>
+    <h5 class="text-muted mb-3">暂无匹配的模块</h5>
+    {% if search or type_filter or status_filter %}
+    <p class="text-muted mb-4">尝试调整筛选条件或搜索关键词</p>
+    <a href="{{ url('module:list') }}" class="btn btn-primary">
+        <i class="bi bi-arrow-counterclockwise"></i> 清除筛选
+    </a>
+    {% else %}
+    <p class="text-muted mb-4">请使用扫描功能获取可用模块</p>
+    <form method="POST" action="{{ url('module:scan') }}" style="display:inline;">
+        {% include "includes/csrf.html" %}
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-arrow-repeat"></i> 扫描模块
+        </button>
+    </form>
+    {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

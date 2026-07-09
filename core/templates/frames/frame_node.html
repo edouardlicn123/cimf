@@ -1,0 +1,11 @@
+{% extends "frames/frame_sidebar_base.html" %}
+
+{% block sidebar_nav %}
+          <ul class="nav flex-column mb-auto">
+{% set section, icon, label, url_name = 'dashboard', 'bi-grid', '事务总览', 'node:index' %}{% include "includes/nav_item.html" %}
+            
+            {% for nt in node_types %}
+{% set section = nt.slug %}{% set icon = nt.icon|default('bi-folder') %}{% set label = nt.name %}{% set url_name = 'node:module_page' %}{% set url_args = nt.slug %}{% include "includes/nav_item.html" %}
+            {% endfor %}
+          </ul>
+{% endblock %}
