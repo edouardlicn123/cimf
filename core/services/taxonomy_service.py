@@ -110,6 +110,18 @@ class TaxonomyService(BaseService):
         """获取词汇表的所有词汇项"""
         return TaxonomyItem.objects.filter(taxonomy_id=taxonomy_id).order_by("weight", "name")
 
+    @classmethod
+    def get_items_bulk(cls, slugs: list[str]) -> dict[str, list[models.Model]]:
+        """批量获取多个词汇表的词汇项，一次数据库查询"""
+        taxonomies = Taxonomy.objects.filter(slug__in=slugs).prefetch_related("items")
+        result: dict[str, list[models.Model]] = {}
+        for tax in taxonomies:
+            items = tax.items.all().order_by("weight", "name") if hasattr(tax, "items") else []
+            result[tax.slug] = list(items)
+        for slug in slugs:
+            result.setdefault(slug, [])
+        return result
+
     @staticmethod
     def get_item_by_id(item_id: int):
         """根据 ID 获取词汇项"""

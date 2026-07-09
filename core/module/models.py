@@ -45,6 +45,13 @@ class Module(BaseModel):
         module_path = settings.BASE_DIR / "modules" / self.path
         return module_path.is_dir()
 
+    @classmethod
+    def get_active_ids(cls, module_type: str | None = None) -> list[str]:
+        qs = cls.objects.filter(is_active=True)
+        if module_type:
+            qs = qs.filter(module_type=module_type)
+        return list(qs.values_list("module_id", flat=True))
+
     def __str__(self):
         return f"{self.name} ({self.module_id})"
 

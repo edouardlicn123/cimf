@@ -29,9 +29,7 @@ logger = logging.getLogger(__name__)
 @login_required
 def nodes_index(request):
     """节点首页 - 只显示 node 类型的节点类型"""
-    node_type_ids = Module.objects.filter(module_type=ModuleType.NODE, is_active=True).values_list(
-        "module_id", flat=True
-    )
+    node_type_ids = Module.get_active_ids(ModuleType.NODE)
     node_types = NodeType.objects.filter(slug__in=node_type_ids, is_active=True)
     return render(
         request,
