@@ -213,9 +213,8 @@ def module_custom_dispatch(request, node_type_slug: str, extra_path: str):
     raise Http404
 
 
-@login_required
-def module_dispatch(request, node_type_slug: str, node_id: int | None = None, action: str | None = None):
-    """模块分发视图 - 根据节点类型动态加载对应模块的视图"""
+def _check_module_exists(node_type_slug: str) -> str:
+    """检查模块是否存在并已激活，返回模块路径或抛出 404"""
     from core.module.models import Module  # noqa: PLC0415
 
     if not Module.objects.filter(module_id=node_type_slug, is_installed=True, is_active=True).exists():
@@ -226,32 +225,44 @@ def module_dispatch(request, node_type_slug: str, node_id: int | None = None, ac
         import_module(f"modules.{module_path}.views")
     except ImportError:
         raise Http404(f"未找到模块: {node_type_slug}") from None
+    return module_path
 
+
+def _check_action_permission(request, action: str | None, node_type_slug: str):
+    """检查是否需要管理员权限，无权限时返回 redirect"""
     if action in ("create", "edit", "delete") and not request.user.is_admin:
         messages.error(request, "需要管理员权限")
         return redirect("node:module_page", node_type_slug=node_type_slug)
+    return None
 
+
+def _resolve_view(module_path: str, action: str | None, node_id: int | None = None):
+    """解析动作对应的视图函数"""
     if action == "create":
-        view = dynamic_import_view(module_path, "node_create") or dynamic_import_view(module_path, "create")
-        if view:
-            return view(request)
-
+        return dynamic_import_view(module_path, "node_create") or dynamic_import_view(module_path, "create")
     if action == "delete":
-        view = dynamic_import_view(module_path, "node_delete") or dynamic_import_view(module_path, "delete")
-        if view:
-            return view(request, node_id)
-
+        return dynamic_import_view(module_path, "node_delete") or dynamic_import_view(module_path, "delete")
     if action == "edit":
-        view = dynamic_import_view(module_path, "node_edit") or dynamic_import_view(module_path, "edit")
-        if view:
-            return view(request, node_id)
+        return dynamic_import_view(module_path, "node_edit") or dynamic_import_view(module_path, "edit")
 
-    view = (dynamic_import_view(module_path, "module_view") or
+    return (dynamic_import_view(module_path, "module_view") or
             (dynamic_import_view(module_path, "detail_view") if node_id is not None else None) or
             dynamic_import_view(module_path, "list_view") or
             (dynamic_import_view(module_path, "node_list") if node_id is None else None) or
             (dynamic_import_view(module_path, "node_view") if node_id is not None else None) or
             (dynamic_import_view(module_path, "node_edit") if node_id is not None else None))
+
+
+@login_required
+def module_dispatch(request, node_type_slug: str, node_id: int | None = None, action: str | None = None):
+    """模块分发视图 - 根据节点类型动态加载对应模块的视图"""
+    module_path = _check_module_exists(node_type_slug)
+
+    permission_response = _check_action_permission(request, action, node_type_slug)
+    if permission_response:
+        return permission_response
+
+    view = _resolve_view(module_path, action, node_id)
     if view:
         sig = inspect.signature(view)
         if len(sig.parameters) == 1:
