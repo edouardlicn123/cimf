@@ -24,6 +24,18 @@ class EmailService:
     _last_send_time = 0.0
     _next_delay = 0.0
 
+    @staticmethod
+    def _resolve_system_url(request=None) -> str:
+        """获取系统地址，优先使用配置值，无配置时从请求拼接"""
+        system_url = SmtpService.get_system_url()
+        if system_url:
+            return system_url
+        if request:
+            host = request.get_host()
+            scheme = "https" if request.is_secure() else "http"
+            return f"{scheme}://{host}"
+        return ""
+
     @classmethod
     def send_email(
         cls,
@@ -330,7 +342,7 @@ CIMF 系统检测到最近有 {failed_count} 封邮件发送失败，请检查 S
             request: Django 请求对象（用于获取系统URL）
             async_send: 是否异步发送
         """
-        system_url = SmtpService.get_system_url(request)
+        system_url = cls._resolve_system_url(request)
         context = {
             "code": code,
             "expire_minutes": expire_minutes,
@@ -363,7 +375,7 @@ CIMF 系统检测到最近有 {failed_count} 封邮件发送失败，请检查 S
             request: Django 请求对象
             async_send: 是否异步发送
         """
-        system_url = SmtpService.get_system_url(request)
+        system_url = cls._resolve_system_url(request)
         context = {
             "reset_link": reset_link,
             "expire_hours": expire_hours,
@@ -400,7 +412,7 @@ CIMF 系统检测到最近有 {failed_count} 封邮件发送失败，请检查 S
             request: Django 请求对象
             async_send: 是否异步发送
         """
-        system_url = SmtpService.get_system_url(request)
+        system_url = cls._resolve_system_url(request)
         context = {
             "title": title,
             "message": message,

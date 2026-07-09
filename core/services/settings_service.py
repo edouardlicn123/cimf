@@ -49,29 +49,17 @@ from core.services.mixins import CachedServiceMixin
 
 
 def _convert_setting_value(value: str) -> bool | int | float | str:
-    """
-    将设置值字符串转换为合适的 Python 类型
-
-    说明：
-        数据库中存储的是字符串，此函数根据内容自动转换为：
-        - 'true'/'false' -> bool
-        - 纯数字（无小数点） -> int
-        - 纯数字（有小数点） -> float
-        - 其他 -> str
-
-    参数：
-        value: 数据库中的字符串值
-
-    返回：
-        转换后的 Python 对象
-    """
     value = value.strip()
     if value.lower() in ("true", "false"):
         return value.lower() == "true"
-    elif value.isdigit():
+    try:
         return int(value)
-    elif value.count(".") == 1 and value.replace(".", "").isdigit():
+    except (ValueError, TypeError):
+        pass
+    try:
         return float(value)
+    except (ValueError, TypeError):
+        pass
     return value
 
 

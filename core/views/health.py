@@ -16,15 +16,12 @@ from core.decorators import login_required_json
 from core.services import VersionService
 
 
-def _run_check(checks, name, fn, on_error_status="degraded"):
-    overall = "ok"
+def _run_check(checks, name, fn):
     try:
         fn()
         checks[name] = "ok"
     except Exception as e:
         checks[name] = f"error: {e!s}"
-        overall = on_error_status
-    return overall
 
 
 @login_required_json
@@ -41,27 +38,21 @@ def health_check(request):  # noqa: ARG001
     def _check_db():
         connection.ensure_connection()
 
-    result = _run_check(checks, "database", _check_db, "error")
-    if result != "ok":
-        overall_status = result
+    _run_check(checks, "database", _check_db)
 
     def _check_cache():
         cache.set("_health_check", "ok", 10)
         if cache.get("_health_check") != "ok":
             raise RuntimeError("degraded")
 
-    result = _run_check(checks, "cache", _check_cache)
-    if result != "ok":
-        overall_status = result
+    _run_check(checks, "cache", _check_cache)
 
     def _check_storage():
         storage_path = Path(__file__).parent.parent / "storage"
         if not storage_path.exists():
             raise RuntimeError("missing")
 
-    result = _run_check(checks, "storage", _check_storage)
-    if result != "ok":
-        overall_status = result
+    _run_check(checks, "storage", _check_storage)
 
     checks["uptime_ms"] = round((time.time() - start_time) * 1000, 2)
     checks["status"] = overall_status
@@ -84,9 +75,7 @@ def detailed_health_check(request):  # noqa: ARG001
         with connection.cursor() as cursor:
             cursor.execute("SELECT 1")
 
-    result = _run_check(checks, "database", _check_db, "error")
-    if result != "ok":
-        overall_status = result
+    _run_check(checks, "database", _check_db)
 
     def _check_tables():
         from core.models import SystemSetting, User  # noqa: PLC0415
@@ -96,9 +85,7 @@ def detailed_health_check(request):  # noqa: ARG001
             "settings": SystemSetting.objects.count(),
         }
 
-    result = _run_check(checks, "tables", _check_tables)
-    if result != "ok":
-        overall_status = result
+    _run_check(checks, "tables", _check_tables)
 
     def _check_modules():
         from core.node.models import Node, NodeType  # noqa: PLC0415
@@ -121,9 +108,7 @@ def detailed_health_check(request):  # noqa: ARG001
         except Exception:
             pass
 
-    result = _run_check(checks, "storage", _check_storage)
-    if result != "ok":
-        overall_status = result
+    _run_check(checks, "storage", _check_storage)
 
     checks["uptime_ms"] = round((time.time() - start_time) * 1000, 2)
     checks["status"] = overall_status

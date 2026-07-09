@@ -362,4 +362,5 @@
 4. R2修复: change_password缺失@login_required+handle_password_decorator崩溃; datetime.now→timezone.now; 修复tools_dashboard.html坏URL; 消除_get_node_type_or_none重复; update()复用FIELD_MAPPING
 5. 创建 docs/stage5/05_全面封装重构计划_SML.md：34 项（S10 + M轻16 + M重7 + L1），预估 ~170min
 6. S5: settings.py COMMON_ROLES 常量替换 + 修复缩进
+7. M轻 批次A: M1-M5 共享函数抽取(csv_response, _read_log_file, _module_to_dict, update_fields, build_filter_summaries)
 
