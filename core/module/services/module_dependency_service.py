@@ -2,7 +2,6 @@ from core.module.models import Module
 
 
 class ModuleDependencyService:
-
     @staticmethod
     def check_dependencies(module_id: str, visited: set | None = None) -> tuple:
         if visited is None:
@@ -14,6 +13,7 @@ class ModuleDependencyService:
         visited.add(module_id)
 
         from core.module.services.module_registry_service import ModuleRegistryService  # noqa: PLC0415
+
         module_info = ModuleRegistryService.load_module_info(module_id)
         if not module_info:
             return True, "", []
@@ -60,9 +60,7 @@ class ModuleDependencyService:
             module_info = ModuleRegistryService.load_module_info(cid)
             dep_module = Module.objects.filter(module_id=cid).first()
             if not dep_module:
-                raise ValueError(
-                    f"需要「{module_info.get('name', cid)}」已安装并启用（当前状态：未注册）"
-                )
+                raise ValueError(f"需要「{module_info.get('name', cid)}」已安装并启用（当前状态：未注册）")
 
             info = {
                 "module_id": cid,

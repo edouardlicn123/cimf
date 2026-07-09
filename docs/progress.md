@@ -367,4 +367,5 @@
 9. M轻 批次C: M11 Module.get_active_ids, M12 TaxonomyService.get_items_bulk, M13 CronTask缓存属性
 10. M轻 批次D: M14 SETTINGS_META分组注释, M15 迁移脚本常量提取
 11. M重 批次E: M17 system_settings拆分, M18 check_node_permission, M19 docstring, M20 validate_upload
+12. M重 批次F: M21 api_dashboard_cards拆分, M22 _read_local_version改用importlib, M23 module_dispatch拆分
 
