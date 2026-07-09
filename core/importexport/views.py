@@ -16,36 +16,7 @@ from core.node.services import NodeTypeService
 from core.utils.response import json_error, json_success
 
 
-def _build_filter_summaries(node_type_slug: str, filters: list) -> list:
-    """构建过滤器摘要"""
-    if not filters:
-        return []
 
-    all_fields = ExportService.get_exportable_fields(node_type_slug)
-    field_map = {f["name"]: f["label"] for f in all_fields}
-
-    summaries = []
-    for f in filters:
-        field = f.get("field", "")
-        value = f.get("value", "")
-
-        if field == "region":
-            try:
-                region_data = json.loads(value) if isinstance(value, str) else value
-            except (json.JSONDecodeError, TypeError):
-                region_data = {}
-            parts = [
-                v
-                for v in [region_data.get("province", ""), region_data.get("city", ""), region_data.get("district", "")]
-                if v
-            ]
-            if parts:
-                summaries.append({"label": "省市区", "value": " ".join(parts)})
-        else:
-            label = field_map.get(field, field)
-            summaries.append({"label": label, "value": value})
-
-    return summaries
 
 
 def _get_node_type_or_redirect(node_type_slug, redirect_name="importexport:export_list"):
@@ -158,7 +129,7 @@ def export_confirm(request, node_type_slug):
     record_count = ExportService.get_record_count(node_type_slug, filters)
     preview_data = ExportService.get_preview(node_type_slug, selected_fields, filters, limit=5)
 
-    filter_summaries = _build_filter_summaries(node_type_slug, filters)
+    filter_summaries = ExportService.build_filter_summaries(node_type_slug, filters)
 
     return render(
         request,

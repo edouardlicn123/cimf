@@ -38,7 +38,7 @@ from django.db.models import Count, Q
 from core.constants import UserRole
 from core.models import User
 from core.services.base_service import BaseService
-from core.services.mixins import clean_optional_str, clean_str, update_fields
+from core.services.mixins import clean_optional_str, clean_str
 from core.services.permission_service import PermissionService
 
 
@@ -247,7 +247,7 @@ class UserService(BaseService):
     ) -> User:
         """更新用户偏好设置"""
         user = cls._get_user_or_raise(user_id)
-        update_fields(
+        cls.update_fields(
             user, theme=theme, notifications_enabled=notifications_enabled, preferred_language=preferred_language
         )
         return user
