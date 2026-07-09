@@ -7,10 +7,10 @@ logger = logging.getLogger(__name__)
 
 
 class ModuleTaxonomyService:
-
     @staticmethod
     def create_module_taxonomies(module: Module) -> int:
         from core.module.services.module_registry_service import ModuleRegistryService  # noqa: PLC0415
+
         module_info = ModuleRegistryService._load_module_info(module.path)
         if not module_info:
             return 0
@@ -79,9 +79,7 @@ class ModuleTaxonomyService:
             if not taxonomy:
                 raise RuntimeError(f"词汇表创建失败: {slug}")
 
-            existing_item_names = {
-                name for (tid, name) in existing_items if tid == taxonomy.id
-            }
+            existing_item_names = {name for (tid, name) in existing_items if tid == taxonomy.id}
             expected_items = set(items)
             missing_items = expected_items - existing_item_names
 
