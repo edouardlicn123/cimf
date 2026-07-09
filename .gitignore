@@ -1,0 +1,66 @@
+# ========== Python ==========
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.mypy_cache/
+.pytest_cache/
+
+# ========== 虚拟环境 ==========
+env/
+venv/
+.venv/
+
+# ========== 运行时数据 ==========
+instance/
+instance/uploads/*
+*.db
+*.sqlite3
+
+# ========== 环境变量 ==========
+config.env
+
+# ========== 静态文件收集 ==========
+static/fonts/**/*.zip
+static/fonts/**/extras/
+storage/staticfiles/
+storage/staticfiles/fonts/**/*.zip
+storage/staticfiles/fonts/**/extras/
+
+# ========== 日志与报告 ==========
+*.log
+storage/logs/*log*
+storage/reports/
+
+# ========== 代码覆盖率 ==========
+coverage.xml
+htmlcov/
+
+# ========== 编辑器临时文件 ==========
+*.swp
+*.swo
+*~
+.#*
+
+# ========== 操作系统垃圾文件 ==========
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# ========== 开发阶段文档 ==========
+docs/stage3/
+docs/stage4/
+
+# ========== 模块排除 ==========
+# whatsapp
+modules/whatsapp/
+# resident_info
+modules/resident_info/
+# customer_cn
+modules/customer_cn/
+
+# ========== 其他（包管理工具相关）==========
+pip-log.txt
+pip-delete-this-directory.txt

@@ -1,0 +1,104 @@
+{% extends "frames/frame_importexport.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'export' %}
+
+{% block title %}确认导出 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}
+  确认导出 - {{ node_type.name }}
+{% endblock %}
+
+{% block admin_content %}
+{% set section_title %}导出信息{% endset %}
+{% set section_body %}
+<table class="table">
+    <tr>
+        <th>模块：</th>
+        <td>{{ node_type.name }}</td>
+    </tr>
+    <tr>
+        <th>格式：</th>
+        <td>{{ export_format | upper }}</td>
+    </tr>
+    <tr>
+        <th>记录数：</th>
+        <td>{{ record_count }}</td>
+    </tr>
+    <tr>
+        <th>字段：</th>
+        <td>{{ selected_fields | length }} 个</td>
+    </tr>
+</table>
+
+{% if filter_summaries %}
+<h6>筛选条件：</h6>
+<ul>
+    {% for f in filter_summaries %}
+    <li>{{ f.label }}: {{ f.value }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endset %}
+{% include "includes/card_section.html" %}
+
+{% set section_title %}导出字段{% endset %}
+{% set section_body %}
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th>序号</th>
+            <th>字段名</th>
+            <th>标签</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for field in fields_info %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ field.name }}</td>
+            <td>{{ field.label }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endset %}
+{% include "includes/card_section.html" %}
+
+{% if preview_data %}
+{% set section_title %}数据预览（前5条）{% endset %}
+{% set section_body %}
+<div class="table-responsive">
+    <table class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                {% for field in fields_info %}
+                <th>{{ field.label }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in preview_data %}
+            <tr>
+                {% for field in fields_info %}
+                <td>{{ row.get(field.name, '') }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endset %}
+{% include "includes/card_section.html" %}
+{% endif %}
+
+<form method="post">
+    {% include "includes/csrf.html" %}
+    <button type="submit" class="btn btn-success btn-lg">
+        <i class="bi bi-database-down"></i> 开始导出
+    </button>
+    <a href="{{ url('importexport:export_select_fields', node_type.slug) }}" class="btn btn-secondary">返回修改</a>
+</form>
+{% endblock %}

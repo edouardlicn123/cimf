@@ -1,0 +1,10 @@
+{# 角色徽章组件 #}
+{# 用法: {% set role = user.role %}{% set role_labels = role_labels %}{% include "includes/role_badge.html" %} #}
+
+{% if role == 'manager' %}
+    <span class="badge {{ badge_classes.manager|default('bg-danger') }}">{{ role_labels.manager|default("一类用户") }}</span>
+{% elif role == 'leader' %}
+    <span class="badge {{ badge_classes.leader|default('bg-warning text-dark') }}">{{ role_labels.leader|default("二类用户") }}</span>
+{% else %}
+    <span class="badge {{ badge_classes.employee|default('bg-secondary') }}">{{ role_labels.employee|default("三类用户") }}</span>
+{% endif %}

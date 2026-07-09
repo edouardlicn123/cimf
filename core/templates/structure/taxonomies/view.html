@@ -1,0 +1,120 @@
+{% extends "frames/frame_structure.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% block title %}{{ taxonomy.name|default('词汇表详情') if taxonomy else '词汇表详情' }} - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}{{ taxonomy.name|default('词汇表详情') if taxonomy else '词汇表详情' }}{% endblock %}
+
+{% block admin_buttons_content %}
+{% if taxonomy %}
+<a href="{{ url('core:taxonomy_edit', taxonomy.id) }}" class="btn btn-primary">编辑</a>
+{% endif %}
+<a href="{{ url('core:taxonomies') }}" class="btn btn-secondary">返回列表</a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="card mb-4">
+    <div class="card-body">
+        <p class="text-muted">{{ taxonomy.description|default('暂无描述') }}</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h4>词汇项</h4>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">
+            <i class="bi bi-plus-lg"></i> 新增词汇项
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">权重</th>
+                            <th>名称</th>
+                            <th>描述</th>
+                            <th style="width: 150px;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>{{ item.weight }}</td>
+                            <td>{{ item.name }}</td>
+                            <td>{{ item.description|default('-') }}</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editItemModal{{ item.id }}">
+                                    编辑
+                                </button>
+                                <a href="{{ url('core:taxonomy_item_delete', taxonomy.id if taxonomy else 0, item.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('确定删除该词汇项?')">
+                                    删除
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        {% set empty_type = "table" %}{% set empty_colspan = 4 %}{% set empty_message = "暂无词汇项" %}{% include "includes/empty_state.html" %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑词汇项 Modal -->
+{% for item in items %}
+{% set modal_id = "editItemModal" + item.id|string %}
+{% set modal_title = "编辑词汇项" %}
+{% set modal_body %}
+<form method="post" action="{{ url('core:taxonomy_item_update', taxonomy.id, item.id) }}">
+    {% include "includes/csrf.html" %}
+    <div class="mb-3">
+        <label class="form-label">名称 *</label>
+        <input type="text" name="name" class="form-control" value="{{ item.name }}" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">描述</label>
+        <input type="text" name="description" class="form-control" value="{{ item.description|default('') }}">
+    </div>
+</form>
+{% endset %}
+{% set modal_footer %}
+<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+<button type="submit" class="btn btn-primary">保存</button>
+{% endset %}
+{% include "includes/modal.html" %}
+{% endfor %}
+
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+{% include "includes/pagination.html" %}
+{% endif %}
+
+<!-- 新增词汇项 Modal -->
+{% set modal_id = "addItemModal" %}
+{% set modal_title = "新增词汇项" %}
+{% set modal_body %}
+<form method="post" action="{{ url('core:taxonomy_item_create', taxonomy.id) }}">
+    {% include "includes/csrf.html" %}
+    <div class="mb-3">
+        <label class="form-label">名称 *</label>
+        <input type="text" name="name" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">描述</label>
+        <input type="text" name="description" class="form-control">
+    </div>
+</form>
+{% endset %}
+{% set modal_footer %}
+<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+<button type="submit" class="btn btn-primary">保存</button>
+{% endset %}
+{% include "includes/modal.html" %}
+{% endblock %}

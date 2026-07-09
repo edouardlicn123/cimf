@@ -1,0 +1,378 @@
+/* static/css/frame.css - 只写布局 + 导航差异，颜色全走变量 */
+
+/* ── 渐进式加载动画：navbar(下滑) → 侧栏(左滑) → 主体(上浮) ── */
+@media (prefers-reduced-motion: no-preference) {
+    .navbar {
+        animation: slideDown 0.55s ease-out 0s both;
+    }
+    .admin-sidebar {
+        animation: slideLeft 0.55s ease-out 0.2s both;
+    }
+    .admin-sidebar + .flex-grow-1 {
+        animation: slideUp 0.55s ease-out 0.4s both;
+    }
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-100%); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideLeft {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.admin-sidebar .nav-link {
+  color: var(--text-secondary);
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+}
+
+.admin-sidebar .nav-link:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.admin-sidebar .nav-link.active {
+  background: var(--primary-light);
+  color: var(--primary);
+  font-weight: 500;
+  border-left: 4px solid var(--primary);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+/* 右侧内容区 */
+.admin-container {
+  background: var(--bg-body);
+  height: 100vh;
+  overflow-y: auto;
+}
+
+/* 标题与卡片轻微强化（可选，但符合 SaaS 风格） */
+.admin-container .h2,
+.admin-container .h1 {
+  color: var(--text-primary);
+}
+
+.card {
+  border-color: var(--border-light);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+}
+
+/* 加强全高与滚动兼容 */
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+.d-flex.vh-100 {
+  height: 100vh;
+}
+
+.admin-sidebar {
+  background: var(--bg-surface);
+}
+
+.admin-sidebar .position-sticky {
+  background: var(--bg-surface); /* 防止滚动时背景透明 */
+}
+
+.admin-container {
+  background: var(--bg-body);
+}
+
+
+.admin-title-row {                   /* 新增类名给标题行 */
+  height: 3.5rem;                    /* 或根据设计固定一个值 */
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.admin-title-row h1,
+.admin-title-row h2 {
+  margin: 0;
+  line-height: 1.2;
+}
+
+.admin-title-row .save-settings-btn {
+  height: 50%;                       /* 正好是标题行高度的一半 */
+  min-height: 2rem;                  /* 防止过小 */
+  padding: 0 1.25rem;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+/* 左侧菜单 - 当前页面高亮（使用主题变量） */
+.admin-sidebar .nav-link.active {
+  background-color: var(--primary-light) !important;
+  color: var(--primary) !important;
+  font-weight: 600 !important;
+  border-left: 6px solid var(--primary) !important;
+  padding-left: 0.75rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.admin-sidebar .nav-link.active:hover {
+  background-color: var(--primary-extra-light) !important;
+}
+
+
+/* ── Dashboard 卡片槽位（从模板提取） ── */
+.card-slot {
+    height: 150px;
+    min-height: 150px;
+    border: 1px solid var(--border);
+    background-color: var(--bg-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+.card-slot.drag-over {
+    border-color: var(--primary) !important;
+    background-color: var(--primary-light) !important;
+}
+
+/* ── 导航卡片槽位（从模板提取） ── */
+.nav-slot {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+.nav-slot.drag-over {
+    border-color: var(--primary) !important;
+    background-color: var(--primary-light) !important;
+}
+.nav-card, .nav-card-setting {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 500;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.nav-card.dragging, .nav-card-setting.dragging {
+    opacity: 0.5;
+}
+
+/* ── 基本卡片（共享结构）── */
+.card:has(.card-header:not(.d-flex)) {
+    border-radius: var(--radius);
+    box-shadow: none;
+    border: none;
+}
+
+.card:has(.card-header:not(.d-flex)) .card-body {
+    border: none !important;
+    border-radius: 0 0 var(--radius) var(--radius) !important;
+    overflow: hidden;
+}
+
+/* ── 变体1：不透明背景（默认用于现有页面）── */
+.card.card-structure {
+    background: transparent !important;
+}
+.card.card-structure:has(.card-header:not(.d-flex)) .card-body {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--primary) !important;
+    border-radius: 0 0 var(--radius) var(--radius) !important;
+    overflow: hidden;
+}
+
+/* ── 变体2：标题透明（用于结构列表页面）── */
+.card.card-structure-transparent {
+    background: transparent !important;
+}
+.card-structure-transparent .card-body {
+    background: transparent !important;
+}
+
+/* ── 内容区边框容器（配合变体2使用）── */
+.card-body-border {
+    border: 1px solid var(--primary);
+    border-radius: 0 0 var(--radius) var(--radius);
+    overflow: hidden;
+    height: 100%;
+    background: var(--bg-card);
+}
+
+.card-header {
+    border-bottom: none;
+    background: transparent !important;
+    background-color: transparent !important;
+    padding: 0;
+}
+
+.card-header h5,
+.card-header h4 {
+    display: inline-block;
+    padding: 10px 32px 12px;
+    margin: 0;
+    background-color: var(--primary);
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    border-radius: 6px 6px 0 0;
+    white-space: nowrap;
+    line-height: 1.2;
+}
+
+/* 圆形图标按钮 */
+.btn-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-circle .bi {
+    font-size: 1.25rem;
+}
+
+/* ── Entry-card 按钮：描边 + background-size 填充动画 ── */
+.entry-card-actions .btn-primary   { --btn-clr: var(--primary); }
+.entry-card-actions .btn-success   { --btn-clr: var(--success); }
+.entry-card-actions .btn-warning   { --btn-clr: var(--warning); }
+.entry-card-actions .btn-info      { --btn-clr: var(--info); }
+.entry-card-actions .btn-danger    { --btn-clr: var(--danger); }
+.entry-card-actions .btn-secondary { --btn-clr: var(--text-secondary); }
+
+.entry-card-actions .btn {
+    border-radius: var(--radius) !important;
+    background-color: transparent !important;
+    border: 2px solid var(--btn-clr) !important;
+    color: var(--btn-clr) !important;
+    background-image: linear-gradient(135deg, var(--btn-clr), var(--btn-clr)) !important;
+    background-repeat: no-repeat !important;
+    background-size: 0% 100% !important;
+    transition: background-size 0.25s cubic-bezier(0.77, 0, 0.175, 1), color 0.25s ease !important;
+}
+
+.entry-card-actions .btn:hover,
+.entry-card-actions .btn:focus {
+    background-size: 100% 100% !important;
+    color: white !important;
+    box-shadow: 0 0 4px 1px var(--btn-clr) !important;
+}
+
+/* ── 日志文件选择 - 描边过滤标签 ── */
+.nav-pills-outline .nav-link {
+    background: var(--bg-surface);
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    border-radius: 6px 6px 0 0;
+}
+.nav-pills-outline .nav-link:hover {
+    background: var(--primary-light);
+}
+.nav-pills-outline .nav-link.active {
+    background: var(--primary);
+    color: var(--text-inverse) !important;
+}
+.nav-pills-outline .nav-link.active .badge {
+    background: var(--warning) !important;
+    color: var(--text-primary) !important;
+}
+
+/* ── 日志表格边框 ── */
+.log-table-wrap {
+    border: 1px solid var(--primary);
+}
+
+/* ── 基本按键：尺寸统一 + 渐变滑动动画 ── */
+.btn-primary,
+.btn-secondary,
+.btn-success,
+.btn-danger,
+.btn-warning,
+.btn-info {
+    border: none !important;
+}
+
+.btn-primary,
+.btn-success,
+.btn-danger,
+.btn-warning,
+.btn-info {
+    background-size: 200% 100% !important;
+    background-position: 0% 0% !important;
+    transition: background-position 0.4s ease, box-shadow 0.2s ease !important;
+    box-shadow: none !important;
+}
+
+.btn-primary:hover,
+.btn-primary:active,
+.btn-primary.active,
+.btn-success:hover,
+.btn-success:active,
+.btn-success.active,
+.btn-danger:hover,
+.btn-danger:active,
+.btn-danger.active,
+.btn-warning:hover,
+.btn-warning:active,
+.btn-warning.active,
+.btn-info:hover,
+.btn-info:active,
+.btn-info.active {
+    background-position: 100% 0% !important;
+}
+
+.btn-primary:focus-visible,
+.btn-success:focus-visible,
+.btn-danger:focus-visible,
+.btn-warning:focus-visible,
+.btn-info:focus-visible {
+    outline: 2px solid var(--primary) !important;
+    outline-offset: 2px !important;
+}
+
+.btn-primary {
+    --btn-lighter: color-mix(in srgb, var(--primary), white 20%);
+    background-image: linear-gradient(135deg, var(--btn-lighter) 0%, var(--primary) 30% 70%, var(--btn-lighter) 100%) !important;
+    color: var(--text-inverse) !important;
+}
+
+.btn-success {
+    --btn-lighter: color-mix(in srgb, var(--success), white 20%);
+    background-image: linear-gradient(135deg, var(--btn-lighter) 0%, var(--success) 30% 70%, var(--btn-lighter) 100%) !important;
+    color: var(--text-inverse) !important;
+}
+
+.btn-danger {
+    --btn-lighter: color-mix(in srgb, var(--danger), white 20%);
+    background-image: linear-gradient(135deg, var(--btn-lighter) 0%, var(--danger) 30% 70%, var(--btn-lighter) 100%) !important;
+    color: var(--text-inverse) !important;
+}
+
+.btn-warning {
+    --btn-lighter: color-mix(in srgb, var(--warning), white 20%);
+    background-image: linear-gradient(135deg, var(--btn-lighter) 0%, var(--warning) 30% 70%, var(--btn-lighter) 100%) !important;
+    color: var(--text-primary) !important;
+}
+
+.btn-info {
+    --btn-lighter: color-mix(in srgb, var(--info), white 20%);
+    background-image: linear-gradient(135deg, var(--btn-lighter) 0%, var(--info) 30% 70%, var(--btn-lighter) 100%) !important;
+    color: var(--text-inverse) !important;
+}
+
+
+

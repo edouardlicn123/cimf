@@ -1,0 +1,15 @@
+{% extends "frames/frame_sidebar_base.html" %}
+
+{% block sidebar_nav %}
+          <ul class="nav flex-column mb-auto">
+{% set section, icon, label, url_name = 'dashboard', 'bi-house', '数据导入导出', 'importexport:importexport_dashboard' %}{% include "includes/nav_item.html" %}
+          </ul>
+          
+          <ul class="nav flex-column mb-auto">
+{% set section, icon, label, url_name = 'export', 'bi-database-down', '导出', 'importexport:export_list' %}{% include "includes/nav_item.html" %}
+          </ul>
+          
+          <ul class="nav flex-column mb-auto">
+{% set section, icon, label, url_name = 'import', 'bi-database-up', '导入', 'importexport:import_list' %}{% include "includes/nav_item.html" %}
+          </ul>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "frames/frame_admin.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% block title %}人员管理 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}人员管理{% endblock %}
+
+{% block admin_buttons_content %}
+<a href="{{ url('core:user_create') }}" class="btn btn-primary">
+    <i class="bi bi-plus-lg"></i> 新建用户
+</a>
+{% endblock %}
+
+{% block admin_content %}
+<!-- 标题和筛选区之间的分割线 -->
+<hr class="my-3">
+
+<div class="row mb-4">
+    <div class="col-12">
+        <form method="get" class="d-flex gap-2">
+            <input type="text" name="search" class="form-control" style="max-width: 200px;" placeholder="搜索用户名/昵称" value="{{ search_term|default('') }}">
+            <select name="role_filter" class="form-select" style="width: auto;">
+                <option value="" {% if not role_filter %}selected{% endif %}>全部</option>
+                <option value="leader" {% if role_filter == 'leader' %}selected{% endif %}>二类用户</option>
+                <option value="employee" {% if role_filter == 'employee' %}selected{% endif %}>三类用户</option>
+            </select>
+            <select name="only_active" class="form-select" style="width: auto;">
+                <option value="true" {% if only_active == 'true' %}selected{% endif %}>筛选: 活跃</option>
+                <option value="false" {% if only_active == 'false' %}selected{% endif %}>筛选: 全部</option>
+            </select>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-search"></i> 搜索
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card card-structure">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-people me-2"></i>人员管理</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>用户名</th>
+                            <th>昵称</th>
+                            <th>邮箱</th>
+                            <th>角色</th>
+                            <th>状态</th>
+                            <th>最后登录</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                        <tr>
+                            <td>{{ u.username }}</td>
+                            <td>{{ u.nickname|default('-') }}</td>
+                            <td>{{ u.email|default('-') }}</td>
+                            <td>
+                                {% set role = u.role %}
+                                {% include "includes/role_badge.html" %}
+                            </td>
+                            <td>
+                                {% if u.is_active %}
+                                    <span class="badge bg-success">活跃</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">禁用</span>
+                                {% endif %}
+                            </td>
+                            <td>{% if u and u.last_login_at %}{{ u.last_login_at|date('Y-m-d H:i') }}{% else %}-{% endif %}</td>
+                            <td>
+                                <a href="{{ url('core:user_edit', u.id) }}" class="btn btn-sm btn-outline-primary">编辑</a>
+                                {% if u.id != 1 %}
+                                <a href="{{ url('core:user_delete', u.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('确定删除?')">删除</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        {% set empty_type = "table" %}{% set empty_colspan = 7 %}{% set empty_message = "暂无用户" %}{% include "includes/empty_state.html" %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

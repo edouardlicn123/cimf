@@ -1,0 +1,60 @@
+target-version = "py312"
+line-length = 120
+unsafe-fixes = false
+exclude = ["*.html", "*.md"]
+
+[lint]
+select = [
+    "F", "E", "W",
+    "I",
+    "N",
+    "UP",
+    "B",
+    "SIM",
+    "ARG",
+    "RUF",
+    "PL",
+    "C4",
+    "PTH",
+    "TID",
+    "FBT",
+    "ERA",
+    "PERF",
+    "PIE",
+    "EM",
+    "TCH",
+    "DJ",
+]
+ignore = [
+    "E501",
+    "EM101", "EM102",
+    "N801", "N802", "N806",
+    "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PLR2004",
+    "FBT001", "FBT002", "FBT003",
+    "TCH001", "TCH002",
+    "D100", "D104",
+    # 中国项目中文全角标点不是歧义
+    "RUF001", "RUF002", "RUF003",
+    # Django 标准模式：相对导入
+    "TID252",
+    # Django admin list_display/list_filter 等是标准模式
+    "RUF012",
+    # 字符串字段 null=True 需配合 DB 迁移，暂不改
+    "DJ001",
+]
+
+[lint.per-file-ignores]
+"*/migrations/*" = ["ALL"]
+"*/tests/*" = ["ALL"]
+"**/__init__.py" = ["F401", "E402"]
+"**/*.html" = ["ALL"]
+"**/*.md" = ["ALL"]
+
+[lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[lint.pylint]
+max-args = 8
+max-returns = 6
+max-branches = 15
+max-statements = 60

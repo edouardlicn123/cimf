@@ -1,0 +1,23 @@
+{% extends "frames/frame_dashboard.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% block title %}欢迎回来，{{ user_display_name }}{% endblock %}
+
+{% block admin_content %}
+<header class="py-3">
+    <div class="container">
+        <h1 class="h4 mb-0">欢迎回来，{{ user_display_name }}</h1>
+    </div>
+</header>
+
+<!-- 功能卡片区域 -->
+{% include "includes/dashboard_cards_area.html" %}
+
+<!-- 导航卡片区域 -->
+{% include "includes/nav_cards_area.html" %}
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

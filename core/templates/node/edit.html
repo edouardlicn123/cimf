@@ -1,0 +1,39 @@
+{% extends "frames/frame_structure.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% block title %}{% if node_type %}编辑{% else %}新建{% endif %}节点类型 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}{% if node_type %}编辑{% else %}新建{% endif %}节点类型{% endblock %}
+
+{% block admin_content %}
+<form method="post">
+    {% include "includes/csrf.html" %}
+    
+    {% set card_class = "card mb-4" %}
+    {% set section_title %}基本信息{% endset %}
+    {% set section_body %}
+    <div class="mb-3">
+        <label class="form-label">名称 *</label>
+        <input type="text" name="name" class="form-control" value="{{ node_type.name|default('') if node_type else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">标识符 *</label>
+        <input type="text" name="slug" class="form-control" value="{{ node_type.slug|default('') if node_type else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">图标</label>
+        <input type="text" name="icon" class="form-control" value="{{ node_type.icon|default('bi-folder') if node_type else 'bi-folder' }}">
+        <small class="text-muted">使用 Bootstrap Icons 类名，如 bi-folder, bi-person, bi-gear 等</small>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">描述</label>
+        <textarea name="description" class="form-control">{{ node_type.description|default('') if node_type else '' }}</textarea>
+    </div>
+    {% endset %}
+    {% include "includes/card_section.html" %}
+    
+    {% set cancel_url = url('core:node_types_list') %}{% include "includes/form_actions.html" %}
+</form>
+{% endblock %}

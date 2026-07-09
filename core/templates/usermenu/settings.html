@@ -1,0 +1,100 @@
+{% extends "frames/frame_myinfo.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% set active_section = 'preferences' %}
+
+{% block title %}偏好设置 - {{ system_name|default('仙芙CIMF') }}{% endblock %}
+
+{% block admin_title_content %}偏好设置{% endblock %}
+
+{% block admin_buttons_content %}{% endblock %}
+
+{% block head_extra %}{{ super() }}{% endblock %}
+
+{% block admin_content %}
+<form method="POST" novalidate>
+  {% include "includes/csrf.html" %}
+
+  {% set section_title %}<i class="bi bi-person me-2"></i>个人信息{% endset %}
+  {% set section_body %}
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label for="id_nickname" class="form-label fw-medium">显示昵称</label>
+      <input type="text" name="nickname" id="id_nickname" class="form-control" 
+             placeholder="用于显示的昵称" value="{{ user.nickname|default('') }}">
+    </div>
+    <div class="col-md-6">
+      <label for="id_email" class="form-label fw-medium">邮箱地址</label>
+      <input type="email" name="email" id="id_email" class="form-control" 
+             placeholder="用于接收通知" value="{{ user.email|default('') }}">
+    </div>
+    <div class="col-12 text-end">
+      <button type="submit" name="submit_profile" class="btn btn-primary">保存</button>
+    </div>
+  </div>
+  {% endset %}
+  {% include "includes/card_section.html" %}
+
+  {% set section_title %}<i class="bi bi-palette me-2"></i>偏好设置{% endset %}
+  {% set section_body %}
+  <div class="row g-3">
+    <div class="col-md-4">
+      <label for="id_theme" class="form-label fw-medium">界面主题</label>
+      <select name="theme" id="id_theme" class="form-select">
+        {% for value, label in theme_choices %}
+        <option value="{{ value }}" {% if user.theme == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label for="id_preferred_language" class="form-label fw-medium">界面语言</label>
+      <select name="preferred_language" id="id_preferred_language" class="form-select">
+        {% for value, label in language_choices %}
+        <option value="{{ value }}" {% if user.preferred_language == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-4">
+          {% set switch_name = "notifications_enabled" %}{% set switch_id = "id_notifications_enabled" %}{% set switch_checked = user.notifications_enabled %}{% set switch_label = "开启系统通知" %}{% include "includes/form_switch.html" %}
+    </div>
+    <div class="col-12 text-end">
+      <button type="submit" name="submit_preferences" class="btn btn-primary">保存</button>
+    </div>
+  </div>
+  {% endset %}
+  {% include "includes/card_section.html" %}
+
+  {% set section_title %}<i class="bi bi-key me-2"></i>修改密码{% endset %}
+  {% set section_body %}
+  <div class="row g-3">
+    <div class="col-12">
+      <div class="alert alert-warning py-2" role="alert">
+        <small><i class="bi bi-exclamation-triangle me-1"></i>修改密码后系统将自动登出，请使用新密码重新登录。</small>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <label for="id_current_password" class="form-label fw-medium">当前密码 *</label>
+      <input type="password" name="current_password" id="id_current_password" 
+             class="form-control">
+    </div>
+    <div class="col-md-4">
+      <label for="id_new_password" class="form-label fw-medium">新密码 *</label>
+      <input type="password" name="new_password" id="id_new_password" 
+             class="form-control">
+    </div>
+    <div class="col-md-4">
+      <label for="id_confirm_password" class="form-label fw-medium">确认新密码 *</label>
+      <input type="password" name="confirm_password" id="id_confirm_password" 
+             class="form-control">
+    </div>
+    <div class="col-12 text-end">
+      <button type="submit" name="submit_password" class="btn btn-primary">修改密码</button>
+    </div>
+  </div>
+  {% endset %}
+  {% include "includes/card_section.html" %}
+
+</form>
+{% endblock %}

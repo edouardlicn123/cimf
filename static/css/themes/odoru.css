@@ -1,0 +1,183 @@
+/*
+ * odoru.css
+ * CIMF - 踊主题（温暖文艺风）
+ * 版本：2026-05-09 v1.0
+ *
+ * 配色灵感：福永あずさ「踊」 https://fukunagaazusa.jp/
+ * 主色       #0ba29a   青绿（唯一高饱和色）
+ * 背景       #fdfbef   奶油暖白
+ * 文字       #493c33   深褐色
+ * 点缀       #f5a96e   暖橙
+ */
+
+:root {
+  /* 主色系 - 青绿 */
+  --primary:           #0ba29a;
+  --primary-hover:     #098a82;
+  --primary-active:    #07726b;
+  --primary-light:     rgba(11, 162, 154, 0.10);
+  --primary-extra-light: rgba(11, 162, 154, 0.05);
+
+  /* 信息 / 辅助 - 青绿 */
+  --info:              #0ba29a;
+  --info-hover:        #098a82;
+  --info-light:        rgba(11, 162, 154, 0.10);
+
+  /* 成功 - 柔和绿 */
+  --success:           #5a9e6a;
+  --success-hover:     #4a8a5a;
+
+  /* 警告 / 强调 - 暖橙 */
+  --warning:           #f5a96e;
+  --warning-hover:     #e09050;
+  --warning-light:     rgba(245, 169, 110, 0.15);
+
+  /* 危险 - 暖红 */
+  --danger:            #c0392b;
+  --danger-hover:      #a33226;
+  --danger-light:      rgba(192, 57, 43, 0.10);
+
+  /* 背景 - 奶油暖白 */
+  --bg-body:           #fdfbef;
+  --bg-gradient:       linear-gradient(to bottom, #fdfbef 0%, #ffffff 100%);
+  --bg-surface:        #ffffff;
+  --bg-card:           #ffffff;
+  --bg-nav:            #0ba29a;
+  --bg-nav-text:       #ffffff;
+  --bg-footer:         #493c33;
+
+  /* 文字 - 暖褐色系 */
+  --text-primary:      #493c33;
+  --text-secondary:    #5a4f48;
+  --text-muted:        #8a8078;
+    --text-inverse:      #f0f0f0;
+  --text-nav:          #ffffff;
+  --text-nav-active:   #ffffff;
+
+  /* 边框 & 分割 */
+  --border:            #e7e7e7;
+  --border-light:      #f0ece0;
+  --border-focus:      #0ba29a;
+
+  /* 阴影 - 柔和暖调 */
+  --shadow-sm:         0 1px 3px rgba(73, 60, 51, 0.06);
+  --shadow:            0 2px 6px rgba(73, 60, 51, 0.08);
+  --shadow-hover:      0 4px 12px rgba(73, 60, 51, 0.10);
+  --shadow-nav:        0 2px 4px rgba(73, 60, 51, 0.06);
+
+  /* 圆角 - 偏圆润，呼应手绘感 */
+  --radius-sm:         4px;
+  --radius:            6px;
+  --radius-md:         8px;
+  --radius-lg:         10px;
+  --radius-xl:         12px;
+  --radius-pill:       9999px;
+
+  /* 卡片渐变 */
+  --entry-card-gradient: linear-gradient(135deg, #0ba29a 0%, #5a9e6a 100%);
+}
+
+body {
+  background: var(--bg-gradient);
+  color: var(--text-primary);
+  font-weight: 400;
+  min-height: 100vh;
+}
+
+/* ──────────────────────────────────────────────
+   导航栏 - 青绿背景 + 白色文字
+───────────────────────────────────────────────── */
+
+.navbar-odoru {
+  background-color: var(--bg-nav) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.12) !important;
+  box-shadow: var(--shadow-nav) !important;
+  border-radius: 0 !important;
+  transition: var(--transition) !important;
+}
+
+.navbar-odoru,
+.navbar-odoru .navbar-brand,
+.navbar-odoru .nav-link,
+.navbar-odoru .nav-link:hover,
+.navbar-odoru .nav-link.active,
+.navbar-odoru .navbar-toggler-icon {
+  color: var(--text-nav) !important;
+}
+
+.navbar-odoru .dropdown-item {
+  color: var(--text-primary) !important;
+}
+
+.navbar-odoru .dropdown-item:hover,
+.navbar-odoru .dropdown-item:focus {
+  background-color: var(--primary-light) !important;
+  color: var(--primary) !important;
+}
+
+.admin-sidebar .nav-link,
+.admin-sidebar .nav-item,
+.admin-sidebar .nav-link.active,
+.admin-sidebar .nav-link.active:hover,
+.admin-sidebar .nav-link.active:focus,
+.admin-sidebar .nav-link:hover,
+.admin-sidebar .nav-link:focus {
+  border-radius: 0 !important;
+}
+
+.admin-sidebar .nav-link:hover {
+  background-color: var(--primary-extra-light) !important;
+  color: var(--primary-hover) !important;
+}
+
+.btn-primary,
+.primary-btn {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: white !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary.focus,
+.primary-btn:hover,
+.primary-btn:focus {
+  background-color: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
+  color: white !important;
+  box-shadow: 0 0 0 0.25rem rgba(11, 162, 154, 0.25) !important;
+}
+
+.btn-primary:active,
+.btn-primary.active,
+.primary-btn:active,
+.primary-btn.active {
+  background-color: #07726b !important;
+  border-color: #07726b !important;
+  color: white !important;
+}
+
+.btn-primary:hover:not(.disabled):not(:disabled),
+.primary-btn:hover:not(.disabled):not(:disabled) {
+  background-color: #098a82 !important;
+  color: white !important;
+}
+
+/* btn-secondary 跟随主题 */
+.btn-secondary {
+  background-color: color-mix(in srgb, var(--primary), white 60%) !important;
+  border-color: color-mix(in srgb, var(--primary), white 60%) !important;
+  color: var(--primary) !important;
+}
+.btn-secondary:hover,
+.btn-secondary:focus {
+  background-color: color-mix(in srgb, var(--primary), white 40%) !important;
+  border-color: color-mix(in srgb, var(--primary), white 40%) !important;
+  color: white !important;
+}
+.btn-secondary:active,
+.btn-secondary.active {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: white !important;
+}

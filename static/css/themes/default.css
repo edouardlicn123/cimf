@@ -1,0 +1,238 @@
+/*
+ * default.css
+ * FFE 项目跟进系统 - 默认主题，LinkedIn风格（更新版 v7.1）
+ * 版本：2026-02-15 v7.1
+ *
+ * 本次调整：
+ * - 取消 nav 菜单底部圆角（border-radius: 0）
+ * - 修复左侧导航高亮（.nav-link.active）跟随 --primary 主色
+ * - 统一 .primary-btn / .btn-primary hover 为浅亮蓝（--info）
+ * - 保持其他所有原有设置不变
+*/
+
+:root {
+  /* 覆盖 Bootstrap 核心变量 */
+  --bs-primary: #0A66C2;           /* 主色：LinkedIn 经典蓝 */
+  --bs-primary-rgb: 10, 102, 194;
+  --bs-info: #2977C9;              /* 辅助蓝（hover、focus） */
+  --bs-info-rgb: 41, 119, 201;
+  --info-darker: #0f4a8a;          /* 深蓝（active、深 hover） */
+  --bs-secondary-bg: #f8f9fa;      /* 折叠状态浅灰背景 */
+  --bs-body-bg: var(--bg-body);    /* 全局页面背景 */
+  --bs-body-color: var(--text-primary); /* 全局文字色 */
+
+  /* 主色系 - LinkedIn 经典蓝 */
+  --primary:           #0A66C2;
+  --primary-hover:     #004182;
+  --primary-active:    #003366;
+  --primary-light:     rgba(10, 102, 194, 0.10);
+  --primary-extra-light: rgba(10, 102, 194, 0.05);
+
+  /* 信息 / 辅助蓝 */
+  --info:              #2977C9;
+  --info-hover:        #1a5fa8;
+  --info-active:       #0f4a8a;
+  --info-light:        rgba(41, 119, 201, 0.10);
+
+  /* 成功 */
+  --success:           #057642;
+  --success-hover:     #046134;
+
+  /* 警告 / 强调 */
+  --warning:           #F5C742;
+  --warning-hover:     #E0B038;
+  --warning-light:     rgba(245, 199, 66, 0.12);
+
+  /* 危险 */
+  --danger:            #D9534F;
+  --danger-hover:      #C9302C;
+  --danger-light:      rgba(217, 83, 79, 0.10);
+
+  /* 背景 */
+  --bg-body:           #F3F2EF;
+  --bg-gradient:       linear-gradient(to bottom, #F3F2EF 0%, #FFFFFF 100%);
+  --bg-surface:        #FFFFFF;
+  --bg-card:           #FFFFFF;
+  --bg-nav:            #0A66C2;          /* 主菜单区蓝色背景 */
+  --bg-footer:         #F3F2EF;
+
+  /* 文字 */
+  --text-primary:      #000000;
+  --text-secondary:    #333333;
+  --text-muted:        #666666;
+  --text-inverse:      #f0f0f0;
+  --text-nav:          #FFFFFF;          /* 主菜单文字强制白色 */
+  --text-nav-active:   #FFFFFF;
+
+  /* 边框 & 分割 */
+  --border:            #E0E0E0;
+  --border-light:      #EDEDED;
+  --border-focus:      #0A66C2;
+
+  /* 阴影 - 极克制 */
+  --shadow-sm:         0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow:            0 2px 6px rgba(0, 0, 0, 0.10);
+  --shadow-hover:      0 4px 12px rgba(0, 0, 0, 0.12);
+  --shadow-nav:        0 2px 4px rgba(0, 0, 0, 0.08);
+
+  /* 圆角 - 相对减少，更专业 */
+  --radius-sm:         4px;
+  --radius:            6px;
+  --radius-md:         7px;
+  --radius-lg:         8px;
+  --radius-xl:         10px;
+  --radius-pill:       9999px;
+
+}
+
+body {
+  background: var(--bg-gradient);
+  color: var(--text-primary);
+  font-weight: 400;
+  min-height: 100vh;
+}
+
+/* ──────────────────────────────────────────────
+   导航栏 - 主菜单区蓝色背景 + 白色文字
+───────────────────────────────────────────────── */
+.navbar-default {
+  background-color: var(--bg-nav) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.15) !important;
+  box-shadow: var(--shadow-nav) !important;
+  border-radius: 0 !important;  /* 完全取消所有圆角（包括底部） */
+  transition: var(--transition) !important;
+}
+
+/* 主菜单区所有文字强制白色 */
+.navbar-default,
+.navbar-default .navbar-brand,
+.navbar-default .nav-link,
+.navbar-default .nav-link:hover,
+.navbar-default .nav-link.active,
+.navbar-default .navbar-toggler-icon {
+  color: var(--text-nav) !important;
+}
+
+.navbar-default .dropdown-item {
+  color: var(--text-primary) !important;
+}
+
+.navbar-default .dropdown-item:hover,
+.navbar-default .dropdown-item:focus {
+  background-color: var(--primary-light) !important;
+  color: var(--primary) !important;
+}
+
+.admin-sidebar .nav-link.active,
+.admin-sidebar .nav-link.active:hover,
+.admin-sidebar .nav-link.active:focus {
+  border-radius: var(--radius-sm) !important;
+}
+
+/* 个人下拉菜单 - 维持白色背景 + 深色文字 */
+.navbar-default .dropdown-menu {
+  background-color: #ffffff !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.navbar-default .dropdown-item {
+  color: var(--text-primary) !important;
+}
+
+.navbar-default .dropdown-item:hover,
+.navbar-default .dropdown-item:focus {
+  background-color: var(--primary-light) !important;
+  color: var(--primary) !important;
+}
+
+/* 退出链接保持红色 */
+.navbar-default .logout-link {
+  color: var(--danger) !important;
+}
+
+/* 未登录“登录”按钮 - 白色边框 + 白色文字 */
+.navbar-default .login-btn {
+  border-color: white !important;
+  color: white !important;
+  background: transparent !important;
+}
+
+.navbar-default .login-btn:hover {
+  background-color: white !important;
+  color: var(--primary) !important;
+}
+
+/* ──────────────────────────────────────────────
+   左侧导航高亮（.nav-link.active）跟随主题主色
+───────────────────────────────────────────────── */
+.admin-sidebar .nav-link.active,
+.admin-sidebar .nav-link.active:hover,
+.admin-sidebar .nav-link.active:focus {
+  background-color: var(--primary-light) !important;
+  color: var(--primary) !important;
+  font-weight: 600 !important;
+  border-radius: var(--radius-sm) !important;
+}
+
+.admin-sidebar .nav-link:hover {
+  background-color: var(--primary-extra-light) !important;
+  color: var(--primary-hover) !important;
+}
+
+/* default: primary-btn hover 变浅亮蓝（--info） */
+.primary-btn:hover {
+  background-color: var(--info) !important;
+  border-color: var(--info) !important;
+}
+
+/* 修复 btn-primary 跟随主题 - 使用 CSS 变量 */
+/* 正常状态 */
+.btn-primary,
+.primary-btn {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: var(--text-inverse) !important;
+}
+
+/* hover / focus */
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary.focus,
+.primary-btn:hover,
+.primary-btn:focus {
+  background-color: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
+  color: white !important;
+  box-shadow: 0 0 0 0.25rem var(--primary-light) !important;
+}
+
+/* active / 点击按下 */
+.btn-primary:active,
+.btn-primary.active,
+.primary-btn:active,
+.primary-btn.active {
+  background-color: var(--primary-active) !important;
+  border-color: var(--primary-active) !important;
+  color: white !important;
+}
+
+/* btn-secondary 跟随主题 */
+.btn-secondary {
+  background-color: color-mix(in srgb, var(--primary), white 60%) !important;
+  border-color: color-mix(in srgb, var(--primary), white 60%) !important;
+  color: var(--primary) !important;
+}
+.btn-secondary:hover,
+.btn-secondary:focus {
+  background-color: color-mix(in srgb, var(--primary), white 40%) !important;
+  border-color: color-mix(in srgb, var(--primary), white 40%) !important;
+  color: white !important;
+}
+.btn-secondary:active,
+.btn-secondary.active {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: white !important;
+}

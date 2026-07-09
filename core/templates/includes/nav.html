@@ -1,0 +1,113 @@
+<nav class="navbar navbar-expand-lg navbar-{{ user.theme|default('default') }} fixed-top shadow-sm">
+        <div class="container-fluid nav-container">
+            
+            <!-- 左侧品牌 -->
+            <a class="navbar-brand fw-bold fs-4 d-flex align-items-center ms-0" href="{{ url('core:dashboard') }}">
+            {% if system_settings.get('site_logo_enabled', true) %}
+                {% if system_settings.get('site_logo_path') %}
+                    <img src="{{ media(system_settings['site_logo_path']) }}" alt="{{ system_name }}" class="me-2" style="height: 32px;">
+                {% else %}
+                    <img src="{{ static('sitelogo_white.png') }}" alt="{{ system_name }}" class="me-2" style="height: 32px;">
+                {% endif %}
+            {% endif %}
+            <span>{{ system_name|default("仙芙CIMF") }}</span>
+        </a>
+        
+        <!-- 移动端折叠按钮 -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+                data-bs-target="#navbarContent" aria-controls="navbarContent" 
+                aria-expanded="false" aria-label="切换导航">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarContent">
+            
+                <!-- 中间主导航 -->
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 main-nav ps-1 ps-lg-2">
+                <li class="nav-item">
+                    <a class="nav-link fw-bold {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" 
+                       href="{{ url('core:dashboard') }}">
+                        首页
+                    </a>
+                </li>
+                
+                <!-- 事务处理 - 节点管理入口 -->
+                <li class="nav-item">
+                    <a class="nav-link fw-bold" href="{{ url('node:index') }}">
+                        事务处理
+                    </a>
+                </li>
+                
+                <!-- 协作工具 -->
+                <li class="nav-item">
+                    <a class="nav-link fw-bold" href="{{ url('core:tools_index') }}">
+辅助工具
+                    </a>
+                </li>
+                
+                <!-- 导出导入 -->
+                {% if 'importexport.view' in user_permissions or '*' in user_permissions %}
+                <li class="nav-item">
+                    <a class="nav-link fw-bold {% if request.resolver_match.url_name == 'importexport_dashboard' %}active{% endif %}" 
+                       href="{{ url('importexport:importexport_dashboard') }}">
+                        导出导入
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- 模块管理 - 仅管理员可见 -->
+                {% if user.is_admin %}
+                <li class="nav-item">
+                    <a class="nav-link fw-bold {% if request.resolver_match.url_name == 'list' and request.resolver_match.namespace == 'module' %}active{% endif %}" 
+                       href="{{ url('module:list') }}">
+                        模块管理
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- 内容结构 - 仅管理员可见 -->
+                {% if user.is_admin %}
+                <li class="nav-item">
+                    <a class="nav-link fw-bold {% if request.resolver_match.url_name == 'structure_dashboard' %}active{% endif %}" 
+                       href="{{ url('core:structure_dashboard') }}">
+                        内容结构
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- 系统管理 - 仅管理员可见 -->
+                {% if user.is_admin %}
+                <li class="nav-item">
+                    <a class="nav-link fw-bold" href="{{ url('core:system_settings') }}">
+                        系统管理
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+            
+            <!-- 右侧用户区 -->
+            <ul class="navbar-nav ms-auto align-items-center gap-2">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center fw-medium" href="{{ url('core:profile_view') }}">
+                            <i class="bi bi-person me-1"></i>
+                            <strong>{{ user.nickname|default(user.username) }}</strong>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center fw-bold" href="{{ url('core:logout') }}">
+                            <i class="bi bi-box-arrow-right me-1"></i>
+                            退出登录
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="card-btn primary-btn rounded-pill px-4 py-2 fw-semibold" href="{{ url('core:login') }}">
+                            登录
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

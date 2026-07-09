@@ -1,0 +1,82 @@
+{% if page_obj is defined and page_obj %}
+  {% set current_page = page_obj.number %}
+  {% set total_pages = page_obj.paginator.num_pages %}
+  {% set has_prev = page_obj.has_previous() %}
+  {% set has_next = page_obj.has_next() %}
+  {% set prev_page = page_obj.previous_page_number() if has_prev else 1 %}
+  {% set next_page = page_obj.next_page_number() if has_next else total_pages %}
+{% endif %}
+{% set show_numbers = show_numbers|default(true) %}
+{% set extra_params = extra_params|default('') %}
+
+{% if total_pages and total_pages > 1 %}
+<nav>
+    <ul class="pagination justify-content-center mb-0">
+        {% if has_prev %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ prev_page }}{{ extra_params }}" aria-label="上一页">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link" aria-label="上一页"><span aria-hidden="true">&laquo;</span></span>
+        </li>
+        {% endif %}
+
+        {% if show_numbers %}
+            {% if current_page > 3 %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{{ extra_params }}">1</a>
+            </li>
+            {% if current_page > 4 %}
+            <li class="page-item disabled"><span class="page-link">...</span></li>
+            {% endif %}
+            {% endif %}
+
+            {% if current_page - 1 < 1 %}
+                {% set window_start = 1 %}
+            {% else %}
+                {% set window_start = current_page - 1 %}
+            {% endif %}
+
+            {% if current_page + 1 > total_pages %}
+                {% set window_end = total_pages %}
+            {% else %}
+                {% set window_end = current_page + 1 %}
+            {% endif %}
+
+            {% for p in range(window_start, window_end + 1) %}
+            <li class="page-item {% if p == current_page %}active{% endif %}">
+                <a class="page-link" href="?page={{ p }}{{ extra_params }}">{{ p }}</a>
+            </li>
+            {% endfor %}
+
+            {% if current_page < total_pages - 2 %}
+            {% if current_page < total_pages - 3 %}
+            <li class="page-item disabled"><span class="page-link">...</span></li>
+            {% endif %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ total_pages }}{{ extra_params }}">{{ total_pages }}</a>
+            </li>
+            {% endif %}
+        {% else %}
+            <li class="page-item active">
+                <span class="page-link">第 {{ current_page }} / {{ total_pages }} 页 (共 {{ page_obj.paginator.count }} 条)</span>
+            </li>
+        {% endif %}
+
+        {% if has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ next_page }}{{ extra_params }}" aria-label="下一页">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link" aria-label="下一页"><span aria-hidden="true">&raquo;</span></span>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
