@@ -368,4 +368,9 @@
 10. M轻 批次D: M14 SETTINGS_META分组注释, M15 迁移脚本常量提取
 11. M重 批次E: M17 system_settings拆分, M18 check_node_permission, M19 docstring, M20 validate_upload
 12. M重 批次F: M21 api_dashboard_cards拆分, M22 _read_local_version改用importlib, M23 module_dispatch拆分
+13. L级: ModuleRegistryService God类拆分为5个服务 (Scan/Install/Lifecycle/Query/Scaffold), ModuleService继承链扩展为7基类
+14. 撰写 Stage6 计划: 模块标准化与去重 (5批次, 38项)
+15. 撰写 Stage6 补充计划: 模块脚手架升级与规范固化 (4批次)
+16. 导入 contactsplus.xlsx 33条新客户 + 修正 probalust aus 电话格式
+17. 修复: 删除 _recheck_all_task 中预先重置 has_whatsapp=None 的循环，避免全部验证时中断导致已检测数据丢失；清理调试日志
 
