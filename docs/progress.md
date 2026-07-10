@@ -374,3 +374,8 @@
 16. 导入 contactsplus.xlsx 33条新客户 + 修正 probalust aus 电话格式
 17. 修复: 删除 _recheck_all_task 中预先重置 has_whatsapp=None 的循环，避免全部验证时中断导致已检测数据丢失；清理调试日志
 
+
+
+# 2026-07-10 修改记录
+
+1. 编写 WhatsApp 批次轮次发送开发计划
