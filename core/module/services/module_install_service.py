@@ -96,18 +96,16 @@ except Exception as e:
             )
 
         if has_migrations:
-            script_content = cls.MIGRATION_SCRIPT_TEMPLATE.format(base_dir=repr(base_dir), module_id=repr(module_id))
+            script_content = cls.MIGRATION_SCRIPT_TEMPLATE.format(base_dir=base_dir, module_id=module_id)
         else:
-            script_content = cls.MAKEMIGRATIONS_SCRIPT_TEMPLATE.format(
-                base_dir=repr(base_dir), module_id=repr(module_id)
-            )
+            script_content = cls.MAKEMIGRATIONS_SCRIPT_TEMPLATE.format(base_dir=base_dir, module_id=module_id)
 
         with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False, encoding="utf-8") as f:
             f.write(script_content)
             script_path = f.name
 
         try:
-            result = subprocess.run(
+            result = subprocess.run(  # noqa: S603 — controlled module install script
                 [venv_python, script_path], capture_output=True, text=True, timeout=120, check=False
             )
             if result.returncode != 0:
@@ -118,6 +116,7 @@ except Exception as e:
         except subprocess.TimeoutExpired:
             errors.append("migrate 超时")
         except Exception as e:
+            logger.exception("模块 %s migrate 子进程异常", module_id)
             errors.append(f"migrate 执行失败: {e}")
         finally:
             Path(script_path).unlink()
@@ -130,7 +129,7 @@ except Exception as e:
         if not req_path.exists():
             return True, "无依赖需求"
         try:
-            result = subprocess.run(
+            result = subprocess.run(  # noqa: S603 — controlled pip install
                 [sys.executable, "-m", "pip", "install", "-r", str(req_path)],
                 capture_output=True,
                 text=True,
@@ -144,6 +143,7 @@ except Exception as e:
         except subprocess.TimeoutExpired:
             return False, "依赖安装超时(120s)"
         except Exception as e:
+            logger.exception("模块 %s 依赖安装异常", module_id)
             return False, f"依赖安装异常: {e!s}"
 
     @classmethod
@@ -242,11 +242,12 @@ except Exception as e:
 
         module.is_installed = True
         module.installed_at = timezone.now()
-        module.save()
+        module.save(update_fields=["is_installed", "installed_at"])
 
         try:
             ModuleLifecycleService._handle_cron_tasks(module, register=True)
         except Exception as e:
+            logger.exception("模块 %s cron 任务注册失败", module.module_id)
             return False, f"cron 任务注册失败: {e}"
 
         return True, "安装成功"

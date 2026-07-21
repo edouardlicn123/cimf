@@ -82,40 +82,30 @@ def run_stage2(dry_run: bool) -> dict[str, Any]:
     if dry_run:
         return results
 
-    try:
-        # 2.1 系统设置
-        from core.services import SettingsService  # noqa: PLC0415
-
-        results["settings"] = {"count": SettingsService.reset_to_default(), "success": True}
-    except Exception as e:
-        results["settings"] = {"error": str(e)}
+    from django.db import transaction as db_transaction  # noqa: PLC0415
 
     try:
-        # 2.2 角色权限
-        from core.services import PermissionService  # noqa: PLC0415
+        with db_transaction.atomic():
+            from core.services import SettingsService  # noqa: PLC0415
 
-        PermissionService.init_default_role_permissions()
-        results["permissions"] = {"success": True}
-    except Exception as e:
-        results["permissions"] = {"error": str(e)}
+            results["settings"] = {"count": SettingsService.reset_to_default(), "success": True}
+            from core.services import PermissionService  # noqa: PLC0415
 
-    try:
-        # 2.3 词汇表
-        from core.services.taxonomy_service import TaxonomyService  # noqa: PLC0415
+            PermissionService.init_default_role_permissions()
+            results["permissions"] = {"success": True}
+            from core.services.taxonomy_service import TaxonomyService  # noqa: PLC0415
 
-        results["taxonomies"] = {"count": TaxonomyService.init_default_taxonomies(), "success": True}
-    except Exception as e:
-        results["taxonomies"] = {"error": str(e)}
+            results["taxonomies"] = {"count": TaxonomyService.init_default_taxonomies(), "success": True}
+            from core.smtp.services.template_service import TemplateService  # noqa: PLC0415
 
-    try:
-        # 2.4 邮件模板
-        from core.smtp.services.template_service import TemplateService  # noqa: PLC0415
-
-        results["templates"] = {"count": TemplateService.init_default_templates(), "success": True}
-    except Exception as e:
-        results["templates"] = {"error": str(e)}
+            results["templates"] = {"count": TemplateService.init_default_templates(), "success": True}
+    except Exception as e:  # noqa: CIMF_W007 — CLI 脚本，结果存储在 results 中
+        results["error"] = str(e)
 
     # 输出结果
+    # 注意：原子块的回滚意味着所有子步骤要么全成功要么全不成功。
+    # 如果某个子步骤失败，之前的修改也会被回滚。
+    # 每个子步骤的 init_* 函数是幂等的，可以安全重试。
     if results.get("settings", {}).get("success"):
         count = results.get("settings", {}).get("count", 0)
         print(colored(f"    ✓ 系统设置默认值已重置/插入，共 {count} 项", "green"))

@@ -1,8 +1,11 @@
 import ast
 import json
+import logging
 import operator
 
 from django.contrib.auth.decorators import login_required
+
+logger = logging.getLogger(__name__)
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_POST
@@ -96,5 +99,6 @@ def calculate(request):
         return JsonResponse({"error": "不能除以零"}, status=400)
     except ValueError as e:
         return JsonResponse({"error": str(e)}, status=400)
-    except Exception:
+    except Exception as e:
+        logger.warning(f"表达式求值失败: {e}", exc_info=True)
         return JsonResponse({"error": "表达式格式错误"}, status=400)

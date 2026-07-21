@@ -42,7 +42,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- 联系信息 -->
     <div class="col-12 mb-4">
         <div class="card card-structure">
@@ -86,7 +86,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- 地址信息 -->
     <div class="col-12 mb-4">
         <div class="card card-structure">
@@ -115,7 +115,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- 企业信息 -->
     <div class="col-12 mb-4">
         <div class="card card-structure">
@@ -140,7 +140,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- 其他 -->
     <div class="col-12 mb-4">
         <div class="card card-structure">
@@ -169,7 +169,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- 时间信息 -->
     <div class="col-12">
         <div class="card card-structure">
@@ -177,11 +177,11 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label text-muted">创建时间</label>
-                        <p class="mb-0">{{ customer.created_at.strftime('%Y-%m-%d %H:%M') if customer.created_at else '-' }}</p>
+                        <p class="mb-0">{{ customer.created_at|date('Y-m-d H:i') if customer.created_at else '-' }}</p>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label text-muted">更新时间</label>
-                        <p class="mb-0">{{ customer.updated_at.strftime('%Y-%m-%d %H:%M') if customer.updated_at else '-' }}</p>
+                        <p class="mb-0">{{ customer.updated_at|date('Y-m-d H:i') if customer.updated_at else '-' }}</p>
                     </div>
                 </div>
             </div>

@@ -11,12 +11,15 @@
     - 1.0: 初始版本
 """
 
+import logging
 import time
 
 from django.middleware.csrf import get_token
 
 from core.constants import URL_SECTION_MAPPING
 from core.services import PermissionService, SettingsService
+
+logger = logging.getLogger(__name__)
 
 
 def system_settings(_request):
@@ -31,6 +34,7 @@ def system_settings(_request):
             "timestamp": int(time.time()),
         }
     except Exception:
+        logger.exception("加载系统设置失败")
         return {
             "system_name": "CIMF",
             "system_settings": {},
@@ -45,7 +49,12 @@ def user_permissions(request):
     if not hasattr(request, "user") or not request.user.is_authenticated:
         return {"user_permissions": []}
 
-    return {"user_permissions": PermissionService.get_user_effective_permissions(request.user)}
+    try:
+        permissions = PermissionService.get_user_effective_permissions(request.user)
+    except Exception:
+        logger.exception("获取用户权限失败")
+        permissions = []
+    return {"user_permissions": permissions}
 
 
 def csrf_token(request):
@@ -58,7 +67,7 @@ def csrf_token(request):
 
 def active_section(request):
     """从URL名称自动推断 active_section"""
-    url_name = request.resolver_match.url_name if request.resolver_match else None
+    url_name = request.resolver_match.url_name if request.resolver_match else ""
     section = URL_SECTION_MAPPING.get(url_name)
     if section:
         return {"active_section": section}

@@ -61,6 +61,7 @@ class EmailService:
             同步模式返回 bool，异步模式返回 EmailLog ID
         """
         to_list = [to] if isinstance(to, str) else to
+        subject = subject.replace("\r", "").replace("\n", "")
 
         config = SmtpService.get_current_config()
 
@@ -114,7 +115,7 @@ class EmailService:
         if not template:
             return False
 
-        subject = TemplateService.render_subject(template, context)
+        subject = TemplateService.render_subject(template, context).replace("\r", "").replace("\n", "")
         html_body, text_body = TemplateService.render_body(template, context)
 
         return cls.send_email(
@@ -248,23 +249,30 @@ class EmailService:
                 if success:
                     log.status = "sent"
                     log.sent_at = timezone.now()
+                    log.error_message = ""
                     sent_count += 1
                 else:
                     log.status = "failed"
                     log.error_message = "发送失败"
                     log.retry_count += 1
+                    log.sent_at = None
 
                 log.save(update_fields=["status", "sent_at", "error_message", "retry_count"])
 
             except Exception as e:
+                logger.error(f"处理待发送邮件失败: log_id={log.id}, error={e}", exc_info=True)
                 log.status = "failed"
-                log.error_message = str(e)
+                password = config.get("password", "")
+                error_msg = str(e)
+                if password and password in error_msg:
+                    error_msg = error_msg.replace(password, "***")
+                log.error_message = error_msg
                 log.retry_count += 1
                 log.save(update_fields=["status", "error_message", "retry_count"])
 
         if sent_count > 0:
             cls._last_send_time = time.time()
-            cls._next_delay = send_interval + random.randint(-15, 15)
+            cls._next_delay = send_interval + random.randint(-15, 15)  # noqa: S311 — not crypto, jitter only
             logger.info(f"发送 {sent_count} 封，下次间隔 {cls._next_delay:.0f}s（设定 {send_interval}s ±15s）")
             cls._check_and_notify_failed()
 

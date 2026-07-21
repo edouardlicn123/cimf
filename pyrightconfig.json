@@ -1,0 +1,14 @@
+{
+  "include": ["core", "modules", "cimf_django"],
+  "exclude": ["**/migrations", "**/venv", "**/__pycache__"],
+  "typeCheckingMode": "off",
+  "reportMissingImports": "none",
+  "reportMissingTypeStubs": "none",
+  "reportOptionalMemberAccess": "warning",
+  "reportOptionalSubscript": "warning",
+  "reportOptionalCall": "warning",
+  "reportCallIssue": "warning",
+  "reportGeneralTypeIssues": "none",
+  "pythonVersion": "3.12",
+  "pythonPlatform": "Linux"
+}

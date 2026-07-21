@@ -32,7 +32,7 @@
     - core.services.permission_service: 权限服务
 """
 
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.db.models import Count, Q
 
 from core.constants import UserRole
@@ -117,22 +117,23 @@ class UserService(BaseService):
             permissions = PermissionService.get_role_permissions_from_db(role)
 
         with transaction.atomic():
-            if User.objects.filter(username=username).exists():
-                raise ValueError("用户名已存在")
-
             if email and User.objects.filter(email=email).exists():
                 raise ValueError("邮箱已存在")
-
-            user = User.objects.create_user(
-                username=username,
-                password=password,
-                nickname=nickname,
-                email=email,
-                role=role,
-                permissions=permissions,
-                is_admin=is_admin,
-                is_active=True,
-            )
+            try:
+                user = User.objects.create_user(
+                    username=username,
+                    password=password,
+                    nickname=nickname,
+                    email=email,
+                    role=role,
+                    permissions=permissions,
+                    is_admin=is_admin,
+                    is_active=True,
+                )
+            except IntegrityError:
+                if User.objects.filter(username=username).exists():
+                    raise ValueError("用户名已存在")
+                raise
 
         return user
 
@@ -153,39 +154,49 @@ class UserService(BaseService):
 
         user = cls._get_user_or_raise(user_id)
 
-        if username and clean_str(username) != user.username:
-            if User.objects.filter(username=username).exclude(id=user_id).exists():
-                raise ValueError("用户名已存在")
-            user.username = clean_str(username)
+        update_fields: list[str] = []
 
-        if nickname:
-            user.nickname = clean_str(nickname)
+        with transaction.atomic():
+            if username and clean_str(username) != user.username:
+                if User.objects.filter(username=username).exclude(id=user_id).exists():
+                    raise ValueError("用户名已存在")
+                user.username = clean_str(username)
+                update_fields.append("username")
 
-        if email is not None:
-            if email:
-                if User.objects.filter(email=email).exclude(id=user_id).exists():
-                    raise ValueError("邮箱已存在")
-                user.email = clean_str(email)
-            else:
-                user.email = None
+            if nickname:
+                user.nickname = clean_str(nickname)
+                update_fields.append("nickname")
 
-        if password:
-            user.set_password(password)
+            if email is not None:
+                if email:
+                    if User.objects.filter(email=email).exclude(id=user_id).exists():
+                        raise ValueError("邮箱已存在")
+                    user.email = clean_str(email)
+                else:
+                    user.email = None
+                update_fields.append("email")
 
-        if role is not None:
-            user.role = role
-            if role == UserRole.MANAGER:
-                user.permissions = ["*"]
-            else:
-                user.permissions = PermissionService.get_role_permissions_from_db(role)
+            if password:
+                user.set_password(password)
+                update_fields.append("password")
 
-        if is_admin is not None:
-            user.is_admin = is_admin
+            if role is not None:
+                user.role = role
+                if role == UserRole.MANAGER:
+                    user.permissions = ["*"]
+                else:
+                    user.permissions = PermissionService.get_role_permissions_from_db(role)
+                update_fields.extend(["role", "permissions"])
 
-        if is_active is not None:
-            user.is_active = is_active
+            if is_admin is not None:
+                user.is_admin = is_admin
+                update_fields.append("is_admin")
 
-        user.save()
+            if is_active is not None:
+                user.is_active = is_active
+                update_fields.append("is_active")
+
+            user.save(update_fields=update_fields)
         return user
 
     @classmethod
@@ -199,7 +210,7 @@ class UserService(BaseService):
             return user
 
         user.is_active = active
-        user.save()
+        user.save(update_fields=["is_active"])
         return user
 
     @staticmethod
@@ -221,20 +232,27 @@ class UserService(BaseService):
         cls._protect_admin(user_id)
         user = cls._get_user_or_raise(user_id)
 
-        if nickname is not None:
-            cleaned = clean_optional_str(nickname)
-            user.nickname = cleaned if cleaned else None
+        with transaction.atomic():
+            changed = []
+            if nickname is not None:
+                cleaned = clean_optional_str(nickname)
+                user.nickname = cleaned if cleaned else None
+                changed.append("nickname")
 
-        if email is not None:
-            if email:
-                cleaned_email = clean_str(email)
-                if User.objects.filter(email=cleaned_email).exclude(id=user_id).exists():
-                    raise ValueError("该邮箱已被其他用户使用")
-                user.email = cleaned_email
+            if email is not None:
+                if email:
+                    cleaned_email = clean_str(email)
+                    if User.objects.filter(email=cleaned_email).exclude(id=user_id).exists():
+                        raise ValueError("该邮箱已被其他用户使用")
+                    user.email = cleaned_email
+                else:
+                    user.email = None
+                changed.append("email")
+
+            if changed:
+                user.save(update_fields=changed)
             else:
-                user.email = None
-
-        user.save()
+                user.save()
         return user
 
     @classmethod
@@ -258,7 +276,7 @@ class UserService(BaseService):
         user = cls._get_user_or_raise(user_id)
 
         user.set_password(new_password)
-        user.save()
+        user.save(update_fields=["password"])
         return user
 
     @classmethod

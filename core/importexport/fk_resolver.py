@@ -54,7 +54,7 @@ class FKResolverPool:
                         )
                     item = TaxonomyItem.objects.create(taxonomy=taxonomy, name=value, weight=0)
             else:
-                item = TaxonomyItem.objects.filter(name=value).first()
+                item = TaxonomyItem.objects.filter(name=value).first()  # noqa: CIMF_W008 — intentional None return
             return item
 
         try:
@@ -62,7 +62,7 @@ class FKResolverPool:
                 return fk_model_or_name.objects.filter(name=value).first()
             elif hasattr(fk_model_or_name, "customer_name"):
                 return fk_model_or_name.objects.filter(customer_name=value).first()
-        except Exception:
+        except Exception:  # noqa: S110 — FK resolution best-effort
             pass
 
         return None

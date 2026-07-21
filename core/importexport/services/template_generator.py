@@ -66,7 +66,7 @@ class TemplateGenerator:
                     if cell.value:
                         length = len(str(cell.value))
                         max_length = max(max_length, length)
-                except Exception:
+                except Exception:  # noqa: S110 — cell value parse best-effort
                     pass
 
             adjusted_width = min(max(max_length + 4, 15), 40)
@@ -154,7 +154,7 @@ class TemplateGenerator:
     def _build_response(cls, wb, filename: str) -> HttpResponse:
         """构建 HTTP 响应"""
         buffer = BytesIO()
-        wb.save(buffer)
+        wb.save(buffer)  # noqa: CIMF_W006 — openpyxl Workbook.save()，非 Django model
         buffer.seek(0)
 
         response = HttpResponse(

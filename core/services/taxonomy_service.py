@@ -165,8 +165,13 @@ class TaxonomyService(BaseService):
     def reorder_items(taxonomy_id: int, item_ids: list[int]) -> bool:
         """重新排序词汇项"""
         with transaction.atomic():
+            items = list(TaxonomyItem.objects.filter(id__in=item_ids, taxonomy_id=taxonomy_id))
+            item_map = {item.id: item for item in items}
             for idx, item_id in enumerate(item_ids):
-                TaxonomyItem.objects.filter(id=item_id, taxonomy_id=taxonomy_id).update(weight=idx)
+                item = item_map.get(item_id)
+                if item:
+                    item.weight = idx
+            TaxonomyItem.objects.bulk_update(items, ["weight"], batch_size=1000)
         return True
 
     @staticmethod

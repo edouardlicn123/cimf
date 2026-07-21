@@ -19,5 +19,5 @@ class NodesConfig(AppConfig):
                     f"安装 {result['installed']} 个, "
                     f"跳过 {result['skipped']} 个"
                 )
-        except Exception:
+        except Exception:  # noqa: CIMF_W007 — 数据库未就绪时预期行为
             logger.debug("模块自动注册跳过（数据库尚未就绪）")

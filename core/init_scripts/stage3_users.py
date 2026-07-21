@@ -93,7 +93,7 @@ def run_stage3(force: bool = False, dry_run: bool = False) -> bool:
             print("❌ 错误：生产环境必须设置 DJANGO_ADMIN_PASSWORD 环境变量！")
             return False
         else:
-            admin_password = "admin123"  # 仅开发环境默认值
+            admin_password = "admin123"  # noqa: S105 — 仅开发环境默认值
             print("⚠️ 警告：使用默认密码，生产环境请设置 DJANGO_ADMIN_PASSWORD")
     admin_email = os.environ.get("DJANGO_ADMIN_EMAIL", "admin@example.com")
     admin_theme = os.environ.get("DJANGO_ADMIN_THEME", "default")
@@ -114,17 +114,18 @@ def run_stage3(force: bool = False, dry_run: bool = False) -> bool:
 
     try:
         existing_admin = User.objects.filter(username=admin_username).first()
-    except Exception as e:
+    except Exception as e:  # noqa: CIMF_W007 — CLI 脚本，特定错误处理后重新抛出
         if "no such table" in str(e) or "does not exist" in str(e):
             print(colored("✗ 数据库表不存在，请先运行阶段1完成数据库迁移：", "red"))
             print(colored("  ./venv/bin/python init_db.py --stage 1", "yellow"))
             return False
         raise
 
-    if existing_admin and not force:
-        print(colored(f"    - 管理员 '{admin_username}' 已存在，跳过创建", "yellow"))
+    if existing_admin:
         if force:
-            print(colored("    (使用 --force 可强制重置)", "yellow"))
+            print(colored(f"    - 管理员 '{admin_username}' 已存在，使用 --force 将强制重置", "yellow"))
+        else:
+            print(colored(f"    - 管理员 '{admin_username}' 已存在，跳过创建（使用 --force 可强制重置）", "yellow"))
         return True
 
     if existing_admin and force:
@@ -146,7 +147,7 @@ def run_stage3(force: bool = False, dry_run: bool = False) -> bool:
             navigation_cards=DEFAULT_NAV_CARDS,
         )
         admin.set_password(admin_password)
-        admin.save()
+        admin.save(update_fields=["password"])
 
         print(colored("    ✓ 管理员用户创建成功", "green"))
         print(f"      用户名: {admin_username}")

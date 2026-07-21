@@ -3,20 +3,19 @@
 """
 
 import json
+import logging
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+
+logger = logging.getLogger(__name__)
 from django.db import transaction
 from django.shortcuts import redirect, render
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from core.decorators import login_required_json, permission_required
 from core.importexport import ExportService, ImportService, TemplateGenerator
 from core.node.services import NodeTypeService
 from core.utils.response import json_error, json_success
-
-
-
 
 
 def _get_node_type_or_redirect(node_type_slug, redirect_name="importexport:export_list"):
@@ -42,6 +41,7 @@ def export_list(request):
 
 
 @permission_required("importexport.view")
+@require_http_methods(["GET", "POST"])
 def export_select_fields(request, node_type_slug):
     """字段选择页"""
     node_type, response = _get_node_type_or_redirect(node_type_slug)
@@ -109,6 +109,7 @@ def export_select_fields(request, node_type_slug):
 
 
 @permission_required("importexport.view")
+@require_http_methods(["GET", "POST"])
 def export_confirm(request, node_type_slug):
     """确认页"""
     node_type, response = _get_node_type_or_redirect(node_type_slug)
@@ -168,8 +169,6 @@ def export_exporting(request, node_type_slug):
     )
 
 
-@login_required
-@require_POST
 @permission_required("importexport.view")
 def do_export(request, node_type_slug):
     """执行导出"""
@@ -192,6 +191,7 @@ def do_export(request, node_type_slug):
             del request.session["export_filters"]
         return response
     except Exception as e:
+        logger.exception(f"导出失败: node_type={node_type_slug}")
         messages.error(request, f"导出失败：{e!s}")
         return redirect("importexport:export_select_fields", node_type_slug)
 
@@ -230,6 +230,7 @@ def import_page(request, node_type_slug):
     )
 
 
+@require_GET
 @permission_required("importexport.view")
 def download_template(request, node_type_slug):  # noqa: ARG001
     """下载导入模板"""
@@ -257,9 +258,7 @@ def upload_preview(request, node_type_slug):
 
     from core.utils.response import validate_upload  # noqa: PLC0415
 
-    valid, error_msg = validate_upload(
-        file, max_size=10 * 1024 * 1024, allowed_exts=[".csv", ".xlsx", ".xls"]
-    )
+    valid, error_msg = validate_upload(file, max_size=10 * 1024 * 1024, allowed_exts=[".csv", ".xlsx", ".xls"])
     if not valid:
         return json_error(error_msg, 400)
 
@@ -310,10 +309,10 @@ def upload_preview(request, node_type_slug):
         )
 
     except Exception as e:
+        logger.exception(f"文件读取失败: filename={filename}")
         return json_error(f"文件读取失败：{e!s}", 500)
 
 
-@login_required
 @require_POST
 @permission_required("importexport.view")
 def do_import(request, node_type_slug):
@@ -340,6 +339,7 @@ def do_import(request, node_type_slug):
         with transaction.atomic():
             result = ImportService.import_data(node_type_slug, valid_rows, request.user, skip_duplicates=True)
     except Exception as e:
+        logger.exception(f"导入失败: node_type={node_type_slug}")
         messages.error(request, f"导入失败: {e!s}")
         return redirect("importexport:import_page", node_type_slug)
 
@@ -372,6 +372,7 @@ def do_import(request, node_type_slug):
     )
 
 
+@require_GET
 @permission_required("importexport.view")
 def download_errors(request, node_type_slug):
     """下载错误列表"""

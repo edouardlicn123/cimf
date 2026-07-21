@@ -16,6 +16,8 @@
     - core.node.services: Node服务
 """
 
+import logging
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, JsonResponse
@@ -29,6 +31,8 @@ from core.utils.pagination import paginate_queryset
 from core.utils.views import safe_int
 from modules.customer.forms import CustomerForm
 from modules.customer.services import CustomerService
+
+logger = logging.getLogger(__name__)
 
 
 def _get_node_or_404(node_id):
@@ -98,6 +102,7 @@ def _process_customer_form(request, customer=None, node=None):
             messages.success(request, "客户创建成功")
             return redirect("node:module_page", node_type_slug="customer")
         except ValueError as e:
+            logger.warning("客户表单处理失败: %s", e)
             messages.error(request, str(e))
     else:
         for field, errors in form.errors.items():

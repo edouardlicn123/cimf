@@ -14,11 +14,10 @@ def _null_to_empty(apps, schema_editor):
     with schema_editor.connection.cursor() as cursor:
         for table, fields in tables:
             for field in fields:
-                cursor.execute(f"UPDATE {table} SET {field} = '' WHERE {field} IS NULL")
+                cursor.execute(f"UPDATE {table} SET {field} = '' WHERE {field} IS NULL")  # noqa: S608
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("core", "0017_alter_taxonomyitem_unique_together"),
     ]
@@ -82,13 +81,21 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="user",
             name="email",
-            field=models.EmailField(blank=True, db_index=True, help_text="用户邮箱（可选，用于密码重置、通知等）", max_length=254, verbose_name="邮箱"),
+            field=models.EmailField(
+                blank=True,
+                db_index=True,
+                help_text="用户邮箱（可选，用于密码重置、通知等）",
+                max_length=254,
+                verbose_name="邮箱",
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
             model_name="user",
             name="nickname",
-            field=models.CharField(blank=True, help_text="显示昵称（仪表盘、项目成员列表等处优先显示）", max_length=64, verbose_name="昵称"),
+            field=models.CharField(
+                blank=True, help_text="显示昵称（仪表盘、项目成员列表等处优先显示）", max_length=64, verbose_name="昵称"
+            ),
             preserve_default=False,
         ),
     ]

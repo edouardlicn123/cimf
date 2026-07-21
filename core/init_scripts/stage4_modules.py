@@ -97,8 +97,8 @@ def print_module_results(results: dict[str, Any]):
         msg += f"，跳过 {results.get('skipped')} 个已注册模块"
     print(colored(msg, "green"))
 
-    if results.get("error"):
-        print(colored(f"    ⚠ 部分模块异常: {results.get('error')}", "yellow"))
+    if results.get("failed"):
+        print(colored(f"    ⚠ 部分模块异常: {'; '.join(results['failed'][:3])}", "yellow"))
 
 
 def verify_installed_modules():

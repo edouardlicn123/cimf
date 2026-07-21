@@ -1,6 +1,10 @@
 """模块市场视图"""
 
+import logging
+
 from django.contrib.auth.decorators import login_required
+
+logger = logging.getLogger(__name__)
 from django.shortcuts import render
 from django.views.decorators.http import require_POST
 
@@ -96,6 +100,7 @@ def market_install(request, module_id: str):  # noqa: ARG001
             result["message"] = "下载成功，请在模块管理页面完成安装和启用"
             result["registered"] = True
     except Exception as e:
+        logger.warning(f"注册模块 {module_id} 失败: {e}", exc_info=True)
         result["success"] = False
         result["error"] = f"注册失败: {e!s}"
 

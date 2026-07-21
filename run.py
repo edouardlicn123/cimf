@@ -27,7 +27,7 @@ import socket
 import subprocess
 import sys
 import threading
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 # 设置 Django settings
@@ -42,7 +42,7 @@ DEBUG = os.environ.get("DJANGO_DEBUG", "true" if ENV == "development" else "fals
     "yes",
     "on",
 )
-HOST = os.environ.get("DJANGO_HOST", "0.0.0.0")
+HOST = os.environ.get("DJANGO_HOST", "0.0.0.0")  # noqa: S104 — dev server
 
 # 端口从命令行参数或环境变量获取
 CUSTOM_PORT = int(sys.argv[1]) if len(sys.argv) > 1 and sys.argv[1].isdigit() else None
@@ -57,7 +57,7 @@ def check_database():
         print(f"\n未检测到数据库文件: {db_path}")
         print("将创建新数据库...")
         print("执行 python manage.py migrate ...")
-        result = subprocess.run(["python", "manage.py", "migrate"], capture_output=True, text=True, check=False)
+        result = subprocess.run(["python", "manage.py", "migrate"], capture_output=True, text=True, check=False)  # noqa: S607 — controlled dev command
         if result.returncode != 0:
             print(f"迁移失败: {result.stderr}")
             sys.exit(1)
@@ -121,7 +121,7 @@ def check_production():
                 print("\n" + "=" * 80)
                 print("【警告】SECRET_KEY 太弱，建议设置为至少48位随机字符串")
                 print("=" * 80 + "\n")
-        except Exception:
+        except Exception:  # noqa: S110 — SECRET_KEY check best-effort
             pass
 
 
@@ -141,7 +141,7 @@ def main():
 
     # 启动信息 - 立即刷新输出
     print("\n" + "=" * 70, flush=True)
-    print(f"CIMF 管理系统启动 ({datetime.now().strftime('%Y-%m-%d %H:%M:%S')})", flush=True)
+    print(f"CIMF 管理系统启动 ({datetime.now(UTC).strftime('%Y-%m-%d %H:%M:%S')})", flush=True)
     print(f"Python: {sys.version.split()[0]}", flush=True)
     print(f"环境: {ENV.upper()}", flush=True)
     print(f"Debug: {DEBUG}", flush=True)
@@ -151,7 +151,7 @@ def main():
         local_ip = socket.gethostbyname(socket.gethostname())
         if local_ip != "127.0.0.1":
             print(f"局域网访问: http://{local_ip}:{PORT}", flush=True)
-    except Exception:
+    except Exception:  # noqa: S110 — IP display best-effort
         pass
 
     print(f"本地访问: http://localhost:{PORT}", flush=True)

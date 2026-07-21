@@ -14,7 +14,9 @@ class CustomerFields(BaseModel):
     node = models.OneToOneField(Node, on_delete=models.CASCADE, related_name="customer_fields", verbose_name="关联节点")
 
     customer_name = models.CharField(max_length=200, unique=True, verbose_name="客户名称")
-    customer_code = models.CharField(max_length=50, unique=True, blank=True, verbose_name="客户代码")
+    customer_code = models.CharField(
+        max_length=50, unique=True, blank=True, null=True, default=None, verbose_name="客户代码"
+    )
     customer_type = models.ForeignKey(
         "core.TaxonomyItem",
         on_delete=models.SET_NULL,
@@ -82,4 +84,4 @@ class CustomerFields(BaseModel):
         return self.node.created_by if hasattr(self, "node") and self.node else None
 
     def __str__(self):
-        return self.customer_name
+        return self.customer_name or f"CustomerFields({self.pk})"

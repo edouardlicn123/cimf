@@ -34,7 +34,7 @@ class ModuleScaffoldService:
             type_obj.description = module.description or ""
             type_obj.icon = icon
             type_obj.is_active = module.is_active
-            type_obj.save()
+            type_obj.save(update_fields=["name", "description", "icon", "is_active"])
 
         return type_obj
 
@@ -104,16 +104,16 @@ class {module_id.title().replace("-", "").replace("_", "")}Model(models.Model):
             views_content = f"""# -*- coding: utf-8 -*-
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
+from core.decorators import login_required_json
 
 
-@login_required
+@login_required_json
 @require_http_methods(["GET"])
 def list_view(request):
     return JsonResponse({{'message': 'List view for {module_id}'}})
 
 
-@login_required
+@login_required_json
 @require_http_methods(["GET"])
 def detail_view(request, pk):
     return JsonResponse({{'message': f'Detail view for {{pk}}'}})
@@ -132,6 +132,7 @@ def detail_view(request, pk):
         except PermissionError:
             return {"success": False, "error": "权限不足，无法创建目录"}
         except Exception as e:
+            logger.exception("创建模块 %s 失败", module_id)
             if module_path.exists():
                 shutil.rmtree(module_path)
             return {"success": False, "error": f"创建模块失败: {e!s}"}

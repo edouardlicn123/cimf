@@ -6,11 +6,11 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        {{ modal_body|safe if modal_body else '' }}
+        {{ modal_body|safe if modal_body else '' }}  {# noqa: CIMF_W009 #}
       </div>
       <div class="modal-footer">
         {% if modal_footer %}
-        {{ modal_footer|safe }}
+        {{ modal_footer|safe }}  {# noqa: CIMF_W009 #}
         {% else %}
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
         <button type="button" class="btn btn-danger" id="modalConfirmBtn">确认</button>

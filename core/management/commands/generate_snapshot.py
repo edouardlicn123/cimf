@@ -163,10 +163,12 @@ class Command(BaseCommand):
                         for arg in item.args.args:
                             if arg.arg != "self" and arg.arg != "cls":
                                 args.append(arg.arg)
-                        methods.append({
-                            "name": item.name,
-                            "args": args,
-                        })
+                        methods.append(
+                            {
+                                "name": item.name,
+                                "args": args,
+                            }
+                        )
                 if methods:
                     classes[node.name] = {
                         "bases": [self._get_name(b) for b in node.bases],
@@ -193,7 +195,7 @@ class Command(BaseCommand):
                 bases_str = ", ".join(info["bases"][:2])
                 fields_str = ", ".join(info["fields"][:5])
                 if len(info["fields"]) > 5:
-                    fields_str += f"... (+{len(info['fields'])-5})"
+                    fields_str += f"... (+{len(info['fields']) - 5})"
                 lines.append(f"| {name} | {bases_str} | {fields_str} |")
             lines.append("")
 
@@ -317,5 +319,6 @@ class Command(BaseCommand):
         return "?"
 
     def _today(self):
-        from datetime import date
-        return date.today().isoformat()
+        from django.utils import timezone
+
+        return timezone.now().date().isoformat()

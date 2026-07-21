@@ -31,6 +31,7 @@ class LoginForm(BootstrapFormMixin, forms.Form):
                 "placeholder": "请输入用户名",
                 "autocomplete": "username",
                 "autofocus": True,
+                "class": "form-control form-control-lg rounded-pill",
             }
         ),
     )
@@ -41,6 +42,7 @@ class LoginForm(BootstrapFormMixin, forms.Form):
             attrs={
                 "placeholder": "请输入密码",
                 "autocomplete": "current-password",
+                "class": "form-control form-control-lg rounded-pill",
             }
         ),
     )
