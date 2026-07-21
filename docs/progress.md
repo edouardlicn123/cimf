@@ -210,3 +210,5 @@
 6. 新增预防机制：CIMF_W008(.first() None检查)、CIMF_W009(mark_safe/|safe标记)、pre-commit hook(--tag cimf)、GitHub CI workflow、快照遗留问题清单
 7. 第四轮并发+importexport+视图+init脚本 Bug修复：import_service logger未定义、module views消息级别、settings profile表单、customer/user TOCTOU、logs分页、init stage2-4小问题、exc_info补齐、S110 noqa清理
 8. 移除 pre-commit django-check hook（已由 run.sh 选项 9 覆盖）
+9. 关闭所有 pre-commit hook，设为空 repos: []
+
