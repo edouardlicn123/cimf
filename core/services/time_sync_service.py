@@ -27,7 +27,7 @@
 import json
 import logging
 import time
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from urllib.request import urlopen
 
 from django.utils.timezone import now
@@ -65,7 +65,8 @@ class TimeSyncService(SingletonMixin):
 
             value = SettingsService.get_setting(key)
             return value if value is not None else default
-        except Exception:
+        except Exception as e:
+            logger.warning("获取设置值失败: key=%s, error=%s", key, e)
             return default
 
     def is_enabled(self) -> bool:
@@ -100,12 +101,12 @@ class TimeSyncService(SingletonMixin):
         """从指定服务器获取时间"""
 
         def _fetch():
-            with urlopen(url, timeout=3) as response:
+            with urlopen(url, timeout=3) as response:  # noqa: S310 — trusted time API server
                 if response.status == 200:
                     data = json.loads(response.read().decode("utf-8"))
                     date_str = data.get("date") or data.get("datetime", "").split("+")[0].replace("T", " ")
                     if date_str:
-                        return datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S").replace(tzinfo=None)
+                        return datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S").replace(tzinfo=UTC)
             return None
 
         return safe_execute(_fetch, error_return=None, log_msg=f"从 {url} 获取时间失败", logger=logger)
@@ -166,6 +167,7 @@ class TimeSyncService(SingletonMixin):
                 synced = datetime.fromisoformat(synced_str)
                 if synced.tzinfo is None:
                     from django.utils.timezone import make_aware  # noqa: PLC0415
+
                     synced = make_aware(synced)
                 mono = float(monotonic_str)
                 elapsed = time.monotonic() - mono

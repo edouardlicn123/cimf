@@ -3,6 +3,7 @@
 """
 
 import contextlib
+import html
 import json
 
 from django import forms
@@ -41,7 +42,8 @@ class RegionSelectWidget(forms.TextInput):
         city_api = reverse("core:api_regions_cities")
         district_api = reverse("core:api_regions_districts")
 
-        html = f'''
+        escaped_value = html.escape(json.dumps(initial_data, ensure_ascii=False))
+        html_output = f'''
         <div class="region-select-widget">
             <div class="row">
                 <div class="col-md-4">
@@ -60,10 +62,10 @@ class RegionSelectWidget(forms.TextInput):
                     </select>
                 </div>
             </div>
-            <input type="hidden" name="{name}" id="id_{name}" value='{json.dumps(initial_data, ensure_ascii=False)}'>
+            <input type="hidden" name="{name}" id="id_{name}" value='{escaped_value}'>
         </div>
         '''
-        return mark_safe(html)
+        return mark_safe(html_output)  # noqa: CIMF_W009 — 所有数据已 html.escape()  # noqa: S308 — data already html.escape'd
 
     class Media:
         js = ("/js/region_select.js",)
@@ -100,7 +102,7 @@ class RegionSelectField(forms.CharField):
         if isinstance(value, str):
             try:
                 return json.loads(value)
-            except Exception:
+            except Exception:  # noqa: CIMF_W007 — invalid JSON, return defaults
                 return {
                     "province": "",
                     "city": "",

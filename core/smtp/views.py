@@ -119,13 +119,14 @@ def smtp_history(request):
     failed_count = all_qs.filter(status="failed").count()
     pending_count = all_qs.filter(status__in=["pending", "sending"]).count()
 
-    page_ctx = paginate_queryset(request, logs_qs, per_page=20)
+    page_obj, page_range = paginate_queryset(request, logs_qs, per_page=20)
 
     return render(
         request,
         "smtp/history.html",
         {
-            **page_ctx,
+            "page_obj": page_obj,
+            "page_range": page_range,
             "filter_status": status_filter,
             "total_count": total_count,
             "sent_count": sent_count,

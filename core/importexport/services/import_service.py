@@ -6,13 +6,17 @@ ImportService - 导入服务
 
 import csv
 import io
+import logging
 import re
+import threading
 from importlib import import_module
 from typing import Any
 
 from django.db import transaction
 from django.http import HttpResponse
 from openpyxl import load_workbook
+
+logger = logging.getLogger(__name__)
 
 try:
     import chardet
@@ -26,6 +30,8 @@ class ImportService:
     FORMAT_CSV = "csv"
     FORMAT_XLSX = "xlsx"
     MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
+
+    _import_lock = threading.Lock()
 
     FK_TAXONOMY_OVERRIDES = {
         ("customer_cn", "enterprise_type"): "enterprise_nature",
@@ -71,7 +77,7 @@ class ImportService:
                     return "utf-8"
                 if encoding:
                     return encoding
-            except Exception:
+            except Exception:  # noqa: S110 — encoding detection best-effort
                 pass
         # 回退：尝试常见编码
         for enc in ("utf-8-sig", "utf-8", "gbk", "gb2312", "latin-1"):
@@ -272,7 +278,23 @@ class ImportService:
 
     @classmethod
     def import_data(cls, node_type_slug: str, rows: list[dict], user, skip_duplicates: bool = True) -> dict:
-        """执行导入"""
+        """执行导入（线程安全，同一时间只允许一个导入任务）"""
+        if not cls._import_lock.acquire(blocking=False):
+            return {
+                "success_count": 0,
+                "warning_count": 0,
+                "warning_details": [],
+                "error_count": 1,
+                "errors": [{"row": 0, "data": {}, "errors": ["导入服务忙，请稍后再试"]}],
+            }
+        try:
+            return cls._do_import(node_type_slug, rows, user, skip_duplicates)
+        finally:
+            cls._import_lock.release()
+
+    @classmethod
+    def _do_import(cls, node_type_slug: str, rows: list[dict], user, skip_duplicates: bool = True) -> dict:
+        """执行导入（内部方法，由 import_data 加锁调用）"""
         from core.importexport.model_registry import ModelRegistry  # noqa: PLC0415
         from core.node.models import Node, NodeType  # noqa: PLC0415
 
@@ -292,40 +314,40 @@ class ImportService:
 
         for idx, row in enumerate(rows, start=1):
             try:
-                transformed = cls._transform_row(row, node_type_slug, field_map)
+                with transaction.atomic():
+                    transformed = cls._transform_row(row, node_type_slug, field_map)
 
-                existing = cls._find_existing(model_class, transformed)
+                    existing = cls._find_existing(model_class, transformed)
 
-                if existing:
-                    if skip_duplicates:
-                        warnings.append(
-                            {
-                                "row": idx,
-                                "data": row,
-                                "message": "记录已存在，已跳过",
-                            }
-                        )
-                        continue
-                    instance = existing
-                elif import_row:
-                    with transaction.atomic():
+                    if existing:
+                        if skip_duplicates:
+                            warnings.append(
+                                {
+                                    "row": idx,
+                                    "data": row,
+                                    "message": "记录已存在，已跳过",
+                                }
+                            )
+                            continue
+                        instance = existing
+                    elif import_row:
                         instance = import_row(transformed, user)
-                else:
-                    with transaction.atomic():
+                    else:
                         node = Node.objects.create(
                             node_type=node_type,
                             created_by=user,
                             updated_by=user,
                         )
                         instance = model_class.objects.create(node=node)
-
-                for key, value in transformed.items():
-                    setattr(instance, key, value)
-
-                instance.save()
+                        modified = []
+                        for key, value in transformed.items():
+                            setattr(instance, key, value)
+                            modified.append(key)
+                        instance.save(update_fields=modified)
                 success_count += 1
 
             except Exception as e:
+                logger.warning(f"导入第 {idx} 行失败: {e}")
                 errors.append(
                     {
                         "row": idx,
@@ -390,7 +412,7 @@ class ImportService:
         for field_name, value in data.items():
             try:
                 field = model_class._meta.get_field(field_name)
-            except Exception:
+            except Exception:  # noqa: CIMF_W007 — field discovery skip unknown
                 continue
             if getattr(field, "unique", False) and value:
                 existing = model_class.objects.filter(**{field_name: value}).first()
@@ -445,4 +467,4 @@ class ImportService:
             for e in errors
         ]
 
-        return csv_response(headers, data_rows, "import_errors.csv", sanitize=False)
+        return csv_response(headers, data_rows, "import_errors.csv", sanitize=True)

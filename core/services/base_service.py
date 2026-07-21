@@ -50,14 +50,15 @@ class BaseService:
         instance = cls.get_by_id(entity_id)
         if instance is None:
             return None, False
-        changed = False
+        changed_fields = []
         for key, value in kwargs.items():
             if getattr(instance, key) != value:
                 setattr(instance, key, value)
-                changed = True
-        if changed:
-            instance.save()
-        return instance, changed
+                changed_fields.append(key)
+        if changed_fields:
+            instance.save(update_fields=changed_fields)
+            return instance, True
+        return instance, False
 
     @classmethod
     def delete(cls, entity_id: int) -> bool:
@@ -73,7 +74,8 @@ class BaseService:
         """根据 ID 获取对象，不存在则抛出异常"""
         instance = cls.get_by_id(entity_id)
         if not instance:
-            raise ValueError(error_msg or f"{cls.model_class.__name__} 不存在 (ID: {entity_id})")
+            model_name = cls.model_class.__name__ if cls.model_class else "Unknown"
+            raise ValueError(error_msg or f"{model_name} 不存在 (ID: {entity_id})")
         return instance
 
     @classmethod
@@ -86,13 +88,11 @@ class BaseService:
     @staticmethod
     def update_fields(instance, **fields):
         """更新实例的指定字段，仅在值发生变化时保存"""
-        changed = False
+        changed_fields = []
         for key, value in fields.items():
             if getattr(instance, key) != value:
                 setattr(instance, key, value)
-                changed = True
-        if changed:
-            instance.save()
+                changed_fields.append(key)
+        if changed_fields:
+            instance.save(update_fields=changed_fields)
         return instance
-
-

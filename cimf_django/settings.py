@@ -15,6 +15,7 @@
     - jinja2: 模板引擎（兼容现有模板）
 """
 
+import secrets
 from pathlib import Path
 
 # pymysql 兼容性处理（使用 MySQL 时需要）
@@ -47,8 +48,8 @@ for _dir in _storage_dirs:
     (BASE_DIR / _dir).mkdir(parents=True, exist_ok=True)
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# 从环境变量读取，如果不存在则使用默认值（仅用于开发）
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-9dtjvn^e5l-o7k12i*0_2ez**pbtje4ik=v*)a42t+r=n2rt#l")
+# 从环境变量读取，如果不存在则使用运行生成的密钥（生产环境必须设置 DJANGO_SECRET_KEY）
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", secrets.token_urlsafe(50))
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # 调试模式：从环境变量读取，默认开启（开发环境）
@@ -106,7 +107,10 @@ MIDDLEWARE = [
     "cimf_django.middleware.GlobalLoginRequiredMiddleware",  # 全局登录要求
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "cimf_django.middleware.ContentSecurityPolicyMiddleware",  # CSP 内容安全策略
 ]
+
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 5000
 
 ROOT_URLCONF = "cimf_django.urls"
 
@@ -194,14 +198,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 STATIC_ROOT = STORAGE_DIR / "staticfiles"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
 # Media files
-MEDIA_URL = "media/"
+MEDIA_URL = "/media/"
 MEDIA_ROOT = STORAGE_DIR / "uploads"
 
 # Default primary key field type
@@ -362,15 +366,31 @@ SECURE_SSL_REDIRECT = os.getenv("DJANGO_SSL_REDIRECT", "false").lower() == "true
 # Cookie 安全设置
 SESSION_COOKIE_SECURE = os.getenv("DJANGO_SESSION_COOKIE_SECURE", "false").lower() == "true"
 CSRF_COOKIE_SECURE = os.getenv("DJANGO_CSRF_COOKIE_SECURE", "false").lower() == "true"
+CSRF_COOKIE_HTTPONLY = True
+SECURE_REFERRER_POLICY = "same-origin"
+
+# 内容类型嗅探防护
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# 反向代理 SSL 头：仅在有反向代理时设置
+# 若没有代理却设置此选项，攻击者可伪造 X-Forwarded-Proto 标头绕过 SSL 重定向
+# 设置 DJANGO_BEHIND_PROXY=true 启用
+if os.getenv("DJANGO_BEHIND_PROXY", "false").lower() == "true":
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # 生产环境自动启用安全配置
 if DJANGO_ENV == "production":
+    if not DJANGO_SECRET_KEY or DJANGO_SECRET_KEY == "your-secret-key-here-change-in-production":
+        raise ValueError("生产环境必须通过 DJANGO_SECRET_KEY 环境变量设置一个强密钥！")
     SECURE_HSTS_SECONDS = SECURE_HSTS_SECONDS or 31536000  # 默认1年
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    CSRF_TRUSTED_ORIGINS = (
+        os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") if os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS") else []
+    )
     DEBUG = False
     if ALLOWED_HOSTS == ["localhost", "127.0.0.1"]:
         raise ValueError("生产环境必须在 DJANGO_ALLOWED_HOSTS 中配置实际域名！")

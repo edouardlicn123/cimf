@@ -1,3 +1,4 @@
+import logging
 from datetime import timedelta
 from typing import Any
 
@@ -14,6 +15,7 @@ from core.services import PermissionService
 from .models import CustomerFields
 from .sample_data import OVERSEAS_CUSTOMERS
 
+logger = logging.getLogger(__name__)
 User = get_user_model()
 
 FIELD_MAPPING = {
@@ -86,7 +88,7 @@ class CustomerService:
             .order_by("-code_num")
             .first()
         )
-        next_num = (max_code.code_num + 1) if max_code else 1
+        next_num = (max_code.code_num + 1) if max_code and max_code.code_num is not None else 1
         return f"cc{next_num:08d}"
 
     @staticmethod
@@ -98,24 +100,31 @@ class CustomerService:
                 try:
                     fields[field_name] = _type(val) if _type is not str else val
                 except (ValueError, TypeError):
+                    logger.warning("字段 '%s' 类型转换失败，使用原始值: %r", field_name, val)
                     fields[field_name] = val
         return fields
 
     @staticmethod
     def create(user, data: dict[str, Any]) -> CustomerFields:
-        with transaction.atomic():
-            node = NodeService.create_node("customer", {}, user)
-            if not node:
-                raise ValueError("创建节点失败")
+        from django.db import IntegrityError  # noqa: PLC0415
 
-            customer_code = data.get("customer_code")
-            if not customer_code:
-                customer_code = CustomerService._generate_unique_code()
+        customer_code = data.get("customer_code")
+        max_retries = 3 if not customer_code else 1
+        for attempt in range(max_retries):
+            try:
+                with transaction.atomic():
+                    node = NodeService.create_node("customer", {}, user)
+                    if not node:
+                        raise ValueError("创建节点失败")
 
-            fields = CustomerService._build_fields(data, {"node": node, "customer_code": customer_code})
-            customer = CustomerFields.objects.create(**fields)
-
-        return customer
+                    code = customer_code or CustomerService._generate_unique_code()
+                    fields = CustomerService._build_fields(data, {"node": node, "customer_code": code})
+                    return CustomerFields.objects.create(**fields)
+            except IntegrityError as e:
+                if attempt == max_retries - 1:
+                    raise ValueError(f"客户代码重复且重试耗尽: {e}")
+                logger.warning("客户代码冲突，重试生成唯一代码")
+                continue
 
     @staticmethod
     def import_row(data: dict, user) -> CustomerFields:
@@ -136,8 +145,6 @@ class CustomerService:
 
     @staticmethod
     def update(customer_id: int, _user, data: dict[str, Any]) -> CustomerFields | None:
-        from django.db import transaction  # noqa: PLC0415
-
         with transaction.atomic():
             customer = CustomerFields.objects.filter(id=customer_id).first()
             if not customer:
@@ -155,8 +162,6 @@ class CustomerService:
 
     @staticmethod
     def delete(customer_id: int) -> bool:
-        from django.db import transaction  # noqa: PLC0415
-
         with transaction.atomic():
             customer = CustomerFields.objects.filter(id=customer_id).first()
             if customer:

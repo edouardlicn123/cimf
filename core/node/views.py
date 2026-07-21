@@ -13,11 +13,11 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import URLPattern, URLResolver
 
 from core.constants import ModuleType
-from core.decorators import admin_post_view, admin_required
+from core.decorators import admin_post_view, admin_required, login_required_json
 from core.fields import get_all_field_types_info
+from core.models import Taxonomy
 from core.module.models import Module
 from core.node.models import Node, NodeType
-from core.models import Taxonomy
 from core.node.services import NodeService, NodeTypeService
 from core.utils.pagination import paginate_queryset
 from core.utils.response import json_error, json_success
@@ -171,14 +171,14 @@ def field_types(request):
     )
 
 
-@login_required
+@login_required_json
 def field_types_api(request):  # noqa: ARG001
     """字段类型 API"""
     field_types_info = get_all_field_types_info()
     return json_success(extra={"field_types": field_types_info})
 
 
-@login_required
+@login_required_json
 def taxonomy_items_api(request):
     """获取词汇表项 API"""
     taxonomy_slug = request.GET.get("taxonomy")
@@ -245,12 +245,14 @@ def _resolve_view(module_path: str, action: str | None, node_id: int | None = No
     if action == "edit":
         return dynamic_import_view(module_path, "node_edit") or dynamic_import_view(module_path, "edit")
 
-    return (dynamic_import_view(module_path, "module_view") or
-            (dynamic_import_view(module_path, "detail_view") if node_id is not None else None) or
-            dynamic_import_view(module_path, "list_view") or
-            (dynamic_import_view(module_path, "node_list") if node_id is None else None) or
-            (dynamic_import_view(module_path, "node_view") if node_id is not None else None) or
-            (dynamic_import_view(module_path, "node_edit") if node_id is not None else None))
+    return (
+        dynamic_import_view(module_path, "module_view")
+        or (dynamic_import_view(module_path, "detail_view") if node_id is not None else None)
+        or dynamic_import_view(module_path, "list_view")
+        or (dynamic_import_view(module_path, "node_list") if node_id is None else None)
+        or (dynamic_import_view(module_path, "node_view") if node_id is not None else None)
+        or (dynamic_import_view(module_path, "node_edit") if node_id is not None else None)
+    )
 
 
 @login_required

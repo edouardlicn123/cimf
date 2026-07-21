@@ -92,7 +92,7 @@ def run_stage1(skip_migrate: bool, incremental: bool, db_exists: bool, dry_run: 
         try:
             call_command("migrate", "--noinput")
             print(colored("    ✓ migrations 执行完成", "green"))
-        except Exception as e:
+        except Exception as e:  # noqa: CIMF_W007 — CLI 脚本，用 print 报错后退出
             print(colored(f"    ✗ migrations 执行失败: {e!s}", "red"))
             import sys  # noqa: PLC0415
 
@@ -101,4 +101,3 @@ def run_stage1(skip_migrate: bool, incremental: bool, db_exists: bool, dry_run: 
         print(colored("    [模拟] 将执行 python manage.py migrate --noinput", "yellow"))
 
     return True
-

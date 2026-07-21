@@ -34,7 +34,7 @@ def get_database_config():
     if db_type == "mysql":
         return _get_mysql_config(db_config)
     else:
-        return _get_sqlite_config()
+        return _get_sqlite_config(db_config)
 
 
 def _load_config(config_path: Path) -> dict:
@@ -60,14 +60,15 @@ def _load_config(config_path: Path) -> dict:
 
             if "=" in line:
                 key, value = line.split("=", 1)
-                config[key.strip()] = value.strip()
+                config[key.strip()] = value.strip().strip("\"'")
 
     return config
 
 
-def _get_sqlite_config() -> dict:
+def _get_sqlite_config(config: dict | None = None) -> dict:
     """获取 SQLite 配置"""
-    db_path = BASE_DIR / "instance" / "django.db"
+    db_name = config.get("DJANGO_DB_NAME", "django.db") if config else "django.db"
+    db_path = BASE_DIR / "instance" / db_name
     # 确保 instance 目录存在
     db_path.parent.mkdir(parents=True, exist_ok=True)
 

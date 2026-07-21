@@ -118,7 +118,7 @@ class PermissionService:
         setting_key = f"role_permissions_{role}"
         value = SettingsService.get_setting(setting_key, parse_json=True)
 
-        if value:
+        if value is not None:
             return value
 
         return ROLE_DEFAULT_PERMISSIONS.get(role, [])

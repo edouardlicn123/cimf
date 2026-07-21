@@ -24,8 +24,8 @@ class SampleDataService:
 
         admin_user = User.objects.filter(is_admin=True).first()
 
-        customer_node_type = NodeType.objects.filter(slug="customer").first()
-        customer_cn_node_type = NodeType.objects.filter(slug="customer_cn").first()
+        customer_node_type = NodeType.objects.filter(slug="customer").first()  # noqa: CIMF_W008 — guarded below
+        customer_cn_node_type = NodeType.objects.filter(slug="customer_cn").first()  # noqa: CIMF_W008 — guarded below
 
         if not admin_user:
             return results
@@ -34,6 +34,7 @@ class SampleDataService:
         try:
             from modules.customer_cn.models import CustomerCnFields  # noqa: PLC0415
             from modules.customer_cn.sample_data import DOMESTIC_CUSTOMERS  # noqa: PLC0415
+
             has_customer_cn = True
         except (ImportError, ModuleNotFoundError):
             logger.debug("customer_cn 模块未安装，跳过国内客户样本")
@@ -54,7 +55,13 @@ class SampleDataService:
                         k: v
                         for k, v in data.items()
                         if k
-                        not in ("customer_name", "customer_type_id", "country_id", "enterprise_type_id", "customer_level_id")
+                        not in (
+                            "customer_name",
+                            "customer_type_id",
+                            "country_id",
+                            "enterprise_type_id",
+                            "customer_level_id",
+                        )
                     }
                     CustomerFields.objects.create(
                         node=node,

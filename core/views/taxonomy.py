@@ -27,7 +27,7 @@ def _handle_taxonomy_form(request, taxonomy=None):
         taxonomy.name = name
         taxonomy.slug = slug
         taxonomy.description = description
-        taxonomy.save()
+        taxonomy.save(update_fields=["name", "slug", "description"])
         return redirect_with_success(request, "词汇表更新成功", "core:taxonomies")
 
     if TaxonomyService.check_slug_exists(slug):

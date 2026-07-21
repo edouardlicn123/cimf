@@ -185,7 +185,13 @@ class ExportService:
             cell.border = thin_border
 
         for row in rows:
-            ws.append([row.get(f["name"], "") for f in fields])
+            ws.append(
+                [
+                    f"'{v}" if isinstance(v, str) and v.startswith(("=", "+", "-", "@")) else v
+                    for f in fields
+                    if (v := row.get(f["name"], "")) is not None
+                ]
+            )
 
         for i, col in enumerate(ws.columns, 1):
             max_length = 0
@@ -199,7 +205,7 @@ class ExportService:
         response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
 
-        wb.save(response)
+        wb.save(response)  # noqa: CIMF_W006 — openpyxl Workbook.save()，非 Django model
         return response
 
     @classmethod
@@ -285,10 +291,15 @@ class ExportService:
             queryset = Node.objects.filter(node_type__slug=node_type_slug)
             return cls._apply_filters(queryset, filters, node_type_slug, None, None)
 
-        queryset = model_class.objects.all()
+        from django.db.models import ForeignKey  # noqa: PLC0415
+
+        fk_fields = [f.name for f in model_class._meta.get_fields() if isinstance(f, ForeignKey)]
+        queryset = model_class.objects.all().select_related(*fk_fields)
 
         if not filters:
             return queryset
+
+        return cls._apply_filters(queryset, filters, node_type_slug, model_class, None)
 
     @classmethod
     def build_filter_summaries(cls, node_type_slug: str, filters: list) -> list:
@@ -311,7 +322,11 @@ class ExportService:
                     region_data = {}
                 parts = [
                     v
-                    for v in [region_data.get("province", ""), region_data.get("city", ""), region_data.get("district", "")]
+                    for v in [
+                        region_data.get("province", ""),
+                        region_data.get("city", ""),
+                        region_data.get("district", ""),
+                    ]
                     if v
                 ]
                 if parts:
@@ -376,7 +391,12 @@ class ExportService:
                 if isinstance(field_obj, models.ForeignKey):
                     lookup = f"{field}__name__icontains"
                     queryset = queryset.filter(**{lookup: value})
-                elif hasattr(field_obj, "name") or field in ["charfield", "textfield"]:
+                elif isinstance(
+                    field_obj,
+                    (models.CharField, models.TextField, models.EmailField, models.URLField, models.SlugField),
+                ):
                     queryset = queryset.filter(**{f"{field}__icontains": value})
+                else:
+                    queryset = queryset.filter(**{f"{field}__exact": value})
 
         return queryset

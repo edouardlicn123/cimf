@@ -40,7 +40,7 @@ typewrite() {
     local color="$1"
     local text="$2"
     local delay="${3:-0.02}"
-    
+
     for ((i=0; i<${#text}; i++)); do
         echo -n -e "${color}${text:$i:1}${NC}"
         sleep $delay
@@ -72,7 +72,7 @@ fi
 # 安装虚拟环境
 install_venv() {
     echo -e "${BLUE}[准备]${NC} 创建虚拟环境..."
-    
+
     if [[ -d "$PROJECT_ROOT/venv" ]]; then
         echo -e "${YELLOW}虚拟环境已存在${NC}"
         read -p "是否重新创建？(y/N) " answer
@@ -83,15 +83,15 @@ install_venv() {
             return 0
         fi
     fi
-    
+
     echo "创建虚拟环境..."
     $PYTHON_CMD -m venv "$PROJECT_ROOT/venv"
-    
+
     echo "安装依赖..."
     local venv_pip
     venv_pip="$PROJECT_ROOT/venv/bin/pip"
     $venv_pip install --upgrade pip -i "$PIP_INDEX" -q
-    
+
     # 读取 requirements.txt 获取包列表
     local requirements_file="$PROJECT_ROOT/requirements.txt"
     if [[ -f "$requirements_file" ]]; then
@@ -104,13 +104,13 @@ install_venv() {
             pkg=$(echo "$line" | sed 's/[>=<!\[].*//; s/#.*//')
             packages+=("$pkg")
         done < "$requirements_file"
-        
+
         local total=${#packages[@]}
         local current=0
-        
+
         echo "共 $total 个依赖包"
         echo
-        
+
         for pkg in "${packages[@]}"; do
             current=$((current + 1))
             printf "  [%d/%d] %-30s" "$current" "$total" "$pkg"
@@ -123,7 +123,7 @@ install_venv() {
     else
         echo -e "${YELLOW}未找到 requirements.txt${NC}"
     fi
-    
+
     echo -e "${GREEN}虚拟环境创建完成${NC}"
 }
 
@@ -173,17 +173,17 @@ fi
 # 启动开发服务器
 run_server() {
     echo -e "\n${GREEN}>>> 启动 CIMF 管理系统 (开发模式)${NC}\n"
-    
+
     mkdir -p storage/uploads storage/backups instance
-    
+
     echo "  监听地址 : http://0.0.0.0:${APP_PORT}"
     echo "  本地访问 : http://127.0.0.1:${APP_PORT}"
     echo "  后台管理 : http://127.0.0.1:${APP_PORT}/admin/"
     echo "  按 Ctrl+C 停止服务"
     echo
-    
+
     export DJANGO_SETTINGS_MODULE=cimf_django.settings
-    
+
     local venv_python
     venv_python=$(get_venv_python)
     $venv_python run.py
@@ -192,9 +192,9 @@ run_server() {
 # 初始化系统（重建数据库+创建管理员）
 init_system() {
     echo -e "\n${GREEN}>>> 初始化系统${NC}\n"
-    
+
     activate_venv
-    
+
     # 备份现有数据库
     if [[ -f "$DB_PATH" ]]; then
         echo -e "${YELLOW}检测到已存在数据库文件${NC}"
@@ -205,53 +205,53 @@ init_system() {
             backup_database
         fi
     fi
-    
+
     # 执行初始化（init_db.py 统一管理 migrations）
     local venv_python
     venv_python=$(get_venv_python)
-    
+
     echo -e "${BLUE}[1/2]${NC} 初始化数据（migrations + 初始数据）..."
     $venv_python init_db.py --with-data --force
-    
+
     echo -e "${GREEN}初始化完成！${NC}"
 }
 
 # 初始化海外客户样本数据
 init_overseas_customers() {
     echo -e "\n${GREEN}>>> 初始化海外客户样本数据${NC}\n"
-    
+
     activate_venv
-    
+
     local venv_python
     venv_python=$(get_venv_python)
-    
+
     $venv_python manage.py init_overseas_customers
-    
+
     echo -e "${GREEN}海外客户样本数据初始化完成！${NC}"
 }
 
 # 初始化国内客户样本数据
 init_domestic_customers() {
     echo -e "\n${GREEN}>>> 初始化国内客户样本数据${NC}\n"
-    
+
     activate_venv
-    
+
     local venv_python
     venv_python=$(get_venv_python)
-    
+
     $venv_python manage.py init_domestic_customers
-    
+
     echo -e "${GREEN}国内客户样本数据初始化完成！${NC}"
 }
 
 # 数据库备份
 backup_database() {
     echo -e "\n${GREEN}>>> 数据库备份${NC}\n"
-    
+
     mkdir -p "$BACKUP_DIR"
-    
+
     timestamp=$(date +%Y%m%d_%H%M%S)
-    
+
     if [[ -f "$DB_PATH" ]]; then
         backup_file="${BACKUP_DIR}/django_${timestamp}.db"
         cp "$DB_PATH" "$backup_file"
@@ -264,33 +264,33 @@ backup_database() {
 # 清理缓存
 clean_cache() {
     echo -e "\n${GREEN}>>> 清理缓存${NC}\n"
-    
+
     echo "删除 __pycache__、.pyc..."
     find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
     find . -type f -name "*.pyc" -delete 2>/dev/null || true
     find . -type f -name "*.pyo" -delete 2>/dev/null || true
-    
+
     rm -rf .pytest_cache .coverage .mypy_cache .ruff_cache 2>/dev/null || true
     rm -rf storage/staticfiles/.cache 2>/dev/null || true
-    
+
     echo -e "${GREEN}缓存清理完成${NC}"
 }
 
 # 杀死服务器进程
 kill_server() {
     echo -e "\n${GREEN}>>> 杀死服务器进程 (端口: ${APP_PORT})${NC}\n"
-    
+
     local pids
     pids=$(lsof -ti:${APP_PORT} -sTCP:LISTEN 2>/dev/null || true)
-    
+
     if [[ -z "$pids" ]]; then
         echo -e "${YELLOW}端口 ${APP_PORT} 上没有运行的进程${NC}"
         return 0
     fi
-    
+
     echo "找到进程 PID: $pids"
     echo "正在杀死进程..."
-    
+
     for pid in $pids; do
         if kill -9 "$pid" 2>/dev/null; then
             echo -e "${GREEN}进程已杀死 (PID: $pid)${NC}"
@@ -314,7 +314,7 @@ show_env_vars() {
 # 创建 config.env 文件
 create_env_file() {
     echo -e "\n${GREEN}>>> 创建 config.env 文件${NC}\n"
-    
+
     if [[ -f "config.env" ]]; then
         echo -e "${YELLOW}config.env 已存在${NC}"
         read -p "是否覆盖？(y/N) " answer
@@ -323,14 +323,14 @@ create_env_file() {
             return 0
         fi
     fi
-    
+
     if [[ -f "config.env.sample" ]]; then
         # 选择数据库类型
         echo "请选择数据库类型："
         echo "  1 → SQLite（默认，适合开发和测试）"
         echo "  2 → MySQL（适合生产环境）"
         read -p "请输入选项 (1/2): " db_choice
-        
+
         case "$db_choice" in
             1)
                 # SQLite 配置
@@ -345,7 +345,7 @@ create_env_file() {
                 read -s -p "  密码: " db_pass; echo
                 read -p "  主机 [localhost]: " db_host
                 read -p "  端口 [3306]: " db_port
-                
+
                 # 生成配置
                 cp config.env.sample config.env
                 sed -i 's/^DJANGO_DB_TYPE=sqlite/DJANGO_DB_TYPE=mysql/' config.env
@@ -354,7 +354,7 @@ create_env_file() {
                 sed -i "s/^# DJANGO_DB_PASSWORD=$/DJANGO_DB_PASSWORD=${db_pass}/" config.env
                 sed -i "s/^# DJANGO_DB_HOST=localhost/DJANGO_DB_HOST=${db_host:-localhost}/" config.env
                 sed -i "s/^# DJANGO_DB_PORT=3306/DJANGO_DB_PORT=${db_port:-3306}/" config.env
-                
+
                 # 取消注释 MySQL 配置行
                 sed -i 's/^# \(DJANGO_DB_TYPE=mysql\)/\1/' config.env
                 sed -i 's/^# \(DJANGO_DB_NAME=\)/\1/' config.env
@@ -362,7 +362,7 @@ create_env_file() {
                 sed -i 's/^# \(DJANGO_DB_PASSWORD=\)/\1/' config.env
                 sed -i 's/^# \(DJANGO_DB_HOST=\)/\1/' config.env
                 sed -i 's/^# \(DJANGO_DB_PORT=\)/\1/' config.env
-                
+
                 echo -e "${GREEN}已创建 config.env（MySQL）${NC}"
                 ;;
             *)
@@ -378,10 +378,10 @@ create_env_file() {
 # 生成随机 SECRET_KEY
 generate_secret_key() {
     echo -e "\n${GREEN}>>> 生成随机 SECRET_KEY${NC}\n"
-    
+
     local new_key
     new_key=$(python3 -c 'import secrets; print(secrets.token_urlsafe(50))')
-    
+
     if [[ -f "config.env" ]]; then
         if grep -q "^SECRET_KEY=" config.env; then
             sed -i "s|^SECRET_KEY=.*|SECRET_KEY=$new_key|" config.env
@@ -397,12 +397,12 @@ generate_secret_key() {
 # 下载/更新省市区数据
 update_china_regions() {
     echo -e "\n${GREEN}>>> 下载/更新省市区数据${NC}\n"
-    
+
     activate_venv
-    
+
     local venv_python
     venv_python=$(get_venv_python)
-    
+
     echo -e "${BLUE}[1/2]${NC} 从网络下载最新省市区数据..."
     $venv_python -c "
 from core.services.china_region_service import ChinaRegionService
@@ -413,12 +413,12 @@ if result['success']:
 else:
     print(f\"  ✗ 下载失败: {result['error']}\")
 "
-    
+
     if [[ $? -ne 0 ]]; then
         echo -e "${RED}下载失败${NC}"
         return 1
     fi
-    
+
     echo -e "${BLUE}[2/2]${NC} 更新数据库..."
     $venv_python -c "
 from core.services.china_region_service import ChinaRegionService
@@ -429,7 +429,7 @@ if result['success']:
 else:
     print(f\"  ✗ 更新失败: {result['error']}\")
 "
-    
+
     echo -e "${GREEN}省市区数据更新完成！${NC}"
 }
 
@@ -452,9 +452,9 @@ run_init_menu() {
     while true; do
         show_init_menu
         read -p "请输入选项 (0/1/2/3/4): " raw_input
-        
+
         choice=$(echo "$raw_input" | sed 's/[^0-9]//g' | head -c 1)
-        
+
         case "$choice" in
             0) break ;;
             1) echo "→ 创建 .env 文件"; create_env_file ;;
@@ -463,7 +463,7 @@ run_init_menu() {
             4) echo "→ 生成 SECRET_KEY"; generate_secret_key ;;
             *) echo -e "${YELLOW}无效选项 '$choice'${NC}" ;;
         esac
-        
+
         echo
         echo "按回车键返回菜单..."
         read -s -r
@@ -475,24 +475,64 @@ run_ruff_check() {
         echo -e "${YELLOW}Ruff 未安装，正在安装...${NC}"
         ./venv/bin/pip install ruff -q
     fi
-    
+
     local report_dir="storage/reports"
     mkdir -p "$report_dir"
     local timestamp=$(date +%Y%m%d_%H%M%S)
     local report_file="${report_dir}/ruff_${timestamp}.txt"
-    
+
     echo -e "${CYAN}正在扫描代码...${NC}"
     ./venv/bin/python -m ruff check core/ modules/ cimf_django/ --output-format=concise \
         > "$report_file" 2>&1 || true
-    
+
     cat "$report_file"
-    
+
     if grep -q '^Found.*errors' "$report_file" 2>/dev/null; then
         echo -e "${YELLOW}检测完成（发现代码问题）${NC}"
     else
         echo -e "${GREEN}✅ 未发现问题${NC}"
     fi
     echo -e "${CYAN}报告已保存: ${report_file}${NC}"
+}
+
+run_template_check() {
+    echo -e "\n${GREEN}>>> 模板问题检查${NC}\n"
+
+    activate_venv
+
+    local venv_python
+    venv_python=$(get_venv_python)
+
+    echo -e "${CYAN}正在运行 manage.py check_templates ...${NC}\n"
+    $venv_python manage.py check_templates 2>&1
+    local exit_code=$?
+
+    echo
+    if [[ $exit_code -eq 0 ]]; then
+        echo -e "${GREEN}✅ 模板检查完成${NC}"
+    else
+        echo -e "${YELLOW}⚠️  发现模板问题，请根据以上提示修复${NC}"
+    fi
+}
+
+run_deploy_check() {
+    echo -e "\n${GREEN}>>> Deploy 安全检查${NC}\n"
+
+    activate_venv
+
+    local venv_python
+    venv_python=$(get_venv_python)
+
+    echo -e "${CYAN}正在运行 manage.py check --deploy ...${NC}\n"
+    $venv_python manage.py check --deploy 2>&1
+    local exit_code=$?
+
+    echo
+    if [[ $exit_code -eq 0 ]]; then
+        echo -e "${GREEN}✅ Deploy 安全检查通过${NC}"
+    else
+        echo -e "${YELLOW}⚠️  发现安全问题，请根据以上提示修复${NC}"
+    fi
 }
 
 # 维护子菜单
@@ -508,6 +548,9 @@ show_maint_menu() {
     echo "  4 → 杀死服务器进程"
     echo "  5 → 下载/更新省市区数据（从网络更新本地文件）"
     echo "  6 → Ruff 代码检查"
+    echo "  7 → Deploy 安全检查 (manage.py check --deploy)"
+    echo "  8 → 模板问题检查 (manage.py check_templates)"
+    echo "  9 → 全面 Bug 预检查 (manage.py check + 增量扫描)"
     echo "  0 → 返回主菜单"
     echo
 }
@@ -515,10 +558,10 @@ show_maint_menu() {
 run_maint_menu() {
     while true; do
         show_maint_menu
-        read -p "请输入选项 (0/1/2/3/4/5/6): " raw_input
-        
+        read -p "请输入选项 (0/1/2/3/4/5/6/7/8/9): " raw_input
+
         choice=$(echo "$raw_input" | sed 's/[^0-9]//g' | head -c 1)
-        
+
         case "$choice" in
             0) break ;;
             1) echo "→ 数据库备份"; backup_database ;;
@@ -527,13 +570,45 @@ run_maint_menu() {
             4) echo "→ 杀死服务器进程"; kill_server ;;
             5) echo "→ 更新省市区数据"; update_china_regions ;;
             6) echo "→ Ruff 代码检查"; run_ruff_check ;;
+            7) echo "→ Deploy 安全检查"; run_deploy_check ;;
+            8) echo "→ 模板问题检查"; run_template_check ;;
+            9) echo "→ 全面 Bug 预检查"; run_bug_precheck ;;
             *) echo -e "${YELLOW}无效选项 '$choice'${NC}" ;;
         esac
-        
+
         echo
         echo "按回车键返回菜单..."
         read -s -r
     done
+}
+
+run_bug_precheck() {
+    echo -e "\n${GREEN}>>> 全面 Bug 预检查${NC}\n"
+
+    activate_venv
+    local venv_python
+    venv_python=$(get_venv_python)
+
+    # 1) Django 系统检查（含 CIMF_W006/W007 等自定义检查）
+    echo -e "${CYAN}[1/3] 运行 manage.py check ...${NC}\n"
+    $venv_python manage.py check 2>&1
+
+    # 2) save() 无 update_fields 残留扫描
+    echo -e "\n${CYAN}[2/3] 扫描 save() 无 update_fields 残留 ...${NC}"
+    local results
+    results=$(grep -rn "\.save()" core/ modules/ | grep -v "update_fields" | grep -v "# noqa: CIMF_W006" || true)
+    if [[ -z "$results" ]]; then
+        echo -e "${GREEN}  未发现${NC}"
+    else
+        echo "$results"
+    fi
+
+    # 3) 并发锁使用概况
+    echo -e "\n${CYAN}[3/3] 并发锁使用概况 ...${NC}"
+    echo "$(grep -rn "threading\.Lock" core/ modules/ | wc -l) 处 threading.Lock"
+    echo "$(grep -rn "select_for_update" core/ modules/ | wc -l) 处 select_for_update"
+
+    echo -e "\n${GREEN}✅ 预检查完成${NC}"
 }
 
 # 显示主菜单
@@ -579,11 +654,11 @@ fi
 # 进入交互菜单
 while true; do
     show_menu
-    
+
     read -p "请输入选项 (0/1/2/3/h): " raw_input
-    
+
     choice=$(echo "$raw_input" | sed 's/[^0-9hH]//g' | head -c 1 | tr '[:upper:]' '[:lower:]')
-    
+
     case "$choice" in
         0) echo -e "${GREEN}感谢使用，再见！${NC}"; exit 0 ;;
         1) echo "→ 启动系统"; run_server; break ;;
@@ -592,7 +667,7 @@ while true; do
         h) show_help ;;
         *) echo -e "${YELLOW}无效选项 '$choice'${NC}" ;;
     esac
-    
+
     echo
     echo "按回车键返回菜单..."
     read -s -r

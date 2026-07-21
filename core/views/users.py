@@ -1,6 +1,9 @@
 """用户管理视图模块"""
 
+import logging
+
 from django.contrib import messages
+from django.db.models.deletion import ProtectedError
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
 
@@ -9,6 +12,8 @@ from core.forms.admin_forms import UserCreateForm, UserEditForm
 from core.models import User
 from core.services import UserService
 from core.utils.views import redirect_with_error, redirect_with_success
+
+logger = logging.getLogger(__name__)
 
 
 @admin_required
@@ -122,5 +127,8 @@ def user_delete(request, user_id: int):
     try:
         user.delete()
         return redirect_with_success(request, "用户已删除", "core:system_users")
-    except Exception:
+    except ProtectedError:
+        return redirect_with_error(request, "该用户有关联数据，无法删除", "core:system_users")
+    except Exception as e:
+        logger.error("删除用户失败: user_id=%d, error=%s", user_id, e, exc_info=True)
         return redirect_with_error(request, "删除用户失败", "core:system_users")

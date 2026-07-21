@@ -50,7 +50,7 @@ class CustomerForm(forms.Form):
 
     phone1 = forms.CharField(
         label="电话1",
-        max_length=20,
+        max_length=50,
         required=False,
         widget=forms.TextInput(
             attrs={
@@ -74,7 +74,7 @@ class CustomerForm(forms.Form):
 
     phone2 = forms.CharField(
         label="电话2",
-        max_length=20,
+        max_length=50,
         required=False,
         widget=forms.TextInput(
             attrs={
@@ -190,6 +190,15 @@ class CustomerForm(forms.Form):
         widget=forms.Select(attrs={"class": "form-select"}),
     )
 
+    has_whatsapp = forms.NullBooleanField(
+        label="WhatsApp",
+        required=False,
+        widget=forms.Select(
+            choices=[(None, "未检测"), (True, "有"), (False, "没有")],
+            attrs={"class": "form-select"},
+        ),
+    )
+
     credit_limit = forms.DecimalField(
         label="信用额度",
         max_digits=15,
@@ -217,6 +226,7 @@ class CustomerForm(forms.Form):
 
     notes = forms.CharField(
         label="备注",
+        max_length=2000,
         required=False,
         widget=forms.Textarea(
             attrs={

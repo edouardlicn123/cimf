@@ -50,7 +50,7 @@ import argparse
 import os
 import sys
 import traceback
-from datetime import datetime
+from datetime import UTC, datetime
 
 # 导入初始化脚本包
 from core.init_scripts import (
@@ -87,7 +87,7 @@ def init_database(
     banner = f"\033[1m\033[96m{'=' * 60}\033[0m"
     print(banner)
     print(colored("CIMF 管理系统 - 数据库初始化工具", "cyan"))
-    print(colored(f"({datetime.now().strftime('%Y-%m-%d %H:%M:%S')})", "cyan"))
+    print(colored(f"({datetime.now(UTC).strftime('%Y-%m-%d %H:%M:%S')})", "cyan"))
     print(banner)
     print(colored(f"当前环境: {os.environ.get('DJANGO_ENV', 'development')}", "cyan"))
 

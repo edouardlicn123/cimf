@@ -107,11 +107,28 @@ Agent 应在以下情况检查该文档：
 
 | 层级 | 优先级 | 检查内容 |
 |------|--------|----------|
-| 服务层检查 | 🔴 高（默认必查） | `.first()` 返回值、外键访问、查询逻辑、datetime→timezone |
+| 服务层检查 | 🔴 高（默认必查） | `.first()` 返回值、外键访问、查询逻辑、datetime→timezone、并发安全、`save(update_fields=...)` |
 | 视图层检查 | 🔴 高（默认必查） | `@login_required`/`@admin_required`/`@require_POST`、参数验证 |
 | 模板层检查 | 🟡 中（按需） | 仅涉及模板修改时检查：Jinja2语法、csrf_token、外键None、block名称 |
 | 模型层检查 | 🟡 中（按需） | 仅涉及模型修改时检查：JSONField default、ForeignKey on_delete、`__str__` |
 | 配置层检查 | 🟡 中（按需） | 仅涉及配置修改时检查：环境变量名、APP_DIRS、WAL模式 |
+
+**同类问题扩散扫描（防遗漏）：**
+- 发现一个 Bug 后，必须用 `grep` 在全库搜索**同类模式**，确认问题是否在其他位置重复存在
+- 报告必须注明"全库搜索确认：共 X 处相同模式，已修复 / Y 处为误报"
+- 常见扩散扫描清单：
+
+  | 发现的问题 | 扩散搜索命令 |
+  |------------|-------------|
+  | `except: pass` | `grep -rn "except.*:\s*pass" core/ modules/` |
+  | `.first()` 未检查 None | `grep -rn "\.first()" core/ modules/` 逐处审查 |
+  | `@login_required` 缺失 | 遍历所有视图函数核对装饰器 |
+  | JSONField `default={}` | `grep -rn "JSONField.*default={" core/ modules/` |
+  | `datetime.now()` | `grep -rn "datetime\.now()" core/ modules/` |
+  | 模板 `csrf_token` 缺失 | 遍历所有 POST 表单 |
+  | `save()` 无 `update_fields` | `grep -rn "\.save()" core/ modules/ \| grep -v "update_fields"` |
+  | 静默 `except Exception` | `manage.py check` 输出中 CIMF_W007 告警 |
+  | 并发无锁 | `grep -rn "threading\.Lock\|select_for_update" core/ modules/` |
 
 **代码快照（省 token）：**
 - 项目维护了分层快照：
@@ -129,6 +146,27 @@ Agent 应在以下情况检查该文档：
 - `A08_Bug排查技术规范.md`（含补充材料 `A08_补充材料.md`）
 
 默认读快速版，看不懂规则时再读补充材料。具体映射见 `docs/阅读指南.md`。
+
+**开发阶段高频反模式自查清单：**
+
+新增/修改代码后，对照以下清单逐项检查，避免 4 轮 Bug 修复中发现的常见问题：
+
+| # | 检查项 | 对应历史 Bug |
+|---|--------|-------------|
+| 1 | **`.first()` 结果是否检查 None？** — 使用 `obj = QuerySet.first()` 后必须判断 `if obj is None` | P0 export_filter |
+| 2 | **`except:` 是否无声吞异常？** — 必须 `logger.error(...)` 或 `# noqa: S110` 注明意图 | P1 多处 S110 |
+| 3 | **`mark_safe` / `|safe` / `autoescape=false` 是否必要？** — 优先用 `html.escape()` 转义用户数据后再 `mark_safe` | P1 region_select XSS |
+| 4 | **模板 block 名是否与 base 一致？** — `{% block content %}` 名必须匹配 base 模板定义的 block | P2 模板不匹配 |
+| 5 | **模板 POST 表单是否有 `csrf_token`？** — Jinja2: `{{ csrf_input }}` | P2 |
+| 6 | **外键访问是否可能 None？** — `obj.fk_field.name` → 先 `if obj.fk_field_id` | P1 模板外键 |
+| 7 | **邮件/CSV 输出是否 sanitize 用户输入？** — subject 去换行、CSV `sanitize=True` | P1 邮件注入、P2 CSV 注入 |
+| 8 | **生产安全配置是否补全？** — 发布前跑 `check --deploy`（菜单选项 7） | P1 settings 配置缺失 |
+| 9 | **调用 `subprocess` 是否传入可控参数？** — 固定命令列表（非字符串拼接 shell=True） | S603 |
+| 10 | **`datetime.now()` 是否应替换为 `timezone.now()`？** — 前者无时区信息 | 通用 |
+| 11 | **`JSONField(default={})` 是否可变成共享引用？** — 全部使用 `default=dict` 或 `default=list` | 通用 |
+| 12 | **`save(update_fields=[...])` 是否覆盖全部修改字段？** — 容易遗漏新增字段 | 通用 |
+| 13 | **`@login_required` 是否冗余？** — `GlobalLoginRequiredMiddleware` 已默认强制登录，白名单路径例外 | P3 冗余装饰器 |
+| 14 | **并发安全？** — 共享资源有无 `threading.Lock` / `select_for_update`？`CronTask.run()` 可重入？ | Round 8 |
 
 **进度记录（省 token）：**
 - `docs/progress.md` 仅保留最近 ~300 条记录。
@@ -185,3 +223,26 @@ Agent 应在以下情况检查该文档：
 | `cimf_django/settings.py` | Django 配置 |
 | `run.sh` | 启动/维护脚本 |
 | `core/urls.py` | URL 路由配置 |
+
+### 预防检查体系（Pre-commit + 自定义检查）
+
+| 检查项 | 触发时机 | 实现方式 |
+|--------|----------|----------|
+| Ruff DTZ (datetime 时区) | pre-commit + 手动 `ruff check` | `ruff.toml` 启用 DTZ 规则 |
+| Ruff S (安全/注入) | pre-commit + 手动 | `ruff.toml` 启用带 S 的迁移文件扫描 |
+| Admin N+1 检测 | `manage.py check` | `core/checks.py` CIMF_W003 |
+| Signal 处理器保护检测 | `manage.py check` | `core/checks.py` CIMF_W004 |
+| 表单模板上下文检测 | `manage.py check` | `core/checks.py` CIMF_W005 |
+| Deploy 安全检查 | pre-commit + run.sh 选项7 | `manage.py check --deploy --fail-level WARNING` |
+| 模板问题检查 | run.sh 选项8 | `manage.py check_templates` |
+| 类型检查 | pre-commit | `basedpyright`（`pyrightconfig.json` 配置） |
+
+**手动运行命令：**
+```bash
+./venv/bin/ruff check                                  # 全量 Ruff
+./venv/bin/python manage.py check                      # Django 系统检查（含自定义）
+./venv/bin/python manage.py check --deploy             # 生产安全配置检查
+./venv/bin/python manage.py check_templates            # 模板问题检查
+./venv/bin/basedpyright                                # 类型检查
+./venv/bin/pre-commit run --all-files                  # 全部 pre-commit 检查
+```

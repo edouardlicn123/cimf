@@ -295,3 +295,14 @@
 | get_recent_count | days |
 | get_exportable_fields |  |
 | init_sample_data |  |
+
+---
+
+## Known Design Issues
+
+| # | File | Issue | Impact | Status |
+|---|------|-------|--------|--------|
+| 1 | `core/views/api/cards.py:135` | `module_contents[module_id]` 为 dict，多卡片时后覆盖前 | 每模块仅显示最后一张卡片 | TODO: 改为 list |
+| 2 | `cimf_django/settings.py:383` | `DJANGO_SECRET_KEY` 仅在生产环境校验 | 开发环境可留占位密钥 | 预期行为 |
+| 3 | `checks.py` CIMF_W001 | calc AST 访问者 + resident_info 辅助函数误报 | 8 条 false positive 一直存在 | 不影响功能 |
+| 4 | `checks.py` CIMF_W006 | PIL `Image.save()` 误报 | 2 条 false positive | 不影响功能 |

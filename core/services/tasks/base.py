@@ -23,6 +23,8 @@
 """
 
 import logging
+import threading
+import time
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 
@@ -78,11 +80,14 @@ class CronTask(ABC):
         self._app_ready: bool = False
         self._enabled_cache: bool | None = None
         self._interval_cache: int | None = None
+        self._cache_ts: float = 0.0
+        self._run_lock: threading.Lock = threading.Lock()
 
     def reset_cache(self):
         """清空缓存，下次调用时重新从数据库读取"""
         self._enabled_cache = None
         self._interval_cache = None
+        self._cache_ts = 0.0
 
     def set_app_ready(self, ready: bool = True):
         """
@@ -103,9 +108,12 @@ class CronTask(ABC):
         """获取间隔设置项的 key"""
         return f"cron_{self.name}_interval"
 
+    def _check_cache_expired(self, ttl: float = 30.0) -> bool:
+        return time.monotonic() - self._cache_ts > ttl
+
     def is_enabled(self) -> bool:
-        """检查任务是否启用（结果缓存在实例中）"""
-        if self._enabled_cache is not None:
+        """检查任务是否启用（结果缓存在实例中，30秒TTL）"""
+        if self._enabled_cache is not None and not self._check_cache_expired():
             return self._enabled_cache
 
         if not self._app_ready:
@@ -117,14 +125,15 @@ class CronTask(ABC):
 
             setting = SettingsService.get_setting(self.setting_key_enabled)
             self._enabled_cache = setting is None or setting is True or str(setting).lower() == "true"
+            self._cache_ts = time.monotonic()
         except Exception as e:
             logger.warning(f"任务 {self.name} 检查启用状态失败: {e}")
             self._enabled_cache = self.enabled_by_default
         return self._enabled_cache
 
     def get_interval(self) -> int:
-        """获取执行间隔（秒），结果缓存在 self 中"""
-        if self._interval_cache is not None:
+        """获取执行间隔（秒），结果缓存在 self 中，30秒TTL"""
+        if self._interval_cache is not None and not self._check_cache_expired():
             return self._interval_cache
 
         if not self._app_ready:
@@ -137,12 +146,14 @@ class CronTask(ABC):
             if interval:
                 try:
                     self._interval_cache = int(interval)
+                    self._cache_ts = time.monotonic()
                     return self._interval_cache
                 except (TypeError, ValueError):
                     logger.warning(f"任务 {self.name} 间隔值 '{interval}' 无法转换为整数，使用默认间隔")
         except Exception as e:
             logger.warning(f"任务 {self.name} 获取间隔失败: {e}")
         self._interval_cache = self.default_interval
+        self._cache_ts = time.monotonic()
         return self._interval_cache
 
     @abstractmethod
@@ -150,25 +161,32 @@ class CronTask(ABC):
         """执行任务逻辑（抽象方法）"""
 
     def run(self):
-        """运行任务（包含异常处理）"""
-        if not self._app_ready:
-            logger.debug(f"任务 {self.name} 跳过：应用未就绪")
-            return
-
-        if not self.is_enabled():
+        """运行任务（包含异常处理），线程安全"""
+        if not self._run_lock.acquire(blocking=False):
+            logger.debug(f"任务 {self.name} 跳过：另一实例正在执行")
             return
 
         try:
-            self.execute()
-            self._last_status = "success"
-            self._last_error = None
-        except Exception as e:
-            self._last_status = "failed"
-            self._last_error = str(e)
-            logger.error(f"任务 {self.name} 执行失败: {e}", exc_info=True)
+            if not self._app_ready:
+                logger.debug(f"任务 {self.name} 跳过：应用未就绪")
+                return
+
+            if not self.is_enabled():
+                return
+
+            try:
+                self.execute()
+                self._last_status = "success"
+                self._last_error = None
+            except Exception as e:
+                self._last_status = "failed"
+                self._last_error = str(e)
+                logger.error(f"任务 {self.name} 执行失败: {e}", exc_info=True)
+            finally:
+                self._last_run = now()
+                self._run_count += 1
         finally:
-            self._last_run = now()
-            self._run_count += 1
+            self._run_lock.release()
 
     def get_next_run_time(self):
         """获取下次执行时间"""

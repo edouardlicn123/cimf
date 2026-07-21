@@ -16,6 +16,7 @@ from django.shortcuts import redirect, render
 from core.constants import Language, UserRole, UserTheme
 from core.decorators import admin_required, handle_form_errors
 from core.forms import ChangePasswordForm, PreferencesForm, ProfileForm
+from core.forms.admin_forms import SystemSettingsForm
 from core.services import PermissionService, SettingsService, UserService
 
 logger = logging.getLogger(__name__)
@@ -53,7 +54,8 @@ def _handle_logo_upload(request, settings_dict) -> HttpResponseRedirect | None:
             for chunk in logo_file.chunks():
                 destination.write(chunk)
     except Exception as e:
-        messages.error(request, f"文件保存失败: {e!s}")
+        logger.error("Logo 文件保存失败: %s", e, exc_info=True)
+        messages.error(request, "文件保存失败，请检查服务器配置")
         return redirect("core:system_settings")
 
     settings_dict["site_logo_path"] = "logos/custom.png"
@@ -64,8 +66,12 @@ def _handle_logo_upload(request, settings_dict) -> HttpResponseRedirect | None:
 def system_settings(request):
     """系统设置页面"""
     if request.method == "POST":
-        settings_dict = {}
+        form = SystemSettingsForm(request.POST)
+        if not form.is_valid():
+            messages.error(request, "表单验证失败，请检查输入")
+            return redirect("core:system_settings")
 
+        settings_dict = {}
         for key in SettingsService.SETTINGS_META:
             if SettingsService.SETTINGS_META[key]["type"] is bool:
                 value = "true" if request.POST.get(key) else "false"
@@ -109,13 +115,13 @@ def system_permissions(request):
         employee_perms = request.POST.getlist("permissions_employee")
         PermissionService.save_role_permissions("employee", employee_perms)
 
-    for role in COMMON_ROLES:
-        role_name = request.POST.get(f"role_name_{role}", "").strip()
-        if role_name:
-            SettingsService.update_setting(f"role_name_{role}", role_name)
+        for role in COMMON_ROLES:
+            role_name = request.POST.get(f"role_name_{role}", "").strip()
+            if role_name:
+                SettingsService.update_setting(f"role_name_{role}", role_name)
 
-    messages.success(request, "权限已保存")
-    return redirect("core:system_permissions")
+        messages.success(request, "权限已保存")
+        return redirect("core:system_permissions")
 
     role_labels = dict(UserRole.LABELS)
     for role in COMMON_ROLES:
@@ -146,8 +152,8 @@ def system_permissions(request):
 def _handle_password_change(user_id: int, new_password: str, request) -> HttpResponseRedirect:
     """执行密码修改并登出重定向到登录页"""
     UserService.change_password(user_id, new_password)
-    messages.success(request, "密码修改成功，请使用新密码重新登录")
     logout(request)
+    messages.success(request, "密码修改成功，请使用新密码重新登录")
     return redirect("core:login")
 
 
@@ -200,43 +206,50 @@ def profile_settings(request):
     pwd_form = ChangePasswordForm(request.POST or None, user=request.user)
 
     if request.method == "POST":
-        if "submit_profile" in request.POST and profile_form.is_valid():
-            UserService.update_profile(
-                user_id=request.user.id,
-                nickname=profile_form.cleaned_data.get("nickname"),
-                email=profile_form.cleaned_data.get("email"),
-            )
-            messages.success(request, "个人信息已更新成功")
+        if "submit_profile" in request.POST:
+            if profile_form.is_valid():
+                UserService.update_profile(
+                    user_id=request.user.id,
+                    nickname=profile_form.cleaned_data.get("nickname"),
+                    email=profile_form.cleaned_data.get("email"),
+                )
+                messages.success(request, "个人信息已更新成功")
+                return redirect("core:profile_settings")
+            messages.error(request, "请检查个人信息表单中的错误")
 
-        elif "submit_preferences" in request.POST and pref_form.is_valid():
-            UserService.update_preferences(
-                user_id=request.user.id,
-                theme=pref_form.cleaned_data.get("theme"),
-                notifications_enabled=pref_form.cleaned_data.get("notifications_enabled"),
-                preferred_language=pref_form.cleaned_data.get("preferred_language"),
-            )
-            messages.success(request, "偏好设置已保存")
+        elif "submit_preferences" in request.POST:
+            if pref_form.is_valid():
+                UserService.update_preferences(
+                    user_id=request.user.id,
+                    theme=pref_form.cleaned_data.get("theme"),
+                    notifications_enabled=pref_form.cleaned_data.get("notifications_enabled"),
+                    preferred_language=pref_form.cleaned_data.get("preferred_language"),
+                )
+                messages.success(request, "偏好设置已保存")
+                return redirect("core:profile_settings")
+            messages.error(request, "请检查偏好设置表单中的错误")
 
-        elif "submit_password" in request.POST and pwd_form.is_valid():
-            return _handle_password_change(request.user.id, pwd_form.cleaned_data.get("new_password"), request)
+        elif "submit_password" in request.POST:
+            if pwd_form.is_valid():
+                return _handle_password_change(request.user.id, pwd_form.cleaned_data.get("new_password"), request)
+            messages.error(request, "请检查密码表单中的错误")
 
-        return redirect("core:profile_settings")
-
-    profile_form = ProfileForm(
-        user_id=request.user.id,
-        initial={
-            "nickname": request.user.nickname,
-            "email": request.user.email,
-        },
-    )
-    pref_form = PreferencesForm(
-        initial={
-            "theme": request.user.theme,
-            "notifications_enabled": request.user.notifications_enabled,
-            "preferred_language": request.user.preferred_language,
-        }
-    )
-    pwd_form = ChangePasswordForm(user=request.user)
+    else:
+        profile_form = ProfileForm(
+            user_id=request.user.id,
+            initial={
+                "nickname": request.user.nickname,
+                "email": request.user.email,
+            },
+        )
+        pref_form = PreferencesForm(
+            initial={
+                "theme": request.user.theme,
+                "notifications_enabled": request.user.notifications_enabled,
+                "preferred_language": request.user.preferred_language,
+            }
+        )
+        pwd_form = ChangePasswordForm(user=request.user)
 
     return render(
         request,

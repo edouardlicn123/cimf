@@ -25,7 +25,7 @@ class EmailTemplate(IsActiveMixin, models.Model):
         ordering = ["name"]
 
     def __str__(self):
-        return self.name
+        return self.name or f"EmailTemplate({self.pk})"
 
 
 class EmailLog(models.Model):
@@ -59,4 +59,4 @@ class EmailLog(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.to_email} - {self.subject}"
+        return f"{self.to_email or '?'} - {self.subject or '?'}"

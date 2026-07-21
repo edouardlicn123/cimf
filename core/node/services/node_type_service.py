@@ -64,7 +64,7 @@ class NodeTypeService:
             for key, value in data.items():
                 if hasattr(node_type, key):
                     setattr(node_type, key, value)
-            node_type.save()
+            node_type.save(update_fields=list(data.keys()))
         return node_type
 
     @staticmethod
@@ -72,7 +72,7 @@ class NodeTypeService:
         node_type = NodeTypeService.get_by_id(node_type_id)
         if node_type:
             node_type.is_active = False
-            node_type.save()
+            node_type.save(update_fields=["is_active"])
             return True
         return False
 
@@ -81,7 +81,7 @@ class NodeTypeService:
         node_type = NodeTypeService.get_by_id(node_type_id)
         if node_type:
             node_type.is_active = True
-            node_type.save()
+            node_type.save(update_fields=["is_active"])
             return True
         return False
 
@@ -90,7 +90,7 @@ class NodeTypeService:
         node_type = NodeTypeService.get_by_id(node_type_id)
         if node_type:
             node_type.is_active = False
-            node_type.save()
+            node_type.save(update_fields=["is_active"])
             return True
         return False
 
@@ -99,7 +99,7 @@ class NodeTypeService:
         node_type = NodeTypeService.get_by_id(node_type_id)
         if node_type:
             node_type.is_active = not node_type.is_active
-            node_type.save()
+            node_type.save(update_fields=["is_active"])
             return node_type.is_active
         return False
 
@@ -147,9 +147,9 @@ class NodeTypeService:
     def init_default_node_types() -> None:
         node_types_config = NodeTypeService.get_node_types_from_modules()
         existing_slugs = set(
-            NodeType.objects.filter(
-                slug__in=[nt["slug"] for nt in node_types_config if nt.get("slug")]
-            ).values_list("slug", flat=True)
+            NodeType.objects.filter(slug__in=[nt["slug"] for nt in node_types_config if nt.get("slug")]).values_list(
+                "slug", flat=True
+            )
         )
         for nt_data in node_types_config:
             slug = nt_data.get("slug")

@@ -84,7 +84,8 @@ def jinja2_slice(value, start=0, end=None):
 
 def environment(**options):
     """创建自定义 Jinja2 环境"""
-    env = Environment(**options)
+    options.setdefault("autoescape", True)
+    env = Environment(**options)  # noqa: S701 — autoescape=True set above via setdefault
 
     def media(path):
         """生成媒体文件 URL"""
@@ -95,7 +96,7 @@ def environment(**options):
         if request is None:
             return ""
         token = get_token(request)
-        return mark_safe(f'<input type="hidden" name="csrfmiddlewaretoken" value="{token}">')
+        return mark_safe(f'<input type="hidden" name="csrfmiddlewaretoken" value="{token}">')  # noqa: S308 — token is Django-generated, safe
 
     def get_request():
         """获取当前请求对象"""
@@ -105,8 +106,7 @@ def environment(**options):
                     if hasattr(ctx, "request"):
                         return ctx.request
         except Exception:
-            pass
-        return None
+            return None
 
     # 添加 static 函数
     env.globals.update(

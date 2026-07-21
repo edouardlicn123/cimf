@@ -67,12 +67,13 @@ class SystemSettingAdmin(admin.ModelAdmin):
     """
 
     list_display = ["key", "value", "description", "updated_at"]
+    list_filter = ["updated_at"]
     search_fields = ["key", "description"]
     ordering = ["key"]
 
     fieldsets = (("配置信息", {"fields": ("key", "value", "description")}),)
 
-    readonly_fields = ["updated_at"]
+    readonly_fields = ["key", "updated_at"]
 
 
 class TaxonomyItemInline(admin.TabularInline):

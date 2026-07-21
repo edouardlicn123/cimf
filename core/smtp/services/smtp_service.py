@@ -2,8 +2,11 @@
 SMTP 配置管理服务
 """
 
+import logging
 import os
 import smtplib
+
+logger = logging.getLogger(__name__)
 import socket
 import ssl
 from contextlib import contextmanager
@@ -256,6 +259,7 @@ class SmtpService:
             return True, "连接测试成功！"
 
         except Exception as e:
+            logger.warning(f"SMTP 连接测试失败: {e}", exc_info=True)
             return False, f"连接失败: {e!s}"
 
     @classmethod

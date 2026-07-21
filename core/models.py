@@ -59,7 +59,7 @@ class UserManager(BaseUserManager):
             raise ValueError("用户名不能为空")
         user = self.model(username=username, **extra_fields)
         user.set_password(password)
-        user.save(using=self._db)
+        user.save(using=self._db)  # noqa: CIMF_W006 — 新创建用户，此为 INSERT 非 UPDATE
         return user
 
     def create_superuser(self, username, password=None, **extra_fields):
@@ -247,7 +247,7 @@ class Taxonomy(BaseModel):
         ordering = ["name"]
 
     def __str__(self):
-        return self.name
+        return self.name or f"Taxonomy({self.pk})"
 
 
 class TaxonomyItem(BaseModel):
@@ -273,7 +273,7 @@ class TaxonomyItem(BaseModel):
         unique_together = [["taxonomy", "name"]]
 
     def __str__(self):
-        return self.name
+        return self.name or f"TaxonomyItem({self.pk})"
 
 
 class ChinaRegion(models.Model):
@@ -319,3 +319,7 @@ class ChinaRegion(models.Model):
             parts.append(parent.name)
             parent = parent.parent
         return " - ".join(reversed(parts))
+
+
+from core.module.models import Module, ToolType  # noqa: F401, E402
+from core.node.models import Node, NodeType  # noqa: F401, E402

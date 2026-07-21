@@ -90,7 +90,7 @@ class ModuleScanService:
                 existing.version = new_version
                 existing.description = module_info.get("description", existing.description)
                 existing.icon = module_info.get("icon", existing.icon)
-                existing.save()
+                existing.save(update_fields=["name", "version", "description", "icon"])
             return existing
 
         module = Module.objects.create(
@@ -168,12 +168,17 @@ class ModuleScanService:
 
         original_skipped = len(all_modules) - len(pending)
 
+        pending_ids = [m["id"] for m in pending if m.get("is_registered")]
+        registered_modules = (
+            {m.module_id: m for m in Module.objects.filter(module_id__in=pending_ids)} if pending_ids else {}
+        )
+
         skipped_due_to_install_on_init = 0
         if respect_install_on_init:
             filtered_pending = []
             for m in pending:
                 if m.get("is_registered"):
-                    module_obj = Module.objects.filter(module_id=m["id"]).first()
+                    module_obj = registered_modules.get(m["id"])
                     if not module_obj:
                         logger.warning(f"模块已注册但数据库无记录: {m['id']}")
                         continue
@@ -210,6 +215,7 @@ class ModuleScanService:
                     else:
                         result["failed"].append(f"{m.get('name', m['id'])}: {msg}")
             except Exception as e:
+                logger.warning("模块注册安装失败: %s — %s", m["id"], e, exc_info=True)
                 result["failed"].append(f"{m.get('name', m['id'])}: {e!s}")
 
         return result
@@ -232,7 +238,7 @@ class ModuleScanService:
                 logger.debug("modules 表不存在，跳过自动注册")
                 return {"registered": 0, "message": "数据库未就绪"}
         except Exception:
-            logger.debug("数据库未就绪，跳过自动注册")
+            logger.warning("数据库未就绪，跳过自动注册", exc_info=True)
             return {"registered": 0, "message": "数据库未就绪"}
 
         return cls.scan_register_install(do_install=True, dry_run=False, respect_install_on_init=True)

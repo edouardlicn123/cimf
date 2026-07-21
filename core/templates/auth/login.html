@@ -42,20 +42,26 @@
                     <!-- 用户名 -->
                     <div class="mb-3">
                         <label class="form-label">用户名</label>
-                        <input type="text" name="username" class="form-control rounded-pill" placeholder="用户名" required>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                        <div class="text-danger small mt-1">{{ form.username.errors|join(', ') }}</div>
+                        {% endif %}
                     </div>
 
                     <!-- 密码 -->
                     <div class="mb-3">
                         <label class="form-label">密码</label>
-                        <input type="password" name="password" class="form-control rounded-pill" placeholder="密码" required>
+                        {{ form.password }}
+                        {% if form.password.errors %}
+                        <div class="text-danger small mt-1">{{ form.password.errors|join(', ') }}</div>
+                        {% endif %}
                     </div>
 
                     <!-- 记住我 -->
                     <div class="mb-4">
                         <div class="form-check">
-                            <input type="checkbox" name="remember_me" class="form-check-input" id="remember_me">
-                            <label class="form-check-label text-muted" for="remember_me">记住我</label>
+                            {{ form.remember_me }}
+                            <label class="form-check-label text-muted" for="{{ form.remember_me.id_for_label }}">记住我</label>
                         </div>
                     </div>
 
@@ -145,7 +151,7 @@
     .login-message-container .alert {
         margin-bottom: 1rem;
     }
-    
+
 </style>
 
 {% endblock %}

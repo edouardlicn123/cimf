@@ -28,7 +28,7 @@ class ModuleQueryService:
                         }
                     )
         except Exception as e:
-            logging.getLogger(__name__).warning(f"加载首页卡片模块失败: {e}", exc_info=True)
+            logger.warning("加载首页卡片模块失败: %s", e, exc_info=True)
         return result
 
     @classmethod

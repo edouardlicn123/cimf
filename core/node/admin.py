@@ -45,6 +45,7 @@ class NodeAdmin(admin.ModelAdmin):
     list_filter = ["node_type", "created_at"]
     search_fields = ["id"]
     ordering = ["-created_at"]
+    list_select_related = ["node_type", "created_by", "updated_by"]
 
     fieldsets = (
         ("节点信息", {"fields": ("node_type",)}),
@@ -52,4 +53,4 @@ class NodeAdmin(admin.ModelAdmin):
         ("时间", {"fields": ("created_at", "updated_at")}),
     )
 
-    readonly_fields = ["created_at", "updated_at"]
+    readonly_fields = ["created_by", "updated_by", "created_at", "updated_at"]

@@ -24,6 +24,8 @@ select = [
     "EM",
     "TCH",
     "DJ",
+    "S",
+    "DTZ",
 ]
 ignore = [
     "E501",
@@ -44,8 +46,9 @@ ignore = [
 ]
 
 [lint.per-file-ignores]
-"*/migrations/*" = ["ALL"]
-"*/tests/*" = ["ALL"]
+"**/migrations/*" = ["E501", "N802", "N806", "EM101", "EM102", "UP035", "UP009", "ARG001", "PLC0415"]
+"**/tests/*" = ["ALL"]
+"core/management/commands/generate_snapshot.py" = ["PTH", "PERF", "PLR1714", "PIE810", "PLC0415"]
 "**/__init__.py" = ["F401", "E402"]
 "**/*.html" = ["ALL"]
 "**/*.md" = ["ALL"]

@@ -85,7 +85,8 @@ class ModuleTaxonomyService:
 
             if missing_items:
                 logger.warning("词汇表 %s 缺少项目: %s，尝试补充", slug, missing_items)
-                for item_name in missing_items:
-                    TaxonomyItem.objects.create(taxonomy=taxonomy, name=item_name, weight=0)
+                TaxonomyItem.objects.bulk_create(
+                    [TaxonomyItem(taxonomy=taxonomy, name=item_name, weight=0) for item_name in missing_items]
+                )
 
         return created_count

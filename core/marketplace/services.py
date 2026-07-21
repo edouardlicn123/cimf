@@ -3,6 +3,7 @@
 """
 
 import json
+import logging
 import os
 import shutil
 import sys
@@ -15,6 +16,8 @@ from urllib.parse import urlparse
 
 import requests
 from django.utils.timezone import now
+
+logger = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 MARKETPLACE_CONFIG = BASE_DIR / "marketplace" / "marketplace.json"
@@ -94,8 +97,8 @@ class MarketService:
             module = Module.objects.filter(module_id=module_id).first()
             if module:
                 return module.version
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning("获取模块版本失败: module_id=%s, error=%s", module_id, e)
         return None
 
     @classmethod
@@ -145,6 +148,7 @@ class MarketService:
             domain = parsed.hostname or ""
             return any(domain == allowed or domain.endswith("." + allowed) for allowed in ALLOWED_DOWNLOAD_DOMAINS)
         except Exception:
+            logger.warning(f"URL 验证失败: {url}", exc_info=True)
             return False
 
     @classmethod
@@ -176,8 +180,8 @@ class MarketService:
             mod = _import_module(module_path)
             if hasattr(mod, "MODULE_INFO") and isinstance(mod.MODULE_INFO, dict):
                 return mod.MODULE_INFO.get("version")
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning("读取本地模块版本失败: module_id=%s, error=%s", module_id, e)
         finally:
             sys.modules.pop(module_path, None)
         return None
@@ -297,8 +301,9 @@ class MarketService:
                 existing = Module.objects.filter(module_id=module_id).first()
                 if existing:
                     existing.version = market_version
-                    existing.save()
+                    existing.save(update_fields=["version"])
             except Exception as e:
+                logger.warning(f"更新模块 {module_id} 版本失败: {e}", exc_info=True)
                 return {"success": False, "error": f"解压成功但更新版本失败: {e!s}"}
 
             result = {"success": True, "message": "下载成功"}
@@ -311,6 +316,7 @@ class MarketService:
         except zipfile.BadZipFile:
             return {"success": False, "error": "文件格式错误，不是有效的zip文件"}
         except Exception as e:
+            logger.warning(f"解压模块 {module_id} 失败: {e}", exc_info=True)
             return {"success": False, "error": f"解压失败: {e!s}"}
         finally:
             if Path(temp_dir).exists():

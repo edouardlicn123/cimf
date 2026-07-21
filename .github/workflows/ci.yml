@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          ./venv/bin/pip install --upgrade pip
+          ./venv/bin/pip install -r requirements.txt 2>/dev/null || true
+          ./venv/bin/pip install ruff basedpyright
+
+      - name: Ruff check
+        run: ./venv/bin/ruff check
+
+      - name: Django CIMF checks
+        run: ./venv/bin/python manage.py check --tag cimf --fail-level WARNING
+        env:
+          DJANGO_ENV: test
+          DJANGO_SECRET_KEY: ci-test-secret-key-not-for-production
+          DJANGO_DEBUG: "true"
+
+      - name: Django deploy check
+        run: ./venv/bin/python manage.py check --deploy --fail-level WARNING
+        env:
+          DJANGO_ENV: production
+          DJANGO_SECRET_KEY: ci-test-secret-key-not-for-production
+          DJANGO_DEBUG: "false"

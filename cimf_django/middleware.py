@@ -1,8 +1,9 @@
-"""IP 访问限制中间件
+"""安全中间件
 
-提供两层安全控制：
+提供三层安全控制：
 1. IPWhitelistMiddleware — 按客户端 IP 限制访问来源
 2. GlobalLoginRequiredMiddleware — 全局登录要求
+3. ContentSecurityPolicyMiddleware — 内容安全策略 (CSP)
 
 ---
 IPWhitelistMiddleware 白名单来源优先级：
@@ -128,3 +129,49 @@ class GlobalLoginRequiredMiddleware:
 
         # 页面请求：重定向到登录页
         return redirect_to_login(request.get_full_path())
+
+
+class ContentSecurityPolicyMiddleware:
+    """内容安全策略 (CSP) 中间件
+
+    CSP 策略通过设置 `Content-Security-Policy` 响应头来限制浏览器加载资源，
+    有效防御 XSS、数据注入等攻击。策略通过 settings.CSP_DIRECTIVES 配置，
+    默认启用以下安全策略：
+
+    - default-src 'self'            仅允许同源资源
+    - script-src 'self'             仅允许同源脚本
+    - style-src 'self' 'unsafe-inline'  允许同源和内联样式（admin 需要）
+    - img-src 'self' data:          允许同源和 data URI 图片
+    - font-src 'self'               仅允许同源字体
+    - form-action 'self'            仅允许同源提交
+    - frame-ancestors 'none'        禁止被嵌入 iframe
+
+    禁用方法：settings.CSP_ENABLED = False
+    自定义策略：settings.CSP_DIRECTIVES = {...} 会完全覆盖默认策略
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+        self.enabled = getattr(settings, "CSP_ENABLED", True)
+
+        # 默认 CSP 策略
+        default_directives = {
+            "default-src": "'self'",
+            "script-src": "'self'",
+            "style-src": "'self' 'unsafe-inline'",
+            "img-src": "'self' data:",
+            "font-src": "'self'",
+            "form-action": "'self'",
+            "frame-ancestors": "'none'",
+        }
+        self.policy_str = self._build_policy(getattr(settings, "CSP_DIRECTIVES", default_directives))
+
+    @staticmethod
+    def _build_policy(directives: dict) -> str:
+        return "; ".join(f"{k} {v}" for k, v in directives.items())
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        if self.enabled:
+            response["Content-Security-Policy"] = self.policy_str
+        return response

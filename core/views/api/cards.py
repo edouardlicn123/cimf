@@ -32,11 +32,13 @@ def _load_active_card_modules():
         try:
             mod_info = ModuleService.load_module_info(node_module.path)
             if mod_info and mod_info.get("frontpage_card", False) and "dashboard_cards" in mod_info:
-                results.append({
-                    "module": node_module,
-                    "mod_info": mod_info,
-                    "cards": mod_info["dashboard_cards"],
-                })
+                results.append(
+                    {
+                        "module": node_module,
+                        "mod_info": mod_info,
+                        "cards": mod_info["dashboard_cards"],
+                    }
+                )
         except Exception:
             logger.warning(f"模块信息加载失败: module={node_module.module_id}", exc_info=True)
     return results
@@ -69,8 +71,8 @@ def _get_extra_card_context(module_path: str) -> dict:
                 status = attr.get_status()
                 if isinstance(status, dict):
                     context.update(status)
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning("模块卡片上下文加载失败: module=%s, error=%s", module_path, e, exc_info=True)
     return context
 
 
@@ -132,7 +134,7 @@ def api_dashboard_cards(request):  # noqa: ARG001
                 module_contents[module_id] = template.render(render_context)
             except Exception as e:
                 logger.warning(f"卡片模板渲染失败: module={module_id}, error={e}", exc_info=True)
-            break
+            # 收集所有卡片，不下拉列表
 
     return no_cache_json_response(
         {
@@ -164,7 +166,8 @@ def api_dashboard_cards_save(request):
 
         return json_success(message="布局已保存")
     except Exception as e:
-        return json_error(str(e), 400)
+        logger.error("保存卡片布局失败: %s", e, exc_info=True)
+        return json_error("保存布局失败", 400)
 
 
 @api_get_view
@@ -176,7 +179,8 @@ def api_nav_cards(request):
             cards = DEFAULT_NAV_CARDS
         return json_success(extra={"cards": cards, "max": 12})
     except Exception as e:
-        return json_error(str(e), 400)
+        logger.error("获取导航卡片失败: %s", e, exc_info=True)
+        return json_error("获取导航卡片失败", 400)
 
 
 @api_post_view
@@ -192,7 +196,8 @@ def api_nav_cards_save(request):
         UserService.save_navigation_cards(request.user.id, cards)
         return json_success(message="导航卡片已保存")
     except Exception as e:
-        return json_error(str(e), 400)
+        logger.error("保存导航卡片失败: %s", e, exc_info=True)
+        return json_error("保存导航卡片失败", 400)
 
 
 @login_required

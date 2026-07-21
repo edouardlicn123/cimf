@@ -1,7 +1,10 @@
+import logging
 import threading
 import time
 
 from django.core.cache import cache
+
+logger = logging.getLogger(__name__)
 
 
 class SingletonMixin:
@@ -72,13 +75,13 @@ _sentinel = object()
 
 
 def update_fields(instance, **fields):
-    changed = False
+    changed_fields = []
     for key, value in fields.items():
         if getattr(instance, key) != value:
             setattr(instance, key, value)
-            changed = True
-    if changed:
-        instance.save()
+            changed_fields.append(key)
+    if changed_fields:
+        instance.save(update_fields=changed_fields)
     return instance
 
 
@@ -90,6 +93,7 @@ def retry_with_fallbacks(sources, fetch_fn, max_retries=1, retry_delay=2, timeou
                 return fetch_fn(source, timeout)
             except Exception as e:
                 last_error = e
+                logger.warning(f"获取源 {source} 失败: {e}", exc_info=True)
                 continue
         if attempt < max_retries - 1:
             time.sleep(retry_delay)

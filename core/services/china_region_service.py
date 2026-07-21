@@ -66,7 +66,7 @@ class ChinaRegionService:
     # ===== 数据导入 =====
 
     @staticmethod
-    def import_from_file(file_path: str | None = None) -> dict:
+    def import_from_file(file_path: str | Path | None = None) -> dict:
         """从本地文件导入数据"""
         file_path = file_path or ChinaRegionService.DATA_FILE_PATH
 

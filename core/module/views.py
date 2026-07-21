@@ -170,8 +170,10 @@ def module_install(request, module_id: str):
 def module_enable(request, module_id: str):
     """启用模块"""
     success = ModuleService.enable_module(module_id)
-    status = "启用" if success else "启用失败"
-    messages.success(request, f"模块已{status}")
+    if success:
+        messages.success(request, "模块已启用")
+    else:
+        messages.error(request, "模块启用失败")
     return redirect("module:list")
 
 
@@ -179,8 +181,10 @@ def module_enable(request, module_id: str):
 def module_disable(request, module_id: str):
     """禁用模块"""
     success = ModuleService.disable_module(module_id)
-    status = "禁用" if success else "禁用失败"
-    messages.success(request, f"模块已{status}")
+    if success:
+        messages.success(request, "模块已禁用")
+    else:
+        messages.error(request, "模块禁用失败")
     return redirect("module:list")
 
 
@@ -213,4 +217,5 @@ def module_create_action(request):
         ModuleService.create_module(module_id, name, module_type, description)
         return json_success(message="模块创建成功")
     except Exception as e:
+        logger.warning("创建模块失败: %s", e, exc_info=True)
         return json_error(str(e))

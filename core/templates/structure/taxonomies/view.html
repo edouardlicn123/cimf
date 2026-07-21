@@ -73,7 +73,7 @@
 {% set modal_id = "editItemModal" + item.id|string %}
 {% set modal_title = "编辑词汇项" %}
 {% set modal_body %}
-<form method="post" action="{{ url('core:taxonomy_item_update', taxonomy.id, item.id) }}">
+<form method="post" action="{{ url('core:taxonomy_item_update', taxonomy.id if taxonomy else 0, item.id) }}">
     {% include "includes/csrf.html" %}
     <div class="mb-3">
         <label class="form-label">名称 *</label>
@@ -100,7 +100,7 @@
 {% set modal_id = "addItemModal" %}
 {% set modal_title = "新增词汇项" %}
 {% set modal_body %}
-<form method="post" action="{{ url('core:taxonomy_item_create', taxonomy.id) }}">
+<form method="post" action="{{ url('core:taxonomy_item_create', taxonomy.id if taxonomy else 0) }}">
     {% include "includes/csrf.html" %}
     <div class="mb-3">
         <label class="form-label">名称 *</label>

@@ -4,11 +4,13 @@
 
 import logging
 
-from jinja2 import Template, UndefinedError
+from jinja2 import Environment, UndefinedError
 
 from core.smtp.models import EmailTemplate
 
 logger = logging.getLogger(__name__)
+
+_email_env = Environment(autoescape=True)
 
 
 class TemplateService:
@@ -23,7 +25,7 @@ class TemplateService:
     def _render_safe(cls, template_text: str, context: dict) -> str:
         """安全渲染模板，出错时返回空字符串"""
         try:
-            return Template(template_text).render(**context)
+            return _email_env.from_string(template_text).render(**context)
         except UndefinedError as e:
             logger.error(f"邮件模板渲染错误: {e}")
             return ""
@@ -74,17 +76,24 @@ class TemplateService:
         is_active: bool | None = None,
     ) -> EmailTemplate:
         """更新模板"""
+        changed_fields = []
         if subject is not None:
             template.subject = subject
+            changed_fields.append("subject")
         if html_body is not None:
             template.html_body = html_body
+            changed_fields.append("html_body")
         if text_body is not None:
             template.text_body = text_body
+            changed_fields.append("text_body")
         if description is not None:
             template.description = description
+            changed_fields.append("description")
         if is_active is not None:
             template.is_active = is_active
-        template.save()
+            changed_fields.append("is_active")
+        if changed_fields:
+            template.save(update_fields=changed_fields)
         return template
 
     @classmethod
@@ -190,7 +199,7 @@ class TemplateService:
             <p>您好，</p>
             <p>您请求重置密码，请点击下面的按钮：</p>
             <p style="text-align: center;">
-                <a href="{{ reset_link }}" class="btn">重置密码</a>
+                <a href="{{ reset_link | safe }}" class="btn">重置密码</a>
             </p>
             <p>链接将在 {{ expire_hours }} 小时后失效。</p>
             <p>如果您没有请求重置密码，请忽略此邮件。</p>
@@ -255,7 +264,7 @@ class TemplateService:
             <p>{{ message }}</p>
             {% if action_url %}
             <p style="text-align: center;">
-                <a href="{{ action_url }}" class="btn">{{ action_text | default('查看详情') }}</a>
+                <a href="{{ action_url | safe }}" class="btn">{{ action_text | default('查看详情') }}</a>
             </p>
             {% endif %}
         </div>

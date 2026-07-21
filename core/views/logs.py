@@ -17,7 +17,7 @@ def _parse_page_params(request, default_page=1, default_size=100):
     except (ValueError, TypeError):
         page = default_page
         page_size = default_size
-    return page, page_size
+    return max(page, 1), max(page_size, 1)
 
 
 @admin_required

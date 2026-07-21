@@ -1,3 +1,5 @@
+from django.db import transaction
+
 from core.node.models import Node, NodeType
 from core.services.base_service import BaseService
 
@@ -18,11 +20,13 @@ class NodeService(BaseService):
 
     @staticmethod
     def create_node(node_type_slug: str, _data: dict, user) -> Node | None:
+        # _data 由模块层处理，NodeService 仅创建核心节点记录
         node_type = NodeType.objects.filter(slug=node_type_slug).first()
         if not node_type:
             return None
 
-        node = Node.objects.create(node_type=node_type, created_by=user, updated_by=user)
+        with transaction.atomic():
+            node = Node.objects.create(node_type=node_type, created_by=user, updated_by=user)
         return node
 
     @staticmethod
@@ -31,10 +35,13 @@ class NodeService(BaseService):
         if not node:
             return None
 
+        changed = []
         for key, value in data.items():
-            if hasattr(node, key):
+            if hasattr(node, key) and getattr(node, key) != value:
                 setattr(node, key, value)
-        node.save()
+                changed.append(key)
+        if changed:
+            node.save(update_fields=changed)
         return node
 
     @staticmethod

@@ -106,7 +106,7 @@ class WatermarkService:
 
             try:
                 font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", font_size)
-            except Exception:
+            except Exception:  # noqa: CIMF_W007 — font file not available, use default
                 font = ImageFont.load_default()
 
             bbox = draw.textbbox((0, 0), text, font=font)
@@ -125,7 +125,7 @@ class WatermarkService:
             if watermarked.mode == "RGBA":
                 watermarked = watermarked.convert("RGB")
 
-            watermarked.save(output_path)
+            watermarked.save(output_path)  # noqa: CIMF_W006 — PIL Image.save()
             return True
 
         except Exception as e:
@@ -182,7 +182,7 @@ class WatermarkService:
             if result.mode == "RGBA":
                 result = result.convert("RGB")
 
-            result.save(output_path)
+            result.save(output_path)  # noqa: CIMF_W006 — PIL Image.save()
             return True
 
         except Exception as e:

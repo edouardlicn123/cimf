@@ -25,7 +25,7 @@ class NodeType(BaseModel, IsActiveMixin):
         ordering = ["name"]
 
     def __str__(self):
-        return self.name
+        return self.name or f"NodeType({self.pk})"
 
     def get_node_count(self):
         return self.nodes.count()

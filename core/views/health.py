@@ -16,12 +16,15 @@ from core.decorators import login_required_json
 from core.services import VersionService
 
 
-def _run_check(checks, name, fn):
+def _run_check(checks, name, fn, overall_status=None):
     try:
         fn()
         checks[name] = "ok"
     except Exception as e:
+        logger.warning("健康检查失败: %s — %s", name, e, exc_info=True)
         checks[name] = f"error: {e!s}"
+        if overall_status is not None:
+            overall_status[0] = "error"
 
 
 @login_required_json
@@ -33,31 +36,31 @@ def health_check(request):  # noqa: ARG001
         "version": f"{VERSION_MAJOR}.{VERSION_MINOR:03d}",
         "timestamp": timezone.now().isoformat(),
     }
-    overall_status = "ok"
+    overall_status = ["ok"]
 
     def _check_db():
         connection.ensure_connection()
 
-    _run_check(checks, "database", _check_db)
+    _run_check(checks, "database", _check_db, overall_status)
 
     def _check_cache():
         cache.set("_health_check", "ok", 10)
         if cache.get("_health_check") != "ok":
             raise RuntimeError("degraded")
 
-    _run_check(checks, "cache", _check_cache)
+    _run_check(checks, "cache", _check_cache, overall_status)
 
     def _check_storage():
         storage_path = Path(__file__).parent.parent / "storage"
         if not storage_path.exists():
             raise RuntimeError("missing")
 
-    _run_check(checks, "storage", _check_storage)
+    _run_check(checks, "storage", _check_storage, overall_status)
 
     checks["uptime_ms"] = round((time.time() - start_time) * 1000, 2)
-    checks["status"] = overall_status
+    checks["status"] = overall_status[0]
 
-    status_code = 200 if overall_status == "ok" else 503
+    status_code = 200 if overall_status[0] == "ok" else 503
     return JsonResponse(checks, status=status_code)
 
 
@@ -69,13 +72,13 @@ def detailed_health_check(request):  # noqa: ARG001
         "status": "ok",
         "version": f"{VERSION_MAJOR}.{VERSION_MINOR:03d}",
     }
-    overall_status = "ok"
+    overall_status = ["ok"]
 
     def _check_db():
         with connection.cursor() as cursor:
             cursor.execute("SELECT 1")
 
-    _run_check(checks, "database", _check_db)
+    _run_check(checks, "database", _check_db, overall_status)
 
     def _check_tables():
         from core.models import SystemSetting, User  # noqa: PLC0415
@@ -85,7 +88,7 @@ def detailed_health_check(request):  # noqa: ARG001
             "settings": SystemSetting.objects.count(),
         }
 
-    _run_check(checks, "tables", _check_tables)
+    _run_check(checks, "tables", _check_tables, overall_status)
 
     def _check_modules():
         from core.node.models import Node, NodeType  # noqa: PLC0415
@@ -95,7 +98,7 @@ def detailed_health_check(request):  # noqa: ARG001
             "nodes": Node.objects.count(),
         }
 
-    _run_check(checks, "modules", _check_modules)
+    _run_check(checks, "modules", _check_modules, overall_status)
 
     def _check_storage():
         storage_path = Path(__file__).parent.parent / "storage"
@@ -105,15 +108,15 @@ def detailed_health_check(request):  # noqa: ARG001
             stat = os.statvfs(str(storage_path))
             free_space = stat.f_bavail * stat.f_frsize / (1024**3)
             checks["disk_free_gb"] = round(free_space, 2)
-        except Exception:
+        except Exception:  # noqa: S110 — health check best-effort
             pass
 
-    _run_check(checks, "storage", _check_storage)
+    _run_check(checks, "storage", _check_storage, overall_status)
 
     checks["uptime_ms"] = round((time.time() - start_time) * 1000, 2)
-    checks["status"] = overall_status
+    checks["status"] = overall_status[0]
 
-    status_code = 200 if overall_status == "ok" else 503
+    status_code = 200 if overall_status[0] == "ok" else 503
     return JsonResponse(checks, status=status_code)
 
 

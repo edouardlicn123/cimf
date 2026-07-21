@@ -19,7 +19,7 @@
 
 import re
 import sys
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 VERSION_FILE = "core/constants.py"
@@ -49,7 +49,7 @@ def increment_version(current_major, current_minor):
 
     content = content.replace(f"VERSION_MINOR = {current_minor}", f"VERSION_MINOR = {new_minor}")
 
-    today = datetime.now().strftime("%Y-%m-%d")
+    today = datetime.now(UTC).strftime("%Y-%m-%d")
     old_pattern = rf"    - {current_major}\.{current_minor:03d}: .+"
     new_history = f"    - {new_major}.{new_minor:03d}: {today}"
     content = re.sub(old_pattern, new_history, content, count=1)
@@ -66,7 +66,7 @@ def get_version_display(major, minor):
 
 def get_today_date():
     """获取今天的日期字符串"""
-    return datetime.now().strftime("%Y-%m-%d")
+    return datetime.now(UTC).strftime("%Y-%m-%d")
 
 
 def read_existing_progress():
@@ -187,14 +187,6 @@ def archive_oldest_block(content):
     oldest_date, oldest_block = blocks[0]
     month = oldest_date[:7]  # YYYY-MM
 
-    # Determine end of this month's data (find last block in same month)
-    end_date = oldest_date
-    for date_str, _ in blocks[1:]:
-        if date_str[:7] == month:
-            end_date = date_str
-        else:
-            break
-
     ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
 
     # Collect all blocks from this month
@@ -215,7 +207,7 @@ def archive_oldest_block(content):
     else:
         existing = f"# 历史修改记录 ({month})\n\n> 自动归档自 progress.md\n\n---\n\n"
 
-    for date_str, block in to_archive:
+    for _, block in to_archive:
         existing += "\n" + block.strip() + "\n"
     archive_path.write_text(existing, encoding="utf-8")
 
@@ -223,16 +215,16 @@ def archive_oldest_block(content):
 
     # Reconstruct content without archived blocks
     header_end = content.find("\n# ")
-    preamble = content[:header_end + 1] if header_end != -1 else ""
+    preamble = content[: header_end + 1] if header_end != -1 else ""
     remaining = preamble + "\n".join(b for _, b in remaining_blocks) + "\n" if remaining_blocks else preamble + "\n"
     return remaining
 
     # Remove oldest block from content
-    remaining = content[len(oldest_block):].strip()
+    remaining = content[len(oldest_block) :].strip()
     # Re-add preamble (everything before first date header)
     header_end = content.find("\n# ")
     if header_end != -1:
-        preamble = content[:header_end + 1]
+        preamble = content[: header_end + 1]
         remaining = preamble + "\n" + remaining
     else:
         remaining = content

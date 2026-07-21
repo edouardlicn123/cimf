@@ -20,11 +20,10 @@ def _null_to_empty(apps, schema_editor):
     ]
     with schema_editor.connection.cursor() as cursor:
         for field in fields:
-            cursor.execute(f"UPDATE customer_fields SET {field} = '' WHERE {field} IS NULL")
+            cursor.execute(f"UPDATE customer_fields SET {field} = '' WHERE {field} IS NULL")  # noqa: S608
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("customer", "0003_alter_customerfields_phone1_and_more"),
     ]

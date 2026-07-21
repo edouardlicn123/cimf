@@ -168,7 +168,13 @@
 {% include "includes/modal.html" %}
 
 <script>
-let cards = {{ cards|tojson|safe }};
+function htmlEscape(str) {
+    var d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+}
+
+let cards = {{ cards|tojson|safe }};  {# noqa: CIMF_W009 #}
 let maxCards = {{ max_cards }};
 let editingId = null;
 
@@ -188,7 +194,7 @@ function updateCardCount() {
 function updateCardDisplay() {
     const cardsArea = document.getElementById('cardsArea');
     cardsArea.innerHTML = '';
-    
+
     // 先创建12个空格子
     for (let i = 1; i <= 12; i++) {
         const col = document.createElement('div');
@@ -200,14 +206,14 @@ function updateCardDisplay() {
         col.appendChild(slot);
         cardsArea.appendChild(col);
     }
-    
+
     // 收集已使用的position，防止重复
     const usedPositions = new Set();
-    
+
     // 按position放置卡片
     cards.forEach(card => {
         let position = card.position || 1;
-        
+
         // 如果position已被使用，分配到第一个空位置
         if (usedPositions.has(position)) {
             for (let i = 1; i <= 12; i++) {
@@ -218,20 +224,23 @@ function updateCardDisplay() {
                 }
             }
         }
-        
+
         usedPositions.add(position);
-        
+
         const slot = document.querySelector(`.nav-slot[data-position="${position}"]`);
         if (slot) {
+            var cardId = htmlEscape(card.id);
+            var cardName = htmlEscape(card.name);
+            var cardBg = htmlEscape(card.bg_color);
             slot.innerHTML = `
-                <div class="nav-card-setting" draggable="true" data-card-id="${card.id}" data-position="${position}"
-                     style="background-color: ${card.bg_color}">
-                    <span>${card.name}</span>
+                <div class="nav-card-setting" draggable="true" data-card-id="${cardId}" data-position="${position}"
+                     style="background-color: ${cardBg}">
+                    <span>${cardName}</span>
                     <div class="card-actions">
-                        <button type="button" class="btn-icon edit" onclick="editCard('${card.id}')" title="编辑">
+                        <button type="button" class="btn-icon edit" onclick="editCard('${cardId}')" title="编辑">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button type="button" class="btn-icon delete" onclick="deleteCard('${card.id}')" title="删除">
+                        <button type="button" class="btn-icon delete" onclick="deleteCard('${cardId}')" title="删除">
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
@@ -239,7 +248,7 @@ function updateCardDisplay() {
             `;
         }
     });
-    
+
     updateCardCount();
     initDragAndDrop();
 }
@@ -253,7 +262,7 @@ document.getElementById('addCardBtn').addEventListener('click', function() {
     document.getElementById('cardColor').value = '#007bff';
     document.getElementById('colorPicker').value = '#007bff';
     updatePreview();
-    
+
     const modal = new bootstrap.Modal(document.getElementById('cardModal'));
     modal.show();
 });
@@ -261,7 +270,7 @@ document.getElementById('addCardBtn').addEventListener('click', function() {
 function editCard(cardId) {
     const card = cards.find(c => c.id === cardId);
     if (!card) return;
-    
+
     editingId = cardId;
     document.getElementById('modalTitle').textContent = '编辑导航卡片';
     document.getElementById('cardId').value = card.id;
@@ -270,7 +279,7 @@ function editCard(cardId) {
     document.getElementById('cardColor').value = card.bg_color;
     document.getElementById('colorPicker').value = card.bg_color;
     updatePreview();
-    
+
     const modal = new bootstrap.Modal(document.getElementById('cardModal'));
     modal.show();
 }
@@ -279,10 +288,10 @@ const navCardsChannel = new BroadcastChannel('nav-cards-updated');
 
 async function deleteCard(cardId) {
     if (!confirm('确定要删除这个导航卡片吗？')) return;
-    
+
     cards = cards.filter(c => c.id !== cardId);
     updateCardDisplay();
-    
+
     try {
         const response = await fetch('{{ url("api:api_nav_cards_save") }}', {
             method: 'POST',
@@ -335,7 +344,7 @@ document.getElementById('saveCardBtn').addEventListener('click', async function(
     const name = document.getElementById('cardName').value.trim();
     const url = document.getElementById('cardUrl').value.trim();
     const bgColor = document.getElementById('cardColor').value;
-    
+
     if (!name) {
         alert('请输入网站名称');
         return;
@@ -348,7 +357,7 @@ document.getElementById('saveCardBtn').addEventListener('click', async function(
         alert('网址必须以 http:// 或 https:// 开头');
         return;
     }
-    
+
     if (editingId) {
         const card = cards.find(function(c) { return c.id === editingId; });
         if (card) {
@@ -370,10 +379,10 @@ document.getElementById('saveCardBtn').addEventListener('click', async function(
             position: newPosition
         });
     }
-    
+
     updateCardDisplay();
     bootstrap.Modal.getInstance(document.getElementById('cardModal')).hide();
-    
+
     // 保存到数据库
     try {
         const response = await fetch('{{ url("api:api_nav_cards_save") }}', {
@@ -400,14 +409,14 @@ document.getElementById('saveCardBtn').addEventListener('click', async function(
 function onNavCardDrop(draggingCard, toSlot) {
     var fromSlot = draggingCard.closest('.nav-slot');
     if (fromSlot === toSlot) return;
-    
+
     var fromPosition = parseInt(fromSlot.dataset.position);
     var toPosition = parseInt(toSlot.dataset.position);
     var toCard = toSlot.querySelector('.nav-card-setting');
-    
+
     var cardData = cards.find(function(c) { return c.id == draggingCard.dataset.cardId; });
     if (!cardData) return;
-    
+
     if (toCard) {
         var toCardData = cards.find(function(c) { return c.id == toCard.dataset.cardId; });
         if (toCardData) {
@@ -418,7 +427,7 @@ function onNavCardDrop(draggingCard, toSlot) {
     } else {
         cardData.position = toPosition;
     }
-    
+
     updateCardDisplay();
     saveCardsOrder();
 }

@@ -42,6 +42,13 @@
 
     var cardPositions = {};
 
+    window._modulePrefixes = {
+        node: '/nodes/',
+        tool: '/modules/',
+        system: '/modules/system/',
+        'default': '/modules/',
+    };
+
     // 农历数据
     var lunarInfo = [
         0x04bd8, 0x04ae0, 0x0a570, 0x054d5, 0x0d260, 0x0d950, 0x16554, 0x056a0, 0x09ad0, 0x055d2,
@@ -66,7 +73,7 @@
         0x0e968, 0x0d520, 0x0daa0, 0x16aa6, 0x056d0, 0x04ae0, 0x0a9d4, 0x0a2d0, 0x0d150, 0x0f252,
         0x0d520
     ];
-    
+
     var lunarMonth = ['正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '腊'];
     var lunarDay = ['初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十',
         '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十',
@@ -142,7 +149,7 @@
                 };
             }
         });
-        
+
         fetch('{{ url('api:api_dashboard_cards_save') }}', {
             method: 'POST',
             headers: {
@@ -174,35 +181,33 @@
         var isOdd = (position % 2 === 1);
         var bgColor = isOdd ? 'var(--primary)' : 'var(--primary-light)';
         var textColor = isOdd ? '#fff' : 'var(--primary)';
-        
+
         var card = document.createElement('div');
         card.className = 'clock-card module-card';
         card.setAttribute('draggable', 'true');
         card.setAttribute('data-module', 'clock');
         card.style.cssText = 'background-color:' + bgColor + ' !important;color:' + textColor + ' !important;border:none;height:100%;padding:0.75rem;display:flex;flex-direction:column;justify-content:center;align-items:center;cursor:grab;';
-        
-        card.innerHTML = 
+
+        card.innerHTML =
             '<div class="clock-date-weekday" style="font-size:0.875rem;opacity:0.75;margin-bottom:2px;">加载中...</div>' +
             '<div class="clock-lunar" style="font-size:0.875rem;opacity:0.75;margin-bottom:8px;">加载中...</div>' +
             '<div class="clock-time" style="font-size:1.5rem;font-weight:bold;letter-spacing:2px;">--:--:--</div>';
-        
+
         return card;
     }
 
     function getModulePrefix(moduleId) {
         var typeMap = window._moduleTypes || {};
         var type = typeMap[moduleId];
-        if (type === 'node') return '/nodes/';
-        if (type === 'tool') return '/modules/';
-        if (type === 'system') return '/modules/system/';
-        return '/modules/';
+        var prefixes = window._modulePrefixes || {};
+        return prefixes[type] || prefixes['default'] || '/modules/';
     }
 
     function createCustomerCard(moduleId, position, stats) {
         var isOdd = (position % 2 === 1);
         var bgColor = isOdd ? 'var(--primary)' : 'var(--primary-light)';
         var textColor = isOdd ? '#fff' : 'var(--primary)';
-        
+
         var moduleNames = {
             'customer': '海外客户',
             'customer_cn': '国内客户',
@@ -211,19 +216,19 @@
         var moduleName = moduleNames[moduleId] || moduleId;
         var total = stats ? stats.total : 0;
         var recent = stats ? stats.recent : 0;
-        
+
         var card = document.createElement('a');
         card.href = getModulePrefix(moduleId) + moduleId + '/';
         card.className = 'clock-card module-card';
         card.setAttribute('draggable', 'true');
         card.setAttribute('data-module', moduleId);
         card.style.cssText = 'background-color:' + bgColor + ' !important;color:' + textColor + ' !important;border:none;height:100%;padding:0.75rem;display:flex;flex-direction:column;justify-content:center;align-items:center;cursor:grab;text-decoration:none;';
-        
-        card.innerHTML = 
+
+        card.innerHTML =
             '<div class="card-title" style="font-size:1rem;font-weight:bold;margin-bottom:8px;">' + moduleName + '</div>' +
             '<div class="card-count" style="font-size:2rem;font-weight:bold;">' + total + '</div>' +
             '<div class="card-subtitle" style="font-size:0.75rem;opacity:0.75;margin-top:4px;">本周新增 ' + recent + ' 条</div>';
-        
+
         return card;
     }
 
@@ -231,13 +236,13 @@
         var temp = document.createElement('div');
         temp.innerHTML = htmlContent;
         var card = temp.firstElementChild;
-        
+
         if (card) {
             card.classList.add('clock-card', 'module-card');
             card.setAttribute('draggable', 'true');
             card.dataset.module = moduleId;
         }
-        
+
         return card || temp;
     }
 
@@ -245,7 +250,7 @@
         var isOdd = (position % 2 === 1);
         var bgColor = isOdd ? 'var(--primary)' : 'var(--primary-light)';
         var textColor = isOdd ? '#fff' : 'var(--primary)';
-        
+
         var card = document.createElement('a');
         card.href = getModulePrefix(moduleId) + moduleId + '/';
         card.className = 'clock-card module-card';
@@ -253,7 +258,7 @@
         card.setAttribute('data-module', moduleId);
         card.setAttribute('data-template', templatePath);
         card.style.cssText = 'background-color:' + bgColor + ' !important;color:' + textColor + ' !important;border:none;height:100%;padding:0.75rem;display:flex;flex-direction:column;justify-content:center;align-items:center;cursor:grab;text-decoration:none;';
-        
+
         var moduleNames = {
             'whatsapp': '📱 WhatsApp 发送',
             'customer': '👥 客户信息',
@@ -261,23 +266,23 @@
             'resident_info': '📋 居民信息'
         };
         var moduleName = moduleNames[moduleId] || moduleId;
-        
+
         var total = stats ? stats.total : 0;
         var recent = stats ? stats.recent : 0;
-        
-        card.innerHTML = 
+
+        card.innerHTML =
             '<div class="card-title" style="font-size:1rem;font-weight:bold;margin-bottom:8px;">' + moduleName + '</div>' +
             '<div class="card-count" style="font-size:2rem;font-weight:bold;">' + total + '</div>' +
             '<div class="card-subtitle" style="font-size:0.75rem;opacity:0.75;margin-top:4px;">本周新增 ' + recent + ' 条</div>';
-        
+
         loadModuleTemplate(card, moduleId, templatePath);
-        
+
         return card;
     }
-    
+
     function loadModuleTemplate(card, moduleId, templatePath) {
         if (!templatePath) return;
-        
+
         fetch(getModulePrefix(moduleId) + moduleId + '/templates/' + templatePath, {credentials: 'include'})
             .then(function(response) { return response.text(); })
             .then(function(html) {
@@ -326,7 +331,7 @@
         var timeEl = document.querySelector('.clock-time');
         var dateWeekdayEl = document.querySelector('.clock-date-weekday');
         var lunarEl = document.querySelector('.clock-lunar');
-        
+
         if (timeEl) {
             timeEl.textContent = now.toLocaleTimeString('zh-CN', {hour12: false});
         }
@@ -344,7 +349,7 @@
 
     function renderCards() {
         var slots = document.querySelectorAll('.card-slot');
-        
+
         fetch('{{ url('api:api_dashboard_cards') }}', {credentials: 'include'})
             .then(function(response) { return response.json(); })
             .then(function(data) {
@@ -355,15 +360,15 @@
                     var moduleContents = data.data.module_contents || {};
                     var moduleClickable = data.data.module_clickable || {};
                     window._moduleTypes = data.data.module_types || {};
-                    
+
                     slots.forEach(function(slot) {
                         var position = slot.dataset.position;
                         var cardData = cardPositions[position];
-                        
+
                         if (cardData && cardData.module) {
                             var moduleId = cardData.module;
                             if (availableModules.indexOf(moduleId) === -1) return;
-                            
+
                             if (moduleContents[moduleId]) {
                                 slot.innerHTML = moduleContents[moduleId];
                                 var card = slot.querySelector('.module-card');
@@ -386,7 +391,7 @@
                         }
                     });
                 }
-                
+
                 initDragAndDrop();
             })
             .catch(function() {
@@ -398,18 +403,18 @@
     function onCardDrop(draggingCard, toSlot) {
         var fromSlot = draggingCard.closest('.card-slot');
         if (fromSlot === toSlot) return;
-        
+
         var toCard = toSlot.querySelector('.module-card');
         var newPosition = parseInt(toSlot.dataset.position);
         var fromPosition = parseInt(fromSlot.dataset.position);
-        
+
         toSlot.innerHTML = '';
         toSlot.appendChild(draggingCard);
-        
+
         if (toCard) {
             fromSlot.innerHTML = '';
             fromSlot.appendChild(toCard);
-            
+
             var tempModule = cardPositions[fromPosition];
             cardPositions[fromPosition] = cardPositions[newPosition];
             cardPositions[newPosition] = tempModule;
@@ -417,7 +422,7 @@
             cardPositions[newPosition] = cardPositions[fromPosition];
             cardPositions[fromPosition] = {module: null, size: 'medium', config: {}};
         }
-        
+
         saveCardPositions();
     }
 

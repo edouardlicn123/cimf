@@ -8,10 +8,13 @@ logger = logging.getLogger(__name__)
 
 def _enable_sqlite_wal(sender, connection, **_kwargs):  # noqa: ARG001
     """SQLite 连接创建时启用 WAL 模式"""
-    if connection.vendor == "sqlite":
-        with connection.cursor() as cursor:
-            cursor.execute("PRAGMA journal_mode=WAL")
-            cursor.execute("PRAGMA synchronous=NORMAL")
+    try:
+        if connection.vendor == "sqlite":
+            with connection.cursor() as cursor:
+                cursor.execute("PRAGMA journal_mode=WAL")
+                cursor.execute("PRAGMA synchronous=NORMAL")
+    except Exception:
+        logger.warning("启用 SQLite WAL 模式失败")
 
 
 class CoreConfig(AppConfig):
@@ -19,6 +22,9 @@ class CoreConfig(AppConfig):
 
     def ready(self):
         logger.info("CoreConfig.ready() 被调用")
+        # 显式导入 checks 模块以注册自定义 Django 检查（CIMF_W001~W007）
+        from core import checks  # noqa: F401, PLC0415
+
         connection_created.connect(_enable_sqlite_wal, dispatch_uid="enable_sqlite_wal")
         # 启动时同步 SMTP 配置到 Django 运行时设置
         try:
