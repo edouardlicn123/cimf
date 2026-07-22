@@ -132,10 +132,10 @@ Service 层：业务验证（唯一性等）。Form 层：格式验证。视图�
 API 挂载于 `/api/v1/`，使用复数名词。
 
 ### 8.2 JSON 响应格式
-使用 `success_response(data, message)` 和 `error_response(message, code)` 统一函数。
+视图层使用 `json_success(data=None, message=None, status=200, extra=None)` 和 `json_error(message, status=400, data=None)`（位于 `core/utils/response.py`，返回 `JsonResponse`）；服务层使用 `success_response(**kwargs)` 和 `error_response(message, **kwargs)`（位于 `core/services/mixins.py`，返回 `dict`）。
 
 ### 8.3 错误响应格式
-`{'success': False, 'message': '...', 'code': '...'}`，禁止字段名不一致。
+视图层 `json_error` 返回 `{'success': False, 'error': message}`（键名为 `error`，无 `code` 键）；服务层 `error_response` 返回 `{'success': False, 'error': message, **kwargs}`。
 
 ### 8.4 认证与授权
 `@login_required` + `PermissionService.has_permission()`。
@@ -145,7 +145,11 @@ API 挂载于 `/api/v1/`，使用复数名词。
 ### 9.1 测试文件位置
 ```
 tests/
-├── core/   (test_models, test_views, test_services, test_forms, test_api)
+├── test_models.py
+├── test_views.py
+├── test_services.py
+├── test_forms.py
+├── test_api.py
 └── modules/ (clock/, customer/)
 ```
 
@@ -262,4 +266,4 @@ Service 层 ≥80% | View 层 ≥60% | Model 层 ≥50%
 | A03_省市县联动字段技术规范.md | 省市县三级联动字段设计 |
 | docs/开发规范.md | 项目开发通用规范 |
 
-*文档版本：1.1 | 最后更新：2026-05-03*
+

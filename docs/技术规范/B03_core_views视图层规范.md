@@ -52,7 +52,7 @@
 | `modules/customer/views.py` | 6 | 海外客户管理 |
 | `modules/clock/views.py` | 1 | 时钟 API |
 | `modules/calc/views.py` | 2 | 计算器工具页面 + 计算表达式API |
-| `modules/smtptest/views.py` | 2 | 列表页 + 详情页（预留） |
+| `modules/smtptest/views.py` | 1 | SMTP 测试工具 |
 
 ---
 
@@ -71,8 +71,8 @@
 |----------|-----|------|------|
 | `smtp_config` | `/system/smtp/` | GET/POST | SMTP 配置 |
 | `smtp_test` | `/system/smtp/test/` | POST | 发送测试邮件 |
-| `smtp_presets` | `/system/smtp/presets/` | GET | 预设配置列表（⚠️ 函数存在但未注册URL，预留功能） |
 | `smtp_history` | `/system/smtp/history/` | GET | 发送历史 |
+| `smtp_process_queue` | `/system/smtp/process/` | POST | 手动处理待发送邮件队列 |
 | `smtp_cleanup_logs` | `/system/smtp/cleanup/` | POST | 清理历史记录 |
 
 ### 2.3 管理后台视图
@@ -88,6 +88,8 @@
 | `system_permissions` | `/system/permissions/` | GET | 权限管理 |
 | `cron_manager` | `/system/cron/` | GET | 定时任务管理 |
 | `permission_check` | `/system/permission-check/` | GET | 权限检查页面 |
+| `logs_index` | `/system/logs/` | GET | 日志首页 |
+| `logs_view` | `/system/logs/<str:log_type>/` | GET | 查看日志 |
 
 ### 2.4 词汇表视图
 
@@ -109,6 +111,8 @@
 | `dashboard` | `/` | GET | 仪表盘（首页） |
 | `profile_view` | `/user/profile/` | GET | 个人资料查看 |
 | `profile_settings` | `/user/settings/` | GET/POST | 个人设置 |
+| `change_password` | `/settings/change-password/` | GET/POST | 修改密码 |
+| `profile` | `/profile/` | GET | 个人页面 |
 | `homepage_settings` | `/user/functioncards/` | GET/POST | 首页功能卡片设置 |
 | `navigation_settings` | `/user/navcards/` | GET | 导航卡片设置 |
 
@@ -156,45 +160,66 @@
 `core/node/views.py` 中的 `module_dispatch` 是节点系统的核心分发器：
 
 ```python
-@login_required
-def module_dispatch(request, node_type_slug, node_id=None, action=None):
-    """模块分发视图 - 根据节点类型动态加载对应模块的视图"""
+def _check_module_exists(node_type_slug: str) -> str:
+    """检查模块是否存在并已激活，返回模块路径或抛出 404"""
+    from core.module.models import Module
+
+    if not Module.objects.filter(module_id=node_type_slug, is_installed=True, is_active=True).exists():
+        raise Http404
     module_path = node_type_slug
-    
+
     try:
-        module_views = __import__(f'modules.{module_path}.views', fromlist=[''])
-        
-        # create 操作
-        if action == 'create':
-            if hasattr(module_views, 'node_create'):
-                return module_views.node_create(request)
-            elif hasattr(module_views, 'create'):
-                return module_views.create(request)
-        
-        # delete 操作
-        if action == 'delete':
-            if hasattr(module_views, 'node_delete'):
-                return module_views.node_delete(request, node_id)
-            elif hasattr(module_views, 'delete'):
-                return module_views.delete(request, node_id)
-        
-        # 通用分发
-        if hasattr(module_views, 'module_view'):
-            return module_views.module_view(request, node_id)
-        elif hasattr(module_views, 'detail_view') and node_id:
-            return module_views.detail_view(request, node_id)
-        elif hasattr(module_views, 'list_view'):
-            return module_views.list_view(request)
-        elif hasattr(module_views, 'node_list') and not node_id:
-            return module_views.node_list(request)
-        elif hasattr(module_views, 'node_view') and node_id:
-            return module_views.node_view(request, node_id)
-        elif hasattr(module_views, 'node_edit') and node_id:
-            return module_views.node_edit(request, node_id)
-    except ImportError:
-        pass
-    
-    return redirect('node:module_page', node_type_slug)
+        import_module(f"modules.{module_path}.views")
+    except ImportError as e:
+        logger.warning("模块视图加载失败: %s — %s", node_type_slug, e, exc_info=True)
+        raise Http404(f"未找到模块: {node_type_slug}") from None
+    return module_path
+
+
+def _check_action_permission(request, action: str | None, node_type_slug: str):
+    """检查是否需要管理员权限，无权限时返回 redirect"""
+    if action in ("create", "edit", "delete") and not request.user.is_admin:
+        messages.error(request, "需要管理员权限")
+        return redirect("node:module_page", node_type_slug=node_type_slug)
+    return None
+
+
+def _resolve_view(module_path: str, action: str | None, node_id: int | None = None):
+    """解析动作对应的视图函数"""
+    if action == "create":
+        return dynamic_import_view(module_path, "node_create") or dynamic_import_view(module_path, "create")
+    if action == "delete":
+        return dynamic_import_view(module_path, "node_delete") or dynamic_import_view(module_path, "delete")
+    if action == "edit":
+        return dynamic_import_view(module_path, "node_edit") or dynamic_import_view(module_path, "edit")
+
+    return (
+        dynamic_import_view(module_path, "module_view")
+        or (dynamic_import_view(module_path, "detail_view") if node_id is not None else None)
+        or dynamic_import_view(module_path, "list_view")
+        or (dynamic_import_view(module_path, "node_list") if node_id is None else None)
+        or (dynamic_import_view(module_path, "node_view") if node_id is not None else None)
+        or (dynamic_import_view(module_path, "node_edit") if node_id is not None else None)
+    )
+
+
+@login_required
+def module_dispatch(request, node_type_slug: str, node_id: int | None = None, action: str | None = None):
+    """模块分发视图 - 根据节点类型动态加载对应模块的视图"""
+    module_path = _check_module_exists(node_type_slug)
+
+    permission_response = _check_action_permission(request, action, node_type_slug)
+    if permission_response:
+        return permission_response
+
+    view = _resolve_view(module_path, action, node_id)
+    if view:
+        sig = inspect.signature(view)
+        if len(sig.parameters) == 1:
+            return view(request)
+        return view(request, node_id)
+
+    raise Http404(f"未找到模块: {node_type_slug}")
 ```
 
 **分发规则**：详见 [B05 规范第六节](./B05_core_urls路由与模块化规范.md#六模块分发机制module_dispatch)
@@ -401,28 +426,5 @@ render(request, 'template.html', {
 
 ---
 
-## 七、待补充
-
-- [ ] 补充 node/views.py 视图清单
-- [ ] 添加视图单元测试规范
-- [ ] 补充视图性能优化建议
-
 ---
 
-## 八、版本历史
-
-| 版本 | 日期 | 变更内容 |
-|------|------|----------|
-| 1.0 | 2026-04-07 | 初始版本 |
-| 1.1 | 2026-05-02 | 修正 views.py 为 views/ 包结构，更新视图分布表 |
-| 1.2 | 2026-05-03 | 修正 SMTP 预设路由、修正 API 路径至 /api/v1/ |
-| 1.3 | 2026-05-03 | 修正视图文件计数（cron 5→9, tools 2→5） |
-| 1.4 | 2026-05-03 | 修正 SMTP 视图数量 4→5 |
-| 1.5 | 2026-05-04 | 修正 logs 视图计数 3→2、修正 node/views 计数 ~15→14、修正 taxonomy_items_api 归类（移至其他视图）、补充导入导出视图来源说明 |
-| 1.6 | 2026-05-04 | 修正 logs.py 视图计数 2→3（含 logs_api）、修正 cron.py 计数 9→8（5视图+3辅助）、修正 tools.py 计数 5→4（2视图+装饰器+辅助）、更新 module_dispatch 分发规则代码（含 module_view/detail_view/list_view 备选） |
-| 1.7 | 2026-05-06 | 修正 calc/smtptest 模块视图计数（各 1→2） |
-| 1.8 | 2026-05-06 | 修正 @admin_required 描述（重定向而非返回JSON） |
-| 1.9 | 2026-05-06 | 标注 smtp_presets 为未注册URL的预留功能 |
-| 2.0 | 2026-05-06 | 补充 api_urls.py 遗漏的 3 个 API 路由（health/detailed/version）、修正 cards.py 缺失 logging 导入 |
-| 2.1 | 2026-05-06 | 修正 module_dispatch 代码示例（补充 module_path 赋值） |
-| 2.2 | 2026-05-06 | 修正 API 视图数量描述（14→19，补充详细说明） |

@@ -1,7 +1,7 @@
 # core/urls 路由与模块化规范
 
-> 文档版本：3.0
-> 最后更新：2026-05-08
+> 文档版本：3.1
+> 最后更新：2026-07-22
 
 ## 一、概述
 
@@ -21,8 +21,8 @@ URL 路由层负责将 HTTP 请求映射到对应的视图函数。
 
 | 文件 | 路由数量 | 命名空间 | 挂载路径 |
 |------|----------|----------|----------|
-| `core/urls.py` | ~43 | `core` | `/` |
-| `core/node/urls.py` | 6 | `node` | `/nodes/` |
+| `core/urls.py` | ~47（_structure_urls 14 + _system_urls 16 + urlpatterns 17） | `core` | `/` |
+| `core/node/urls.py` | 7 | `node` | `/nodes/` |
 | `core/module/urls.py` | 7 | `module` | `/modules/manage/` |
 | `core/marketplace/urls.py` | 2 | `market` | `/modules/market/` |
 | `core/api_urls.py` | 19 | `api` | `/api/v1/` |
@@ -46,7 +46,7 @@ URL 路由层负责将 HTTP 请求映射到对应的视图函数。
 
 ## 三、core/urls.py 路由清单
 
-~43 条路由，命名空间 `core`，挂载于 `/`，按功能分 7 组：
+~47 条路由，命名空间 `core`，挂载于 `/`，按功能分 7 组：
 
 | 分组 | 路径前缀 | 路由数量 | 命名模式 |
 |------|----------|----------|----------|
@@ -54,14 +54,13 @@ URL 路由层负责将 HTTP 请求映射到对应的视图函数。
 | 仪表盘 | `` | 1 | `core:dashboard` |
 | 内容结构 | `structure/` | 14 | `core:structure_dashboard`, `core:node_types_*`, `core:field_types*`, `core:taxonom*` |
 | 协作工具 | `tools/` | 2 | `core:tools_index`, `core:tools_page` |
-| 系统管理 | `system/` | 15 | `core:system_users`, `core:user_*`, `core:system_*`, `core:cron_*`, `core:smtp_*`, `core:logs_*` |
-| 个人中心 | `user/` | 4 | `core:profile_*`, `core:homepage_settings`, `core:navigation_settings` |
+| 系统管理 | `system/` | 16 | `core:system_users`, `core:user_*`, `core:system_*`, `core:cron_*`, `core:permission_check`, `core:smtp_*`, `core:logs_*` |
+| 个人中心 | — | 6 | `core:profile_view`, `core:profile_settings`, `core:change_password`, `core:profile`, `core:homepage_settings`, `core:navigation_settings` |
 | 健康检查 | `health/` | 2 | `core:health_check`, `core:detailed_health_check` |
-| 重定向 | — | 3 | 向后兼容旧路径（`structure/`→`/structure/dashboard/` 等） |
 
 ## 四、core/node/urls.py 路由清单
 
-6 条路由，命名空间 `node`，挂载于 `/nodes/`，CRUD 由 `module_dispatch` 分发：
+7 条路由，命名空间 `node`，挂载于 `/nodes/`，CRUD 由 `module_dispatch` 分发：
 
 | 路径 | 视图 | 名称 (name) |
 |------|------|-------------|
@@ -71,6 +70,7 @@ URL 路由层负责将 HTTP 请求映射到对应的视图函数。
 | `<slug>/<id>/` | `module_dispatch` | `node_view` |
 | `<slug>/<id>/edit/` | `module_dispatch` | `node_edit` |
 | `<slug>/<id>/delete/` | `module_dispatch` | `node_delete` |
+| `<slug:node_type_slug>/<path:extra_path>/` | `module_custom_dispatch` | `module_custom` |
 
 ## 五、其他路由模块清单
 
@@ -96,8 +96,8 @@ URL 路由层负责将 HTTP 请求映射到对应的视图函数。
 |------|------|----------|----------|
 | customer | node | `nodes/customer/` | `core/node/urls.py` 分发 |
 | clock | system | `system/clock/` | 动态挂载于 `modules` 命名空间 |
-| calc | tool | `tools/calc/` | `core/urls.py` `tools_page` 分发 |
-| smtptest | tool | `tools/smtptest/` | `core/urls.py` `tools_page` 分发 |
+| calc | tool | `tools/calc/`、`modules/calc/` | `core/urls.py` `tools_page` 分发 + `modules/urls.py` 动态挂载 |
+| smtptest | tool | `tools/smtptest/`、`modules/smtptest/` | `core/urls.py` `tools_page` 分发 + `modules/urls.py` 动态挂载 |
 
 ### 5.6 模块通用 API
 `api/taxonomy-items/` → `taxonomy_items_api`（视图来自 `core/node/views.py`），挂载于 `modules` 命名空间。
@@ -147,6 +147,7 @@ Jinja2 语法：`{{ url('namespace:name', arg) }}`。示例：`url('core:system_
 | `/structure/` | 内容结构（节点类型、词汇表、字段类型） | `/structure/taxonomies/` |
 | `/nodes/` | 事务节点（node 类型模块 CRUD） | `/nodes/customer/` |
 | `/tools/` | 协作工具（tool 类型模块） | `/tools/calc/` |
+| `/modules/` | 其它模块（含 tool 类型模块的 API/子页面） | `/modules/calc/`, `/modules/smtptest/` |
 | `/modules/manage/` | 模块管理 | `/modules/manage/` |
 | `/modules/market/` | 模块市场 | `/modules/market/` |
 | `/importexport/` | 导入导出 | `/importexport/export/` |

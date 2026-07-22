@@ -1,8 +1,8 @@
 # core/services 服务层规范
 
-> 文档版本：2.4  
+> 文档版本：2.5  
 > 创建日期：2026-04-07  
-> 最后更新：2026-05-06
+> 最后更新：2026-07-22
 
 ---
 
@@ -75,7 +75,7 @@
 | 方法 | 参数 | 返回 | 说明 |
 |------|------|------|------|
 | `authenticate()` | username, password | `User \| None` | 验证用户凭据 |
-| `login()` | request, username, password | `Dict` | 处理登录，返回 success/message/user |
+| `login()` | username, password | `Dict` | 处理登录，返回 success/message/user |
 | `is_account_locked()` | user | `bool` | 检查账号是否锁定 |
 | `unlock_expired_accounts()` | - | `int` | 解锁所有过期锁定账号 |
 | `get_login_max_failures()` | - | `int` | 获取登录失败最大次数（默认5） |
@@ -134,7 +134,8 @@ ROLE_DEFAULT_PERMISSIONS = {
 | `get_user_effective_permissions()` | 获取用户有效权限列表 |
 | `can_access_admin()` | 检查是否可以访问后台（admin） |
 | `init_default_role_permissions()` | 初始化角色默认权限到数据库 |
-| `get_node_permissions()` | 获取节点权限（从模块配置动态读取） |
+| `check_node_permission()` | user, node, permission_type | `tuple[bool, str \| None]` | 检查用户对指定节点的操作权限 |
+| `get_node_permissions()` | - | `dict` | 获取节点权限（从模块配置动态读取） |
 
 ---
 
@@ -170,7 +171,7 @@ ROLE_DEFAULT_PERMISSIONS = {
 
 ### 5.2 默认配置
 
-SettingsService 共定义 **51** 项默认配置：
+SettingsService 共定义 **57** 项默认配置：
 
 | 分类 | 配置项 | 默认值 |
 |------|--------|--------|
@@ -200,10 +201,11 @@ SettingsService 共定义 **51** 项默认配置：
 | 时间 | time_zone | Asia/Shanghai |
 | 时间 | time_sync_interval | 15 |
 | 时间 | time_sync_max_retries | 5 |
+| 时间 | system_synced_time | （空） |
+| 时间 | system_sync_monotonic | 0 |
 | 定时任务 | cron_time_sync_enabled | true |
 | 定时任务 | cron_cache_cleanup_enabled | true |
 | 定时任务 | cron_email_sending_enabled | false |
-| 定时任务 | smtp_send_interval | 100 |
 | 定时任务 | cron_email_cleanup_enabled | false |
 | 定时任务 | cron_email_cleanup_interval | 86400 |
 | 维护 | maintenance_mode | false |
@@ -220,11 +222,16 @@ SettingsService 共定义 **51** 项默认配置：
 | SMTP | smtp_timeout | 30 |
 | SMTP | smtp_skip_verify | false |
 | SMTP | smtp_batch_size | 10 |
-| SMTP | smtp_rate_limit | 0 |
+| SMTP | smtp_password | （空） |
+| SMTP | smtp_retry_count | 3 |
 | SMTP | smtp_log_days | 30 |
 | SMTP | smtp_failed_notify | false |
 | SMTP | smtp_notify_email | （空） |
 | SMTP | smtp_system_url | （空） |
+| SMTP | smtp_proxy_host | 127.0.0.1 |
+| SMTP | smtp_proxy_port | 10808 |
+| SMTP | smtp_use_proxy | false |
+| SMTP | smtp_send_interval | 240 |
 
 ### 5.3 方法说明
 
@@ -267,18 +274,23 @@ SettingsService 共定义 **51** 项默认配置：
 | 方法 | 说明 |
 |------|------|
 | `get_all_taxonomies()` | 获取所有词汇表 |
-| `get_taxonomy_by_id()` | 获取词汇表详情 |
-| `get_taxonomy_by_slug()` | 通过 slug 获取词汇表 |
-| `create_taxonomy()` | 创建词汇表 |
-| `update_taxonomy()` | 更新词汇表 |
-| `delete_taxonomy()` | 删除词汇表（级联删除词汇项） |
-| `get_items()` | 获取词汇表的所有词汇项 |
-| `get_item()` | 获取词汇项详情 |
-| `create_item()` | 创建词汇项 |
-| `update_item()` | 更新词汇项 |
-| `delete_item()` | 删除词汇项 |
-| `reorder_items()` | 重新排序词汇项 |
+| `get_taxonomy_list(search)` | 获取词汇表列表，支持搜索 |
+| `check_slug_exists(slug)` | 检查词汇表标识是否已存在 |
+| `check_slug_exists_exclude(slug, exclude_id)` | 检查词汇表标识是否已存在（排除指定 ID） |
+| `get_taxonomy_by_id(taxonomy_id)` | 获取词汇表详情 |
+| `get_taxonomy_by_slug(slug)` | 通过 slug 获取词汇表 |
+| `create_taxonomy(name, slug, description)` | 创建词汇表 |
+| `update_taxonomy(taxonomy_id, name, slug, description)` | 更新词汇表 |
+| `delete_taxonomy(taxonomy_id)` | 删除词汇表（级联删除词汇项） |
+| `get_items(taxonomy_id)` | 获取词汇表的所有词汇项 |
+| `get_items_bulk(slugs)` | 批量获取多个词汇表的词汇项 |
+| `get_item_by_id(item_id)` | 根据 ID 获取词汇项 |
+| `create_item(taxonomy_id, name, description, weight)` | 创建词汇项 |
+| `update_item(item_id, name, description, weight)` | 更新词汇项 |
+| `delete_item(item_id)` | 删除词汇项 |
+| `reorder_items(taxonomy_id, item_ids)` | 重新排序词汇项 |
 | `init_default_taxonomies()` | 初始化预置分类数据 |
+| `generate_items_ai(taxonomy_id, count)` | AI 生成词汇项（预留接口） |
 
 ---
 
@@ -365,12 +377,74 @@ SettingsService 共定义 **51** 项默认配置：
 | `get_status()` | 获取所有任务状态 |
 | `trigger()` | 手动触发任务 |
 | `toggle()` | 切换任务启用状态 |
+| `set_app_ready(ready)` | 设置所有任务应用已就绪 |
 
 ---
 
-## 十、服务层调用规范
+## 十、TimeService - 时间服务
 
-### 10.1 视图层调用示例
+### 10.1 用途
+时间工具服务，作为时间相关功能的统一入口，封装 TimeSyncService 的功能。
+
+### 10.2 方法说明
+
+| 方法 | 说明 |
+|------|------|
+| `is_sync_enabled()` | 检查时间同步是否启用 |
+| `get_time_server_url()` | 获取配置的时间服务器 URL |
+| `get_current_time()` | 获取当前时间字符串（格式：YYYY-MM-DD HH:MM:SS） |
+| `get_current_datetime()` | 获取当前时间 datetime 对象 |
+| `get_timezone()` | 获取配置的时区 |
+| `get_sync_status()` | 获取时间同步状态 |
+
+---
+
+## 十一、TimeSyncService - 时间同步服务
+
+### 11.1 用途
+时钟同步服务，负责与远程时间服务器同步系统时间，支持多服务器和重试机制。
+
+### 11.2 方法说明
+
+| 方法 | 说明 |
+|------|------|
+| `is_enabled()` | 检查时间同步是否启用 |
+| `get_sync_interval()` | 获取同步间隔（秒） |
+| `get_max_retries()` | 获取最大重试次数 |
+| `get_server_url()` | 获取时间服务器 URL |
+| `test_connection(url)` | 测试时间服务器连接 |
+| `sync_time()` | 执行时间同步 |
+| `get_current_time()` | 获取当前时间 datetime 对象 |
+| `get_current_time_str(fmt)` | 获取当前时间字符串 |
+| `get_status()` | 获取同步状态 |
+
+---
+
+## 十二、LogService - 日志服务
+
+### 12.1 用途
+统一日志服务，提供日志记录（安全事件、登录、权限等）和日志读取（文件列表、分页查询、统计）功能。
+
+### 12.2 方法说明
+
+| 方法 | 说明 |
+|------|------|
+| `log_login_attempt(request, username, success, reason)` | 记录登录尝试 |
+| `log_logout(user, username, ip)` | 记录登出 |
+| `log_permission_denied(request, user, resource, reason)` | 记录权限拒绝 |
+| `log_security_event(event_type, details)` | 记录安全事件 |
+| `log_api_access(request, endpoint, user)` | 记录 API 访问 |
+| `log_data_export(request, user, export_type, record_count)` | 记录数据导出 |
+| `log_failed_validation(request, form_name, errors)` | 记录验证失败 |
+| `get_log_files()` | 获取日志文件列表及基本信息 |
+| `read_log(log_type, page, page_size, level)` | 读取日志，支持分页和级别筛选 |
+| `get_log_stats(log_type)` | 获取日志统计 |
+
+---
+
+## 十三、服务层调用规范
+
+### 13.1 视图层调用示例
 
 ```python
 # 正确：调用服务层
@@ -382,33 +456,27 @@ def user_list(request):
     users = User.objects.filter(username__icontains='john')
 ```
 
-### 10.2 错误处理
+### 13.2 错误处理
 
 - 服务层抛出异常，由视图层捕获处理
 - 业务错误返回特定异常（如 `ValueError`, `PermissionError`）
 - 数据库错误由 Django 框架处理
 
-### 10.3 事务处理
+### 13.3 事务处理
 
 - 简单操作：服务层方法内部处理
 - 复杂操作：使用 `@transaction.atomic` 装饰器
 
 ---
 
-## 十一、待补充
-
-- [ ] 添加更多服务的方法详细说明
-- [ ] 补充服务层单元测试规范
-- [ ] 添加服务层性能优化建议
-
 ---
 
-## 十二、VersionService - 版本服务
+## 十五、VersionService - 版本服务
 
-### 12.1 用途
+### 15.1 用途
 获取和管理系统版本信息
 
-### 12.2 方法说明
+### 15.2 方法说明
 
 | 方法 | 参数 | 返回 | 说明 |
 |------|------|------|------|
@@ -421,12 +489,12 @@ def user_list(request):
 
 ---
 
-## 十三、SampleDataService - 示例数据服务
+## 十六、SampleDataService - 示例数据服务
 
-### 13.1 用途
+### 16.1 用途
 初始化模块示例数据
 
-### 13.2 方法说明
+### 16.2 方法说明
 
 | 方法 | 参数 | 返回 | 说明 |
 |------|------|------|------|
@@ -436,6 +504,4 @@ def user_list(request):
 
 ---
 
-*文档版本：2.4*
-*最后更新：2026-05-06*
-*更新内容：补充 node 和 module 服务信息（NodeService、NodeTypeService、ModuleService）*
+

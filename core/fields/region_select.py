@@ -38,9 +38,9 @@ class RegionSelectWidget(forms.TextInput):
                 initial_data = value
 
         # 生成三个下拉框
-        province_api = reverse("core:api_regions_provinces")
-        city_api = reverse("core:api_regions_cities")
-        district_api = reverse("core:api_regions_districts")
+        province_api = reverse("api:api_regions_provinces")
+        city_api = reverse("api:api_regions_cities")
+        district_api = reverse("api:api_regions_districts")
 
         escaped_value = html.escape(json.dumps(initial_data, ensure_ascii=False))
         html_output = f'''
@@ -68,7 +68,7 @@ class RegionSelectWidget(forms.TextInput):
         return mark_safe(html_output)  # noqa: CIMF_W009 — 所有数据已 html.escape()  # noqa: S308 — data already html.escape'd
 
     class Media:
-        js = ("/js/region_select.js",)
+        js = ("js/region_select.js",)
 
 
 class RegionSelectField(forms.CharField):
