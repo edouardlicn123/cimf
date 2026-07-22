@@ -1,8 +1,8 @@
 # core/forms 表单与验证规范
 
-> 文档版本：1.5  
+> 文档版本：1.6  
 > 创建日期：2026-04-07  
-> 最后更新：2026-05-06
+> 最后更新：2026-07-22
 
 ---
 
@@ -26,10 +26,11 @@
 
 | 文件 | 表单类 | 用途 |
 |------|--------|------|
-| `mixins.py` | BootstrapFormMixin | Bootstrap 样式混合类 |
+| `mixins.py` | BootstrapFormMixin, UserAwareFormMixin, EmailCleanMixin, UsernameCleanMixin | 表单混合类 |
 | `auth_forms.py` | LoginForm | 登录表单 |
 | `admin_forms.py` | UserCreateForm, UserEditForm, UserSearchForm, SystemSettingsForm, PermissionForm | 后台管理 |
 | `settings_forms.py` | ProfileForm, PreferencesForm, ChangePasswordForm | 用户设置 |
+| `validators.py` | validate_unique_email, validate_unique_username, validate_password_confirmation | 共享验证器 |
 
 ---
 
@@ -41,9 +42,9 @@
 
 | 字段 | 类型 | 验证规则 | Widget |
 |------|------|----------|--------|
-| username | CharField | max_length=64, min_length=3 | TextInput |
-| password | CharField | 无 | PasswordInput |
-| remember_me | BooleanField | required=False | CheckboxInput |
+| username | CharField | max_length=64, min_length=3 | TextInput（rounded-pill） |
+| password | CharField | 无 | PasswordInput（rounded-pill） |
+| remember_me | BooleanField | required=False, initial=False | CheckboxInput（role="switch"） |
 
 **字段级验证**：
 - `clean_username()`: 去除用户名首尾空格
@@ -59,7 +60,7 @@
 
 #### UserCreateForm - 用户创建表单
 
-> 继承 `BootstrapFormMixin` 和 `forms.ModelForm`，自动应用 Bootstrap 样式。
+> 继承 `BootstrapFormMixin, EmailCleanMixin, UsernameCleanMixin` 和 `forms.ModelForm`，自动应用 Bootstrap 样式和共享验证逻辑。
 
 | 字段 | 类型 | 验证规则 | Widget |
 |------|------|----------|--------|
@@ -72,15 +73,15 @@
 | confirm_password | CharField | min_length=10, **required** | PasswordInput |
 
 **字段级验证**：
-- `clean_username()`: 检查用户名唯一性
-- `clean_email()`: 检查邮箱唯一性
+- `clean_username()`: 去除用户名首尾空格（`UsernameCleanMixin`，唯一性由模型层 `unique=True` 约束捕获）
+- `clean_email()`: 检查邮箱唯一性（`EmailCleanMixin`）
 
 **表单级验证**：
 - `clean()`: 检查两次密码一致，密码长度 >= 10
 
 #### UserEditForm - 用户编辑表单
 
-> 继承 `BootstrapFormMixin` 和 `forms.ModelForm`，自动应用 Bootstrap 样式。
+> 继承 `BootstrapFormMixin, EmailCleanMixin, UsernameCleanMixin` 和 `forms.ModelForm`，自动应用 Bootstrap 样式。
 
 | 字段 | 类型 | 验证规则 | Widget |
 |------|------|----------|--------|
@@ -123,7 +124,7 @@
 | email | EmailField | required=False | EmailInput |
 
 **特殊处理**：
-- `__init__()`: 接收 `user_id` 参数用于唯一性验证
+- `__init__()`: 通过 `UserAwareFormMixin` 接收 `user_id` 和 `user` 参数用于唯一性验证
 - `clean_email()`: 检查邮箱唯一性（排除当前用户）
 
 #### PreferencesForm - 偏好设置表单
@@ -138,9 +139,10 @@
 ```python
 from core.constants import UserTheme, Language
 
-# UserTheme.CHOICES / LABELS:
-# ('default', '默认'), ('gov', '浓重红色'), ('indigo', '靛蓝'),
-# ('macaron', '马卡龙'), ('teal', '青绿'), ('uniklo', 'uniklo'), ('savawoku', 'Savawoku')
+# UserTheme.DISPLAY_LABELS.items():
+# [('default', '默认'), ('gov', '中国红'), ('indigo', '靛蓝'),
+#  ('macaron', '马卡龙'), ('savawoku', '橙红'),
+#  ('kajima', '绿岛森林'), ('odogu', '踊'), ('tais', '梵紫')]
 
 # Language.CHOICES:
 # [('zh', '中文（简体）'), ('en', 'English')]
@@ -309,20 +311,5 @@ raise ValidationError('两次输入的密码不一致')
 
 ---
 
-## 七、待补充
-
-- [ ] 补充表单测试规范
-- [ ] 添加自定义 Widget 示例
-- [ ] 补充表单安全最佳实践
-
 ---
 
-## 八、版本历史
-
-| 版本 | 日期 | 变更内容 |
-|------|------|----------|
-| 1.0 | 2026-04-07 | 初始版本 |
-| 1.1 | 2026-05-03 | 修正 UserCreateForm 字段（移除 is_active） |
-| 1.2 | 2026-05-06 | 全面审查，确认与代码一致 |
-| 1.3 | 2026-05-06 | 修正 UserCreateForm/UserEditForm 继承类：forms.Form→forms.ModelForm |
-| 1.4 | 2026-05-06 | 补充 mixins.py（BootstrapFormMixin）到表单分布表 |

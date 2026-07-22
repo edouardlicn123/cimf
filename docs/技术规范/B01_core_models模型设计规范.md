@@ -1,8 +1,8 @@
 # core/models 模型设计规范
 
-> 文档版本：1.9  
+> 文档版本：2.0  
 > 创建日期：2026-04-07  
-> 最后更新：2026-05-06
+> 最后更新：2026-07-22
 
 ---
 
@@ -62,12 +62,12 @@ class User(AbstractUser):
 
 | 文件 | 模型 | 用途 |
 |------|------|------|
-| `core/models.py` | User, SystemSetting, Taxonomy, TaxonomyItem, ChinaRegion | 核心基础数据（5个具体模型 + 1个抽象BaseModel） |
+| `core/models.py` | User, SystemSetting, Taxonomy, TaxonomyItem, ChinaRegion, IsActiveMixin（抽象混入类） | 核心基础数据（5个具体模型 + 2个抽象类） |
 | `core/node/models.py` | NodeType, Node | 节点系统模型 |
 | `core/module/models.py` | Module, ToolType | 模块注册与工具类型 |
 | `core/smtp/models.py` | EmailTemplate, EmailLog | 邮件系统模型 |
 
-**模型总计**：12 个具体模型 + 1 个抽象基类（BaseModel）
+**模型总计**：12 个具体模型 + 2 个抽象基类（BaseModel, IsActiveMixin）
 
 > **注意**：User 模型继承自 `AbstractUser`（Django 内置），而非 `BaseModel`。
 
@@ -85,6 +85,7 @@ class User(AbstractUser):
 | `username` | CharField | 用户名（AbstractUser 继承） |
 | `nickname` | CharField | 昵称（优先显示于仪表盘等处） |
 | `email` | EmailField | 邮箱（可选，用于密码重置、通知） |
+| `is_active` | BooleanField | 激活状态（`db_index=True, default=True`，重写 AbstractUser） |
 | `is_admin` | BooleanField | 是否为系统管理员 |
 | `role` | CharField | 角色：manager/leader/employee |
 | `permissions` | JSONField | 细粒度权限列表 |
@@ -159,6 +160,8 @@ class User(AbstractUser):
 | `created_at` | DateTimeField | 创建时间 |
 | `updated_at` | DateTimeField | 更新时间 |
 
+**约束**：`unique_together = [["taxonomy", "name"]]`
+
 ---
 
 ## 五、ChinaRegion 模型
@@ -170,10 +173,10 @@ class User(AbstractUser):
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
-| `code` | CharField | 行政区划代码（6位） |
+| `code` | CharField | 行政区划代码（6位，`unique=True`） |
 | `name` | CharField | 名称 |
-| `level` | IntegerField | 层级：1=省级、2=地级市、3=县/区 |
-| `parent` | ForeignKey | 父级行政区划（自关联） |
+| `level` | IntegerField | 层级：1=省级、2=地级市、3=县/区（`choices=LEVEL_CHOICES, db_index=True`） |
+| `parent` | ForeignKey | 父级行政区划（自关联，`on_delete=PROTECT`） |
 | `created_at` | DateTimeField | 创建时间 |
 
 ### 5.3 方法
@@ -221,8 +224,8 @@ class User(AbstractUser):
 | 字段 | 类型 | 说明 |
 |------|------|------|
 | `node_type` | ForeignKey | 节点类型 |
-| `created_by` | ForeignKey | 创建人 |
-| `updated_by` | ForeignKey | 更新人 |
+| `created_by` | ForeignKey | 创建人（`on_delete=SET_NULL, null=True, blank=True`） |
+| `updated_by` | ForeignKey | 更新人（`on_delete=SET_NULL, null=True, blank=True`） |
 | `created_at` | DateTimeField | 创建时间 |
 | `updated_at` | DateTimeField | 更新时间 |
 
@@ -259,6 +262,7 @@ class User(AbstractUser):
 | 方法 | 说明 |
 |------|------|
 | `path_exists` (property) | 检查模块目录是否存在 |
+| `get_active_ids(module_type=None)` (classmethod) | 获取启用模块 ID 列表，可选按 `module_type` 过滤；返回 `list[str]` |
 
 ---
 
@@ -312,12 +316,12 @@ class User(AbstractUser):
 | 字段 | 类型 | 说明 |
 |------|------|------|
 | `from_email` | EmailField | 发件人 |
-| `to_email` | EmailField | 收件人 |
+| `to_email` | TextField | 收件人（允许多个收件人） |
 | `subject` | CharField | 邮件主题 |
 | `text_body` | TextField | 纯文本正文 |
 | `html_body` | TextField | HTML 正文 |
 | `template_name` | CharField | 使用的模板 |
-| `status` | CharField | 状态：pending/sending/sent/failed |
+| `status` | CharField | 状态：pending/sending/sent/failed（`db_index=True`） |
 | `error_message` | TextField | 错误信息 |
 | `retry_count` | IntegerField | 重试次数 |
 | `created_at` | DateTimeField | 创建时间 |
@@ -375,24 +379,5 @@ EmailLog (独立)
 
 ---
 
-## 十四、待补充
-
-- [ ] 添加更多字段说明及约束
-- [ ] 补充服务层调用示例
-- [ ] 添加数据字典表格
-
 ---
 
-## 十五、版本历史
-
-| 版本 | 日期 | 变更内容 |
-|------|------|----------|
-| 1.0 | 2026-04-07 | 初始版本 |
-| 1.1 | 2026-05-02 | 确认模型与代码一致 |
-| 1.2 | 2026-05-03 | 修正 NodeType icon 默认值 |
-| 1.3 | 2026-05-04 | 确认模型数量 11+1 |
-| 1.4 | 2026-05-06 | 修正关系图 ToolType 关联 |
-| 1.5 | 2026-05-06 | 确认所有模型字段与代码一致 |
-| 1.6 | 2026-05-06 | 补充 ToolType 模型详情（八之一节） |
-| 1.7 | 2026-05-06 | 补充 User 模型 preferred_language 字段 |
-| 1.9 | 2026-05-06 | 修正章节编号（八之一→九，8.4→9.1，8.5→9.2） |

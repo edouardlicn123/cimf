@@ -30,9 +30,18 @@
 | 标题文字色 | `white` | 高对比 |
 | 标题顶部圆角 | `6px` | 不随 `--radius-sm` 变 |
 | 标题底部 | 直角 | 衔接 card-body |
-| Card-body 边框色 | `var(--primary)` | 统一色调 |
-| Card-body 圆角 | `0 --radius-sm --radius-sm --radius-sm` | 左上 0 |
+| Card-body 边框色 | `none` | 基础卡片无边框 |
+| Card-body 圆角 | `0 0 var(--radius) var(--radius)` | 仅底部圆角 |
 | Card-body `overflow` | `hidden` | 防内容溢出 |
+| 卡片整体边框 | `none` | 基础卡片无边框 |
+
+### CSS 变体
+
+| 变体类名 | Card-body 边框 | Card-body 背景 | 用途 |
+|----------|---------------|---------------|------|
+| 基础（无变体） | `none` | 由 `.card` 的 `bg-card` 决定 | 默认，边框由标题色线间接指示 |
+| `.card-structure` | `1px solid var(--primary)` | `var(--bg-card)` | 显式主色边框，适用于需要明确区块分隔的页面 |
+| `.card-structure-transparent` | 无，配合 `.card-body-border` | `transparent` | 透明背景，配合独立的 `.card-body-border` 容器，用于结构列表页 |
 
 ### 已适配页面
 
@@ -71,15 +80,15 @@
 
 | 属性 | 非选中 | 选中 |
 |------|--------|------|
-| 背景色 | `#fff` | `var(--primary)` |
-| 文字色 | `var(--primary)` | `#fff` |
+| 背景色 | `var(--bg-surface)` | `var(--primary)` |
+| 文字色 | `var(--primary)` | `var(--text-inverse)` |
 | 边框 | `1px solid var(--primary)` | 同左 |
-| 圆角 | `50px`（药丸形） | 同左 |
+| 圆角 | `6px 6px 0 0`（仅顶部） | 同左 |
 | Hover | `var(--primary-light)` | — |
 
 ### 注意事项
 
-1. 非选中 `background: #fff` 硬编码；选中 `color: #fff !important`
+1. 非选中 `background: var(--bg-surface)`（跟随主题）；选中 `color: var(--text-inverse) !important`
 2. 橙色 badge `#f57c00`；选中时变半透明白底+主色
 3. 标签内 `d-flex align-items-center`；`gap-2` 控制间距
 4. `bg-warning` badge 保留原始样式
@@ -124,11 +133,11 @@
 
 ### 用途
 
-填充式操作按钮（新增、保存、删除、发送等）。不适用：`btn-outline-*`、`btn-secondary`、entry-card 按钮。
+填充式操作按钮（新增、保存、删除、发送等）。`.btn-secondary` 仅参与 `border: none !important`，不参与渐变扫描动画。不适用：`btn-outline-*`、entry-card 按钮。
 
 ### CSS 规则
 
-`static/css/frame.css` — `.btn-primary, .btn-success, .btn-danger, .btn-warning, .btn-info`
+`static/css/frame.css` — `.btn-primary, .btn-secondary, .btn-success, .btn-danger, .btn-warning, .btn-info`（边框去除）；`.btn-primary, .btn-success, .btn-danger, .btn-warning, .btn-info`（渐变动画）
 
 ### 技术原理
 
@@ -163,7 +172,7 @@
 
 ### 用途
 
-快捷入口 6 张功能卡片（`.module-card`）+ 常用链接 12 张导航卡片（`.nav-card`）
+快捷入口 6 张功能卡片（`.module-card`）+ 常用链接 6 张导航卡片（`.nav-card`）
 
 ### CSS 规则
 

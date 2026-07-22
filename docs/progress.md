@@ -225,4 +225,17 @@
 8. bugscan: 创建6个检测器(3 L1 grep + 3 L2 AST) + .bugscanignore + run.sh维护菜单合并为6(全面检查)/7(bugscan)，修复maintenance.py datetime.now时区bug
 9. AGENTS.md: Bug排查规范新增bugscan前置步骤(省token)
 10. docs/A04_补充材料.md: 更新目录树、修复 Jinja2 语法、CSRF 实现、block 命名
+11. 修复region_select.py URL reverse命名空间(core:→api:)和Media JS路径(/js→js)、更新A03文档region_select.js状态
+12. 修复 A05_Python代码开发规范.md 和 A05_补充材料.md 中与实际代码不一致的文档（响应函数名、错误响应键名、测试文件结构、Jinja2 转义说明）
+13. 同步 A07_环境变量与配置管理规范.md 与实际代码一致：调整 §2.2 分类（DJANGO_PORT/DJANGO_HOST 移至开发服务器配置、SECRET_KEY 改为 ⚠️、SQLite 路径补充 instance/）、替换 §3.3 为完整 config.env.sample、§4 改用 pathlib.Path 风格、§5.2 修正 .gitignore 规则、§4.3 补充缺少的安全配置、新增 §8 已知问题说明死配置
+14. 同步A01_项目概述与技术架构.md与实际代码一致
+15. 修复 D01_CSS外观设计标准套件.md：卡片边框/圆角/变体、过滤标签色值/圆角、btn-secondary 边框、导航卡片数量
+16. 同步 B01_core_models 规范与实际代码：补充 IsActiveMixin、User.is_active、TaxonomyItem.unique_together、ChinaRegion 字段约束、Node 外键 on_delete、Module.get_active_ids、EmailLog 字段修正
+17. 同步服务层规范文档与代码：修正 AuthService.login 签名、PermissionService 补充 check_node_permission、SettingsService 修正为 57 项/补充 8 项/删除 smtp_rate_limit/改 smtp_send_interval 默认值、TaxonomyService 补充缺失方法、CronService 补充 set_app_ready、新增 TimeService/TimeSyncService/LogService 章节
+18. 更新 B04 和 B05 技术规范文档：路由计数、表单分布、继承类、主题选项等
+19. 更新 A08_Bug排查技术规范.md 和 A08_补充材料.md: 统计标记已清零，BP01~BP18 标注已修复，附录 B 标记已清理，新增 CIMF_W001~W011 Django 检查体系文档
+20. 全面技术规范文档修正：根据代码现状更新 A01-D01 共18份技术规范文档
+21. 删除7个文档中的待补充章节/页脚版本号不一致内容
+22. 删除 A02_补充材料 十二节（重复的模块市场配置）和 A08_补充材料 附录C（重复的Bug修复前后对比）
+23. 精简技术规范文档：删除版本历史/更新记录(7份)、待补充章节(4份)、页脚版本号(5份)、重复内容(2份)
 
