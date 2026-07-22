@@ -116,6 +116,11 @@ class LogService:
                 "exists": filepath.exists(),
                 "size": filepath.stat().st_size if filepath.exists() else 0,
             }
+            if info["exists"]:
+                try:
+                    info["size"] = filepath.stat().st_size
+                except OSError:
+                    info["size"] = 0
             files.append(info)
         return files
 

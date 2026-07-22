@@ -13,13 +13,15 @@
     - 1.2: 修复 url() 函数支持位置参数
 """
 
+import logging
+
 from django.conf import settings
-from django.middleware.csrf import get_token
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.dateformat import format as date_format
-from django.utils.safestring import mark_safe
 from jinja2 import Environment
+
+logger = logging.getLogger(__name__)
 
 
 def jinja2_date_filter(value, format_string="Y-m-d H:i"):
@@ -30,7 +32,8 @@ def jinja2_date_filter(value, format_string="Y-m-d H:i"):
         return value
     try:
         return date_format(value, format_string)
-    except Exception:
+    except Exception as e:
+        logger.warning("日期格式化失败: %s — %s", value, e)
         return str(value)
 
 
@@ -65,19 +68,12 @@ def jinja2_truncatechars(value, length=50):
 
 
 def jinja2_slice(value, start=0, end=None):
-    """Slice filter for Jinja2 templates - supports ':50' style"""
+    """Slice filter for Jinja2 templates"""
     if value is None:
         return ""
     if isinstance(value, int):
         value = str(value)
     if isinstance(value, str):
-        if isinstance(start, str) and start.startswith(":"):
-            end = int(start[1:])
-            start = 0
-        elif isinstance(start, str):
-            start = int(start)
-        if end is None:
-            return value[start:]
         return value[start:end]
     return value
 
@@ -91,13 +87,6 @@ def environment(**options):
         """生成媒体文件 URL"""
         return f"{settings.MEDIA_URL}{path}"
 
-    def csrf_token():
-        request = get_request()
-        if request is None:
-            return ""
-        token = get_token(request)
-        return mark_safe(f'<input type="hidden" name="csrfmiddlewaretoken" value="{token}">')  # noqa: S308 — token is Django-generated, safe
-
     def get_request():
         """获取当前请求对象"""
         try:
@@ -105,7 +94,8 @@ def environment(**options):
                 for ctx in reversed(env._context_stack):
                     if hasattr(ctx, "request"):
                         return ctx.request
-        except Exception:
+        except Exception as e:
+            logger.warning("get_request() 执行失败: %s", e, exc_info=True)
             return None
 
     # 添加 static 函数
@@ -115,7 +105,6 @@ def environment(**options):
             "url": url_with_args,
             "range": range,
             "media": media,
-            "csrf_token": csrf_token,
         }
     )
 

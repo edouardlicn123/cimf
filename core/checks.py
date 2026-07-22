@@ -600,3 +600,109 @@ def check_mark_safe_usage(app_configs, **kwargs):  # noqa: ARG001
                 except Exception:  # noqa: S110
                     pass
     return errors
+
+
+# ── Check: ModelChoiceField 静态 queryset ────────────────────
+
+
+@register("cimf")
+def check_model_choice_field_queryset(app_configs, **kwargs):  # noqa: ARG001
+    """检查 ModelChoiceField 的 queryset 是否在类加载时评估（应为实例化时动态设置）"""
+    errors = []
+    scan_dirs = [
+        Path(__file__).parent,
+        Path(__file__).parent.parent / "modules",
+    ]
+    for filepath in _find_all_py_files(scan_dirs):
+        if filepath.name != "forms.py":
+            continue
+        try:
+            with filepath.open(encoding="utf-8") as f:
+                source = f.read()
+            tree = ast.parse(source)
+            rel_path = os.path.relpath(filepath, Path(__file__).parent)
+            source_lines = source.split("\n")
+
+            for node in ast.walk(tree):
+                if not isinstance(node, ast.ClassDef):
+                    continue
+                if not any(isinstance(b, ast.Name) and "Form" in b.id for b in node.bases):
+                    continue
+                for item in node.body:
+                    if not isinstance(item, ast.Assign):
+                        continue
+                    for target in item.targets:
+                        if not isinstance(target, ast.Name):
+                            continue
+                        if not isinstance(item.value, ast.Call):
+                            continue
+                        call = item.value
+                        if not isinstance(call.func, ast.Attribute):
+                            continue
+                        if call.func.attr not in ("ModelChoiceField", "ModelMultipleChoiceField"):
+                            continue
+                        has_queryset_kw = False
+                        queryset_is_none = False
+                        for kw in call.keywords:
+                            if kw.arg == "queryset":
+                                has_queryset_kw = True
+                                if isinstance(kw.value, ast.Call) and isinstance(kw.value.func, ast.Attribute):
+                                    if kw.value.func.attr == "none":
+                                        queryset_is_none = True
+                        if has_queryset_kw and not queryset_is_none:
+                            lineno = getattr(item, "lineno", 0)
+                            if lineno > 0 and lineno <= len(source_lines):
+                                line_text = source_lines[lineno - 1]
+                                if "# noqa: CIMF_W010" in line_text:
+                                    continue
+                            errors.append(
+                                Warning(
+                                    f"{filepath.name} 第 {lineno} 行: {target.id} 的 queryset 在类加载时评估",
+                                    hint="将 queryset=... 移到 __init__ 中动态赋值，防止数据陈旧",
+                                    obj=f"{rel_path}:{lineno}",
+                                    id="CIMF_W010",
+                                )
+                            )
+        except SyntaxError:
+            pass
+    return errors
+
+
+# ── Check: NullBooleanField ──────────────────────────────────
+
+
+@register("cimf")
+def check_null_boolean_field(app_configs, **kwargs):  # noqa: ARG001
+    """检查是否使用了已弃用的 NullBooleanField（Django 4.0+）"""
+    errors = []
+    scan_dirs = [
+        Path(__file__).parent,
+        Path(__file__).parent.parent / "modules",
+    ]
+    null_boolean_re = re.compile(r"\bNullBooleanField\(")
+
+    for filepath in _find_all_py_files(scan_dirs):
+        if filepath.name != "forms.py":
+            continue
+        try:
+            with filepath.open(encoding="utf-8") as f:
+                source = f.read()
+            source_lines = source.split("\n")
+            rel_path = os.path.relpath(filepath, Path(__file__).parent)
+
+            for i, line in enumerate(source_lines):
+                if not null_boolean_re.search(line):
+                    continue
+                if "# noqa: CIMF_W011" in line:
+                    continue
+                errors.append(
+                    Warning(
+                        f"{filepath.name} 第 {i + 1} 行: NullBooleanField 已弃用（Django 4.0+）",
+                        hint="替换为 TypedChoiceField(choices=[(None,'未检测'),(True,'有'),(False,'没有')]) 或 BooleanField(null=True)",
+                        obj=f"{rel_path}:{i + 1}",
+                        id="CIMF_W011",
+                    )
+                )
+        except SyntaxError:
+            pass
+    return errors

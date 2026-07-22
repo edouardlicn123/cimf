@@ -130,19 +130,19 @@ def taxonomy_delete(request, taxonomy_id: int):
 @admin_required
 def taxonomy_item_create(request, taxonomy_id: int):
     """创建词汇项"""
-    get_object_or_404(Taxonomy, id=taxonomy_id)
+    taxonomy = get_object_or_404(Taxonomy, id=taxonomy_id)
     if request.method == "POST":
-        return _handle_taxonomy_item_form(request, taxonomy_id)
-    return redirect("core:taxonomy_view", taxonomy_id)
+        return _handle_taxonomy_item_form(request, taxonomy.id)
+    return redirect("core:taxonomy_view", taxonomy.id)
 
 
 @admin_required
 def taxonomy_item_update(request, taxonomy_id: int, item_id: int):
     """更新词汇项"""
-    get_object_or_404(Taxonomy, id=taxonomy_id)
+    taxonomy = get_object_or_404(Taxonomy, id=taxonomy_id)
     if request.method == "POST":
-        return _handle_taxonomy_item_form(request, taxonomy_id, item_id)
-    return redirect("core:taxonomy_view", taxonomy_id)
+        return _handle_taxonomy_item_form(request, taxonomy.id, item_id)
+    return redirect("core:taxonomy_view", taxonomy.id)
 
 
 @admin_required

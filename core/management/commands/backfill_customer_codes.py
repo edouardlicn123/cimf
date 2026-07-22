@@ -10,7 +10,8 @@
 """
 
 from django.core.management.base import BaseCommand
-from django.db.models import Q
+from django.db import transaction
+from django.db.models import Max, Q
 
 
 class Command(BaseCommand):
@@ -34,21 +35,17 @@ class Command(BaseCommand):
             self.stdout.write(f"将更新 {records.count()} 条记录")
             return
 
-        base = (
-            CustomerFields.objects.filter(customer_code__startswith="cc")
-            .order_by("-customer_code")
-            .values_list("customer_code", flat=True)
-            .first()
-        )
+        base = CustomerFields.objects.filter(
+            customer_code__startswith="cc"
+        ).aggregate(max_code=Max("customer_code"))["max_code"]
         next_num = (int(base[2:]) + 1) if base and base[2:].isdigit() else 1
         updated = 0
-        for customer in records:
-            while CustomerFields.objects.filter(customer_code=f"cc{next_num:08d}").exists():
+        with transaction.atomic():
+            for customer in records:
+                code = f"cc{next_num:08d}"
+                customer.customer_code = code
+                customer.save(update_fields=["customer_code"])
                 next_num += 1
-            code = f"cc{next_num:08d}"
-            customer.customer_code = code
-            customer.save(update_fields=["customer_code"])
-            next_num += 1
-            updated += 1
+                updated += 1
 
         self.stdout.write(self.style.SUCCESS(f"已更新 {updated} 条记录"))

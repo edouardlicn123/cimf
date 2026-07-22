@@ -72,7 +72,8 @@ class Command(BaseCommand):
         with open(filepath) as f:
             try:
                 tree = ast.parse(f.read())
-            except SyntaxError:
+            except SyntaxError as e:
+                self.stdout.write(self.style.WARNING(f"  跳过（语法错误）: {e}"))
                 return {}
 
         models = {}
@@ -150,7 +151,8 @@ class Command(BaseCommand):
         with open(filepath) as f:
             try:
                 tree = ast.parse(f.read())
-            except SyntaxError:
+            except SyntaxError as e:
+                self.stdout.write(self.style.WARNING(f"  跳过（语法错误）: {e}"))
                 return {}
 
         classes = {}

@@ -208,8 +208,8 @@ def module_custom_dispatch(request, node_type_slug: str, extra_path: str):
                 match = pattern.resolve(path_to_match)
                 if match:
                     return match.func(request, **match.kwargs)
-    except ImportError:
-        pass
+    except ImportError as e:
+        logger.warning("模块自定义路由加载失败: %s — %s", node_type_slug, e, exc_info=True)
     raise Http404
 
 
@@ -223,7 +223,8 @@ def _check_module_exists(node_type_slug: str) -> str:
 
     try:
         import_module(f"modules.{module_path}.views")
-    except ImportError:
+    except ImportError as e:
+        logger.warning("模块视图加载失败: %s — %s", node_type_slug, e, exc_info=True)
         raise Http404(f"未找到模块: {node_type_slug}") from None
     return module_path
 

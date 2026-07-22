@@ -5,8 +5,6 @@
 确保系统可以在没有任何模块的情况下启动。
 """
 
-from importlib import import_module
-
 from django.core.cache import cache
 from django.db.utils import OperationalError, ProgrammingError
 from django.urls import include, path
@@ -20,9 +18,8 @@ app_name = "modules"
 def try_include_module(module_slug, prefix=""):
     """尝试动态导入模块 URL，失败则返回空列表"""
     try:
-        import_module(f"modules.{module_slug}.urls")
         return [path(f"{prefix}{module_slug}/", include(f"modules.{module_slug}.urls"))]
-    except (ImportError, ModuleNotFoundError, AttributeError):
+    except (ImportError, AttributeError):
         return []
 
 

@@ -1,12 +1,14 @@
 import csv
+import re
 from pathlib import Path
 
 from django.http import HttpResponse, JsonResponse
 
 
 def csv_response(headers: list[str], rows: list[list], filename: str, sanitize: bool = True) -> HttpResponse:
+    safe_filename = re.sub(r'[\\/:"*?<>|]', "_", filename)
     response = HttpResponse(content_type="text/csv; charset=utf-8-sig")
-    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+    response["Content-Disposition"] = f'attachment; filename="{safe_filename}"'
 
     writer = csv.writer(response)
     writer.writerow(headers)

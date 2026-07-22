@@ -248,32 +248,20 @@ init_domestic_customers() {
 backup_database() {
     echo -e "\n${GREEN}>>> 数据库备份${NC}\n"
 
-    mkdir -p "$BACKUP_DIR"
-
-    timestamp=$(date +%Y%m%d_%H%M%S)
-
-    if [[ -f "$DB_PATH" ]]; then
-        backup_file="${BACKUP_DIR}/django_${timestamp}.db"
-        cp "$DB_PATH" "$backup_file"
-        echo -e "${GREEN}数据库已备份到: $backup_file${NC}"
-    else
-        echo -e "${YELLOW}数据库文件不存在，跳过备份${NC}"
-    fi
+    activate_venv
+    local venv_python
+    venv_python=$(get_venv_python)
+    $venv_python manage.py maintenance backup
 }
 
 # 清理缓存
 clean_cache() {
     echo -e "\n${GREEN}>>> 清理缓存${NC}\n"
 
-    echo "删除 __pycache__、.pyc..."
-    find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-    find . -type f -name "*.pyc" -delete 2>/dev/null || true
-    find . -type f -name "*.pyo" -delete 2>/dev/null || true
-
-    rm -rf .pytest_cache .coverage .mypy_cache .ruff_cache 2>/dev/null || true
-    rm -rf storage/staticfiles/.cache 2>/dev/null || true
-
-    echo -e "${GREEN}缓存清理完成${NC}"
+    activate_venv
+    local venv_python
+    venv_python=$(get_venv_python)
+    $venv_python manage.py maintenance clean_cache
 }
 
 # 杀死服务器进程
@@ -303,11 +291,11 @@ kill_server() {
 # 查看当前环境变量
 show_env_vars() {
     echo -e "\n${GREEN}>>> 查看环境变量${NC}\n"
-    echo "  DJANGO_ENV=${DJANGO_ENV:-未设置}"
-    echo "  DJANGO_DEBUG=${DJANGO_DEBUG:-未设置}"
-    echo "  DJANGO_HOST=${DJANGO_HOST:-未设置}"
-    echo "  DJANGO_PORT=${DJANGO_PORT:-未设置}"
-    echo "  SECRET_KEY=${SECRET_KEY:+已设置}"
+
+    activate_venv
+    local venv_python
+    venv_python=$(get_venv_python)
+    $venv_python manage.py maintenance show_env
     echo
 }
 
@@ -377,21 +365,12 @@ create_env_file() {
 
 # 生成随机 SECRET_KEY
 generate_secret_key() {
-    echo -e "\n${GREEN}>>> 生成随机 SECRET_KEY${NC}\n"
+    export DJANGO_ENV="${DJANGO_ENV:-development}"
 
-    local new_key
-    new_key=$(python3 -c 'import secrets; print(secrets.token_urlsafe(50))')
-
-    if [[ -f "config.env" ]]; then
-        if grep -q "^SECRET_KEY=" config.env; then
-            sed -i "s|^SECRET_KEY=.*|SECRET_KEY=$new_key|" config.env
-        else
-            echo "SECRET_KEY=$new_key" >> config.env
-        fi
-        echo -e "${GREEN}SECRET_KEY 已更新到 config.env${NC}"
-    else
-        echo -e "${YELLOW}请先创建 config.env 文件${NC}"
-    fi
+    activate_venv
+    local venv_python
+    venv_python=$(get_venv_python)
+    $venv_python manage.py maintenance generate_secret_key
 }
 
 # 下载/更新省市区数据
@@ -503,16 +482,22 @@ run_template_check() {
     local venv_python
     venv_python=$(get_venv_python)
 
-    echo -e "${CYAN}正在运行 manage.py check_templates ...${NC}\n"
-    $venv_python manage.py check_templates 2>&1
-    local exit_code=$?
+    local report_dir="storage/reports"
+    mkdir -p "$report_dir"
+    local timestamp
+    timestamp=$(date +%Y%m%d_%H%M%S)
+    local report_file="${report_dir}/templates_${timestamp}.txt"
 
-    echo
-    if [[ $exit_code -eq 0 ]]; then
-        echo -e "${GREEN}✅ 模板检查完成${NC}"
+    echo -e "${CYAN}正在运行 manage.py check_templates ...${NC}\n"
+    $venv_python manage.py check_templates > "$report_file" 2>&1 || true
+    cat "$report_file"
+
+    if grep -qi "error\|warning\|问题" "$report_file" 2>/dev/null; then
+        echo -e "\n${YELLOW}⚠️  发现模板问题，请根据以上提示修复${NC}"
     else
-        echo -e "${YELLOW}⚠️  发现模板问题，请根据以上提示修复${NC}"
+        echo -e "\n${GREEN}✅ 模板检查通过${NC}"
     fi
+    echo -e "${CYAN}报告已保存: ${report_file}${NC}"
 }
 
 run_deploy_check() {
@@ -523,16 +508,22 @@ run_deploy_check() {
     local venv_python
     venv_python=$(get_venv_python)
 
-    echo -e "${CYAN}正在运行 manage.py check --deploy ...${NC}\n"
-    $venv_python manage.py check --deploy 2>&1
-    local exit_code=$?
+    local report_dir="storage/reports"
+    mkdir -p "$report_dir"
+    local timestamp
+    timestamp=$(date +%Y%m%d_%H%M%S)
+    local report_file="${report_dir}/deploy_${timestamp}.txt"
 
-    echo
-    if [[ $exit_code -eq 0 ]]; then
-        echo -e "${GREEN}✅ Deploy 安全检查通过${NC}"
+    echo -e "${CYAN}正在运行 manage.py check --deploy ...${NC}\n"
+    $venv_python manage.py check --deploy > "$report_file" 2>&1 || true
+    cat "$report_file"
+
+    if grep -qi "errors\|warnings" "$report_file" 2>/dev/null; then
+        echo -e "\n${YELLOW}⚠️  发现安全问题，请根据以上提示修复${NC}"
     else
-        echo -e "${YELLOW}⚠️  发现安全问题，请根据以上提示修复${NC}"
+        echo -e "\n${GREEN}✅ Deploy 安全检查通过${NC}"
     fi
+    echo -e "${CYAN}报告已保存: ${report_file}${NC}"
 }
 
 # 维护子菜单
@@ -547,10 +538,8 @@ show_maint_menu() {
     echo "  3 → 查看环境变量"
     echo "  4 → 杀死服务器进程"
     echo "  5 → 下载/更新省市区数据（从网络更新本地文件）"
-    echo "  6 → Ruff 代码检查"
-    echo "  7 → Deploy 安全检查 (manage.py check --deploy)"
-    echo "  8 → 模板问题检查 (manage.py check_templates)"
-    echo "  9 → 全面 Bug 预检查 (manage.py check + 增量扫描)"
+    echo "  6 → 全面检查（Ruff + Deploy + 模板 + Bug 预检查）"
+    echo "  7 → Bug 模式扫描（bugscan）"
     echo "  0 → 返回主菜单"
     echo
 }
@@ -558,7 +547,7 @@ show_maint_menu() {
 run_maint_menu() {
     while true; do
         show_maint_menu
-        read -p "请输入选项 (0/1/2/3/4/5/6/7/8/9): " raw_input
+        read -p "请输入选项 (0/1/2/3/4/5/6/7): " raw_input
 
         choice=$(echo "$raw_input" | sed 's/[^0-9]//g' | head -c 1)
 
@@ -569,10 +558,8 @@ run_maint_menu() {
             3) echo "→ 查看环境变量"; show_env_vars ;;
             4) echo "→ 杀死服务器进程"; kill_server ;;
             5) echo "→ 更新省市区数据"; update_china_regions ;;
-            6) echo "→ Ruff 代码检查"; run_ruff_check ;;
-            7) echo "→ Deploy 安全检查"; run_deploy_check ;;
-            8) echo "→ 模板问题检查"; run_template_check ;;
-            9) echo "→ 全面 Bug 预检查"; run_bug_precheck ;;
+            6) echo "→ 全面检查"; run_all_checks ;;
+            7) echo "→ Bug 模式扫描"; run_bug_scan ;;
             *) echo -e "${YELLOW}无效选项 '$choice'${NC}" ;;
         esac
 
@@ -589,26 +576,67 @@ run_bug_precheck() {
     local venv_python
     venv_python=$(get_venv_python)
 
-    # 1) Django 系统检查（含 CIMF_W006/W007 等自定义检查）
-    echo -e "${CYAN}[1/3] 运行 manage.py check ...${NC}\n"
-    $venv_python manage.py check 2>&1
+    local report_dir="storage/reports"
+    mkdir -p "$report_dir"
+    local timestamp
+    timestamp=$(date +%Y%m%d_%H%M%S)
+    local report_file="${report_dir}/precheck_${timestamp}.txt"
 
-    # 2) save() 无 update_fields 残留扫描
-    echo -e "\n${CYAN}[2/3] 扫描 save() 无 update_fields 残留 ...${NC}"
-    local results
-    results=$(grep -rn "\.save()" core/ modules/ | grep -v "update_fields" | grep -v "# noqa: CIMF_W006" || true)
-    if [[ -z "$results" ]]; then
-        echo -e "${GREEN}  未发现${NC}"
-    else
-        echo "$results"
+    {
+        echo "=== [1/3] manage.py check ==="
+        $venv_python manage.py check 2>&1
+        echo ""
+        echo "=== [2/3] save() 无 update_fields 残留 ==="
+        local results
+        results=$(grep -rn "\.save()" core/ modules/ | grep -v "update_fields" | grep -v "# noqa: CIMF_W006" || true)
+        if [[ -z "$results" ]]; then
+            echo "未发现"
+        else
+            echo "$results"
+        fi
+        echo ""
+        echo "=== [3/3] 并发锁使用概况 ==="
+        echo "$(grep -rn "threading\.Lock" core/ modules/ | wc -l) 处 threading.Lock"
+        echo "$(grep -rn "select_for_update" core/ modules/ | wc -l) 处 select_for_update"
+    } > "$report_file" 2>&1
+
+    cat "$report_file"
+    echo -e "\n${CYAN}报告已保存: ${report_file}${NC}"
+}
+
+# 全面检查（合并所有 4 项检测）
+run_all_checks() {
+    echo -e "\n${GREEN}========================================${NC}"
+    echo -e "${GREEN}  开始全面检查（共 4 项检测）${NC}"
+    echo -e "${GREEN}========================================${NC}\n"
+
+    run_ruff_check
+    echo -e "\n${CYAN}────────────────────────────────────────${NC}\n"
+    run_deploy_check
+    echo -e "\n${CYAN}────────────────────────────────────────${NC}\n"
+    run_template_check
+    echo -e "\n${CYAN}────────────────────────────────────────${NC}\n"
+    run_bug_precheck
+
+    echo -e "\n${GREEN}========================================${NC}"
+    echo -e "${GREEN}  全部检测完成！报告已保存到 storage/reports/${NC}"
+    echo -e "${GREEN}========================================${NC}"
+}
+
+# Bug 模式扫描
+run_bug_scan() {
+    echo -e "\n${GREEN}>>> Bug 模式扫描${NC}\n"
+
+    activate_venv
+    local venv_python
+    venv_python=$(get_venv_python)
+    $venv_python manage.py bugscan
+
+    local latest
+    latest=$(ls -t storage/reports/bugscan_*.json 2>/dev/null | head -1)
+    if [[ -n "$latest" ]]; then
+        echo -e "\n${CYAN}最新报告: ${latest}${NC}"
     fi
-
-    # 3) 并发锁使用概况
-    echo -e "\n${CYAN}[3/3] 并发锁使用概况 ...${NC}"
-    echo "$(grep -rn "threading\.Lock" core/ modules/ | wc -l) 处 threading.Lock"
-    echo "$(grep -rn "select_for_update" core/ modules/ | wc -l) 处 select_for_update"
-
-    echo -e "\n${GREEN}✅ 预检查完成${NC}"
 }
 
 # 显示主菜单

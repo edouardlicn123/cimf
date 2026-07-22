@@ -378,9 +378,13 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 if os.getenv("DJANGO_BEHIND_PROXY", "false").lower() == "true":
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
+CSRF_TRUSTED_ORIGINS = (
+    os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") if os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS") else []
+)
+
 # 生产环境自动启用安全配置
 if DJANGO_ENV == "production":
-    if not DJANGO_SECRET_KEY or DJANGO_SECRET_KEY == "your-secret-key-here-change-in-production":
+    if not SECRET_KEY or SECRET_KEY == "your-secret-key-here-change-in-production":  # noqa: S105
         raise ValueError("生产环境必须通过 DJANGO_SECRET_KEY 环境变量设置一个强密钥！")
     SECURE_HSTS_SECONDS = SECURE_HSTS_SECONDS or 31536000  # 默认1年
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
@@ -388,9 +392,6 @@ if DJANGO_ENV == "production":
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    CSRF_TRUSTED_ORIGINS = (
-        os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") if os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS") else []
-    )
     DEBUG = False
     if ALLOWED_HOSTS == ["localhost", "127.0.0.1"]:
         raise ValueError("生产环境必须在 DJANGO_ALLOWED_HOSTS 中配置实际域名！")

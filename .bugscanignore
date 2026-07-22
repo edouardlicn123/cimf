@@ -1,0 +1,39 @@
+# ============================================
+# .bugscanignore — Bug 模式扫描抑制规则
+# ============================================
+# 语法: file_pattern[:line[:pattern_id]]
+#   行首 # 为注释
+#   file_pattern 支持 fnmatch glob
+#   line: 可选，整数
+#   pattern_id: 可选，检测器标识
+
+# bugscan 自身检测器代码中的 false positive（grep 模式字符串命中检测规则自身）
+core/bugscan/detectors.py:datetime_now
+core/bugscan/detectors.py:jsonfield_default
+core/bugscan/detectors.py:nullbooleanfield
+
+# 已知安全的 first_returned（调用者负责 None 检查）
+core/node/services/node_type_service.py:first_returned
+core/node/services/node_service.py:first_returned
+core/services/base_service.py:first_returned
+core/services/taxonomy_service.py:first_returned
+core/module/services/module_query_service.py:first_returned
+core/importexport/fk_resolver.py:first_returned
+core/services/china_region_service.py:first_returned
+core/smtp/services/template_service.py:first_returned
+modules/customer/services.py:first_returned
+core/module/services/module_scaffold_service.py:first_returned
+modules/resident_info/services.py:first_returned
+
+# first_unchecked 但实际由周围逻辑保护
+core/services/sample_data_service.py:27:first_unchecked
+core/services/sample_data_service.py:28:first_unchecked
+
+# 三元表达式 if max_code and max_code.code_num is not None — AST 检测器不追踪 IfExp
+modules/customer/services.py:86:first_unchecked
+
+# 无操作 save（changed 为空时的兜底）
+core/services/user_service.py:255:save_no_updates
+
+# 新用户创建 save — INSERT 而非 UPDATE，无需 update_fields
+core/models.py:62:save_no_updates

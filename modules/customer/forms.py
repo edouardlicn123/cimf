@@ -31,7 +31,7 @@ class CustomerForm(forms.Form):
 
     customer_type = forms.ModelChoiceField(
         label="客户类型",
-        queryset=TaxonomyItem.objects.filter(taxonomy__slug="customer_type"),
+        queryset=TaxonomyItem.objects.none(),
         required=False,
         widget=forms.Select(attrs={"class": "form-select"}),
     )
@@ -110,7 +110,7 @@ class CustomerForm(forms.Form):
 
     country = forms.ModelChoiceField(
         label="国家",
-        queryset=TaxonomyItem.objects.filter(taxonomy__slug="country"),
+        queryset=TaxonomyItem.objects.none(),
         required=False,
         widget=forms.Select(attrs={"class": "form-select"}),
     )
@@ -165,7 +165,7 @@ class CustomerForm(forms.Form):
 
     enterprise_type = forms.ModelChoiceField(
         label="企业性质",
-        queryset=TaxonomyItem.objects.filter(taxonomy__slug="economic_type"),
+        queryset=TaxonomyItem.objects.none(),
         required=False,
         widget=forms.Select(attrs={"class": "form-select"}),
     )
@@ -185,18 +185,18 @@ class CustomerForm(forms.Form):
 
     customer_level = forms.ModelChoiceField(
         label="客户等级",
-        queryset=TaxonomyItem.objects.filter(taxonomy__slug="customer_level"),
+        queryset=TaxonomyItem.objects.none(),
         required=False,
         widget=forms.Select(attrs={"class": "form-select"}),
     )
 
-    has_whatsapp = forms.NullBooleanField(
+    has_whatsapp = forms.TypedChoiceField(
         label="WhatsApp",
         required=False,
-        widget=forms.Select(
-            choices=[(None, "未检测"), (True, "有"), (False, "没有")],
-            attrs={"class": "form-select"},
-        ),
+        coerce=lambda x: {"True": True, "False": False}.get(x),
+        empty_value=None,
+        choices=[(None, "未检测"), ("True", "有"), ("False", "没有")],
+        widget=forms.Select(attrs={"class": "form-select"}),
     )
 
     credit_limit = forms.DecimalField(
@@ -223,6 +223,13 @@ class CustomerForm(forms.Form):
             }
         ),
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["customer_type"].queryset = TaxonomyItem.objects.filter(taxonomy__slug="customer_type")
+        self.fields["country"].queryset = TaxonomyItem.objects.filter(taxonomy__slug="country")
+        self.fields["enterprise_type"].queryset = TaxonomyItem.objects.filter(taxonomy__slug="economic_type")
+        self.fields["customer_level"].queryset = TaxonomyItem.objects.filter(taxonomy__slug="customer_level")
 
     notes = forms.CharField(
         label="备注",

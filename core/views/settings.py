@@ -129,7 +129,7 @@ def system_permissions(request):
         if role_label:
             role_labels[role] = role_label
         elif role_label is None:
-            logger.debug(f"配置未找到: role_name_{role}，使用默认值")
+            logger.debug("配置未找到: role_name_%s，使用默认值", role)
 
     node_perms = PermissionService.get_node_permissions()
     system_perms = PermissionService.get_system_permissions()
@@ -275,7 +275,7 @@ def homepage_settings(request):
         try:
             positions = json.loads(positions_str)
         except Exception as e:
-            logger.warning(f"解析卡片位置配置失败: {e}", exc_info=True)
+            logger.warning("解析卡片位置配置失败: %s", e, exc_info=True)
             positions = {}
     elif positions_str is None:
         logger.debug("配置未找到: user_dashboard_card_positions，使用默认值")

@@ -39,8 +39,8 @@ def _load_active_card_modules():
                         "cards": mod_info["dashboard_cards"],
                     }
                 )
-        except Exception:
-            logger.warning(f"模块信息加载失败: module={node_module.module_id}", exc_info=True)
+        except Exception as e:
+            logger.warning("模块信息加载失败: module=%s, error=%s", node_module.module_id, e, exc_info=True)
     return results
 
 
@@ -131,7 +131,11 @@ def api_dashboard_cards(request):  # noqa: ARG001
                     render_context["recent"] = stats.get("recent", 0)
                 render_context.update(extra_context)
 
-                module_contents[module_id] = template.render(render_context)
+                rendered = template.render(render_context)
+                if module_id in module_contents:
+                    module_contents[module_id] += rendered
+                else:
+                    module_contents[module_id] = rendered
             except Exception as e:
                 logger.warning(f"卡片模板渲染失败: module={module_id}, error={e}", exc_info=True)
             # 收集所有卡片，不下拉列表

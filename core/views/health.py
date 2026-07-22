@@ -2,6 +2,7 @@
 健康检查视图模块
 """
 
+import logging
 import os
 import time
 from pathlib import Path
@@ -14,6 +15,8 @@ from django.utils import timezone
 from core.constants import VERSION_MAJOR, VERSION_MINOR
 from core.decorators import login_required_json
 from core.services import VersionService
+
+logger = logging.getLogger(__name__)
 
 
 def _run_check(checks, name, fn, overall_status=None):
