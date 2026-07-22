@@ -1,7 +1,6 @@
 """核心应用 URL 路由配置"""
 
 from django.urls import include, path, re_path
-from django.views.generic.base import RedirectView
 
 from core.node import views as node_views
 from core.node.views import field_types, field_types_api
@@ -81,12 +80,4 @@ urlpatterns = [
     # 旧路径重定向（向后兼容）
 ]
 
-_old_redirects = [
-    ("structure/", "/structure/dashboard/", "structure_old_redirect"),
-    ("taxonomies/", "/structure/taxonomies/", "taxonomies_old_redirect"),
-    ("taxonomy/", "/structure/taxonomies/", "taxonomy_old_redirect"),
-]
-urlpatterns += [
-    path(old_path, RedirectView.as_view(url=new_url, permanent=False), name=name)
-    for old_path, new_url, name in _old_redirects
-]
+

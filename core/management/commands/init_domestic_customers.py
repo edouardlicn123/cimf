@@ -79,13 +79,8 @@ class Command(BaseCommand):
             return
 
         with transaction.atomic():
-            Node.objects.bulk_create(nodes_to_create)
-
-            created_nodes = Node.objects.filter(
-                node_type=customer_cn_node_type,
-                created_by=admin_user,
-            ).order_by("-id")[: len(nodes_to_create)]
-            node_ids = [n.id for n in reversed(list(created_nodes))]
+            created_nodes = Node.objects.bulk_create(nodes_to_create)
+            node_ids = [n.id for n in created_nodes]
 
             customer_fields_objs = []
             for i, fields_info in enumerate(fields_to_create):

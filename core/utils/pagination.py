@@ -15,8 +15,11 @@ def paginate_queryset(request, queryset, per_page=10):
 
     current = page_obj.number
     total = paginator.num_pages
-    start = max(1, current - 2)
-    end = min(total, current + 2)
-    page_range = range(start, end + 1)
+    if total == 0:
+        page_range = range(0)
+    else:
+        start = max(1, current - 2)
+        end = min(total, current + 2)
+        page_range = range(start, end + 1)
 
     return page_obj, page_range

@@ -51,8 +51,8 @@ def cron_status(request):  # noqa: ARG001
     return json_success(extra=cron.get_status())
 
 
-@require_POST
 @admin_required_json
+@require_POST
 def cron_run_task(request, task_name: str):  # noqa: ARG001
     """手动触发任务"""
     cron = get_cron_service()
@@ -60,8 +60,8 @@ def cron_run_task(request, task_name: str):  # noqa: ARG001
     return json_success(extra=result)
 
 
-@require_POST
 @admin_required_json
+@require_POST
 def cron_toggle_task(request, task_name: str):
     """切换任务启用状态"""
     try:

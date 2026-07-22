@@ -10,6 +10,7 @@ def _null_to_empty(apps, schema_editor):
         ("taxonomies", ["description"]),
         ("taxonomy_items", ["description"]),
         ("tool_types", ["author", "description"]),
+        ("users", ["email", "nickname"]),
     ]
     with schema_editor.connection.cursor() as cursor:
         for table, fields in tables:

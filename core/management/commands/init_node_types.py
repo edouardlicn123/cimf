@@ -4,6 +4,7 @@
 """
 
 from django.core.management.base import BaseCommand
+from django.db import transaction
 
 from core.node.models import NodeType
 from core.node.services import NodeTypeService
@@ -21,26 +22,28 @@ class Command(BaseCommand):
             return
 
         count = 0
-        for data in node_types:
-            slug = data.get("slug")
-            name = data.get("name", slug)
+        with transaction.atomic():
+            for data in node_types:
+                slug = data.get("slug")
+                name = data.get("name", slug)
 
-            if not slug:
-                self.stdout.write(self.style.WARNING(f"跳过无效配置: {data}"))
-                continue
+                if not slug:
+                    self.stdout.write(self.style.WARNING(f"跳过无效配置: {data}"))
+                    continue
 
-            if NodeType.objects.filter(slug=slug).exists():
-                self.stdout.write(f"跳过已存在: {name}")
-                continue
-
-            NodeType.objects.create(
-                name=name,
-                slug=slug,
-                icon=data.get("icon", "bi-folder"),
-                description=data.get("description", ""),
-                is_active=True,
-            )
-            count += 1
-            self.stdout.write(f"创建: {name}")
+                _, created = NodeType.objects.get_or_create(
+                    slug=slug,
+                    defaults={
+                        "name": name,
+                        "icon": data.get("icon", "bi-folder"),
+                        "description": data.get("description", ""),
+                        "is_active": True,
+                    },
+                )
+                if created:
+                    count += 1
+                    self.stdout.write(f"创建: {name}")
+                else:
+                    self.stdout.write(f"跳过已存在: {name}")
 
         self.stdout.write(self.style.SUCCESS(f"完成! 新增 {count} 个节点类型"))

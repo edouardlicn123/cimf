@@ -108,7 +108,8 @@ class CronService(SingletonMixin):
         while self._running:
             sleep_time = 5
             try:
-                tasks_to_run = list(self._tasks.values())
+                with self._lock:
+                    tasks_to_run = list(self._tasks.values())
                 any_task_ran = False
 
                 for task in tasks_to_run:

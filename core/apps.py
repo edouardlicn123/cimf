@@ -14,7 +14,7 @@ def _enable_sqlite_wal(sender, connection, **_kwargs):  # noqa: ARG001
                 cursor.execute("PRAGMA journal_mode=WAL")
                 cursor.execute("PRAGMA synchronous=NORMAL")
     except Exception:
-        logger.warning("启用 SQLite WAL 模式失败")
+        logger.warning("启用 SQLite WAL 模式失败", exc_info=True)
 
 
 class CoreConfig(AppConfig):

@@ -120,13 +120,8 @@ class ChangePasswordForm(BootstrapFormMixin, UserAwareFormMixin, forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-        current_password = cleaned_data.get("current_password")
         new_password = cleaned_data.get("new_password")
         confirm_password = cleaned_data.get("confirm_password")
-
-        # 如果填写了新密码，必须填写当前密码
-        if new_password and not current_password:
-            raise ValidationError("修改密码时必须填写当前密码")
 
         if new_password:
             validate_password_confirmation(new_password, confirm_password)

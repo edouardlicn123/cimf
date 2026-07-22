@@ -31,6 +31,7 @@
     - core.services.settings_service: 设置服务
 """
 
+import logging
 from typing import Any
 
 from django.db import transaction
@@ -40,6 +41,8 @@ from core.models import User
 from core.services.base_service import BaseService
 from core.services.mixins import error_response
 from core.services.settings_service import SettingsService
+
+logger = logging.getLogger(__name__)
 
 
 class AuthService(BaseService):
@@ -116,7 +119,8 @@ class AuthService(BaseService):
         value = SettingsService.get_setting("login_max_failures", 5)
         try:
             return int(value) if value else 5
-        except (ValueError, TypeError):
+        except (ValueError, TypeError) as e:
+            logger.warning("login_max_failures 配置值无效: %r — %s", value, e)
             return 5
 
     @staticmethod
@@ -125,5 +129,6 @@ class AuthService(BaseService):
         value = SettingsService.get_setting("login_lock_minutes", 30)
         try:
             return int(value) if value else 30
-        except (ValueError, TypeError):
+        except (ValueError, TypeError) as e:
+            logger.warning("login_lock_minutes 配置值无效: %r — %s", value, e)
             return 30

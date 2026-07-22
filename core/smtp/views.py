@@ -105,19 +105,20 @@ def smtp_test(request):
 
 
 @admin_required
+@require_http_methods(["GET"])
 def smtp_history(request):
     """发送历史页面"""
     status_filter = request.GET.get("status", "all")
 
-    logs_qs = EmailService.get_send_history()
+    all_logs = EmailService.get_send_history()
+    logs_qs = all_logs
     if status_filter != "all":
-        logs_qs = logs_qs.filter(status=status_filter)
+        logs_qs = all_logs.filter(status=status_filter)
 
-    all_qs = EmailService.get_send_history()
-    total_count = all_qs.count()
-    sent_count = all_qs.filter(status="sent").count()
-    failed_count = all_qs.filter(status="failed").count()
-    pending_count = all_qs.filter(status__in=["pending", "sending"]).count()
+    total_count = all_logs.count()
+    sent_count = all_logs.filter(status="sent").count()
+    failed_count = all_logs.filter(status="failed").count()
+    pending_count = all_logs.filter(status__in=["pending", "sending"]).count()
 
     page_obj, page_range = paginate_queryset(request, logs_qs, per_page=20)
 

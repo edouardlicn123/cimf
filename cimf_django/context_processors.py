@@ -69,6 +69,4 @@ def active_section(request):
     """从URL名称自动推断 active_section"""
     url_name = request.resolver_match.url_name if request.resolver_match else ""
     section = URL_SECTION_MAPPING.get(url_name)
-    if section:
-        return {"active_section": section}
-    return {}
+    return {"active_section": section}

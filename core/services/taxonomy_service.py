@@ -40,6 +40,8 @@ from django.db import models, transaction
 from core.models import Taxonomy, TaxonomyItem
 from core.services.base_service import BaseService
 
+logger = logging.getLogger(__name__)
+
 
 class TaxonomyService(BaseService):
     """
@@ -184,8 +186,6 @@ class TaxonomyService(BaseService):
 
         返回：创建的词汇表数量
         """
-        logger = logging.getLogger(__name__)
-
         if Taxonomy.objects.exists():
             return 0
 

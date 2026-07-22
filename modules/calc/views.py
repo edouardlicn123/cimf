@@ -4,8 +4,6 @@ import logging
 import operator
 
 from django.contrib.auth.decorators import login_required
-
-logger = logging.getLogger(__name__)
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_POST
@@ -13,6 +11,8 @@ from django.views.decorators.http import require_POST
 from core.constants import ModuleType
 from core.decorators import login_required_json
 from core.module.models import Module, ToolType
+
+logger = logging.getLogger(__name__)
 
 
 class ArithmeticEvaluator(ast.NodeVisitor):
@@ -77,8 +77,8 @@ def tool_view(request):
     )
 
 
-@require_POST
 @login_required_json
+@require_POST
 def calculate(request):
     """计算表达式AJAX接口"""
     try:

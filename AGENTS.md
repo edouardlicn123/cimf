@@ -103,6 +103,18 @@ Agent 应在以下情况检查该文档：
 
 **Bug 排查规范：**
 
+### 🥇 前置步骤：读取 bugscan 报告（省 token）
+
+开始手动排查前，按以下处理：
+
+1. **检查最新报告**：`ls -t storage/reports/bugscan_*.json | head -1`
+   - **有报告** → 读取 JSON，检查 `summary.total`
+     - `total == 0`：检测器覆盖的 6 类模式（`datetime_now` / `jsonfield_default` / `nullbooleanfield` / `first_unchecked+returned` / `save_no_updates`）已确认全库无问题，**跳过下方对应的 grep 扩散扫描**
+     - `total > 0`：按 `findings[].fix_hint` 定点修复，重新跑 `./venv/bin/python manage.py bugscan` 确认清零，再继续人工排查
+   - **无报告**或报告超过 24 小时 → 运行 `./venv/bin/python manage.py bugscan` 生成新报告，再按上一步处理
+
+2. **报告非本次生成**：运行结束后重新生成一次确保最新
+
 进行 Bug 检查时（未提及 Ruff），按以下优先级执行：
 
 | 层级 | 优先级 | 检查内容 |

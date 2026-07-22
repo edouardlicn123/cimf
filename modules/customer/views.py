@@ -242,6 +242,8 @@ def node_delete(request, node_id: int):
                 messages.success(request, "客户已删除")
             else:
                 messages.error(request, "客户不存在")
+    else:
+        messages.error(request, "节点不存在")
 
     return redirect("node:module_page", node_type_slug="customer")
 

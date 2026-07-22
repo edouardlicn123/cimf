@@ -211,4 +211,17 @@
 7. 第四轮并发+importexport+视图+init脚本 Bug修复：import_service logger未定义、module views消息级别、settings profile表单、customer/user TOCTOU、logs分页、init stage2-4小问题、exc_info补齐、S110 noqa清理
 8. 移除 pre-commit django-check hook（已由 run.sh 选项 9 覆盖）
 9. 关闭所有 pre-commit hook，设为空 repos: []
+10. 第五轮修复：15个Bug修复完成（init_customers bulk_create返回值、backfill Max聚合+事务、resident_info services atomic+views JSON解析、response.py CSV注入过滤、urls.py死代码移除、generate_snapshot语法错误警告、smtp装饰器+去重复查询、list.html|safe、pagination空分页）
+
+# 2026-07-22 修改记录
+
+1. 第六轮修复：14个Bug修复完成（node_type_service update_fields追踪、customer services事务+update_fields、health.py logger定义、node views logger日志、calc/cron装饰器顺序、customer views节点None反馈、taxonomy冗余查询消除、settings SECRET_KEY名修复+CSRF_TRUSTED_ORIGINS外移、middleware白名单+CSP script-src）
+2. 第七轮修复：12个Bug修复完成（settings_service批量缓存+JSON日志、auth_service类型转换日志、cron_service线程锁、taxonomy_service logger去重、views/settings f-string->%s、api/cards except+e+多卡片合并、log_service TOCTU保护、init_node_types get_or_create+事务）
+3. 第八轮修复：16个问题修复完成（customer/forms动态queryset+NullBooleanField、context_processors active_section返回、jinja2日志+死代码+date/slice过滤器、migration 0018用户字段NULL→空、settings_forms不可达检查移除、apps.py WAL exc_info、modules/urls双导入+冗余异常清理）
+4. 预防体系搭建：ruff新增TRY规则（后因噪音大撤回）、checks.py新增CIMF_W010（ModelChoiceField静态queryset检查）+ CIMF_W011（NullBooleanField弃用检查）、修复customer/forms.py NullBooleanField->TypedChoiceField
+5. run.sh 7/8/9 三项检查统一输出为报告存档模式（storage/reports/下保存 deploy/templates/precheck_时间戳.txt）
+6. maintenance: 将 backup/clean_cache/show_env/generate_secret_key 转为 manage.py 命令
+7. server_service: 将 run.py 启动逻辑封装到 core/server_service.py, run.py 从188行精简至29行
+8. bugscan: 创建6个检测器(3 L1 grep + 3 L2 AST) + .bugscanignore + run.sh维护菜单合并为6(全面检查)/7(bugscan)，修复maintenance.py datetime.now时区bug
+9. AGENTS.md: Bug排查规范新增bugscan前置步骤(省token)
 

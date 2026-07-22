@@ -40,12 +40,15 @@
 """
 
 import json
+import logging
 from typing import Any
 
 from django.core.cache import cache
 
 from core.models import SystemSetting
 from core.services.mixins import CachedServiceMixin
+
+logger = logging.getLogger(__name__)
 
 
 def _convert_setting_value(value: str) -> bool | int | float | str:
@@ -213,7 +216,8 @@ class SettingsService(CachedServiceMixin):
                 return default
             try:
                 return json.loads(setting.value)
-            except (json.JSONDecodeError, TypeError):
+            except (json.JSONDecodeError, TypeError) as e:
+                logger.warning("设置项 %s 不是有效的 JSON: %s — %s", key, setting.value, e)
                 return default
         all_settings = cls.get_all_settings()
         return all_settings.get(key, cls._get_default_settings().get(key, default))
@@ -249,14 +253,18 @@ class SettingsService(CachedServiceMixin):
         批量保存系统设置
 
         说明：
-            批量保存多个设置项，委托给 save_setting 逐项保存。
+            批量保存多个设置项，逐项写入后统一清除缓存。
 
         参数：
             settings_dict: 设置字典
         """
         for key, raw_val in settings_dict.items():
             actual_val = ",".join(raw_val) if key == "web_watermark_content" and isinstance(raw_val, list) else raw_val
-            cls.save_setting(key, actual_val)
+            value_str = str(actual_val).strip()
+            SystemSetting.objects.update_or_create(
+                key=key, defaults={"value": value_str, "description": f"系统设置 - {key}"}
+            )
+        cls.clear_cache()
 
     @classmethod
     def reset_to_default(cls, key: str | None = None) -> int:

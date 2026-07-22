@@ -108,6 +108,8 @@ class GlobalLoginRequiredMiddleware:
         self.whitelist = [
             "/accounts/login/",
             "/admin/login/",
+            "/static/",
+            "/media/",
         ]
 
     def __call__(self, request):
@@ -157,7 +159,7 @@ class ContentSecurityPolicyMiddleware:
         # 默认 CSP 策略
         default_directives = {
             "default-src": "'self'",
-            "script-src": "'self'",
+            "script-src": "'self' 'unsafe-inline'",
             "style-src": "'self' 'unsafe-inline'",
             "img-src": "'self' data:",
             "font-src": "'self'",

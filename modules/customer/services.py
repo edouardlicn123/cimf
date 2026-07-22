@@ -122,11 +122,12 @@ class CustomerService:
                     return CustomerFields.objects.create(**fields)
             except IntegrityError as e:
                 if attempt == max_retries - 1:
-                    raise ValueError(f"客户代码重复且重试耗尽: {e}")
+                    raise ValueError(f"客户代码重复且重试耗尽: {e}") from e
                 logger.warning("客户代码冲突，重试生成唯一代码")
                 continue
 
     @staticmethod
+    @transaction.atomic
     def import_row(data: dict, user) -> CustomerFields:
         customer_code = data.get("customer_code")
         if not customer_code:
@@ -153,11 +154,14 @@ class CustomerService:
             if not customer.node_id:
                 raise ValueError("客户关联节点不存在")
 
+            changed = []
             for key, value in data.items():
                 if key in FIELD_MAPPING:
                     setattr(customer, key, value)
+                    changed.append(key)
 
-            customer.save()
+            if changed:
+                customer.save(update_fields=changed)
             return customer
 
     @staticmethod

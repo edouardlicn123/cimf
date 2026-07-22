@@ -61,10 +61,13 @@ class NodeTypeService:
     def update(node_type_id: int, data: dict[str, Any]) -> NodeType | None:
         node_type = NodeTypeService.get_by_id(node_type_id)
         if node_type:
+            changed = []
             for key, value in data.items():
                 if hasattr(node_type, key):
                     setattr(node_type, key, value)
-            node_type.save(update_fields=list(data.keys()))
+                    changed.append(key)
+            if changed:
+                node_type.save(update_fields=changed)
         return node_type
 
     @staticmethod
