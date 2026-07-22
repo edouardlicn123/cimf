@@ -224,4 +224,5 @@
 7. server_service: 将 run.py 启动逻辑封装到 core/server_service.py, run.py 从188行精简至29行
 8. bugscan: 创建6个检测器(3 L1 grep + 3 L2 AST) + .bugscanignore + run.sh维护菜单合并为6(全面检查)/7(bugscan)，修复maintenance.py datetime.now时区bug
 9. AGENTS.md: Bug排查规范新增bugscan前置步骤(省token)
+10. docs/A04_补充材料.md: 更新目录树、修复 Jinja2 语法、CSRF 实现、block 命名
 
