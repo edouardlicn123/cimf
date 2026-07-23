@@ -247,6 +247,25 @@ a:focus-visible {
     color: white;
 }
 
+/* btn-secondary（从主题文件提取，共用规则） */
+.btn-secondary {
+    background-color: color-mix(in srgb, var(--primary), white 60%) !important;
+    border-color: color-mix(in srgb, var(--primary), white 60%) !important;
+    color: var(--primary) !important;
+}
+.btn-secondary:hover,
+.btn-secondary:focus {
+    background-color: color-mix(in srgb, var(--primary), white 40%) !important;
+    border-color: color-mix(in srgb, var(--primary), white 40%) !important;
+    color: white !important;
+}
+.btn-secondary:active,
+.btn-secondary.active {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: white !important;
+}
+
 /* === 药丸形按钮 === */
 .btn-pill {
     border-radius: var(--radius-pill);

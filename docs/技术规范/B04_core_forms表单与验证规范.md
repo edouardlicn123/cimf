@@ -142,7 +142,7 @@ from core.constants import UserTheme, Language
 # UserTheme.DISPLAY_LABELS.items():
 # [('default', '默认'), ('gov', '中国红'), ('indigo', '靛蓝'),
 #  ('macaron', '马卡龙'), ('savawoku', '橙红'),
-#  ('kajima', '绿岛森林'), ('odogu', '踊'), ('tais', '梵紫')]
+#  ('kajima', '绿岛森林'), ('odoru', '踊'), ('tais', '梵紫')]
 
 # Language.CHOICES:
 # [('zh', '中文（简体）'), ('en', 'English')]

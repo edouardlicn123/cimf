@@ -1,6 +1,8 @@
 """核心应用 URL 路由配置"""
 
+from django.contrib.auth.decorators import login_required
 from django.urls import include, path, re_path
+from django.views.generic.base import RedirectView
 
 from core.node import views as node_views
 from core.node.views import field_types, field_types_api
@@ -71,7 +73,7 @@ urlpatterns = [
     path("user/profile/", views.profile_view, name="profile_view"),
     path("user/settings/", views.profile_settings, name="profile_settings"),
     path("settings/change-password/", views.change_password, name="change_password"),
-    path("profile/", views.profile, name="profile"),
+    path("profile/", login_required(RedirectView.as_view(pattern_name="core:profile_view")), name="profile"),
     path("user/functioncards/", views.homepage_settings, name="homepage_settings"),
     path("user/navcards/", views.navigation_settings, name="navigation_settings"),
     # 健康检查

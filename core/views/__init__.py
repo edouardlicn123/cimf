@@ -30,7 +30,6 @@ from .node import structure_dashboard
 from .settings import (
     change_password,
     homepage_settings,
-    profile,
     profile_settings,
     profile_view,
     system_permissions,

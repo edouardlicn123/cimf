@@ -178,12 +178,6 @@ def change_password(request):
 
 
 @login_required
-def profile(request):  # noqa: ARG001
-    """个人中心 - 跳转到 profile_view"""
-    return redirect("core:profile_view")
-
-
-@login_required
 def profile_view(request):
     """个人中心 - 查看个人信息"""
     return render(

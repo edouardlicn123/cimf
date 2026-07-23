@@ -321,5 +321,4 @@ class ChinaRegion(models.Model):
         return " - ".join(reversed(parts))
 
 
-from core.module.models import Module, ToolType  # noqa: F401, E402
-from core.node.models import Node, NodeType  # noqa: F401, E402
+
