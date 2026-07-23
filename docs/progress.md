@@ -239,3 +239,11 @@
 22. 删除 A02_补充材料 十二节（重复的模块市场配置）和 A08_补充材料 附录C（重复的Bug修复前后对比）
 23. 精简技术规范文档：删除版本历史/更新记录(7份)、待补充章节(4份)、页脚版本号(5份)、重复内容(2份)
 
+# 2026-07-23 修改记录
+
+1. 修正B04表单规范主题值拼写(odogu→odoru)
+2. 删除死代码：core/models.py 末尾重导出、SampleDataService、dashboard_cards.js、js.html 重复 navbar scroll 脚本
+3. 用 RedirectView 替换 profile 视图函数：更新 URL 配置、删除 settings.py 中 profile 函数、清理 __init__.py 导入
+4. 从全部 8 个主题文件中提取 .btn-secondary CSS 至 base.css（共用规则，基于 CSS 变量）
+5. 封装重构：删除死代码(models.py重导出/SampleDataService/dashboard_cards.js/导航栏滚动重复)、提取btn-secondary到base.css、profile视图→RedirectView、误判项补注释
+

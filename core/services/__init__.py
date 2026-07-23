@@ -36,7 +36,7 @@ from .time_service import TimeService
 from .time_sync_service import TimeSyncService, get_time_sync_service
 from .user_service import UserService
 from .version_service import VersionService
-from .watermark_service import WatermarkService
+from .watermark_service import WatermarkService  # 有单元测试，服务端图片水印功能
 
 __all__ = [
     "PERMISSIONS",

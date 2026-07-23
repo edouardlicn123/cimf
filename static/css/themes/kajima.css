@@ -186,21 +186,3 @@ body {
   outline-color: var(--gold) !important;
 }
 
-/* btn-secondary 跟随主题 */
-.btn-secondary {
-  background-color: color-mix(in srgb, var(--primary), white 60%) !important;
-  border-color: color-mix(in srgb, var(--primary), white 60%) !important;
-  color: var(--primary) !important;
-}
-.btn-secondary:hover,
-.btn-secondary:focus {
-  background-color: color-mix(in srgb, var(--primary), white 40%) !important;
-  border-color: color-mix(in srgb, var(--primary), white 40%) !important;
-  color: white !important;
-}
-.btn-secondary:active,
-.btn-secondary.active {
-  background-color: var(--primary) !important;
-  border-color: var(--primary) !important;
-  color: white !important;
-}
