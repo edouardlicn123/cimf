@@ -257,4 +257,6 @@
 1. 封装重构：删除 mixins.py 重复 update_fields；权限字符串 PERMISSION_GROUPS 单源合并；ModuleRegistry 抽象层（8 处 import_module 集中化）；BaseNodeService 继承 BaseService；URLName 常量类；taxonomy.py 服务层重构（消除直接 model 访问）；健康检查合并 _build_check_base/_finalize_check；COMMON_ROLES 从 UserRole 推导；update_taxonomy/update_item None 过滤
 2. 封装/拆分第1-4批: 删除死亡代码; 核心→模块解耦(init命令搬迁); 服务层补齐(BootstrapFormMixin+视图bypass消除); 客户表单简化+模板加命名空间
 3. 批量修复: N+1查询(3处get_by_node_id+1处prefetch); SmtpConfigForm/NodeTypeForm加BootstrapFormMixin; 删除core/node/views.py死亡视图5个; LogService精简; VersionService精简; marketplace硬导入修复; health.py/users.py视图bypass消除
+4. 修复resident_info模块: 表单上下文传递+错误展示; max_length对齐(forms<->model)x4; 删除重复@staticmethod; select_related补齐x4(delete/get_list/get_by_node_id); 批量加载taxonomy替代11次独立调用; 5个字符串字段移除null=True+迁移
+5. 清除 bugscan 报告: 添加 3 条抑制规则 (l1_detectors datetime_now / customer first_unchecked / base_node_service first_returned)，报告清零
 
