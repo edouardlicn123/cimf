@@ -1,16 +1,15 @@
 import ast
-import json
 import logging
 import operator
 
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_POST
 
 from core.constants import ModuleType
-from core.decorators import login_required_json
+from core.decorators import json_body, login_required_json
 from core.module.models import Module, ToolType
+from core.utils.response import json_error, json_success
 
 logger = logging.getLogger(__name__)
 
@@ -79,26 +78,26 @@ def tool_view(request):
 
 @login_required_json
 @require_POST
+@json_body
 def calculate(request):
     """计算表达式AJAX接口"""
+    expression = request.json_data.get("expression", "")
+
+    if not expression:
+        return json_error("表达式不能为空")
+
+    allowed_chars = set("0123456789+-*/.() ")
+    if not all(c in allowed_chars for c in expression.strip()):
+        return json_error("只允许数字和运算符")
+
     try:
-        data = json.loads(request.body)
-        expression = data.get("expression", "")
-
-        if not expression:
-            return JsonResponse({"error": "表达式不能为空"}, status=400)
-
-        allowed_chars = set("0123456789+-*/.() ")
-        if not all(c in allowed_chars for c in expression.strip()):
-            return JsonResponse({"error": "只允许数字和运算符"}, status=400)
-
         result = _evaluator.evaluate(expression)
-
-        return JsonResponse({"result": result})
     except ZeroDivisionError:
-        return JsonResponse({"error": "不能除以零"}, status=400)
+        return json_error("不能除以零")
     except ValueError as e:
-        return JsonResponse({"error": str(e)}, status=400)
+        return json_error(str(e))
     except Exception as e:
         logger.warning(f"表达式求值失败: {e}", exc_info=True)
-        return JsonResponse({"error": "表达式格式错误"}, status=400)
+        return json_error("表达式格式错误")
+
+    return json_success(data={"result": result})

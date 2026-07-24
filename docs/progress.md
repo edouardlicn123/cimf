@@ -246,4 +246,15 @@
 3. 用 RedirectView 替换 profile 视图函数：更新 URL 配置、删除 settings.py 中 profile 函数、清理 __init__.py 导入
 4. 从全部 8 个主题文件中提取 .btn-secondary CSS 至 base.css（共用规则，基于 CSS 变量）
 5. 封装重构：删除死代码(models.py重导出/SampleDataService/dashboard_cards.js/导航栏滚动重复)、提取btn-secondary到base.css、profile视图→RedirectView、误判项补注释
+6. 代码重构：core/checks.py 拆为 core/checks/ 包(8个检查模块)；settings_service.py 的 SETTINGS_META 提取到 core/settings_meta.py；views.py 推广 redirect_with_success/error；ResidentInfoFields 改用 BaseModel 继承；删除 resident_info 自定义权限检查，统一使用 PermissionService.check_node_permission；创建 core/node/base_node_service.py(BaseNodeService) 和 core/node/base_node_view.py(make_api_stats_view)；customer/resident_info 服务继承 BaseNodeService 消除 get_by_id/get_by_node_id 重复；api_stats 视图改用工厂函数
+7. Phase 3: get_all_pages_with_permission_status 从 cron.py 移到 permission_service.py; Phase 4: profile_settings 拆分为6个辅助函数; Phase 5: resident_info 创建 ResidentInfoForm 类消除原始 POST 处理; Phase 6: 创建 make_node_view / make_node_delete 工厂视图, 替换 customer 和 resident_info 的 node_view/node_delete; create_user 改为 @classmethod 修正 F821; Ruff+manage check 全绿
+8. 将 core/bugscan/detectors.py 拆分为 finding/l1/l2/ast/scanner 包结构
+9. 将 export_service.py 拆分为 export_service/ 包（field_service/query_service/value_resolver mixins + __init__）
+10. Phase 7: 创建 @json_body 装饰器, 统一 JsonResponse (health.py/calc/clock/cron/cards); 大文件拆分: detectors.py→5文件, import_service.py→4文件, export_service.py→4文件, email_service.py→4文件, importexport/views.py→2文件, template_service.py 提取默认模板数据; user_service.py 裸save修复; Ruff+manage check 全绿
+
+# 2026-07-24 修改记录
+
+1. 封装重构：删除 mixins.py 重复 update_fields；权限字符串 PERMISSION_GROUPS 单源合并；ModuleRegistry 抽象层（8 处 import_module 集中化）；BaseNodeService 继承 BaseService；URLName 常量类；taxonomy.py 服务层重构（消除直接 model 访问）；健康检查合并 _build_check_base/_finalize_check；COMMON_ROLES 从 UserRole 推导；update_taxonomy/update_item None 过滤
+2. 封装/拆分第1-4批: 删除死亡代码; 核心→模块解耦(init命令搬迁); 服务层补齐(BootstrapFormMixin+视图bypass消除); 客户表单简化+模板加命名空间
+3. 批量修复: N+1查询(3处get_by_node_id+1处prefetch); SmtpConfigForm/NodeTypeForm加BootstrapFormMixin; 删除core/node/views.py死亡视图5个; LogService精简; VersionService精简; marketplace硬导入修复; health.py/users.py视图bypass消除
 

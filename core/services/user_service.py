@@ -95,8 +95,28 @@ class UserService(BaseService):
 
         return queryset.order_by("-created_at")
 
-    @staticmethod
-    def create_user(
+    @classmethod
+    def _validate_username_unique(cls, username: str, exclude_id: int | None = None) -> str:
+        username = clean_str(username)
+        qs = User.objects.filter(username=username)
+        if exclude_id is not None:
+            qs = qs.exclude(id=exclude_id)
+        if qs.exists():
+            raise ValueError("用户名已存在")
+        return username
+
+    @classmethod
+    def _validate_email_unique(cls, email: str, exclude_id: int | None = None) -> str:
+        cleaned = clean_str(email)
+        qs = User.objects.filter(email=cleaned)
+        if exclude_id is not None:
+            qs = qs.exclude(id=exclude_id)
+        if qs.exists():
+            raise ValueError("邮箱已存在")
+        return cleaned
+
+    @classmethod
+    def create_user(cls,
         username: str, nickname: str, email: str | None, password: str, role: str = "employee", is_admin: bool = False
     ) -> User:
         """新建用户"""
@@ -117,8 +137,8 @@ class UserService(BaseService):
             permissions = PermissionService.get_role_permissions_from_db(role)
 
         with transaction.atomic():
-            if email and User.objects.filter(email=email).exists():
-                raise ValueError("邮箱已存在")
+            if email:
+                cls._validate_email_unique(email)
             try:
                 user = User.objects.create_user(
                     username=username,
@@ -131,11 +151,17 @@ class UserService(BaseService):
                     is_active=True,
                 )
             except IntegrityError:
-                if User.objects.filter(username=username).exists():
-                    raise ValueError("用户名已存在")
+                cls._validate_username_unique(username)
                 raise
 
         return user
+
+    @classmethod
+    def _apply_field_updates(cls, user: User, update_fields: list[str], **fields) -> None:
+        for key, value in fields.items():
+            if value is not None:
+                setattr(user, key, value)
+                update_fields.append(key)
 
     @classmethod
     def update_user(
@@ -158,9 +184,7 @@ class UserService(BaseService):
 
         with transaction.atomic():
             if username and clean_str(username) != user.username:
-                if User.objects.filter(username=username).exclude(id=user_id).exists():
-                    raise ValueError("用户名已存在")
-                user.username = clean_str(username)
+                user.username = cls._validate_username_unique(username, exclude_id=user_id)
                 update_fields.append("username")
 
             if nickname:
@@ -169,9 +193,7 @@ class UserService(BaseService):
 
             if email is not None:
                 if email:
-                    if User.objects.filter(email=email).exclude(id=user_id).exists():
-                        raise ValueError("邮箱已存在")
-                    user.email = clean_str(email)
+                    user.email = cls._validate_email_unique(email, exclude_id=user_id)
                 else:
                     user.email = None
                 update_fields.append("email")
@@ -182,19 +204,10 @@ class UserService(BaseService):
 
             if role is not None:
                 user.role = role
-                if role == UserRole.MANAGER:
-                    user.permissions = ["*"]
-                else:
-                    user.permissions = PermissionService.get_role_permissions_from_db(role)
+                user.permissions = ["*"] if role == UserRole.MANAGER else PermissionService.get_role_permissions_from_db(role)
                 update_fields.extend(["role", "permissions"])
 
-            if is_admin is not None:
-                user.is_admin = is_admin
-                update_fields.append("is_admin")
-
-            if is_active is not None:
-                user.is_active = is_active
-                update_fields.append("is_active")
+            cls._apply_field_updates(user, update_fields, is_admin=is_admin, is_active=is_active)
 
             user.save(update_fields=update_fields)
         return user
@@ -212,6 +225,11 @@ class UserService(BaseService):
         user.is_active = active
         user.save(update_fields=["is_active"])
         return user
+
+    @staticmethod
+    def get_count() -> int:
+        """获取用户总数"""
+        return User.objects.count()
 
     @staticmethod
     def get_user_stats() -> dict:
@@ -240,19 +258,11 @@ class UserService(BaseService):
                 changed.append("nickname")
 
             if email is not None:
-                if email:
-                    cleaned_email = clean_str(email)
-                    if User.objects.filter(email=cleaned_email).exclude(id=user_id).exists():
-                        raise ValueError("该邮箱已被其他用户使用")
-                    user.email = cleaned_email
-                else:
-                    user.email = None
+                user.email = cls._validate_email_unique(email, exclude_id=user_id) if email else None
                 changed.append("email")
 
             if changed:
                 user.save(update_fields=changed)
-            else:
-                user.save()
         return user
 
     @classmethod
@@ -300,11 +310,11 @@ class UserService(BaseService):
         user.save(update_fields=["navigation_cards"])
         return user
 
-    @staticmethod
-    def assign_position(cards: list) -> int:
-        """为新卡片分配第一个空position"""
-        used_positions = [c.get("position") for c in cards if c.get("position")]
-        for i in range(1, 13):
-            if i not in used_positions:
-                return i
-        return 0  # 已满
+    @classmethod
+    def delete_user(cls, user_id: int) -> None:
+        """删除用户"""
+        cls._protect_admin(user_id)
+        user = cls._get_user_or_raise(user_id)
+        user.delete()
+
+

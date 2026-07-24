@@ -27,21 +27,6 @@ class VersionService:
     BUILD_DATE = "2026-07-05"
 
     @classmethod
-    def get_version(cls):
-        """获取应用版本号"""
-        return cls.VERSION
-
-    @classmethod
-    def get_api_version(cls):
-        """获取 API 版本号"""
-        return cls.API_VERSION
-
-    @classmethod
-    def get_build_date(cls):
-        """获取构建日期"""
-        return cls.BUILD_DATE
-
-    @classmethod
     def get_info(cls):
         """获取完整的版本信息"""
         return {
@@ -49,23 +34,3 @@ class VersionService:
             "api_version": cls.API_VERSION,
             "build_date": cls.BUILD_DATE,
         }
-
-    @classmethod
-    def check_compatibility(cls, client_version: str) -> bool:
-        """检查客户端版本与 API 的兼容性"""
-        if not client_version:
-            return False
-
-        if client_version.startswith("v"):
-            client_version = client_version[1:]
-
-        try:
-            major = int(client_version.split(".")[0])
-            return major >= 1
-        except (ValueError, IndexError):
-            return False
-
-    @classmethod
-    def get_supported_versions(cls) -> list:
-        """获取支持的 API 版本列表"""
-        return ["v1"]

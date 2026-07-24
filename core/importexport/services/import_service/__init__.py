@@ -4,32 +4,26 @@ ImportService - 导入服务
 提供通用的数据导入功能，支持 CSV/Excel 格式
 """
 
-import csv
-import io
 import logging
-import re
 import threading
-from importlib import import_module
 from typing import Any
 
 from django.db import transaction
 from django.http import HttpResponse
-from openpyxl import load_workbook
+
+from core.module.services.module_registry_service import ModuleRegistryService
+
+from . import reader_service, transformer_service, validator_service
 
 logger = logging.getLogger(__name__)
-
-try:
-    import chardet
-except ImportError:
-    chardet = None
 
 
 class ImportService:
     """通用导入服务"""
 
-    FORMAT_CSV = "csv"
-    FORMAT_XLSX = "xlsx"
-    MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
+    FORMAT_CSV = reader_service.FORMAT_CSV
+    FORMAT_XLSX = reader_service.FORMAT_XLSX
+    MAX_FILE_SIZE = reader_service.MAX_FILE_SIZE
 
     _import_lock = threading.Lock()
 
@@ -52,86 +46,7 @@ class ImportService:
     @classmethod
     def read_file(cls, file, format: str) -> tuple[list[str], list[list[str]]]:
         """读取文件内容，含大小检查"""
-        cls._validate_file_size(file)
-        if format == cls.FORMAT_CSV:
-            return cls._read_csv(file)
-        else:
-            return cls._read_xlsx(file)
-
-    @classmethod
-    def _validate_file_size(cls, file):
-        """验证文件大小不超过限制"""
-        if hasattr(file, "size") and file.size > cls.MAX_FILE_SIZE:
-            raise ValueError(
-                f"文件过大（{file.size / 1024 / 1024:.1f}MB），最大允许 {cls.MAX_FILE_SIZE / 1024 / 1024:.0f}MB"
-            )
-
-    @classmethod
-    def _detect_encoding(cls, raw: bytes) -> str:
-        """检测文件编码"""
-        if chardet:
-            try:
-                result = chardet.detect(raw)
-                encoding = result.get("encoding", "") or ""
-                if encoding.lower().replace("-", "") in ("utf8", "utf8sig", "ascii"):
-                    return "utf-8"
-                if encoding:
-                    return encoding
-            except Exception:  # noqa: S110 — encoding detection best-effort
-                pass
-        # 回退：尝试常见编码
-        for enc in ("utf-8-sig", "utf-8", "gbk", "gb2312", "latin-1"):
-            try:
-                raw.decode(enc)
-                return enc
-            except (UnicodeDecodeError, LookupError):
-                continue
-        return "utf-8"
-
-    @classmethod
-    def _read_csv(cls, file) -> tuple[list[str], list[list[str]]]:
-        """读取 CSV 文件，含编码检测"""
-
-        file_content = file.read()
-        if hasattr(file, "seek"):
-            file.seek(0)
-        if not file_content:
-            return [], []
-        encoding = cls._detect_encoding(file_content)
-        try:
-            decoded_file = file_content.decode(encoding)
-        except (UnicodeDecodeError, LookupError):
-            decoded_file = file_content.decode("utf-8", errors="replace")
-        reader = csv.reader(decoded_file.splitlines())
-        rows = list(reader)
-
-        if not rows:
-            return [], []
-
-        headers = rows[0] if rows else []
-        data_rows = rows[1:] if len(rows) > 1 else []
-
-        return headers, data_rows
-
-    @classmethod
-    def _read_xlsx(cls, file) -> tuple[list[str], list[list[str]]]:
-        """读取 XLSX 文件"""
-
-        file_content = file.read()
-        if hasattr(file, "seek"):
-            file.seek(0)
-        wb = load_workbook(filename=io.BytesIO(file_content), data_only=True)
-        ws = wb.active
-
-        rows = list(ws.values)
-
-        if not rows:
-            return [], []
-
-        headers = [str(h) if h is not None else "" for h in rows[0]]
-        data_rows = [[str(cell) if cell is not None else "" for cell in row] for row in rows[1:]]
-
-        return headers, data_rows
+        return reader_service.read_file(file, format)
 
     @classmethod
     def map_headers_to_fields(cls, headers: list[str], fields: list[dict]) -> dict[str, str]:
@@ -223,7 +138,7 @@ class ImportService:
         field_type = field["type"]
 
         if field_type == "email":
-            if not cls._is_valid_email(value):
+            if not validator_service.is_valid_email(value):
                 errors.append(f"{field['label']} 邮箱格式不正确")
 
         elif field_type == "json":
@@ -237,37 +152,18 @@ class ImportService:
     @classmethod
     def _is_valid_email(cls, email: str) -> bool:
         """验证邮箱格式"""
-        pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
-        return bool(re.match(pattern, str(email)))
+        return validator_service.is_valid_email(email)
 
     @staticmethod
     def _convert_boolean(value: Any) -> bool:
-        """将多种布尔表示转换为 Python Boolean
-
-        支持的输入格式：
-        - 是/否
-        - True/False
-        - true/false
-        - 1/0
-        - 1.0/0.0
-        - yes/no
-        """
-        if value is None:
-            return False
-        if isinstance(value, bool):
-            return value
-        if isinstance(value, (int, float)):
-            return bool(value)
-        if isinstance(value, str):
-            normalized = value.strip().lower()
-            return normalized in ["是", "true", "1", "1.0", "yes", "y"]
-        return bool(value)
+        """将多种布尔表示转换为 Python Boolean"""
+        return validator_service.convert_boolean(value)
 
     @classmethod
     def _get_import_row(cls, slug: str):
         """尝试获取模块的 import_row 方法"""
         try:
-            mod = import_module(f"modules.{slug}.services")
+            mod = ModuleRegistryService.import_module_sub(slug, "services")
             for attr_name in dir(mod):
                 obj = getattr(mod, attr_name)
                 if isinstance(obj, type) and hasattr(obj, "import_row"):
@@ -315,7 +211,7 @@ class ImportService:
         for idx, row in enumerate(rows, start=1):
             try:
                 with transaction.atomic():
-                    transformed = cls._transform_row(row, node_type_slug, field_map)
+                    transformed = transformer_service.transform_row(row, node_type_slug, field_map, cls.FK_TAXONOMY_OVERRIDES)
 
                     existing = cls._find_existing(model_class, transformed)
 
@@ -363,48 +259,6 @@ class ImportService:
             "error_count": len(errors),
             "errors": errors,
         }
-
-    @classmethod
-    def _transform_row(cls, row: dict, node_type_slug: str, field_map: dict) -> dict:
-        """转换行数据"""
-        from core.importexport.fk_resolver import FKResolverPool  # noqa: PLC0415
-        from core.importexport.special_field_handler import SpecialFieldPool  # noqa: PLC0415
-
-        transformed = {}
-
-        for field_name, value in row.items():
-            if field_name not in field_map:
-                continue
-
-            field = field_map[field_name]
-            field_type = field["type"]
-
-            if value is None or (isinstance(value, str) and not value.strip()):
-                continue
-
-            if field_type == "fk":
-                fk_to = field.get("fk_to")
-                if fk_to:
-                    taxonomy_slug = cls.FK_TAXONOMY_OVERRIDES.get(
-                        (node_type_slug, field_name), field.get("taxonomy", field_name)
-                    )
-                    resolved = FKResolverPool.resolve(fk_to, value, taxonomy_slug, auto_create=True)
-                    if resolved is not None:
-                        transformed[field_name] = resolved
-
-            elif field_type == "json":
-                if SpecialFieldPool.is_special_field(field_name):
-                    transformed[field_name] = SpecialFieldPool.handle_import(field_name, value)
-                else:
-                    transformed[field_name] = value
-
-            elif field_type == "boolean":
-                transformed[field_name] = cls._convert_boolean(value)
-
-            else:
-                transformed[field_name] = value
-
-        return transformed
 
     @classmethod
     def _find_existing(cls, model_class, data: dict):

@@ -20,11 +20,10 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, JsonResponse
+from django.http import Http404
 from django.shortcuts import redirect, render
-from django.views.decorators.http import require_POST
 
-from core.decorators import login_required_json
+from core.node.base_node_view import make_api_stats_view, make_node_delete, make_node_view
 from core.node.services import NodeService, NodeTypeService
 from core.services import PermissionService, TaxonomyService
 from core.utils.pagination import paginate_queryset
@@ -142,7 +141,7 @@ def node_list(request):
 
     return render(
         request,
-        "list.html",
+        "customer/list.html",
         {
             "node_type": node_type,
             "node_types": node_types,
@@ -170,37 +169,13 @@ def node_create(request):
         if response:
             return response
 
-    return render(request, "edit.html", _get_customer_context(node_type))
+    return render(request, "customer/edit.html", _get_customer_context(node_type))
 
 
-@login_required
-def node_view(request, node_id: int):
-    """查看海外客户"""
-    node = _get_node_or_404(node_id)
-
-    has_perm, error_msg = PermissionService.check_node_permission(request.user, node, "view")
-    if not has_perm:
-        messages.error(request, error_msg)
-        return redirect("node:module_page", node_type_slug="customer")
-
-    node_types = NodeTypeService.get_all()
-
-    customer = CustomerService.get_by_node_id(node_id)
-    if not customer:
-        messages.error(request, "客户不存在")
-        return redirect("node:module_page", node_type_slug="customer")
-
-    return render(
-        request,
-        "view.html",
-        {
-            "node_type": node.node_type,
-            "node_types": node_types,
-            "node": node,
-            "customer": customer,
-            "active_section": "customer",
-        },
-    )
+node_view = make_node_view(
+    CustomerService, module_slug='customer', obj_context_key='customer',
+    label_name='客户',     template_name='customer/view.html',
+)
 
 
 @login_required
@@ -223,43 +198,12 @@ def node_edit(request, node_id: int):
         if response:
             return response
 
-    return render(request, "edit.html", _get_customer_context(node.node_type, customer, node))
+    return render(request, "customer/edit.html", _get_customer_context(node.node_type, customer, node))
 
 
-@login_required
-@require_POST
-def node_delete(request, node_id: int):
-    """删除海外客户"""
-    node = NodeService.get_by_id(node_id)
-    if node:
-        has_perm, error_msg = PermissionService.check_node_permission(request.user, node, "delete")
-        if not has_perm:
-            messages.error(request, error_msg)
-        else:
-            customer = CustomerService.get_by_node_id(node_id)
-            if customer:
-                CustomerService.delete(customer.id)
-                messages.success(request, "客户已删除")
-            else:
-                messages.error(request, "客户不存在")
-    else:
-        messages.error(request, "节点不存在")
-
-    return redirect("node:module_page", node_type_slug="customer")
+node_delete = make_node_delete(
+    CustomerService, module_slug='customer', label_name='客户',
+)
 
 
-@login_required_json
-def api_stats(request):  # noqa: ARG001
-    """获取客户统计信息"""
-    total = CustomerService.get_count()
-    recent = CustomerService.get_recent_count(days=7)
-
-    return JsonResponse(
-        {
-            "success": True,
-            "data": {
-                "total": total,
-                "recent": recent,
-            },
-        }
-    )
+api_stats = make_api_stats_view(CustomerService)

@@ -21,14 +21,14 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
 from core.constants import ModuleType
-from core.module.models import Module
+from core.module.services.module_query_service import ModuleQueryService
 from core.module.services.module_service import ModuleService
 from core.utils.views import dynamic_import_view
 
 
 def _get_tools_list() -> list:
     """获取所有激活的 tool 类型模块列表"""
-    tool_modules = Module.objects.filter(module_type=ModuleType.TOOL, is_active=True)
+    tool_modules = ModuleQueryService.get_active(ModuleType.TOOL)
     tools = []
     for mod in tool_modules:
         module_info = ModuleService.load_module_info(mod.module_id) or {}

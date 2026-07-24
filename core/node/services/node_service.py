@@ -7,6 +7,10 @@ from core.services.base_service import BaseService
 class NodeService(BaseService):
     model_class = Node
 
+    @classmethod
+    def get_count(cls) -> int:
+        return cls.model_class.objects.count()
+
     @staticmethod
     def get_nodes(node_type_slug: str) -> list[Node]:
         node_type = NodeType.objects.filter(slug=node_type_slug).first()

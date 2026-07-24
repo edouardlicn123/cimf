@@ -2,7 +2,7 @@
 回填客户 customer_code
 
 扫描 CustomerFields 表中 customer_code 为空或 NULL 的记录，
-使用 CustomerService 的编码生成方法为其补全顺序编码。
+使用动态导入获取模型为其补全顺序编码。
 
 用法:
     ./venv/bin/python manage.py backfill_customer_codes          # 执行更新
@@ -12,6 +12,8 @@
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import Max, Q
+
+from core.module.services.module_registry_service import ModuleRegistryService
 
 
 class Command(BaseCommand):
@@ -25,7 +27,15 @@ class Command(BaseCommand):
         )
 
     def handle(self, **options):
-        from modules.customer.models import CustomerFields  # noqa: PLC0415
+        customer_models = ModuleRegistryService.safe_import_module_sub("customer", "models")
+        if not customer_models:
+            self.stderr.write(self.style.ERROR("客户模块未安装，请先安装 customer 模块"))
+            return
+
+        CustomerFields = getattr(customer_models, "CustomerFields", None)
+        if not CustomerFields:
+            self.stderr.write(self.style.ERROR("未找到 CustomerFields 模型"))
+            return
 
         dry_run = options.get("dry_run", False)
 

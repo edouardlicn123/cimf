@@ -1,3 +1,4 @@
+import importlib
 import logging
 from typing import Any
 
@@ -14,6 +15,23 @@ class ModuleRegistryService:
     MODULES_DIR = "modules"
     _module_info_cache: dict[str, dict[str, Any]] = {}
 
+    @staticmethod
+    def get_module_path(module_id: str, submodule: str = "") -> str:
+        """构建模块子模块的导入路径"""
+        return f"modules.{module_id}.{submodule}" if submodule else f"modules.{module_id}"
+
+    @staticmethod
+    def import_module_sub(module_id: str, submodule: str):
+        """导入模块的指定子模块"""
+        return importlib.import_module(f"modules.{module_id}.{submodule}")
+
+    @staticmethod
+    def safe_import_module_sub(module_id: str, submodule: str, default=None):
+        """安全导入模块子模块，不存在时返回默认值"""
+        try:
+            return importlib.import_module(f"modules.{module_id}.{submodule}")
+        except (ImportError, ModuleNotFoundError):
+            return default
     MIGRATION_SCRIPT_TEMPLATE = _Install.MIGRATION_SCRIPT_TEMPLATE
     MAKEMIGRATIONS_SCRIPT_TEMPLATE = _Install.MAKEMIGRATIONS_SCRIPT_TEMPLATE
 

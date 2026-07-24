@@ -1,8 +1,8 @@
 import logging
-from importlib import import_module
 from pathlib import Path
 from typing import Any
 
+from core.module.services.module_registry_service import ModuleRegistryService
 from core.node.models import Node, NodeType
 
 logger = logging.getLogger(__name__)
@@ -12,6 +12,10 @@ class NodeTypeService:
     @staticmethod
     def get_all() -> list[NodeType]:
         return NodeType.objects.filter(is_active=True)
+
+    @staticmethod
+    def get_count() -> int:
+        return NodeType.objects.count()
 
     @staticmethod
     def get_all_including_inactive() -> list[NodeType]:
@@ -127,7 +131,7 @@ class NodeTypeService:
                 continue
 
             try:
-                mod = import_module(f"modules.{item_path.name}.module")
+                mod = ModuleRegistryService.import_module_sub(item_path.name, "module")
                 if hasattr(mod, "MODULE_INFO"):
                     module_info = mod.MODULE_INFO
                     if module_info.get("type") == "node":

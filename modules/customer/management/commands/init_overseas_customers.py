@@ -3,12 +3,11 @@
 用法: ./venv/bin/python manage.py init_overseas_customers
 """
 
-from importlib import import_module
-
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from core.models import User
+from core.module.services.module_registry_service import ModuleRegistryService
 from core.node.models import Node, NodeType
 
 
@@ -16,12 +15,11 @@ class Command(BaseCommand):
     help = "初始化海外客户样本数据"
 
     def handle(self, *args, **options):  # noqa: ARG002
-        try:
-            customer_module = import_module("modules.customer.module")
-            customer_models = import_module("modules.customer.models")
-            customer_sample_data = import_module("modules.customer.sample_data")
-        except (ImportError, ModuleNotFoundError) as e:
-            self.stderr.write(self.style.ERROR(f"模块导入失败: {e}"))
+        customer_models = ModuleRegistryService.safe_import_module_sub("customer", "models")
+        customer_sample_data = ModuleRegistryService.safe_import_module_sub("customer", "sample_data")
+
+        if not customer_models or not customer_sample_data:
+            self.stderr.write(self.style.ERROR("客户模块未安装，请先安装 customer 模块"))
             return
 
         CustomerFields = getattr(customer_models, "CustomerFields", None)
@@ -40,7 +38,8 @@ class Command(BaseCommand):
             self.stderr.write(self.style.ERROR("未找到管理员用户，请先创建用户"))
             return
 
-        module_info = getattr(customer_module, "MODULE_INFO", {})
+        customer_module = ModuleRegistryService.safe_import_module_sub("customer", "module")
+        module_info = getattr(customer_module, "MODULE_INFO", {}) if customer_module else {}
         module_id = module_info.get("id", "customer")
 
         customer_node_type = NodeType.objects.filter(slug=module_id).first()

@@ -4,7 +4,7 @@
 将 node_type_slug 映射到对应的 Django 模型类
 """
 
-from importlib import import_module
+from core.module.services.module_registry_service import ModuleRegistryService
 
 
 class ModelRegistry:
@@ -25,7 +25,7 @@ class ModelRegistry:
 
         # 动态导入模块模型
         try:
-            mod = import_module(f"modules.{slug}.models")
+            mod = ModuleRegistryService.import_module_sub(slug, "models")
 
             # 查找 Fields 结尾的模型类
             for attr_name in dir(mod):

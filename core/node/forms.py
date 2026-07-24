@@ -16,53 +16,34 @@
 
 from django import forms
 
+from core.forms.mixins import BootstrapFormMixin
 
-class NodeTypeForm(forms.Form):
+
+class NodeTypeForm(BootstrapFormMixin, forms.Form):
     """节点类型表单"""
 
     name = forms.CharField(
         label="节点类型名称",
         max_length=100,
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "请输入节点类型名称",
-            }
-        ),
+        widget=forms.TextInput(attrs={"placeholder": "请输入节点类型名称"}),
     )
 
     slug = forms.SlugField(
         label="标识符",
         max_length=50,
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "请输入 URL 标识符（英文、数字、下划线）",
-            }
-        ),
+        widget=forms.TextInput(attrs={"placeholder": "请输入 URL 标识符（英文、数字、下划线）"}),
     )
 
     description = forms.CharField(
         label="描述",
         max_length=500,
         required=False,
-        widget=forms.Textarea(
-            attrs={
-                "class": "form-control",
-                "placeholder": "请输入描述",
-                "rows": 3,
-            }
-        ),
+        widget=forms.Textarea(attrs={"placeholder": "请输入描述", "rows": 3}),
     )
 
     icon = forms.CharField(
         label="图标",
         max_length=50,
         initial="bi-folder",
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "Bootstrap Icons 类名",
-            }
-        ),
+        widget=forms.TextInput(attrs={"placeholder": "Bootstrap Icons 类名"}),
     )

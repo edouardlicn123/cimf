@@ -74,17 +74,6 @@ def safe_execute(fn, error_return=None, log_msg="操作失败", logger=None):
 _sentinel = object()
 
 
-def update_fields(instance, **fields):
-    changed_fields = []
-    for key, value in fields.items():
-        if getattr(instance, key) != value:
-            setattr(instance, key, value)
-            changed_fields.append(key)
-    if changed_fields:
-        instance.save(update_fields=changed_fields)
-    return instance
-
-
 def retry_with_fallbacks(sources, fetch_fn, max_retries=1, retry_delay=2, timeout=30):
     last_error = None
     for attempt in range(max_retries):

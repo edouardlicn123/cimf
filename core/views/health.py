@@ -9,12 +9,12 @@ from pathlib import Path
 
 from django.core.cache import cache
 from django.db import connection
-from django.http import JsonResponse
 from django.utils import timezone
 
 from core.constants import VERSION_MAJOR, VERSION_MINOR
 from core.decorators import login_required_json
-from core.services import VersionService
+from core.services import SettingsService, UserService, VersionService
+from core.utils.response import json_success
 
 logger = logging.getLogger(__name__)
 
@@ -30,21 +30,28 @@ def _run_check(checks, name, fn, overall_status=None):
             overall_status[0] = "error"
 
 
-@login_required_json
-def health_check(request):  # noqa: ARG001
-    start_time = time.time()
-
-    checks = {
+def _build_check_base():
+    return {
         "status": "ok",
         "version": f"{VERSION_MAJOR}.{VERSION_MINOR:03d}",
         "timestamp": timezone.now().isoformat(),
     }
+
+
+def _finalize_check(checks, start_time, overall_status):
+    checks["uptime_ms"] = round((time.time() - start_time) * 1000, 2)
+    checks["status"] = overall_status[0]
+    status_code = 200 if overall_status[0] == "ok" else 503
+    return json_success(data=checks, status=status_code)
+
+
+@login_required_json
+def health_check(request):  # noqa: ARG001
+    start_time = time.time()
+    checks = _build_check_base()
     overall_status = ["ok"]
 
-    def _check_db():
-        connection.ensure_connection()
-
-    _run_check(checks, "database", _check_db, overall_status)
+    _run_check(checks, "database", connection.ensure_connection, overall_status)
 
     def _check_cache():
         cache.set("_health_check", "ok", 10)
@@ -60,21 +67,13 @@ def health_check(request):  # noqa: ARG001
 
     _run_check(checks, "storage", _check_storage, overall_status)
 
-    checks["uptime_ms"] = round((time.time() - start_time) * 1000, 2)
-    checks["status"] = overall_status[0]
-
-    status_code = 200 if overall_status[0] == "ok" else 503
-    return JsonResponse(checks, status=status_code)
+    return _finalize_check(checks, start_time, overall_status)
 
 
 @login_required_json
 def detailed_health_check(request):  # noqa: ARG001
     start_time = time.time()
-
-    checks = {
-        "status": "ok",
-        "version": f"{VERSION_MAJOR}.{VERSION_MINOR:03d}",
-    }
+    checks = _build_check_base()
     overall_status = ["ok"]
 
     def _check_db():
@@ -84,21 +83,19 @@ def detailed_health_check(request):  # noqa: ARG001
     _run_check(checks, "database", _check_db, overall_status)
 
     def _check_tables():
-        from core.models import SystemSetting, User  # noqa: PLC0415
-
         checks["tables"] = {
-            "users": User.objects.count(),
-            "settings": SystemSetting.objects.count(),
+            "users": UserService.get_count(),
+            "settings": SettingsService.get_count(),
         }
 
     _run_check(checks, "tables", _check_tables, overall_status)
 
     def _check_modules():
-        from core.node.models import Node, NodeType  # noqa: PLC0415
+        from core.node.services import NodeService, NodeTypeService  # noqa: PLC0415
 
         checks["modules"] = {
-            "node_types": NodeType.objects.count(),
-            "nodes": Node.objects.count(),
+            "node_types": NodeTypeService.get_count(),
+            "nodes": NodeService.get_count(),
         }
 
     _run_check(checks, "modules", _check_modules, overall_status)
@@ -116,14 +113,10 @@ def detailed_health_check(request):  # noqa: ARG001
 
     _run_check(checks, "storage", _check_storage, overall_status)
 
-    checks["uptime_ms"] = round((time.time() - start_time) * 1000, 2)
-    checks["status"] = overall_status[0]
-
-    status_code = 200 if overall_status[0] == "ok" else 503
-    return JsonResponse(checks, status=status_code)
+    return _finalize_check(checks, start_time, overall_status)
 
 
 @login_required_json
 def api_version(request):  # noqa: ARG001
     """API 版本信息"""
-    return JsonResponse(VersionService.get_info())
+    return json_success(data=VersionService.get_info())
