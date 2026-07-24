@@ -1,11 +1,5 @@
 """
-统一日志服务 - 读写合一
-
-功能：
-- 写日志：从原 logging_utils.py 迁移的安全事件记录
-- 读日志：日志文件读取与页面展示
-
-版本：1.0
+日志读取服务
 """
 
 import logging
@@ -19,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class LogService:
-    """统一日志服务"""
+    """日志读取服务"""
 
     LOG_DIR = Path(settings.BASE_DIR) / "storage" / "logs"
 
@@ -28,79 +22,6 @@ class LogService:
         "error": "error.log",
         "security": "security.log",
     }
-
-    _security_logger = None
-
-    @classmethod
-    def _get_security_logger(cls):
-        if cls._security_logger is None:
-            cls._security_logger = logging.getLogger("django.security")
-        return cls._security_logger
-
-    @classmethod
-    def _log_event(cls, message: str, level: int = logging.INFO):
-        """记录日志事件的通用方法"""
-        logger = cls._get_security_logger()
-        logger.log(level, message)
-
-    # ===== 写日志功能 =====
-
-    @staticmethod
-    def get_client_ip(request) -> str:
-        """获取客户端 IP"""
-        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
-        if x_forwarded_for:
-            return x_forwarded_for.split(",")[0].strip()
-        return request.META.get("REMOTE_ADDR", "unknown")
-
-    @classmethod
-    def log_login_attempt(cls, request, username: str, success: bool, reason: str | None = None):
-        """记录登录尝试"""
-        level = logging.INFO if success else logging.WARNING
-        ip = cls.get_client_ip(request)
-        message = f"Login attempt: user={username}, success={success}, ip={ip}"
-        if reason:
-            message += f", reason={reason}"
-        cls._log_event(message, level)
-
-    @classmethod
-    def log_logout(cls, _user, username: str, ip: str):
-        """记录登出"""
-        cls._log_event(f"Logout: user={username}, ip={ip}")
-
-    @classmethod
-    def log_permission_denied(cls, request, user, resource: str, reason: str | None = None):
-        """记录权限拒绝"""
-        ip = cls.get_client_ip(request)
-        username = user.username if user else "anonymous"
-        message = f"Permission denied: user={username}, resource={resource}, ip={ip}"
-        if reason:
-            message += f", reason={reason}"
-        cls._log_event(message, logging.WARNING)
-
-    @classmethod
-    def log_security_event(cls, event_type: str, details: str, level=logging.INFO):
-        """记录安全事件"""
-        cls._log_event(f"Security event: {event_type}, details={details}", level)
-
-    @classmethod
-    def log_api_access(cls, request, endpoint: str, user=None):
-        """记录 API 访问"""
-        ip = cls.get_client_ip(request)
-        username = user.username if user else "anonymous"
-        cls._log_event(f"API access: user={username}, endpoint={endpoint}, ip={ip}")
-
-    @classmethod
-    def log_data_export(cls, request, user, export_type: str, record_count: int):
-        """记录数据导出"""
-        ip = cls.get_client_ip(request)
-        cls._log_event(f"Data export: user={user.username}, type={export_type}, count={record_count}, ip={ip}")
-
-    @classmethod
-    def log_failed_validation(cls, request, form_name: str, errors: str):
-        """记录验证失败"""
-        ip = cls.get_client_ip(request)
-        cls._log_event(f"Validation failed: form={form_name}, errors={errors}, ip={ip}", logging.WARNING)
 
     # ===== 读日志功能 =====
 

@@ -6,16 +6,16 @@ import json
 import logging
 import os
 import shutil
-import sys
 import tempfile
 import zipfile
-from importlib import import_module as _import_module
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
 import requests
 from django.utils.timezone import now
+
+from core.module.services.module_registry_service import ModuleRegistryService
 
 logger = logging.getLogger(__name__)
 
@@ -173,17 +173,12 @@ class MarketService:
         if not module_py.exists():
             return None
 
-        module_path = f"modules.{safe_id}.module"
         try:
-            if module_path in sys.modules:
-                del sys.modules[module_path]
-            mod = _import_module(module_path)
-            if hasattr(mod, "MODULE_INFO") and isinstance(mod.MODULE_INFO, dict):
+            mod = ModuleRegistryService.safe_import_module_sub(safe_id, "module")
+            if mod and hasattr(mod, "MODULE_INFO") and isinstance(mod.MODULE_INFO, dict):
                 return mod.MODULE_INFO.get("version")
         except Exception as e:
             logger.warning("读取本地模块版本失败: module_id=%s, error=%s", module_id, e)
-        finally:
-            sys.modules.pop(module_path, None)
         return None
 
     @classmethod

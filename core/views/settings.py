@@ -18,10 +18,11 @@ from core.decorators import admin_required, handle_form_errors
 from core.forms import ChangePasswordForm, PreferencesForm, ProfileForm
 from core.forms.admin_forms import SystemSettingsForm
 from core.services import PermissionService, SettingsService, UserService
+from core.utils.views import redirect_with_error, redirect_with_success
 
 logger = logging.getLogger(__name__)
 
-COMMON_ROLES = ["manager", "leader", "employee"]
+COMMON_ROLES = [role for role, _ in UserRole.CHOICES]
 
 
 def _handle_logo_upload(request, settings_dict) -> HttpResponseRedirect | None:
@@ -39,8 +40,7 @@ def _handle_logo_upload(request, settings_dict) -> HttpResponseRedirect | None:
         allowed_exts=[".png", ".jpg", ".jpeg", ".gif", ".webp"],
     )
     if not valid:
-        messages.error(request, error_msg)
-        return redirect("core:system_settings")
+        return redirect_with_error(request, error_msg, "core:system_settings")
 
     upload_dir = Path(django_settings.MEDIA_ROOT) / "logos"
     upload_dir.mkdir(parents=True, exist_ok=True)
@@ -55,8 +55,7 @@ def _handle_logo_upload(request, settings_dict) -> HttpResponseRedirect | None:
                 destination.write(chunk)
     except Exception as e:
         logger.error("Logo 文件保存失败: %s", e, exc_info=True)
-        messages.error(request, "文件保存失败，请检查服务器配置")
-        return redirect("core:system_settings")
+        return redirect_with_error(request, "文件保存失败，请检查服务器配置", "core:system_settings")
 
     settings_dict["site_logo_path"] = "logos/custom.png"
     return None
@@ -68,8 +67,7 @@ def system_settings(request):
     if request.method == "POST":
         form = SystemSettingsForm(request.POST)
         if not form.is_valid():
-            messages.error(request, "表单验证失败，请检查输入")
-            return redirect("core:system_settings")
+            return redirect_with_error(request, "表单验证失败，请检查输入", "core:system_settings")
 
         settings_dict = {}
         for key in SettingsService.SETTINGS_META:
@@ -89,8 +87,7 @@ def system_settings(request):
             return response
 
         SettingsService.save_settings_bulk(settings_dict)
-        messages.success(request, "系统设置已保存")
-        return redirect("core:system_settings")
+        return redirect_with_success(request, "系统设置已保存", "core:system_settings")
 
     settings = SettingsService.get_all_settings()
     return render(
@@ -120,8 +117,7 @@ def system_permissions(request):
             if role_name:
                 SettingsService.update_setting(f"role_name_{role}", role_name)
 
-        messages.success(request, "权限已保存")
-        return redirect("core:system_permissions")
+        return redirect_with_success(request, "权限已保存", "core:system_permissions")
 
     role_labels = dict(UserRole.LABELS)
     for role in COMMON_ROLES:
@@ -153,8 +149,7 @@ def _handle_password_change(user_id: int, new_password: str, request) -> HttpRes
     """执行密码修改并登出重定向到登录页"""
     UserService.change_password(user_id, new_password)
     logout(request)
-    messages.success(request, "密码修改成功，请使用新密码重新登录")
-    return redirect("core:login")
+    return redirect_with_success(request, "密码修改成功，请使用新密码重新登录", "core:login")
 
 
 @login_required
@@ -191,67 +186,74 @@ def profile_view(request):
     )
 
 
+def _handle_profile_post(request, form) -> HttpResponseRedirect | None:
+    if form.is_valid():
+        UserService.update_profile(
+            user_id=request.user.id,
+            nickname=form.cleaned_data.get("nickname"),
+            email=form.cleaned_data.get("email"),
+        )
+        return redirect_with_success(request, "个人信息已更新成功", "core:profile_settings")
+    messages.error(request, "请检查个人信息表单中的错误")
+    return None
+
+
+def _handle_preferences_post(request, form) -> HttpResponseRedirect | None:
+    if form.is_valid():
+        UserService.update_preferences(
+            user_id=request.user.id,
+            theme=form.cleaned_data.get("theme"),
+            notifications_enabled=form.cleaned_data.get("notifications_enabled"),
+            preferred_language=form.cleaned_data.get("preferred_language"),
+        )
+        return redirect_with_success(request, "偏好设置已保存", "core:profile_settings")
+    messages.error(request, "请检查偏好设置表单中的错误")
+    return None
+
+
+def _handle_password_post(request, form) -> HttpResponseRedirect | None:
+    if form.is_valid():
+        return _handle_password_change(request.user.id, form.cleaned_data.get("new_password"), request)
+    messages.error(request, "请检查密码表单中的错误")
+    return None
+
+
+def _build_initial_profile(user):
+    return ProfileForm(user_id=user.id, initial={"nickname": user.nickname, "email": user.email})
+
+
+def _build_initial_preferences(user):
+    return PreferencesForm(
+        initial={
+            "theme": user.theme,
+            "notifications_enabled": user.notifications_enabled,
+            "preferred_language": user.preferred_language,
+        }
+    )
+
+
 @login_required
 @handle_form_errors
 def profile_settings(request):
     """用户设置页面：个人信息 + 偏好设置 + 修改密码"""
-    profile_form = ProfileForm(request.POST or None, user_id=request.user.id)
-    pref_form = PreferencesForm(request.POST or None)
-    pwd_form = ChangePasswordForm(request.POST or None, user=request.user)
-
     if request.method == "POST":
-        if "submit_profile" in request.POST:
-            if profile_form.is_valid():
-                UserService.update_profile(
-                    user_id=request.user.id,
-                    nickname=profile_form.cleaned_data.get("nickname"),
-                    email=profile_form.cleaned_data.get("email"),
-                )
-                messages.success(request, "个人信息已更新成功")
-                return redirect("core:profile_settings")
-            messages.error(request, "请检查个人信息表单中的错误")
-
-        elif "submit_preferences" in request.POST:
-            if pref_form.is_valid():
-                UserService.update_preferences(
-                    user_id=request.user.id,
-                    theme=pref_form.cleaned_data.get("theme"),
-                    notifications_enabled=pref_form.cleaned_data.get("notifications_enabled"),
-                    preferred_language=pref_form.cleaned_data.get("preferred_language"),
-                )
-                messages.success(request, "偏好设置已保存")
-                return redirect("core:profile_settings")
-            messages.error(request, "请检查偏好设置表单中的错误")
-
-        elif "submit_password" in request.POST:
-            if pwd_form.is_valid():
-                return _handle_password_change(request.user.id, pwd_form.cleaned_data.get("new_password"), request)
-            messages.error(request, "请检查密码表单中的错误")
-
-    else:
-        profile_form = ProfileForm(
-            user_id=request.user.id,
-            initial={
-                "nickname": request.user.nickname,
-                "email": request.user.email,
-            },
-        )
-        pref_form = PreferencesForm(
-            initial={
-                "theme": request.user.theme,
-                "notifications_enabled": request.user.notifications_enabled,
-                "preferred_language": request.user.preferred_language,
-            }
-        )
-        pwd_form = ChangePasswordForm(user=request.user)
+        handlers = {
+            "submit_profile": lambda: _handle_profile_post(request, ProfileForm(request.POST, user_id=request.user.id)),
+            "submit_preferences": lambda: _handle_preferences_post(request, PreferencesForm(request.POST)),
+            "submit_password": lambda: _handle_password_post(request, ChangePasswordForm(request.POST, user=request.user)),
+        }
+        for key, handler in handlers.items():
+            if key in request.POST:
+                return handler()
+        return redirect("core:profile_settings")
 
     return render(
         request,
         "usermenu/settings.html",
         {
-            "profile_form": profile_form,
-            "pref_form": pref_form,
-            "pwd_form": pwd_form,
+            "profile_form": _build_initial_profile(request.user),
+            "pref_form": _build_initial_preferences(request.user),
+            "pwd_form": ChangePasswordForm(user=request.user),
             "theme_choices": UserTheme.DISPLAY_LABELS.items(),
             "language_choices": Language.CHOICES,
         },

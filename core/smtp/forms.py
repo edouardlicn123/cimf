@@ -4,10 +4,11 @@ SMTP 配置表单
 
 from django import forms
 
+from core.forms.mixins import BootstrapFormMixin
 from core.smtp.services.smtp_service import SMTP_PRESETS
 
 
-class SmtpConfigForm(forms.Form):
+class SmtpConfigForm(BootstrapFormMixin, forms.Form):
     """SMTP 配置表单"""
 
     provider = forms.ChoiceField(

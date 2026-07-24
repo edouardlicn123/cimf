@@ -4,12 +4,11 @@ Node 节点系统视图
 
 import inspect
 import logging
-from importlib import import_module
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 from django.urls import URLPattern, URLResolver
 
 from core.constants import ModuleType
@@ -17,9 +16,9 @@ from core.decorators import admin_post_view, admin_required, login_required_json
 from core.fields import get_all_field_types_info
 from core.models import Taxonomy
 from core.module.models import Module
-from core.node.models import Node, NodeType
-from core.node.services import NodeService, NodeTypeService
-from core.utils.pagination import paginate_queryset
+from core.module.services.module_registry_service import ModuleRegistryService
+from core.node.models import NodeType
+from core.node.services import NodeTypeService
 from core.utils.response import json_error, json_success
 from core.utils.views import dynamic_import_view
 
@@ -77,86 +76,6 @@ def node_type_toggle(request, node_type_id: int):
     return redirect("core:node_types_list")
 
 
-@login_required
-def node_list(request, node_type_slug: str):
-    """节点列表页"""
-    node_type = get_object_or_404(NodeType, slug=node_type_slug)
-    if not node_type.is_active:
-        messages.error(request, "该节点类型未启用")
-        return redirect("node:index")
-
-    nodes = NodeService.get_nodes(node_type_slug)
-    page_obj, page_range = paginate_queryset(request, nodes, per_page=20)
-    return render(
-        request,
-        "node/node_list.html",
-        {
-            "node_type": node_type,
-            "nodes": page_obj.object_list,
-            "page_obj": page_obj,
-            "page_range": page_range,
-        },
-    )
-
-
-@admin_required
-def node_create(request, node_type_slug: str):
-    """创建节点"""
-    node_type = get_object_or_404(NodeType, slug=node_type_slug)
-    if not node_type.is_active:
-        messages.error(request, "该节点类型未启用")
-        return redirect("node:index")
-
-    return render(
-        request,
-        "node/node_edit.html",
-        {
-            "node_type": node_type,
-            "node": None,
-        },
-    )
-
-
-@login_required
-def node_view(request, node_type_slug: str, node_id: int):
-    """查看节点"""
-    node = get_object_or_404(Node, id=node_id, node_type__slug=node_type_slug)
-    return render(
-        request,
-        "node/node_detail.html",
-        {
-            "node": node,
-        },
-    )
-
-
-@admin_required
-def node_edit(request, node_type_slug: str, node_id: int):
-    """编辑节点"""
-    node = get_object_or_404(Node.objects.select_related("node_type"), id=node_id, node_type__slug=node_type_slug)
-    return render(
-        request,
-        "node/node_edit.html",
-        {
-            "node_type": node.node_type,
-            "node": node,
-        },
-    )
-
-
-@admin_post_view
-def node_delete(request, node_type_slug: str, node_id: int):
-    """删除节点"""
-    node = get_object_or_404(Node, id=node_id, node_type__slug=node_type_slug)
-    try:
-        node.delete()
-        messages.success(request, "节点已删除")
-    except Exception as e:
-        messages.error(request, f"删除节点失败: {e!s}")
-        logger.error(f"删除节点失败: node_id={node_id}, error={e}", exc_info=True)
-    return redirect("node:module_page", node_type_slug)
-
-
 @admin_required
 def field_types(request):
     """字段类型列表"""
@@ -201,7 +120,7 @@ def module_custom_dispatch(request, node_type_slug: str, extra_path: str):
     if not Module.objects.filter(module_id=node_type_slug, is_installed=True, is_active=True).exists():
         raise Http404
     try:
-        module = import_module(f"modules.{node_type_slug}.urls")
+        module = ModuleRegistryService.import_module_sub(node_type_slug, "urls")
         path_to_match = extra_path.strip("/")
         for pattern in module.urlpatterns:
             if isinstance(pattern, (URLResolver, URLPattern)):
@@ -222,7 +141,7 @@ def _check_module_exists(node_type_slug: str) -> str:
     module_path = node_type_slug
 
     try:
-        import_module(f"modules.{module_path}.views")
+        ModuleRegistryService.import_module_sub(module_path, "views")
     except ImportError as e:
         logger.warning("模块视图加载失败: %s — %s", node_type_slug, e, exc_info=True)
         raise Http404(f"未找到模块: {node_type_slug}") from None

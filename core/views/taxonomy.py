@@ -1,10 +1,9 @@
 """词汇表视图模块"""
 
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
 
 from core.decorators import admin_required
-from core.models import Taxonomy, TaxonomyItem
 from core.services import TaxonomyService
 from core.utils.pagination import paginate_queryset
 from core.utils.views import redirect_with_error, redirect_with_success
@@ -24,10 +23,7 @@ def _handle_taxonomy_form(request, taxonomy=None):
     if taxonomy:
         if TaxonomyService.check_slug_exists_exclude(slug, taxonomy.id):
             return redirect_with_error(request, f"标识 '{slug}' 已被使用", "core:taxonomy_edit", taxonomy.id)
-        taxonomy.name = name
-        taxonomy.slug = slug
-        taxonomy.description = description
-        taxonomy.save(update_fields=["name", "slug", "description"])
+        TaxonomyService.update_taxonomy(taxonomy.id, name=name, slug=slug, description=description)
         return redirect_with_success(request, "词汇表更新成功", "core:taxonomies")
 
     if TaxonomyService.check_slug_exists(slug):
@@ -45,8 +41,8 @@ def _handle_taxonomy_item_form(request, taxonomy_id, item_id=None):
         return redirect("core:taxonomy_view", taxonomy_id)
 
     if item_id:
-        item = TaxonomyItem.objects.filter(id=item_id, taxonomy_id=taxonomy_id).first()
-        if not item:
+        item = TaxonomyService.get_item_by_id(item_id)
+        if not item or item.taxonomy_id != taxonomy_id:
             return redirect_with_error(request, "词汇项不存在或不属于当前词汇表", "core:taxonomy_view", taxonomy_id)
         TaxonomyService.update_item(item_id, name=name, description=description)
         return redirect_with_success(request, "词汇项更新成功", "core:taxonomy_view", taxonomy_id)
@@ -89,7 +85,7 @@ def taxonomy_create(request):
 @admin_required
 def taxonomy_view(request, taxonomy_id: int):
     """查看词汇表"""
-    taxonomy = get_object_or_404(Taxonomy, id=taxonomy_id)
+    taxonomy = TaxonomyService.get_or_raise(taxonomy_id, "词汇表不存在")
     queryset = TaxonomyService.get_items(taxonomy_id)
     page_obj, page_range = paginate_queryset(request, queryset, per_page=10)
     return render(
@@ -108,7 +104,7 @@ def taxonomy_view(request, taxonomy_id: int):
 @admin_required
 def taxonomy_edit(request, taxonomy_id: int):
     """编辑词汇表"""
-    taxonomy = get_object_or_404(Taxonomy, id=taxonomy_id)
+    taxonomy = TaxonomyService.get_or_raise(taxonomy_id, "词汇表不存在")
     if request.method == "POST":
         return _handle_taxonomy_form(request, taxonomy)
     return render(
@@ -122,35 +118,35 @@ def taxonomy_edit(request, taxonomy_id: int):
 @require_POST
 def taxonomy_delete(request, taxonomy_id: int):
     """删除词汇表"""
-    taxonomy = get_object_or_404(Taxonomy, id=taxonomy_id)
-    taxonomy.delete()
+    if not TaxonomyService.delete_taxonomy(taxonomy_id):
+        return redirect_with_error(request, "词汇表不存在", "core:taxonomies")
     return redirect_with_success(request, "词汇表已删除", "core:taxonomies")
 
 
 @admin_required
 def taxonomy_item_create(request, taxonomy_id: int):
     """创建词汇项"""
-    taxonomy = get_object_or_404(Taxonomy, id=taxonomy_id)
+    TaxonomyService.get_or_raise(taxonomy_id, "词汇表不存在")
     if request.method == "POST":
-        return _handle_taxonomy_item_form(request, taxonomy.id)
-    return redirect("core:taxonomy_view", taxonomy.id)
+        return _handle_taxonomy_item_form(request, taxonomy_id)
+    return redirect("core:taxonomy_view", taxonomy_id)
 
 
 @admin_required
 def taxonomy_item_update(request, taxonomy_id: int, item_id: int):
     """更新词汇项"""
-    taxonomy = get_object_or_404(Taxonomy, id=taxonomy_id)
+    TaxonomyService.get_or_raise(taxonomy_id, "词汇表不存在")
     if request.method == "POST":
-        return _handle_taxonomy_item_form(request, taxonomy.id, item_id)
-    return redirect("core:taxonomy_view", taxonomy.id)
+        return _handle_taxonomy_item_form(request, taxonomy_id, item_id)
+    return redirect("core:taxonomy_view", taxonomy_id)
 
 
 @admin_required
 @require_POST
 def taxonomy_item_delete(request, taxonomy_id: int, item_id: int):
     """删除词汇项"""
-    item = TaxonomyItem.objects.filter(id=item_id, taxonomy_id=taxonomy_id).first()
-    if item:
-        TaxonomyService.delete_item(item_id)
-        return redirect_with_success(request, "词汇项已删除", "core:taxonomy_view", taxonomy_id)
-    return redirect_with_error(request, "词汇项不存在或不属于当前词汇表", "core:taxonomy_view", taxonomy_id)
+    item = TaxonomyService.get_item_by_id(item_id)
+    if not item or item.taxonomy_id != taxonomy_id:
+        return redirect_with_error(request, "词汇项不存在或不属于当前词汇表", "core:taxonomy_view", taxonomy_id)
+    TaxonomyService.delete_item(item_id)
+    return redirect_with_success(request, "词汇项已删除", "core:taxonomy_view", taxonomy_id)

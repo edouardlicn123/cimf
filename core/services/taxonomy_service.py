@@ -59,7 +59,7 @@ class TaxonomyService(BaseService):
     @staticmethod
     def get_taxonomy_list(search: str = "") -> list:
         """获取词汇表列表，支持搜索"""
-        queryset = Taxonomy.objects.all()
+        queryset = Taxonomy.objects.prefetch_related('items').all()
         if search:
             queryset = queryset.filter(name__icontains=search)
         return queryset.order_by("id")
@@ -96,10 +96,12 @@ class TaxonomyService(BaseService):
     def update_taxonomy(
         cls, taxonomy_id: int, name: str | None = None, slug: str | None = None, description: str | None = None
     ) -> models.Model:
-        """更新词汇表"""
+        """更新词汇表（None 字段表示不更新）"""
         taxonomy = cls.get_by_id(taxonomy_id)
         if taxonomy:
-            BaseService.update_fields(taxonomy, name=name, slug=slug, description=description)
+            kwargs = {k: v for k, v in {"name": name, "slug": slug, "description": description}.items() if v is not None}
+            if kwargs:
+                BaseService.update_fields(taxonomy, **kwargs)
         return taxonomy
 
     @classmethod
@@ -148,10 +150,12 @@ class TaxonomyService(BaseService):
     def update_item(
         cls, item_id: int, name: str | None = None, description: str | None = None, weight: int | None = None
     ) -> models.Model:
-        """更新词汇项"""
+        """更新词汇项（None 字段表示不更新）"""
         item = cls.get_item_by_id(item_id)
         if item:
-            BaseService.update_fields(item, name=name, description=description, weight=weight)
+            kwargs = {k: v for k, v in {"name": name, "description": description, "weight": weight}.items() if v is not None}
+            if kwargs:
+                BaseService.update_fields(item, **kwargs)
         return item
 
     @classmethod
@@ -162,6 +166,13 @@ class TaxonomyService(BaseService):
             item.delete()
             return True
         return False
+
+    @staticmethod
+    def get_count() -> int:
+        """获取词汇表总数"""
+        from core.models import Taxonomy  # noqa: PLC0415
+
+        return Taxonomy.objects.count()
 
     @staticmethod
     def reorder_items(taxonomy_id: int, item_ids: list[int]) -> bool:
@@ -194,7 +205,4 @@ class TaxonomyService(BaseService):
         logger.info(f"词汇表 fixture 加载完成，共 {count} 个词汇表")
         return count
 
-    @staticmethod
-    def generate_items_ai(_taxonomy_id: int, _count: int = 10) -> list[str]:
-        """AI 生成词汇项（预留接口）"""
-        return []
+

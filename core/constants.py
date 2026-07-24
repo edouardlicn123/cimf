@@ -15,7 +15,7 @@
 版本历史：
     - 1.000: 初始版本（仅版本号）
     - 2.000: 2026-05-02 - 集中化常量定义
-    - 2.118: 2026-07-23
+    - 2.126: 2026-07-24
 """
 
 # ============================================================
@@ -23,7 +23,7 @@
 # ============================================================
 
 VERSION_MAJOR = "2"
-VERSION_MINOR = 118
+VERSION_MINOR = 126
 
 
 def get_version_display():
@@ -140,6 +140,36 @@ class Language:
 
 
 # ============================================================
+# URL 名称常量
+# ============================================================
+
+
+class URLName:
+    """URL 名称常量 — 集中管理，消除魔法字符串"""
+
+    LOGIN = "core:login"
+    DASHBOARD = "core:dashboard"
+    SYSTEM_SETTINGS = "core:system_settings"
+    SYSTEM_USERS = "core:system_users"
+    SYSTEM_PERMISSIONS = "core:system_permissions"
+    TAXONOMIES = "core:taxonomies"
+    TAXONOMY_CREATE = "core:taxonomy_create"
+    TAXONOMY_VIEW = "core:taxonomy_view"
+    TAXONOMY_EDIT = "core:taxonomy_edit"
+    PROFILE_SETTINGS = "core:profile_settings"
+    PROFILE_VIEW = "core:profile_view"
+    LOGS_INDEX = "core:logs_index"
+    CRON_MANAGER = "core:cron_manager"
+    TOOLS_INDEX = "core:tools_index"
+    IMPORTEXPORT_DASHBOARD = "core:importexport_dashboard"
+    MODULE_LIST = "core:module_list"
+    MARKET_INDEX = "core:market_index"
+    HOMEPAGE_SETTINGS = "core:homepage_settings"
+    NAVIGATION_SETTINGS = "core:navigation_settings"
+    PERMISSION_CHECK = "core:permission_check"
+
+
+# ============================================================
 # 权限
 # ============================================================
 
@@ -150,6 +180,12 @@ class Perm:
     IMPORTEXPORT_VIEW = "importexport.view"
     SYSTEM_SETTINGS_VIEW = "system.settings.view"
     SYSTEM_SETTINGS_MODIFY = "system.settings.modify"
+    PERMISSIONS_VIEW = "permissions.view"
+    PERMISSIONS_MODIFY = "permissions.modify"
+    USER_CREATE = "user.create"
+    USER_READ = "user.read"
+    USER_UPDATE = "user.update"
+    USER_DELETE = "user.delete"
     USER_MANAGE = "user.manage"
     LOG_VIEW = "log.view"
 

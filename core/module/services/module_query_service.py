@@ -40,8 +40,12 @@ class ModuleQueryService:
         return list(Module.objects.filter(is_installed=True))
 
     @classmethod
-    def get_active(cls) -> list[Module]:
-        return list(Module.objects.filter(is_installed=True, is_active=True))
+    def get_active(cls, module_type: str | None = None) -> list[Module]:
+        """获取已安装并激活的模块列表，可选按类型筛选"""
+        qs = Module.objects.filter(is_installed=True, is_active=True)
+        if module_type:
+            qs = qs.filter(module_type=module_type)
+        return list(qs)
 
     @classmethod
     def get_by_id(cls, module_id: str) -> Module | None:

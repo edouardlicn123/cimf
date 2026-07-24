@@ -4,7 +4,6 @@
 
 import json
 import logging
-from importlib import import_module
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
@@ -12,8 +11,9 @@ from django.template import engines
 from django.views.decorators.http import require_GET
 
 from core.constants import DEFAULT_NAV_CARDS
-from core.decorators import api_get_view, api_post_view
-from core.module.models import Module
+from core.decorators import api_get_view, api_post_view, json_body
+from core.module.services.module_query_service import ModuleQueryService
+from core.module.services.module_registry_service import ModuleRegistryService
 from core.services import SettingsService, UserService
 from core.utils.response import json_error, json_success, no_cache_json_response
 
@@ -25,7 +25,7 @@ def _load_active_card_modules():
     from core.module.services.module_service import ModuleService  # noqa: PLC0415
 
     results = []
-    active_modules = Module.objects.filter(is_active=True)
+    active_modules = ModuleQueryService.get_active()
     for node_module in active_modules:
         if not node_module.path:
             continue
@@ -47,7 +47,7 @@ def _load_active_card_modules():
 def _collect_module_stats(module_path: str) -> dict:
     """收集模块统计数据"""
     try:
-        service_mod = import_module(f"modules.{module_path}.services")
+        service_mod = ModuleRegistryService.import_module_sub(module_path, "services")
         for attr_name in dir(service_mod):
             attr = getattr(service_mod, attr_name)
             if attr_name.endswith("Service") and hasattr(attr, "get_count"):
@@ -64,7 +64,7 @@ def _get_extra_card_context(module_path: str) -> dict:
     """获取额外的卡片上下文（如连接状态等）"""
     context = {}
     try:
-        service_mod = import_module(f"modules.{module_path}.services")
+        service_mod = ModuleRegistryService.import_module_sub(module_path, "services")
         for attr_name in dir(service_mod):
             attr = getattr(service_mod, attr_name)
             if attr_name.endswith("Service") and hasattr(attr, "get_status"):
@@ -156,11 +156,11 @@ def api_dashboard_cards(request):  # noqa: ARG001
 
 
 @api_post_view
+@json_body
 def api_dashboard_cards_save(request):
     """保存功能卡片布局"""
     try:
-        data = json.loads(request.body)
-        positions = data.get("positions", {})
+        positions = request.json_data.get("positions", {})
 
         SettingsService.save_setting(
             key="user_dashboard_card_positions",
@@ -188,11 +188,11 @@ def api_nav_cards(request):
 
 
 @api_post_view
+@json_body
 def api_nav_cards_save(request):
     """保存用户导航卡片"""
     try:
-        data = json.loads(request.body)
-        cards = data.get("cards", [])
+        cards = request.json_data.get("cards", [])
 
         if len(cards) > 12:
             return json_error("最多只能添加12个导航卡片", 400)

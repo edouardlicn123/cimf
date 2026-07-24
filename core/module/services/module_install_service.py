@@ -2,7 +2,6 @@ import logging
 import subprocess
 import sys
 import tempfile
-from importlib import import_module
 from pathlib import Path
 from typing import Any
 
@@ -170,7 +169,9 @@ except Exception as e:
     @classmethod
     def _init_module_sample_data(cls, module_id: str) -> bool:
         try:
-            module_services = import_module(f"modules.{module_id}.services")
+            from core.module.services.module_registry_service import ModuleRegistryService  # noqa: PLC0415
+
+            module_services = ModuleRegistryService.import_module_sub(module_id, "services")
             init_func = getattr(module_services, "init_sample_data", None)
             if init_func and callable(init_func):
                 init_func()

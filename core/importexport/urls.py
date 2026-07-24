@@ -4,9 +4,8 @@
 
 from django.urls import path
 
+from core.importexport import views
 from core.views import importexport_dashboard
-
-from . import views
 
 # 导出 URL
 urlpatterns = [

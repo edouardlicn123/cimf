@@ -1,7 +1,9 @@
 """
-权限检查装饰器模块
+视图装饰器模块
 """
 
+import json
+import logging
 from functools import wraps
 
 from django.contrib import messages
@@ -9,7 +11,10 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.views.decorators.http import require_GET, require_POST
 
+from core.constants import URLName
 from core.utils.response import json_error
+
+logger = logging.getLogger(__name__)
 
 
 def admin_required(view_func):
@@ -31,7 +36,7 @@ def admin_required(view_func):
 
         if not PermissionService.can_access_admin(request.user):
             messages.error(request, "需要系统管理员权限访问该页面")
-            return redirect("core:dashboard")
+            return redirect(URLName.DASHBOARD)
         return view_func(request, *args, **kwargs)
 
     return wrapper
@@ -58,7 +63,7 @@ def permission_required(permission: str):
 
             if not PermissionService.has_permission(request.user, permission):
                 messages.error(request, "您没有权限访问该页面")
-                return redirect("core:dashboard")
+                return redirect(URLName.DASHBOARD)
             return view_func(request, *args, **kwargs)
 
         return wrapper
@@ -121,6 +126,26 @@ def handle_form_errors(view_func):
             messages.error(request, str(e))
             if request.method == "POST":
                 return redirect(request.path)
-            return redirect("core:dashboard")
+            return redirect(URLName.DASHBOARD)
+
+    return wrapper
+
+
+def json_body(view_func):
+    """解析 request.body 为 JSON，注入 request.json_data
+
+    用法：
+        @json_body
+        def my_view(request):
+            data = request.json_data  # dict | None
+    """
+
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        try:
+            request.json_data = json.loads(request.body) if request.body else {}
+        except (json.JSONDecodeError, ValueError):
+            request.json_data = {}
+        return view_func(request, *args, **kwargs)
 
     return wrapper

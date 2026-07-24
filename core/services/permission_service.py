@@ -29,28 +29,66 @@
     - core.models.SystemSetting: 系统设置模型
 """
 
+import inspect
 import json
+import logging
+import re
 
-from core.constants import UserRole
+from django.urls import get_resolver
+
+from core.constants import Perm, UserRole
 from core.models import User
 from core.module.models import Module
 
-PERMISSIONS = [
-    ("system.settings.view", "系统设置 - 查看"),
-    ("system.settings.modify", "系统设置 - 修改"),
-    ("permissions.view", "权限管理 - 查看"),
-    ("permissions.modify", "权限管理 - 修改"),
-    ("user.create", "人员管理 - 创建"),
-    ("user.read", "人员管理 - 查看"),
-    ("user.update", "人员管理 - 修改"),
-    ("user.delete", "人员管理 - 删除"),
-    ("importexport.view", "数据导入导出 - 访问"),
+logger = logging.getLogger(__name__)
+
+PERMISSION_GROUPS: list[dict] = [
+    {
+        "key": "system_settings",
+        "name": "系统设置",
+        "icon": "bi-gear",
+        "permissions": [
+            (Perm.SYSTEM_SETTINGS_VIEW, "系统设置 - 查看"),
+            (Perm.SYSTEM_SETTINGS_MODIFY, "系统设置 - 修改"),
+        ],
+    },
+    {
+        "key": "permissions",
+        "name": "权限管理",
+        "icon": "bi-shield-lock",
+        "permissions": [
+            (Perm.PERMISSIONS_VIEW, "权限管理 - 查看"),
+            (Perm.PERMISSIONS_MODIFY, "权限管理 - 修改"),
+        ],
+    },
+    {
+        "key": "user",
+        "name": "人员管理",
+        "icon": "bi-people",
+        "permissions": [
+            (Perm.USER_CREATE, "人员管理 - 创建"),
+            (Perm.USER_READ, "人员管理 - 查看"),
+            (Perm.USER_UPDATE, "人员管理 - 修改"),
+            (Perm.USER_DELETE, "人员管理 - 删除"),
+        ],
+    },
+    {
+        "key": "importexport",
+        "name": "数据导入导出",
+        "icon": "bi-arrow-down-up",
+        "permissions": [
+            (Perm.IMPORTEXPORT_VIEW, "数据导入导出 - 访问"),
+        ],
+    },
 ]
 
+PERMISSIONS: list[tuple[str, str]] = [
+    perm for group in PERMISSION_GROUPS for perm in group["permissions"]
+]
 
 ROLE_DEFAULT_PERMISSIONS: dict[str, list[str]] = {
-    UserRole.MANAGER: ["importexport.view"],
-    UserRole.LEADER: ["importexport.view"],
+    UserRole.MANAGER: [Perm.IMPORTEXPORT_VIEW],
+    UserRole.LEADER: [Perm.IMPORTEXPORT_VIEW],
     UserRole.EMPLOYEE: [],
 }
 
@@ -70,39 +108,12 @@ class PermissionService:
     def get_system_permissions() -> dict[str, dict]:
         """获取系统权限，按模块分组"""
         return {
-            "system_settings": {
-                "name": "系统设置",
-                "icon": "bi-gear",
-                "permissions": [
-                    ("system.settings.view", "系统设置 - 查看"),
-                    ("system.settings.modify", "系统设置 - 修改"),
-                ],
-            },
-            "permissions": {
-                "name": "权限管理",
-                "icon": "bi-shield-lock",
-                "permissions": [
-                    ("permissions.view", "权限管理 - 查看"),
-                    ("permissions.modify", "权限管理 - 修改"),
-                ],
-            },
-            "user": {
-                "name": "人员管理",
-                "icon": "bi-people",
-                "permissions": [
-                    ("user.create", "人员管理 - 创建"),
-                    ("user.read", "人员管理 - 查看"),
-                    ("user.update", "人员管理 - 修改"),
-                    ("user.delete", "人员管理 - 删除"),
-                ],
-            },
-            "importexport": {
-                "name": "数据导入导出",
-                "icon": "bi-arrow-down-up",
-                "permissions": [
-                    ("importexport.view", "数据导入导出 - 访问"),
-                ],
-            },
+            group["key"]: {
+                "name": group["name"],
+                "icon": group["icon"],
+                "permissions": group["permissions"][:],
+            }
+            for group in PERMISSION_GROUPS
         }
 
     @staticmethod
@@ -220,3 +231,58 @@ class PermissionService:
             node_permissions[module.module_id] = {"name": module.name, "icon": icon, "permissions": perms}
 
         return node_permissions
+
+
+def get_all_pages_with_permission_status():
+    """获取所有页面的权限状态（URL 模式 + 是否含 admin 检查）"""
+    pages = []
+    visited_views = set()
+
+    def extract_patterns(patterns):
+        for pattern in patterns:
+            if hasattr(pattern, "url_patterns"):
+                extract_patterns(pattern.url_patterns)
+            elif hasattr(pattern, "callback") and pattern.callback:
+                view_func = pattern.callback
+                view_name = getattr(view_func, "__name__", pattern.name or "unknown")
+                url_pattern = str(pattern.pattern)
+                url_pattern = url_pattern.lstrip("^").rstrip("$")
+
+                if not url_pattern or url_pattern == "/":
+                    continue
+
+                admin_views = {
+                    "changelist_view", "add_view", "change_view", "delete_view",
+                    "history_view", "app_index", "autocomplete_view", "i18n_javascript",
+                    "password_change", "password_change_done", "user_change_password",
+                    "catch_all_view", "view", "shortcut", "login", "logout", "index", "jsi18n",
+                }
+                if view_name in admin_views and not pattern.name:
+                    continue
+
+                if re.match(r"^\w+/", url_pattern) and not pattern.name:
+                    continue
+
+                if url_pattern.endswith(("/add/", "/delete/")):
+                    continue
+
+                if view_func in visited_views:
+                    continue
+                visited_views.add(view_func)
+
+                has_admin_check = "PermissionService.can_access_admin" in (
+                    inspect.getsource(view_func) if callable(view_func) else ""
+                )
+
+                pages.append({
+                    "name": pattern.name or view_name,
+                    "url": url_pattern,
+                    "has_admin_check": has_admin_check,
+                })
+
+    try:
+        extract_patterns(get_resolver().url_patterns)
+    except Exception as e:
+        logger.warning(f"提取URL模式失败: {e}", exc_info=True)
+
+    return pages

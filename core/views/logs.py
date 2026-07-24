@@ -2,12 +2,10 @@
 日志管理视图
 """
 
-from django.http import JsonResponse
 from django.shortcuts import redirect, render
 
-from core.decorators import admin_required, admin_required_json
+from core.decorators import admin_required
 from core.services.log_service import LogService
-from core.utils.response import json_error
 
 
 def _parse_page_params(request, default_page=1, default_size=100):
@@ -52,15 +50,3 @@ def logs_view(request, log_type):
     )
 
 
-# TODO: logs_api 未注册路由，需在 core/urls.py 中添加 URL 映射。预留用于前端 AJAX 日志加载。
-@admin_required_json
-def logs_api(request, log_type):
-    """日志 API - JSON 接口（未注册路由，预留功能）"""
-    page, page_size = _parse_page_params(request)
-    level = request.GET.get("level", "all")
-
-    if log_type not in ["cimf", "error", "security"]:
-        return json_error("Invalid log type", 400)
-
-    log_data = LogService.read_log(log_type, page, page_size, level)
-    return JsonResponse(log_data)

@@ -1,13 +1,12 @@
 import logging
-from datetime import timedelta
 from typing import Any
 
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.db.models import IntegerField, Q
 from django.db.models.functions import Cast, Substr
-from django.utils import timezone
 
+from core.node.base_node_service import BaseNodeService
 from core.node.models import Node, NodeType
 from core.node.services import NodeService
 from core.services import PermissionService
@@ -42,8 +41,15 @@ FIELD_MAPPING = {
 }
 
 
-class CustomerService:
+class CustomerService(BaseNodeService):
     """海外客户管理服务"""
+    model_class = CustomerFields
+
+    @staticmethod
+    def get_by_node_id(node_id: int) -> 'CustomerFields | None':
+        return CustomerFields.objects.select_related(
+            'customer_type', 'enterprise_type', 'customer_level', 'country',
+        ).filter(node_id=node_id).first()
 
     @staticmethod
     def get_list(
@@ -71,14 +77,6 @@ class CustomerService:
             queryset = queryset.filter(customer_level_id=customer_level_id)
 
         return queryset.order_by("-created_at")
-
-    @staticmethod
-    def get_by_id(customer_id: int) -> CustomerFields | None:
-        return CustomerFields.objects.filter(id=customer_id).first()
-
-    @staticmethod
-    def get_by_node_id(node_id: int) -> CustomerFields | None:
-        return CustomerFields.objects.filter(node_id=node_id).first()
 
     @staticmethod
     def _generate_unique_code() -> str:
@@ -200,15 +198,6 @@ class CustomerService:
             {"name": "website", "label": "网站", "type": "string"},
             {"name": "notes", "label": "备注", "type": "string"},
         ]
-
-    @staticmethod
-    def get_count() -> int:
-        return CustomerFields.objects.count()
-
-    @staticmethod
-    def get_recent_count(days: int = 7) -> int:
-        start_date = timezone.now() - timedelta(days=days)
-        return CustomerFields.objects.filter(created_at__gte=start_date).count()
 
     @staticmethod
     def init_sample_data() -> int:

@@ -258,3 +258,17 @@ Agent 应在以下情况检查该文档：
 ./venv/bin/basedpyright                                # 类型检查
 ./venv/bin/pre-commit run --all-files                  # 全部 pre-commit 检查
 ```
+
+---
+
+## Core → 模块引用规范
+
+所有 `core/` → `modules/` 的动态导入必须使用 `ModuleRegistryService`（`core/module/services/module_registry_service.py`）：
+- **已安装模块：** `ModuleRegistryService.import_module_sub(module_id, submodule)`
+- **可选模块：** `ModuleRegistryService.safe_import_module_sub(module_id, submodule, default=None)`
+
+禁止以下模式：
+- `from modules.xxx import ...`（直接硬导入）
+- `import_module("modules.xxx")`（字符串硬编码）
+
+**验证命令：** `grep -rn 'import_module.*modules\.' core/ --include='*.py'` 应返回 0 条结果（`module_registry_service.py` 自身除外）。

@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
 from core.decorators import admin_required
-from core.services import SettingsService, UserService
+from core.services import SettingsService, TaxonomyService, UserService
 
 
 @login_required
@@ -35,10 +35,8 @@ def dashboard(request):
 def admin_dashboard(request):
     """管理后台仪表盘"""
     stats = UserService.get_user_stats()
-    from core.models import SystemSetting, Taxonomy  # noqa: PLC0415
-
-    settings_count = SystemSetting.objects.count()
-    taxonomy_count = Taxonomy.objects.count()
+    settings_count = SettingsService.get_count()
+    taxonomy_count = TaxonomyService.get_count()
 
     return render(
         request,

@@ -4,12 +4,11 @@ import logging
 
 from django.contrib import messages
 from django.db.models.deletion import ProtectedError
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render
 from django.views.decorators.http import require_POST
 
 from core.decorators import admin_required
 from core.forms.admin_forms import UserCreateForm, UserEditForm
-from core.models import User
 from core.services import UserService
 from core.utils.views import redirect_with_error, redirect_with_success
 
@@ -77,7 +76,10 @@ def user_create(request):
 @admin_required
 def user_edit(request, user_id: int):
     """编辑用户"""
-    user = get_object_or_404(User, id=user_id)
+    try:
+        user = UserService.get_user_by_id(user_id)
+    except ValueError:
+        return redirect_with_error(request, "用户不存在", "core:system_users")
 
     if user_id == 1:
         return redirect_with_error(request, "系统管理员账号禁止编辑", "core:system_users")
@@ -123,10 +125,13 @@ def user_delete(request, user_id: int):
     if user_id == request.user.id:
         return redirect_with_error(request, "禁止删除当前登录账号", "core:system_users")
 
-    user = get_object_or_404(User, id=user_id)
     try:
-        user.delete()
+        UserService.delete_user(user_id)
         return redirect_with_success(request, "用户已删除", "core:system_users")
+    except PermissionError:
+        return redirect_with_error(request, "系统管理员账号禁止删除", "core:system_users")
+    except ValueError:
+        return redirect_with_error(request, "用户不存在", "core:system_users")
     except ProtectedError:
         return redirect_with_error(request, "该用户有关联数据，无法删除", "core:system_users")
     except Exception as e:
