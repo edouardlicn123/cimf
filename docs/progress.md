@@ -260,3 +260,19 @@
 4. 修复resident_info模块: 表单上下文传递+错误展示; max_length对齐(forms<->model)x4; 删除重复@staticmethod; select_related补齐x4(delete/get_list/get_by_node_id); 批量加载taxonomy替代11次独立调用; 5个字符串字段移除null=True+迁移
 5. 清除 bugscan 报告: 添加 3 条抑制规则 (l1_detectors datetime_now / customer first_unchecked / base_node_service first_returned)，报告清零
 
+# 2026-07-26 修改记录
+
+1. 修复 BaseNodeService 无 model_class 时 get_count 崩溃；_collect_module_stats 跳过 model_class 为 None 的服务类
+2. 修复 manage.py check 报告：CIMF_W001 calc 类方法误报、CIMF_W002 views_check 缺少 admin_required_json、CIMF_W006/W007 whatsapp services/views 的 save/except 问题、CIMF_W008/W009 noqa
+3. 新增 core/utils/error_utils.py 提供 service_connect_error() 公用工具；WhatsApp 模块 7 处异常消息改用友好中文提示
+4. 删除 calc（计算器）模块：数据库记录、模块目录、文档引用
+5. 清除 calc 模块残余文档引用：A01/A02/A04/B02/B03/B05 技术规范 + 补充材料 + 快照
+6. 修复 WABridge 重启超时：services.py 加 stdin=DEVNULL；run_stop/run_start CLI 模式跳过 press_enter；socket.js 重连加 .catch() 防进程退出；_kill_wabridge_processes 加 SIGKILL 兜底
+7. 修复 socket.js startSocket async anti-pattern：try-catch 包裹 async executor 防止 unhandled rejection 导致 Node 进程退出；重连失败 10s 后自动重试
+8. socket.js ev.process 回调内加 try-catch 防 saveCreds 异常逃逸；serve.js 加 unhandledRejection 全局兜底
+9. WABridge 稳定性加固：serve.js 加 uncaughtException 兜底；WABridgeRestartTask cron 间隔改为5分钟、仅不健康时重启
+10. 新增 cimf-whatsapp/PATCHES.md 补丁管理文档；更新 README.md 进程稳定性章节和故障排查
+11. 文档补全：修正 whatsapp 模块快照，新增 cimf-whatsapp/whatsapp/README.md 和 runwabridge/README.md，更新 snapshot_完整.md 添加 WhatsApp 模型/服务/Cron 条目
+12. 模块快照迁移：将 clock/customer/smtptest/whatsapp 快照从 docs/模块快照/ 移至各自模块根目录 SNAPSHOT.md，更新 AGENTS.md/现有模块.md/开发规范.md 引用路径，resident_info.md 保留原处待后续迁移
+13. 修复时间同步服务：移除无效的百度接口，新增 suning 接口，超时 3→5 秒，支持更多响应字段名(sysTime2/dateTime)
+

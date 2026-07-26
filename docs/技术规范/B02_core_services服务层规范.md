@@ -500,7 +500,7 @@ def user_list(request):
 |------|------|------|------|
 | `init_sample_customers()` | - | Dict | 初始化客户模块示例数据 |
 
-> **注意**：当前 SampleDataService 仅包含 `init_sample_customers()` 方法。其他服务（clock, calc, smtptest）的 `init_sample_data()` 方法定义在各自的 `modules/*/services.py` 中。
+> **注意**：当前 SampleDataService 仅包含 `init_sample_customers()` 方法。其他服务（clock, smtptest）的 `init_sample_data()` 方法定义在各自的 `modules/*/services.py` 中。
 
 ---
 

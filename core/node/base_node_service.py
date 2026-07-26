@@ -22,13 +22,19 @@ class BaseNodeService(BaseService):
 
     @classmethod
     def get_by_node_id(cls, node_id: int):
+        if cls.model_class is None:
+            return None
         return cls.model_class.objects.filter(node_id=node_id).first()
 
     @classmethod
     def get_count(cls):
+        if cls.model_class is None:
+            return 0
         return cls.model_class.objects.count()
 
     @classmethod
     def get_recent_count(cls, days: int = 7):
+        if cls.model_class is None:
+            return 0
         cutoff = timezone.now() - timedelta(days=days)
         return cls.model_class.objects.filter(created_at__gte=cutoff).count()

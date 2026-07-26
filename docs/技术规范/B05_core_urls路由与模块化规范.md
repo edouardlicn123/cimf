@@ -96,7 +96,6 @@ URL 路由层负责将 HTTP 请求映射到对应的视图函数。
 |------|------|----------|----------|
 | customer | node | `nodes/customer/` | `core/node/urls.py` 分发 |
 | clock | system | `system/clock/` | 动态挂载于 `modules` 命名空间 |
-| calc | tool | `tools/calc/`、`modules/calc/` | `core/urls.py` `tools_page` 分发 + `modules/urls.py` 动态挂载 |
 | smtptest | tool | `tools/smtptest/`、`modules/smtptest/` | `core/urls.py` `tools_page` 分发 + `modules/urls.py` 动态挂载 |
 
 ### 5.6 模块通用 API
@@ -146,8 +145,8 @@ Jinja2 语法：`{{ url('namespace:name', arg) }}`。示例：`url('core:system_
 | `/system/` | 系统管理 + system 类型模块 | `/system/users/`, `/system/clock/api/time/` |
 | `/structure/` | 内容结构（节点类型、词汇表、字段类型） | `/structure/taxonomies/` |
 | `/nodes/` | 事务节点（node 类型模块 CRUD） | `/nodes/customer/` |
-| `/tools/` | 协作工具（tool 类型模块） | `/tools/calc/` |
-| `/modules/` | 其它模块（含 tool 类型模块的 API/子页面） | `/modules/calc/`, `/modules/smtptest/` |
+| `/tools/` | 协作工具（tool 类型模块） | `/tools/smtptest/` |
+| `/modules/` | 其它模块（含 tool 类型模块的 API/子页面） | `/modules/smtptest/` |
 | `/modules/manage/` | 模块管理 | `/modules/manage/` |
 | `/modules/market/` | 模块市场 | `/modules/market/` |
 | `/importexport/` | 导入导出 | `/importexport/export/` |

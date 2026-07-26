@@ -48,9 +48,8 @@ class TimeSyncService(SingletonMixin):
     DEFAULT_SERVER_URL = "https://api.uuni.cn/api/time"
 
     BACKUP_SERVERS = [
-        "https://api.uuni.cn/api/time",
-        "http://api.baidu.com/time/get",
         "http://worldtimeapi.org/api/timezone/Asia/Shanghai",
+        "http://quan.suning.com/getSysTime.do",
     ]
 
     def __init__(self):
@@ -101,12 +100,18 @@ class TimeSyncService(SingletonMixin):
         """从指定服务器获取时间"""
 
         def _fetch():
-            with urlopen(url, timeout=3) as response:  # noqa: S310 — trusted time API server
+            with urlopen(url, timeout=5) as response:  # noqa: S310 — trusted time API server
                 if response.status == 200:
                     data = json.loads(response.read().decode("utf-8"))
-                    date_str = data.get("date") or data.get("datetime", "").split("+")[0].replace("T", " ")
+                    date_str = (
+                        data.get("date")
+                        or data.get("datetime")
+                        or data.get("dateTime")
+                        or data.get("sysTime2")
+                    )
                     if date_str:
-                        return datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S").replace(tzinfo=UTC)
+                        date_str = date_str.replace("T", " ").split("+")[0].rstrip("Z")
+                        return datetime.strptime(date_str[:19], "%Y-%m-%d %H:%M:%S").replace(tzinfo=UTC)
             return None
 
         return safe_execute(_fetch, error_return=None, log_msg=f"从 {url} 获取时间失败", logger=logger)

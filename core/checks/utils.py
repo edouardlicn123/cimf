@@ -27,7 +27,7 @@ def _extract_decorators_and_functions(source):
             deco_match = re.match(r"@(\w+)", stripped)
             if deco_match:
                 current_decorators.append(deco_match.group(1))
-        elif stripped.startswith("def "):
+        elif stripped.startswith("def ") and not line[0].isspace():
             func_match = re.match(r"def (\w+)\(", stripped)
             if func_match:
                 func_name = func_match.group(1)
