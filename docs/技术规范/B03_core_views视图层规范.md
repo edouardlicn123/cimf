@@ -51,7 +51,6 @@
 | `core/module/views.py` | 7 | 模块管理 |
 | `modules/customer/views.py` | 6 | 海外客户管理 |
 | `modules/clock/views.py` | 1 | 时钟 API |
-| `modules/calc/views.py` | 2 | 计算器工具页面 + 计算表达式API |
 | `modules/smtptest/views.py` | 1 | SMTP 测试工具 |
 
 ---

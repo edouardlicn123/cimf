@@ -32,6 +32,16 @@
 |------|------|------|
 | ResidentInfoFields | Model | node, name, relation, id_card, other_id_type... (+33) |
 
+### modules/whatsapp/models.py
+
+| 模型 | 基类 | 字段 |
+|------|------|------|
+| WhatsAppTemplate | Model | title, content, is_default |
+| SendBatch | Model | template(FK→WhatsAppTemplate), total_count, success_count, failed_count, status, truncated, rate_limited, resume_at, next_send_at, template_ids(JSON) |
+| SendLog | Model | batch(FK→SendBatch), customer_id, phone, status, error_message, sent_at, delay_until |
+| CheckBatch | Model | status, total, checked, has_wa, no_wa, invalid, format_issue, error_count |
+| CheckLog | Model | batch(FK→CheckBatch), customer_id, customer_name, phone, result, attempts, attempt_details(JSON), checked_at |
+
 ## 服务层签名
 
 ### NodeService ()
@@ -296,6 +306,49 @@
 | get_exportable_fields |  |
 | init_sample_data |  |
 
+### WhatsAppService ()
+| 方法 | 参数 |
+|------|------|
+| check_health |  |
+| restart_wabridge | timeout |
+| ensure_healthy |  |
+| get_status |  |
+| send_message | phone, message |
+| test_connection |  |
+| create_batch | customer_ids, template_ids |
+| send_next_pending |  |
+| cancel_all_running |  |
+| check_daily_limit |  |
+| batch_check_whatsapp | customer_ids |
+| check_phone | phone |
+| start_recheck_all |  |
+| start_recheck_remaining |  |
+| stop_recheck |  |
+| get_recheck_progress |  |
+
+### TemplateService ()
+| 方法 | 参数 |
+|------|------|
+| get_all |  |
+| get_by_id | _id |
+| get_default |  |
+| create | title, content, is_default |
+| update | _id, title, content, is_default |
+| delete | _id |
+| validate_variables | content |
+
+### WhatsAppSendTask (CronTask)
+| 方法 | 参数 |
+|------|------|
+| __init__ |  |
+| execute |  |
+
+### WABridgeRestartTask (CronTask)
+| 方法 | 参数 |
+|------|------|
+| __init__ |  |
+| execute |  |
+
 ---
 
 ## Known Design Issues
@@ -304,5 +357,5 @@
 |---|------|-------|--------|--------|
 | 1 | `core/views/api/cards.py:135` | `module_contents[module_id]` 为 dict，多卡片时后覆盖前 | 每模块仅显示最后一张卡片 | TODO: 改为 list |
 | 2 | `cimf_django/settings.py:383` | `DJANGO_SECRET_KEY` 仅在生产环境校验 | 开发环境可留占位密钥 | 预期行为 |
-| 3 | `checks.py` CIMF_W001 | calc AST 访问者 + resident_info 辅助函数误报 | 8 条 false positive 一直存在 | 不影响功能 |
+| 3 | `checks.py` CIMF_W001 | 已修复：`_extract_decorators_and_functions` 跳过缩进 def（类方法不再误报） | — | ✅ 已修复 |
 | 4 | `checks.py` CIMF_W006 | PIL `Image.save()` 误报 | 2 条 false positive | 不影响功能 |

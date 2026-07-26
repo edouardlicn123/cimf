@@ -13,7 +13,7 @@ def check_auth_decorators(app_configs, **kwargs):  # noqa: ARG001
         Path(__file__).parent.parent / "views",
         Path(__file__).parent.parent.parent / "modules",
     ]
-    api_decorators = ["login_required_json", "admin_required"]
+    api_decorators = ["login_required_json", "admin_required", "admin_required_json"]
 
     for view_dir in view_dirs:
         if not view_dir.exists():

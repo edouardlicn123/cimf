@@ -50,7 +50,7 @@ def _collect_module_stats(module_path: str) -> dict:
         service_mod = ModuleRegistryService.import_module_sub(module_path, "services")
         for attr_name in dir(service_mod):
             attr = getattr(service_mod, attr_name)
-            if attr_name.endswith("Service") and hasattr(attr, "get_count"):
+            if attr_name.endswith("Service") and hasattr(attr, "get_count") and getattr(attr, "model_class", None) is not None:
                 return {
                     "total": attr.get_count(),
                     "recent": getattr(attr, "get_recent_count", lambda _=7: 0)(7),
