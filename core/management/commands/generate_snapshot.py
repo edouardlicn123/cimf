@@ -313,6 +313,12 @@ class Command(BaseCommand):
             f.write("\n")
         self.stdout.write(f"  写入: docs/模块快照/{module_name}.md")
 
+        module_snapshot_path = os.path.join(base_dir, "modules", module_name, "SNAPSHOT.md")
+        with open(module_snapshot_path, "w") as f:
+            f.write("\n".join(lines))
+            f.write("\n")
+        self.stdout.write(f"  写入: modules/{module_name}/SNAPSHOT.md")
+
     def _get_name(self, node):
         if isinstance(node, ast.Name):
             return node.id

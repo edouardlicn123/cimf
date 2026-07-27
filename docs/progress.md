@@ -276,3 +276,8 @@
 12. 模块快照迁移：将 clock/customer/smtptest/whatsapp 快照从 docs/模块快照/ 移至各自模块根目录 SNAPSHOT.md，更新 AGENTS.md/现有模块.md/开发规范.md 引用路径，resident_info.md 保留原处待后续迁移
 13. 修复时间同步服务：移除无效的百度接口，新增 suning 接口，超时 3→5 秒，支持更多响应字段名(sysTime2/dateTime)
 
+
+
+# 2026-07-27 修改记录
+
+1. 统一模块文档架构：为 resident_info 创建 SNAPSHOT.md；更新 generate_snapshot.py 同步写入模块目录 SNAPSHOT.md；更新 ModuleScaffoldService 自动生成 SNAPSHOT.md 骨架；现有模块.md 新增文档架构规范章节
