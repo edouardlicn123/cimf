@@ -127,6 +127,24 @@ def detail_view(request, pk):
             with (migrations_path / "__init__.py").open("w") as f:
                 f.write("# -*- coding: utf-8 -*-\n")
 
+            snapshot_content = f"""# {module_id} 模块快照
+
+## 模型
+| 模型 | 字段 |
+|------|------|
+
+## 服务类
+| 方法 | 参数 |
+|------|------|
+
+## 文件
+- `modules/{module_id}/models.py` (0 行)
+- `modules/{module_id}/views.py` (0 行)
+- `modules/{module_id}/module.py` (0 行)
+"""
+            with (module_path / "SNAPSHOT.md").open("w") as f:
+                f.write(snapshot_content)
+
             return {"success": True, "module_id": module_id, "path": module_path}
 
         except PermissionError:

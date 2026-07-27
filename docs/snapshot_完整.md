@@ -1,6 +1,6 @@
 # 代码快照
 
-> 自动生成：2026-07-07
+> 自动生成：2026-07-27
 > 用途：避免每次 session 全库扫描，减少 token 消耗
 > 快速参考（模型/服务索引）见 `docs/snapshot_快速参考.md`
 
@@ -10,6 +10,7 @@
 |------|------|------|
 | BaseModel | Model | created_at, updated_at |
 | ChinaRegion | Model | LEVEL_CHOICES, code, name, level, parent... (+1) |
+| IsActiveMixin | Model | is_active |
 | SystemSetting | Model | key, value, description, updated_at |
 | Taxonomy | BaseModel | name, slug, description |
 | TaxonomyItem | BaseModel | taxonomy, name, description, weight |
@@ -30,35 +31,25 @@
 
 | 模型 | 基类 | 字段 |
 |------|------|------|
-| ResidentInfoFields | Model | node, name, relation, id_card, other_id_type... (+33) |
-
-### modules/whatsapp/models.py
-
-| 模型 | 基类 | 字段 |
-|------|------|------|
-| WhatsAppTemplate | Model | title, content, is_default |
-| SendBatch | Model | template(FK→WhatsAppTemplate), total_count, success_count, failed_count, status, truncated, rate_limited, resume_at, next_send_at, template_ids(JSON) |
-| SendLog | Model | batch(FK→SendBatch), customer_id, phone, status, error_message, sent_at, delay_until |
-| CheckBatch | Model | status, total, checked, has_wa, no_wa, invalid, format_issue, error_count |
-| CheckLog | Model | batch(FK→CheckBatch), customer_id, customer_name, phone, result, attempts, attempt_details(JSON), checked_at |
+| ResidentInfoFields | BaseModel | node, name, relation, id_card, other_id_type... (+31) |
 
 ## 服务层签名
 
-### NodeService ()
+### NodeService (BaseService)
 | 方法 | 参数 |
 |------|------|
+| get_count |  |
 | get_nodes | node_type_slug |
 | get_node | node_type_slug, node_id |
-| get_by_id | node_id |
 | create_node | node_type_slug, _data, user |
 | update_node | node_id, data |
-| delete_node | node_id |
 | get_list | node_type_slug, search |
 
 ### NodeTypeService ()
 | 方法 | 参数 |
 |------|------|
 | get_all |  |
+| get_count |  |
 | get_all_including_inactive |  |
 | get_by_id | node_type_id |
 | get_by_id_or_404 | node_type_id |
@@ -80,7 +71,7 @@
 | 方法 | 参数 |
 |------|------|
 | authenticate | username, password |
-| login | _request, username, password |
+| login | username, password |
 | is_account_locked | user |
 | unlock_expired_accounts |  |
 | get_login_max_failures |  |
@@ -97,7 +88,7 @@
 | delete | entity_id |
 | get_or_raise | entity_id, error_msg |
 | get_first |  |
-| get_or_none |  |
+| update_fields | instance |
 
 ### ChinaRegionService ()
 | 方法 | 参数 |
@@ -135,17 +126,9 @@
 ### LogService ()
 | 方法 | 参数 |
 |------|------|
-| _get_security_logger |  |
-| get_client_ip | request |
-| log_login_attempt | request, username, success, reason |
-| log_logout | _user, username, ip |
-| log_permission_denied | request, user, resource, reason |
-| log_security_event | event_type, details, level |
-| log_api_access | request, endpoint, user |
-| log_data_export | request, user, export_type, record_count |
-| log_failed_validation | request, form_name, errors |
 | get_log_files |  |
 | read_log | log_type, page, page_size, level |
+| _read_log_file | log_type |
 | get_log_stats | log_type |
 
 ### CachedServiceMixin ()
@@ -171,22 +154,20 @@
 | get_user_effective_permissions | user |
 | can_access_admin | user |
 | init_default_role_permissions |  |
+| check_node_permission | user, node, permission_type |
 | get_node_permissions |  |
-
-### SampleDataService ()
-| 方法 | 参数 |
-|------|------|
-| init_sample_customers |  |
 
 ### SettingsService (CachedServiceMixin)
 | 方法 | 参数 |
 |------|------|
+| _get_default_settings |  |
 | get_all_settings | as_dict |
 | get_setting | key, default, parse_json |
 | save_setting | key, value, description |
 | save_settings_bulk | settings_dict |
 | reset_to_default | key |
 | _reset_to_default_bulk |  |
+| get_count |  |
 | clear_cache |  |
 
 ### TaxonomyService (BaseService)
@@ -202,14 +183,14 @@
 | update_taxonomy | taxonomy_id, name, slug, description |
 | delete_taxonomy | taxonomy_id |
 | get_items | taxonomy_id |
+| get_items_bulk | slugs |
 | get_item_by_id | item_id |
-| get_item | item_id |
 | create_item | taxonomy_id, name, description, weight |
 | update_item | item_id, name, description, weight |
 | delete_item | item_id |
+| get_count |  |
 | reorder_items | taxonomy_id, item_ids |
 | init_default_taxonomies |  |
-| generate_items_ai | _taxonomy_id, _count |
 
 ### TimeService ()
 | 方法 | 参数 |
@@ -230,6 +211,7 @@
 | get_sync_interval |  |
 | get_max_retries |  |
 | get_server_url |  |
+| test_connection | url |
 | _fetch_time_from_server | url |
 | _try_sync_with_servers |  |
 | sync_time |  |
@@ -245,26 +227,25 @@
 | _get_user_or_raise | user_id |
 | get_user_by_username | username |
 | get_user_list | search_term, only_active, exclude_admin, role |
+| _validate_username_unique | username, exclude_id |
+| _validate_email_unique | email, exclude_id |
 | create_user | username, nickname, email, password... |
+| _apply_field_updates | user, update_fields |
 | update_user | user_id, username, nickname, email... |
 | toggle_user_active | user_id, active |
+| get_count |  |
 | get_user_stats |  |
 | update_profile | user_id, nickname, email |
 | update_preferences | user_id, theme, notifications_enabled, preferred_language |
 | change_password | user_id, new_password |
 | get_navigation_cards | user_id |
 | save_navigation_cards | user_id, cards |
-| assign_position | cards |
+| delete_user | user_id |
 
 ### VersionService ()
 | 方法 | 参数 |
 |------|------|
-| get_version |  |
-| get_api_version |  |
-| get_build_date |  |
 | get_info |  |
-| check_compatibility | client_version |
-| get_supported_versions |  |
 
 ### WatermarkService ()
 | 方法 | 参数 |
@@ -278,84 +259,30 @@
 |------|------|
 | get_current_time |  |
 
-### CustomerService ()
+### CustomerService (BaseNodeService)
 | 方法 | 参数 |
 |------|------|
-| get_list | search, customer_type_id, customer_level_id, user |
-| get_by_id | customer_id |
 | get_by_node_id | node_id |
+| get_list | search, customer_type_id, customer_level_id, user |
+| _generate_unique_code |  |
+| _build_fields | data, extra |
 | create | user, data |
+| import_row | data, user |
 | update | customer_id, _user, data |
 | delete | customer_id |
 | get_exportable_fields |  |
-| get_count |  |
-| get_recent_count | days |
 | init_sample_data |  |
 
-### ResidentInfoService ()
+### ResidentInfoService (BaseNodeService)
 | 方法 | 参数 |
 |------|------|
 | get_list | search, resident_type_id, grid_id, current_community... |
-| get_by_id | resident_id |
 | get_by_node_id | node_id |
 | create | user, data |
 | update | resident_id, data |
+| delete | resident_id |
 | delete_by_node_id | node_id |
 | get_count |  |
 | get_recent_count | days |
 | get_exportable_fields |  |
 | init_sample_data |  |
-
-### WhatsAppService ()
-| 方法 | 参数 |
-|------|------|
-| check_health |  |
-| restart_wabridge | timeout |
-| ensure_healthy |  |
-| get_status |  |
-| send_message | phone, message |
-| test_connection |  |
-| create_batch | customer_ids, template_ids |
-| send_next_pending |  |
-| cancel_all_running |  |
-| check_daily_limit |  |
-| batch_check_whatsapp | customer_ids |
-| check_phone | phone |
-| start_recheck_all |  |
-| start_recheck_remaining |  |
-| stop_recheck |  |
-| get_recheck_progress |  |
-
-### TemplateService ()
-| 方法 | 参数 |
-|------|------|
-| get_all |  |
-| get_by_id | _id |
-| get_default |  |
-| create | title, content, is_default |
-| update | _id, title, content, is_default |
-| delete | _id |
-| validate_variables | content |
-
-### WhatsAppSendTask (CronTask)
-| 方法 | 参数 |
-|------|------|
-| __init__ |  |
-| execute |  |
-
-### WABridgeRestartTask (CronTask)
-| 方法 | 参数 |
-|------|------|
-| __init__ |  |
-| execute |  |
-
----
-
-## Known Design Issues
-
-| # | File | Issue | Impact | Status |
-|---|------|-------|--------|--------|
-| 1 | `core/views/api/cards.py:135` | `module_contents[module_id]` 为 dict，多卡片时后覆盖前 | 每模块仅显示最后一张卡片 | TODO: 改为 list |
-| 2 | `cimf_django/settings.py:383` | `DJANGO_SECRET_KEY` 仅在生产环境校验 | 开发环境可留占位密钥 | 预期行为 |
-| 3 | `checks.py` CIMF_W001 | 已修复：`_extract_decorators_and_functions` 跳过缩进 def（类方法不再误报） | — | ✅ 已修复 |
-| 4 | `checks.py` CIMF_W006 | PIL `Image.save()` 误报 | 2 条 false positive | 不影响功能 |

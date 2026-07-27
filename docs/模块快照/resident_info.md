@@ -9,10 +9,10 @@
 | 方法 | 参数 |
 |------|------|
 | ResidentInfoService.get_list | search, resident_type_id, grid_id, current_community... |
-| ResidentInfoService.get_by_id | resident_id |
 | ResidentInfoService.get_by_node_id | node_id |
 | ResidentInfoService.create | user, data |
 | ResidentInfoService.update | resident_id, data |
+| ResidentInfoService.delete | resident_id |
 | ResidentInfoService.delete_by_node_id | node_id |
 | ResidentInfoService.get_count |  |
 | ResidentInfoService.get_recent_count | days |
@@ -20,7 +20,8 @@
 | ResidentInfoService.init_sample_data |  |
 
 ## 文件
-- `modules/resident_info/models.py` (190 行)
-- `modules/resident_info/services.py` (223 行)
-- `modules/resident_info/views.py` (320 行)
-- `modules/resident_info/module.py` (86 行)
+- `modules/resident_info/models.py` (189 行)
+- `modules/resident_info/services.py` (239 行)
+- `modules/resident_info/views.py` (244 行)
+- `modules/resident_info/forms.py` (101 行)
+- `modules/resident_info/module.py` (89 行)
