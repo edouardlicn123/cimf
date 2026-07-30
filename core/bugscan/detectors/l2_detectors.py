@@ -157,8 +157,55 @@ def detect_modelchoice_static(path: Path, tree: ast.AST) -> list[Finding]:
     return findings
 
 
+def _has_logger_call(stmts: list[ast.stmt]) -> bool:
+    for stmt in stmts:
+        for node in ast.walk(stmt):
+            if isinstance(node, ast.Call):
+                caller = _get_call_caller_name(node)
+                if caller in ("logger", "logging"):
+                    return True
+    return False
+
+
+def _is_silent_return(stmt: ast.stmt) -> bool:
+    if not isinstance(stmt, ast.Return):
+        return False
+    if stmt.value is None:
+        return True
+    if isinstance(stmt.value, (ast.Constant, ast.Name, ast.List, ast.Dict, ast.Tuple)):
+        return True
+    return False
+
+
+def detect_silent_except(path: Path, tree: ast.AST) -> list[Finding]:
+    findings: list[Finding] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Try):
+            continue
+        for handler in node.handlers:
+            if _has_logger_call(handler.body):
+                continue
+            for stmt in handler.body:
+                if isinstance(stmt, (ast.Pass, ast.Continue)) or _is_silent_return(stmt):
+                    findings.append(
+                        Finding(
+                            file=str(path),
+                            line=getattr(stmt, "lineno", handler.lineno),
+                            column=getattr(stmt, "col_offset", handler.col_offset),
+                            severity="medium",
+                            pattern_id="silent_except",
+                            code=_source_snippet(path, handler.lineno),
+                            message="except 块中无日志记录，异常被静默吞没",
+                            fix_hint="添加 logger.warning 或 logger.exception(...)",
+                        )
+                    )
+                    break
+    return findings
+
+
 L2_DETECTORS: list[tuple[str, object]] = [
     ("first_unchecked / first_returned", detect_first_unchecked_returned),
     ("save_no_updates", detect_save_no_update_fields),
     ("modelchoice_static", detect_modelchoice_static),
+    ("silent_except", detect_silent_except),
 ]

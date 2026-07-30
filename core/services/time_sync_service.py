@@ -121,9 +121,14 @@ class TimeSyncService(SingletonMixin):
         servers = [self.get_server_url(), *self.BACKUP_SERVERS]
         servers = list(dict.fromkeys(servers))
         max_retries = self.get_max_retries()
+        failed_servers: set[str] = set()
 
         for attempt in range(max_retries):
-            for server_url in servers:
+            available = [s for s in servers if s not in failed_servers]
+            if not available:
+                break
+
+            for server_url in available:
                 logger.info(f"尝试从 {server_url} 同步时间 (尝试 {attempt + 1}/{max_retries})")
                 server_time = self._fetch_time_from_server(server_url)
                 if server_time:
@@ -132,10 +137,13 @@ class TimeSyncService(SingletonMixin):
                     self._sync_status = "success"
                     logger.info(f"时间同步成功: {server_time}")
                     return True
+                failed_servers.add(server_url)
 
             if attempt < max_retries - 1:
-                logger.info(f"所有服务器同步失败，{self.DEFAULT_RETRY_DELAY}秒后重试...")
-                time.sleep(self.DEFAULT_RETRY_DELAY)
+                retry_servers = [s for s in servers if s not in failed_servers]
+                if retry_servers:
+                    logger.info(f"部分服务器失败，{self.DEFAULT_RETRY_DELAY}秒后重试可用服务器...")
+                    time.sleep(self.DEFAULT_RETRY_DELAY)
 
         self._sync_status = "failed"
         logger.error("时间同步失败，已达到最大重试次数")

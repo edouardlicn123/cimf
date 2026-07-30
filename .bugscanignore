@@ -12,6 +12,14 @@ core/bugscan/detectors.py:datetime_now
 core/bugscan/detectors.py:jsonfield_default
 core/bugscan/detectors.py:nullbooleanfield
 core/bugscan/detectors/l1_detectors.py:datetime_now
+core/bugscan/detectors/l1_detectors.py:http_fallback_url
+core/bugscan/detectors/l1_detectors.py:mark_safe_fstring
+
+# silent_except — bugscan 自身检测器，文件读取/语法错误/检测器异常均为已知安全
+core/bugscan/detectors/scanner.py:silent_except
+
+# silent_except — 系统检查模块中的静默异常处理器均为已知安全
+core/checks/*.py:silent_except
 
 # 已知安全的 first_returned（调用者负责 None 检查）
 core/node/services/node_type_service.py:first_returned

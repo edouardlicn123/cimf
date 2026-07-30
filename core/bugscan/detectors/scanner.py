@@ -14,7 +14,7 @@ def scan_file(path: Path) -> list[Finding]:
 
     try:
         text = path.read_text(encoding="utf-8")
-    except Exception:  # noqa: S110 — file read failure, skip
+    except Exception:  # noqa: CIMF_W007 — file read failure, skip
         return findings
 
     for _pid, detector in L1_DETECTORS:
