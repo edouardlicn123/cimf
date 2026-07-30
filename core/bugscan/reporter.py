@@ -1,8 +1,6 @@
 """JSON 报告生成与写入"""
 
 import json
-import os
-import re
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any

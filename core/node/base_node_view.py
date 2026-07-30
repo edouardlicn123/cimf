@@ -103,9 +103,7 @@ def make_node_delete(service_class, *, module_slug, label_name=None, delete_meth
         label_name = module_slug
 
     @login_required
-    def node_delete(request, node_id: int):  # noqa: ARG001
-        from django.views.decorators.http import require_POST  # noqa: PLC0415
-
+    def node_delete(request, node_id: int):
         if request.method != 'POST':
             return redirect('node:module_page', module_slug)
 

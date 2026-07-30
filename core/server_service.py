@@ -68,7 +68,7 @@ class ServerService:
             print(f"\n未检测到数据库文件: {db_path}")
             print("将创建新数据库...")
             print("执行 python manage.py migrate ...")
-            result = subprocess.run(  # noqa: S603 — controlled dev command
+            result = subprocess.run(  # controlled dev command
                 ["python", "manage.py", "migrate"],
                 capture_output=True,
                 text=True,

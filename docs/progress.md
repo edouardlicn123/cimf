@@ -281,3 +281,9 @@
 # 2026-07-27 修改记录
 
 1. 统一模块文档架构：为 resident_info 创建 SNAPSHOT.md；更新 generate_snapshot.py 同步写入模块目录 SNAPSHOT.md；更新 ModuleScaffoldService 自动生成 SNAPSHOT.md 骨架；现有模块.md 新增文档架构规范章节
+
+# 2026-07-29 修改记录
+
+1. 修复 Ruff 6 处真 bug: 移除 scanner.py/base_node_view.py/server_service.py 无用 noqa, 删除 reporter.py 未用导入 os/re, 删除 base_node_view.py 未用 require_POST 导入
+2. 添加 3 个 bugscan 检测器: http_fallback_url(L1), mark_safe_fstring(L1), silent_except(L2); 更新 .bugscanignore
+
