@@ -287,3 +287,8 @@
 1. 修复 Ruff 6 处真 bug: 移除 scanner.py/base_node_view.py/server_service.py 无用 noqa, 删除 reporter.py 未用导入 os/re, 删除 base_node_view.py 未用 require_POST 导入
 2. 添加 3 个 bugscan 检测器: http_fallback_url(L1), mark_safe_fstring(L1), silent_except(L2); 更新 .bugscanignore
 
+# 2026-07-30 修改记录
+
+1. 移除废弃模块 calc 目录（仅有空壳文件，无源码）
+2. 清理 calc 模块：删除 modules 目录、数据库 modules 记录、tool_types 记录
+
