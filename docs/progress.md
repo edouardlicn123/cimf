@@ -291,4 +291,5 @@
 
 1. 移除废弃模块 calc 目录（仅有空壳文件，无源码）
 2. 清理 calc 模块：删除 modules 目录、数据库 modules 记录、tool_types 记录
+3. 删除 has_whatsapp=False 的客户记录 3104 条
 
