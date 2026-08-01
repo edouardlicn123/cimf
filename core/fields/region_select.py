@@ -65,7 +65,7 @@ class RegionSelectWidget(forms.TextInput):
             <input type="hidden" name="{name}" id="id_{name}" value='{escaped_value}'>
         </div>
         '''
-        return mark_safe(html_output)  # noqa: CIMF_W009 — 所有数据已 html.escape()  # noqa: S308 — data already html.escape'd
+        return mark_safe(html_output)  # noqa: S308, CIMF_W009 — 所有数据已 html.escape()
 
     class Media:
         js = ("js/region_select.js",)

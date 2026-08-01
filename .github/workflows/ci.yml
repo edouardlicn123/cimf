@@ -21,8 +21,8 @@ jobs:
         run: |
           python -m venv venv
           ./venv/bin/pip install --upgrade pip
-          ./venv/bin/pip install -r requirements.txt 2>/dev/null || true
-          ./venv/bin/pip install ruff basedpyright
+          ./venv/bin/pip install -r requirements.txt
+          ./venv/bin/pip install ruff==0.16.1
 
       - name: Ruff check
         run: ./venv/bin/ruff check
@@ -38,5 +38,6 @@ jobs:
         run: ./venv/bin/python manage.py check --deploy --fail-level WARNING
         env:
           DJANGO_ENV: production
-          DJANGO_SECRET_KEY: ci-test-secret-key-not-for-production
+          DJANGO_SECRET_KEY: cimf-ci-5f3b9a0c2e7d4b8f1a6c3e9d0b5a2f8c7e4d1a0b3f6c9e2d7a5b8c0f1e4a7d2
           DJANGO_DEBUG: "false"
+          DJANGO_ALLOWED_HOSTS: ci.example.com

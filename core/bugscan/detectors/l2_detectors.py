@@ -172,9 +172,7 @@ def _is_silent_return(stmt: ast.stmt) -> bool:
         return False
     if stmt.value is None:
         return True
-    if isinstance(stmt.value, (ast.Constant, ast.Name, ast.List, ast.Dict, ast.Tuple)):
-        return True
-    return False
+    return isinstance(stmt.value, (ast.Constant, ast.Name, ast.List, ast.Dict, ast.Tuple))
 
 
 def detect_silent_except(path: Path, tree: ast.AST) -> list[Finding]:

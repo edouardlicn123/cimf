@@ -19,7 +19,7 @@ class ServerService:
     @classmethod
     def prepare_host_port(cls) -> tuple[str, int]:
         """解析 host/port 环境变量"""
-        host = os.environ.get("DJANGO_HOST", "0.0.0.0")
+        host = os.environ.get("DJANGO_HOST", "0.0.0.0")  # noqa: S104 — dev server binds all interfaces
         custom_port = int(sys.argv[1]) if len(sys.argv) > 1 and sys.argv[1].isdigit() else None
         port = custom_port or int(os.environ.get("DJANGO_PORT", "8000"))
         return host, port
@@ -69,7 +69,7 @@ class ServerService:
             print("将创建新数据库...")
             print("执行 python manage.py migrate ...")
             result = subprocess.run(  # controlled dev command
-                ["python", "manage.py", "migrate"],
+                [sys.executable, "manage.py", "migrate"],
                 capture_output=True,
                 text=True,
                 check=False,

@@ -14,6 +14,11 @@ from .utils import (
 )
 
 
+def _has_noqa(line: str, code: str) -> bool:
+    """判断行内 noqa 注释是否包含指定代码（可与 ruff 规则码共存于同一注释）。"""
+    return bool(re.search(rf"noqa:.*\b{code}\b", line))
+
+
 @register("cimf")
 def check_save_update_fields(app_configs, **kwargs):  # noqa: ARG001
     errors = []
@@ -44,7 +49,7 @@ def check_save_update_fields(app_configs, **kwargs):  # noqa: ARG001
                 lineno = getattr(node, "lineno", 0)
                 if lineno > 0 and lineno <= len(source_lines):
                     line_text = source_lines[lineno - 1]
-                    if "# noqa: CIMF_W006" in line_text:
+                    if _has_noqa(line_text, "CIMF_W006"):
                         continue
                 errors.append(
                     Warning(
@@ -85,7 +90,7 @@ def check_silent_except(app_configs, **kwargs):  # noqa: ARG001
                     lineno = getattr(handler, "lineno", 0)
                     if lineno > 0 and lineno <= len(source_lines):
                         line_text = source_lines[lineno - 1]
-                        if "# noqa: CIMF_W007" in line_text or "# noqa: S110" in line_text:
+                        if _has_noqa(line_text, "CIMF_W007") or "# noqa: S110" in line_text:
                             continue
                     has_logger = False
                     for stmt in ast.walk(handler):
@@ -133,7 +138,7 @@ def check_first_no_none_check(app_configs, **kwargs):  # noqa: ARG001
                 if not m:
                     continue
                 var_name = m.group(2)
-                if "# noqa: CIMF_W008" in line:
+                if _has_noqa(line, "CIMF_W008"):
                     continue
 
                 found_check = False
@@ -181,7 +186,7 @@ def check_mark_safe_usage(app_configs, **kwargs):  # noqa: ARG001
             for i, line in enumerate(source_lines):
                 if not mark_safe_re.search(line):
                     continue
-                if "# noqa: CIMF_W009" in line:
+                if _has_noqa(line, "CIMF_W009"):
                     continue
                     errors.append(
                         Warning(
@@ -214,7 +219,7 @@ def check_mark_safe_usage(app_configs, **kwargs):  # noqa: ARG001
                     for i, line in enumerate(lines):
                         if "|safe" not in line:
                             continue
-                        if "# noqa: CIMF_W009" in line:
+                        if _has_noqa(line, "CIMF_W009"):
                             continue
                         errors.append(
                             Warning(
@@ -275,7 +280,7 @@ def check_model_choice_field_queryset(app_configs, **kwargs):  # noqa: ARG001
                             lineno = getattr(item, "lineno", 0)
                             if lineno > 0 and lineno <= len(source_lines):
                                 line_text = source_lines[lineno - 1]
-                                if "# noqa: CIMF_W010" in line_text:
+                                if _has_noqa(line_text, "CIMF_W010"):
                                     continue
                             errors.append(
                                 Warning(
@@ -311,7 +316,7 @@ def check_null_boolean_field(app_configs, **kwargs):  # noqa: ARG001
             for i, line in enumerate(source_lines):
                 if not null_boolean_re.search(line):
                     continue
-                if "# noqa: CIMF_W011" in line:
+                if _has_noqa(line, "CIMF_W011"):
                     continue
                 errors.append(
                     Warning(
