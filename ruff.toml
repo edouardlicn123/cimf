@@ -52,6 +52,8 @@ ignore = [
 "**/__init__.py" = ["F401", "E402"]
 "**/*.html" = ["ALL"]
 "**/*.md" = ["ALL"]
+# 邮件模板常量名含 PASSWORD（RESET_PASSWORD_*），非硬编码密码，且为多行字符串无法行内 noqa
+"core/smtp/services/default_templates.py" = ["S105"]
 
 [lint.flake8-tidy-imports]
 ban-relative-imports = "all"

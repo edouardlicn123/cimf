@@ -266,7 +266,7 @@ class ImportService:
         for field_name, value in data.items():
             try:
                 field = model_class._meta.get_field(field_name)
-            except Exception:  # noqa: CIMF_W007 — field discovery skip unknown
+            except Exception:  # noqa: S112, CIMF_W007 — field discovery skip unknown
                 continue
             if getattr(field, "unique", False) and value:
                 existing = model_class.objects.filter(**{field_name: value}).first()

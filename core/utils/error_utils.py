@@ -1,6 +1,5 @@
 import httpx
 
-
 _SERVICE_ERROR_MAP = [
     (httpx.ConnectError, "无法连接到 {} 服务"),
     (httpx.TimeoutException, "{} 服务连接超时"),

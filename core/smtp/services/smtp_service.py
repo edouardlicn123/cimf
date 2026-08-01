@@ -5,8 +5,6 @@ SMTP 配置管理服务
 import logging
 import os
 import smtplib
-
-logger = logging.getLogger(__name__)
 import socket
 import ssl
 from contextlib import contextmanager
@@ -17,6 +15,8 @@ import socks
 from django.conf import settings
 
 from core.services import SettingsService
+
+logger = logging.getLogger(__name__)
 
 
 @contextmanager

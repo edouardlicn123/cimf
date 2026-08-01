@@ -3,8 +3,6 @@
 import logging
 
 from django.contrib.auth.decorators import login_required
-
-logger = logging.getLogger(__name__)
 from django.shortcuts import render
 from django.views.decorators.http import require_POST
 
@@ -13,6 +11,8 @@ from core.utils.pagination import paginate_queryset
 from core.utils.response import json_success
 
 from .services import MarketService
+
+logger = logging.getLogger(__name__)
 
 
 @login_required

@@ -298,3 +298,10 @@
 # 2026-07-31 修改记录
 
 1. WhatsApp: 清理batch#32重复入队日志21条(206→185, 修正total_count), create_batch新增客户去重(含追加已有批次场景)
+
+# 2026-08-01 修改记录
+
+1. 修复 GitHub Actions CI 必失败问题：清除全库 25 个 ruff 错误（E402×15 import 乱序、I001×3、S308/S112 noqa 补码、S104/S607/S105×2 语义、F401），修复 ci.yml deploy 检查缺 DJANGO_ALLOWED_HOSTS 与 SECRET_KEY 过短(security.W009)，锁定 ruff==0.16.1、移除 basedpyright 与 || true
+2. scanner_checks.py 自定义检查器改为 _has_noqa 裸代码匹配，使 CIMF_W00X 与 ruff 规则码可共存于同一 noqa 注释；ruff 解析确认：noqa 中识别码须在前，未知代码靠前会导致整个指令失效
+3. 修复 CI 必失败: 清除25个ruff错误+ci.yml补ALLOWED_HOSTS/长SECRET_KEY/锁定ruff0.16.1, scanner_checks改用_has_noqa裸码匹配, 版本v2.152
+
