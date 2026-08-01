@@ -293,3 +293,8 @@
 2. 清理 calc 模块：删除 modules 目录、数据库 modules 记录、tool_types 记录
 3. 删除 has_whatsapp=False 的客户记录 3104 条
 
+
+
+# 2026-07-31 修改记录
+
+1. WhatsApp: 清理batch#32重复入队日志21条(206→185, 修正total_count), create_batch新增客户去重(含追加已有批次场景)
