@@ -1,4 +1,5 @@
 import logging
+import os
 import subprocess
 import sys
 import tempfile
@@ -104,8 +105,14 @@ except Exception as e:
             script_path = f.name
 
         try:
+            subprocess_env = {**os.environ, "CIMF_MODULE_MIGRATING": "1"}
             result = subprocess.run(  # noqa: S603 — controlled module install script
-                [venv_python, script_path], capture_output=True, text=True, timeout=120, check=False
+                [venv_python, script_path],
+                capture_output=True,
+                text=True,
+                timeout=120,
+                check=False,
+                env=subprocess_env,
             )
             if result.returncode != 0:
                 error_msg = result.stderr or result.stdout
@@ -211,13 +218,16 @@ except Exception as e:
         has_models = models_path.exists()
 
         if has_models:
-            migration_errors = cls._run_migration_subprocess(module_id, app_name)
-            if migration_errors:
-                error_msg = "; ".join(migration_errors)
-                return False, f"模块 {module_id} 安装失败: {error_msg}"
+            if cls._check_tables_exist(module_id):
+                logger.info("模块 %s 数据表已存在，跳过迁移", module_id)
+            else:
+                migration_errors = cls._run_migration_subprocess(module_id, app_name)
+                if migration_errors:
+                    error_msg = "; ".join(migration_errors)
+                    return False, f"模块 {module_id} 安装失败: {error_msg}"
 
-            if not cls._check_tables_exist(module_id):
-                return False, f"迁移后表仍未创建，模块 {module_id} 可能配置不正确"
+                if not cls._check_tables_exist(module_id):
+                    return False, f"迁移后表仍未创建，模块 {module_id} 可能配置不正确"
 
         err = cls._verify_model_tables(module_id, module_info)
         if err:

@@ -121,7 +121,9 @@ def run_stage2(dry_run: bool) -> dict[str, Any]:
         count = results.get("templates", {}).get("count", 0)
         print(colored(f"    ✓ 邮件模板初始化完成，共创建 {count} 个模板", "green"))
 
-    errors = [f"{k}: {v.get('error')}" for k, v in results.items() if v.get("error")]
+    errors = [f"{k}: {v.get('error')}" for k, v in results.items() if isinstance(v, dict) and v.get("error")]
+    if results.get("error"):
+        errors.append(results["error"])
     if errors:
         print(colored(f"    ⚠ 部分任务执行异常: {'; '.join(errors)}", "yellow"))
 
