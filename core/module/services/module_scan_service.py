@@ -1,5 +1,6 @@
 import ast
 import logging
+import os
 from pathlib import Path
 from typing import Any
 
@@ -150,6 +151,17 @@ class ModuleScanService:
     def scan_register_install(
         cls, do_install: bool = True, dry_run: bool = False, respect_install_on_init: bool = True
     ) -> dict[str, Any]:
+        if os.environ.get("CIMF_MODULE_MIGRATING"):
+            logger.debug("迁移子进程中，跳过模块自动注册安装")
+            return {
+                "registered": 0,
+                "installed": 0,
+                "skipped": 0,
+                "failed": [],
+                "skipped_modules": [],
+                "message": "迁移子进程，跳过",
+            }
+
         all_modules = cls.scan_modules()
 
         result = {
@@ -228,8 +240,13 @@ class ModuleScanService:
         return list(registered)
 
     @classmethod
-    def auto_register_missing(cls) -> dict[str, Any]:
-        """扫描 modules/ 目录，自动注册尚未注册的模块"""
+    def auto_register_missing(cls, do_install: bool = True) -> dict[str, Any]:
+        """扫描 modules/ 目录，自动注册尚未注册的模块
+
+        Args:
+            do_install: 是否安装未安装的模块（默认 True）。
+                启动钩子（AppConfig.ready）应传 False 只注册不安装，避免迁移子进程内递归安装。
+        """
         from django.db import connection  # noqa: PLC0415
 
         try:
@@ -241,4 +258,4 @@ class ModuleScanService:
             logger.warning("数据库未就绪，跳过自动注册", exc_info=True)
             return {"registered": 0, "message": "数据库未就绪"}
 
-        return cls.scan_register_install(do_install=True, dry_run=False, respect_install_on_init=True)
+        return cls.scan_register_install(do_install=do_install, dry_run=False, respect_install_on_init=True)

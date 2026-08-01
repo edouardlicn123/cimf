@@ -522,7 +522,7 @@
   "fields": {
     "taxonomy": 1,
     "name": "男",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:43:57.243Z",
     "updated_at": "2026-04-27T06:43:57.243Z"
@@ -534,7 +534,7 @@
   "fields": {
     "taxonomy": 1,
     "name": "女",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:43:57.243Z",
     "updated_at": "2026-04-27T06:43:57.243Z"
@@ -546,7 +546,7 @@
   "fields": {
     "taxonomy": 2,
     "name": "潜在客户",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:43:57.490Z",
     "updated_at": "2026-04-27T06:43:57.490Z"
@@ -558,7 +558,7 @@
   "fields": {
     "taxonomy": 2,
     "name": "正式客户",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:43:57.490Z",
     "updated_at": "2026-04-27T06:43:57.490Z"
@@ -570,7 +570,7 @@
   "fields": {
     "taxonomy": 2,
     "name": "VIP客户",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:43:57.490Z",
     "updated_at": "2026-04-27T06:43:57.490Z"
@@ -582,7 +582,7 @@
   "fields": {
     "taxonomy": 2,
     "name": "上市公司",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:43:57.490Z",
     "updated_at": "2026-04-27T06:43:57.490Z"
@@ -594,7 +594,7 @@
   "fields": {
     "taxonomy": 2,
     "name": "非上市企业",
-    "description": null,
+    "description": "",
     "weight": 4,
     "created_at": "2026-04-27T06:43:57.490Z",
     "updated_at": "2026-04-27T06:43:57.490Z"
@@ -606,7 +606,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "阿富汗",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -618,7 +618,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "阿尔巴尼亚",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -630,7 +630,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "阿尔及利亚",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -642,7 +642,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "阿拉伯联合酋长国",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -654,7 +654,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "阿根廷",
-    "description": null,
+    "description": "",
     "weight": 4,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -666,7 +666,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "亚美尼亚",
-    "description": null,
+    "description": "",
     "weight": 5,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -678,7 +678,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "澳大利亚",
-    "description": null,
+    "description": "",
     "weight": 6,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -690,7 +690,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "奥地利",
-    "description": null,
+    "description": "",
     "weight": 7,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -702,7 +702,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "阿塞拜疆",
-    "description": null,
+    "description": "",
     "weight": 8,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -714,7 +714,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "巴哈马",
-    "description": null,
+    "description": "",
     "weight": 9,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -726,7 +726,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "巴林",
-    "description": null,
+    "description": "",
     "weight": 10,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -738,7 +738,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "孟加拉国",
-    "description": null,
+    "description": "",
     "weight": 11,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -750,7 +750,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "巴巴多斯",
-    "description": null,
+    "description": "",
     "weight": 12,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -762,7 +762,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "白俄罗斯",
-    "description": null,
+    "description": "",
     "weight": 13,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -774,7 +774,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "比利时",
-    "description": null,
+    "description": "",
     "weight": 14,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -786,7 +786,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "伯利兹",
-    "description": null,
+    "description": "",
     "weight": 15,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -798,7 +798,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "贝宁",
-    "description": null,
+    "description": "",
     "weight": 16,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -810,7 +810,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "不丹",
-    "description": null,
+    "description": "",
     "weight": 17,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -822,7 +822,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "玻利维亚",
-    "description": null,
+    "description": "",
     "weight": 18,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -834,7 +834,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "波斯尼亚和黑塞哥维那",
-    "description": null,
+    "description": "",
     "weight": 19,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -846,7 +846,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "博茨瓦纳",
-    "description": null,
+    "description": "",
     "weight": 20,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -858,7 +858,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "巴西",
-    "description": null,
+    "description": "",
     "weight": 21,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -870,7 +870,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "文莱",
-    "description": null,
+    "description": "",
     "weight": 22,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -882,7 +882,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "保加利亚",
-    "description": null,
+    "description": "",
     "weight": 23,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -894,7 +894,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "布基纳法索",
-    "description": null,
+    "description": "",
     "weight": 24,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -906,7 +906,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "布隆迪",
-    "description": null,
+    "description": "",
     "weight": 25,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -918,7 +918,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "喀麦隆",
-    "description": null,
+    "description": "",
     "weight": 26,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -930,7 +930,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "加拿大",
-    "description": null,
+    "description": "",
     "weight": 27,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -942,7 +942,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "佛得角",
-    "description": null,
+    "description": "",
     "weight": 28,
     "created_at": "2026-04-27T06:43:57.655Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -954,7 +954,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "中非共和国",
-    "description": null,
+    "description": "",
     "weight": 29,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -966,7 +966,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "乍得",
-    "description": null,
+    "description": "",
     "weight": 30,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -978,7 +978,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "智利",
-    "description": null,
+    "description": "",
     "weight": 31,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -990,7 +990,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "中国",
-    "description": null,
+    "description": "",
     "weight": 32,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -1002,7 +1002,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "哥伦比亚",
-    "description": null,
+    "description": "",
     "weight": 33,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -1014,7 +1014,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "科摩罗",
-    "description": null,
+    "description": "",
     "weight": 34,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -1026,7 +1026,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "刚果共和国",
-    "description": null,
+    "description": "",
     "weight": 35,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -1038,7 +1038,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "刚果民主共和国",
-    "description": null,
+    "description": "",
     "weight": 36,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -1050,7 +1050,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "哥斯达黎加",
-    "description": null,
+    "description": "",
     "weight": 37,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -1062,7 +1062,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "科特迪瓦",
-    "description": null,
+    "description": "",
     "weight": 38,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -1074,7 +1074,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "克罗地亚",
-    "description": null,
+    "description": "",
     "weight": 39,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -1086,7 +1086,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "古巴",
-    "description": null,
+    "description": "",
     "weight": 40,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -1098,7 +1098,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "塞浦路斯",
-    "description": null,
+    "description": "",
     "weight": 41,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -1110,7 +1110,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "捷克",
-    "description": null,
+    "description": "",
     "weight": 42,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -1122,7 +1122,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "丹麦",
-    "description": null,
+    "description": "",
     "weight": 43,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -1134,7 +1134,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "多米尼加共和国",
-    "description": null,
+    "description": "",
     "weight": 44,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -1146,7 +1146,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "厄瓜多尔",
-    "description": null,
+    "description": "",
     "weight": 45,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -1158,7 +1158,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "埃及",
-    "description": null,
+    "description": "",
     "weight": 46,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -1170,7 +1170,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "萨尔瓦多",
-    "description": null,
+    "description": "",
     "weight": 47,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.658Z"
@@ -1182,7 +1182,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "赤道几内亚",
-    "description": null,
+    "description": "",
     "weight": 48,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1194,7 +1194,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "厄立特里亚",
-    "description": null,
+    "description": "",
     "weight": 49,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1206,7 +1206,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "爱沙尼亚",
-    "description": null,
+    "description": "",
     "weight": 50,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1218,7 +1218,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "斯威士兰",
-    "description": null,
+    "description": "",
     "weight": 51,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1230,7 +1230,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "埃塞俄比亚",
-    "description": null,
+    "description": "",
     "weight": 52,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1242,7 +1242,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "斐济",
-    "description": null,
+    "description": "",
     "weight": 53,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1254,7 +1254,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "芬兰",
-    "description": null,
+    "description": "",
     "weight": 54,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1266,7 +1266,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "法国",
-    "description": null,
+    "description": "",
     "weight": 55,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1278,7 +1278,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "加蓬",
-    "description": null,
+    "description": "",
     "weight": 56,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1290,7 +1290,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "冈比亚",
-    "description": null,
+    "description": "",
     "weight": 57,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1302,7 +1302,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "格鲁吉亚",
-    "description": null,
+    "description": "",
     "weight": 58,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1314,7 +1314,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "德国",
-    "description": null,
+    "description": "",
     "weight": 59,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1326,7 +1326,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "加纳",
-    "description": null,
+    "description": "",
     "weight": 60,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1338,7 +1338,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "希腊",
-    "description": null,
+    "description": "",
     "weight": 61,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1350,7 +1350,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "格林纳达",
-    "description": null,
+    "description": "",
     "weight": 62,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1362,7 +1362,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "危地马拉",
-    "description": null,
+    "description": "",
     "weight": 63,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1374,7 +1374,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "几内亚",
-    "description": null,
+    "description": "",
     "weight": 64,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1386,7 +1386,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "几内亚比绍",
-    "description": null,
+    "description": "",
     "weight": 65,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1398,7 +1398,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "圭亚那",
-    "description": null,
+    "description": "",
     "weight": 66,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1410,7 +1410,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "海地",
-    "description": null,
+    "description": "",
     "weight": 67,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1422,7 +1422,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "梵蒂冈",
-    "description": null,
+    "description": "",
     "weight": 68,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1434,7 +1434,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "洪都拉斯",
-    "description": null,
+    "description": "",
     "weight": 69,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1446,7 +1446,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "匈牙利",
-    "description": null,
+    "description": "",
     "weight": 70,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1458,7 +1458,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "冰岛",
-    "description": null,
+    "description": "",
     "weight": 71,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1470,7 +1470,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "印度",
-    "description": null,
+    "description": "",
     "weight": 72,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1482,7 +1482,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "印度尼西亚",
-    "description": null,
+    "description": "",
     "weight": 73,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1494,7 +1494,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "伊朗",
-    "description": null,
+    "description": "",
     "weight": 74,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1506,7 +1506,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "伊拉克",
-    "description": null,
+    "description": "",
     "weight": 75,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1518,7 +1518,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "爱尔兰",
-    "description": null,
+    "description": "",
     "weight": 76,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1530,7 +1530,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "以色列",
-    "description": null,
+    "description": "",
     "weight": 77,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1542,7 +1542,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "意大利",
-    "description": null,
+    "description": "",
     "weight": 78,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1554,7 +1554,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "牙买加",
-    "description": null,
+    "description": "",
     "weight": 79,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1566,7 +1566,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "日本",
-    "description": null,
+    "description": "",
     "weight": 80,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1578,7 +1578,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "约旦",
-    "description": null,
+    "description": "",
     "weight": 81,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1590,7 +1590,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "哈萨克斯坦",
-    "description": null,
+    "description": "",
     "weight": 82,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1602,7 +1602,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "肯尼亚",
-    "description": null,
+    "description": "",
     "weight": 83,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1614,7 +1614,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "基里巴斯",
-    "description": null,
+    "description": "",
     "weight": 84,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1626,7 +1626,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "朝鲜",
-    "description": null,
+    "description": "",
     "weight": 85,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1638,7 +1638,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "韩国",
-    "description": null,
+    "description": "",
     "weight": 86,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1650,7 +1650,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "科威特",
-    "description": null,
+    "description": "",
     "weight": 87,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1662,7 +1662,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "吉尔吉斯斯坦",
-    "description": null,
+    "description": "",
     "weight": 88,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1674,7 +1674,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "老挝",
-    "description": null,
+    "description": "",
     "weight": 89,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1686,7 +1686,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "拉脱维亚",
-    "description": null,
+    "description": "",
     "weight": 90,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1698,7 +1698,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "黎巴嫩",
-    "description": null,
+    "description": "",
     "weight": 91,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1710,7 +1710,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "莱索托",
-    "description": null,
+    "description": "",
     "weight": 92,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1722,7 +1722,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "利比里亚",
-    "description": null,
+    "description": "",
     "weight": 93,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1734,7 +1734,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "利比亚",
-    "description": null,
+    "description": "",
     "weight": 94,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1746,7 +1746,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "列支敦士登",
-    "description": null,
+    "description": "",
     "weight": 95,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1758,7 +1758,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "立陶宛",
-    "description": null,
+    "description": "",
     "weight": 96,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1770,7 +1770,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "卢森堡",
-    "description": null,
+    "description": "",
     "weight": 97,
     "created_at": "2026-04-27T06:43:57.656Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1782,7 +1782,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "马达加斯加",
-    "description": null,
+    "description": "",
     "weight": 98,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1794,7 +1794,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "马拉维",
-    "description": null,
+    "description": "",
     "weight": 99,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1806,7 +1806,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "马来西亚",
-    "description": null,
+    "description": "",
     "weight": 100,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1818,7 +1818,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "马尔代夫",
-    "description": null,
+    "description": "",
     "weight": 101,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1830,7 +1830,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "马里",
-    "description": null,
+    "description": "",
     "weight": 102,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1842,7 +1842,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "马耳他",
-    "description": null,
+    "description": "",
     "weight": 103,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1854,7 +1854,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "毛里塔尼亚",
-    "description": null,
+    "description": "",
     "weight": 104,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1866,7 +1866,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "毛里求斯",
-    "description": null,
+    "description": "",
     "weight": 105,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1878,7 +1878,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "墨西哥",
-    "description": null,
+    "description": "",
     "weight": 106,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1890,7 +1890,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "密克罗尼西亚",
-    "description": null,
+    "description": "",
     "weight": 107,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1902,7 +1902,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "摩尔多瓦",
-    "description": null,
+    "description": "",
     "weight": 108,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1914,7 +1914,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "摩纳哥",
-    "description": null,
+    "description": "",
     "weight": 109,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1926,7 +1926,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "蒙古",
-    "description": null,
+    "description": "",
     "weight": 110,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1938,7 +1938,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "黑山",
-    "description": null,
+    "description": "",
     "weight": 111,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1950,7 +1950,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "摩洛哥",
-    "description": null,
+    "description": "",
     "weight": 112,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1962,7 +1962,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "莫桑比克",
-    "description": null,
+    "description": "",
     "weight": 113,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1974,7 +1974,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "缅甸",
-    "description": null,
+    "description": "",
     "weight": 114,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.659Z"
@@ -1986,7 +1986,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "纳米比亚",
-    "description": null,
+    "description": "",
     "weight": 115,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -1998,7 +1998,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "瑙鲁",
-    "description": null,
+    "description": "",
     "weight": 116,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2010,7 +2010,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "尼泊尔",
-    "description": null,
+    "description": "",
     "weight": 117,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2022,7 +2022,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "荷兰",
-    "description": null,
+    "description": "",
     "weight": 118,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2034,7 +2034,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "新西兰",
-    "description": null,
+    "description": "",
     "weight": 119,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2046,7 +2046,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "尼加拉瓜",
-    "description": null,
+    "description": "",
     "weight": 120,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2058,7 +2058,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "尼日尔",
-    "description": null,
+    "description": "",
     "weight": 121,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2070,7 +2070,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "尼日利亚",
-    "description": null,
+    "description": "",
     "weight": 122,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2082,7 +2082,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "北马其顿",
-    "description": null,
+    "description": "",
     "weight": 123,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2094,7 +2094,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "挪威",
-    "description": null,
+    "description": "",
     "weight": 124,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2106,7 +2106,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "阿曼",
-    "description": null,
+    "description": "",
     "weight": 125,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2118,7 +2118,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "巴基斯坦",
-    "description": null,
+    "description": "",
     "weight": 126,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2130,7 +2130,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "帕劳",
-    "description": null,
+    "description": "",
     "weight": 127,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2142,7 +2142,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "巴拿马",
-    "description": null,
+    "description": "",
     "weight": 128,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2154,7 +2154,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "巴布亚新几内亚",
-    "description": null,
+    "description": "",
     "weight": 129,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2166,7 +2166,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "巴拉圭",
-    "description": null,
+    "description": "",
     "weight": 130,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2178,7 +2178,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "秘鲁",
-    "description": null,
+    "description": "",
     "weight": 131,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2190,7 +2190,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "菲律宾",
-    "description": null,
+    "description": "",
     "weight": 132,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2202,7 +2202,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "波兰",
-    "description": null,
+    "description": "",
     "weight": 133,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2214,7 +2214,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "葡萄牙",
-    "description": null,
+    "description": "",
     "weight": 134,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2226,7 +2226,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "卡塔尔",
-    "description": null,
+    "description": "",
     "weight": 135,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2238,7 +2238,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "罗马尼亚",
-    "description": null,
+    "description": "",
     "weight": 136,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2250,7 +2250,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "俄罗斯",
-    "description": null,
+    "description": "",
     "weight": 137,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2262,7 +2262,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "卢旺达",
-    "description": null,
+    "description": "",
     "weight": 138,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2274,7 +2274,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "圣基茨和尼维斯",
-    "description": null,
+    "description": "",
     "weight": 139,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2286,7 +2286,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "圣卢西亚",
-    "description": null,
+    "description": "",
     "weight": 140,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2298,7 +2298,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "圣文森特和格林纳丁斯",
-    "description": null,
+    "description": "",
     "weight": 141,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2310,7 +2310,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "萨摩亚",
-    "description": null,
+    "description": "",
     "weight": 142,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2322,7 +2322,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "圣马力诺",
-    "description": null,
+    "description": "",
     "weight": 143,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2334,7 +2334,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "沙特阿拉伯",
-    "description": null,
+    "description": "",
     "weight": 144,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2346,7 +2346,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "塞内加尔",
-    "description": null,
+    "description": "",
     "weight": 145,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2358,7 +2358,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "塞尔维亚",
-    "description": null,
+    "description": "",
     "weight": 146,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2370,7 +2370,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "塞舌尔",
-    "description": null,
+    "description": "",
     "weight": 147,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2382,7 +2382,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "塞拉利昂",
-    "description": null,
+    "description": "",
     "weight": 148,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2394,7 +2394,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "新加坡",
-    "description": null,
+    "description": "",
     "weight": 149,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2406,7 +2406,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "斯洛伐克",
-    "description": null,
+    "description": "",
     "weight": 150,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2418,7 +2418,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "斯洛文尼亚",
-    "description": null,
+    "description": "",
     "weight": 151,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2430,7 +2430,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "索马里",
-    "description": null,
+    "description": "",
     "weight": 152,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2442,7 +2442,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "南非",
-    "description": null,
+    "description": "",
     "weight": 153,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2454,7 +2454,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "南苏丹",
-    "description": null,
+    "description": "",
     "weight": 154,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2466,7 +2466,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "西班牙",
-    "description": null,
+    "description": "",
     "weight": 155,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2478,7 +2478,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "斯里兰卡",
-    "description": null,
+    "description": "",
     "weight": 156,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2490,7 +2490,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "苏丹",
-    "description": null,
+    "description": "",
     "weight": 157,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2502,7 +2502,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "苏里南",
-    "description": null,
+    "description": "",
     "weight": 158,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2514,7 +2514,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "瑞典",
-    "description": null,
+    "description": "",
     "weight": 159,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2526,7 +2526,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "瑞士",
-    "description": null,
+    "description": "",
     "weight": 160,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2538,7 +2538,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "叙利亚",
-    "description": null,
+    "description": "",
     "weight": 161,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2550,7 +2550,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "台湾省",
-    "description": null,
+    "description": "",
     "weight": 162,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2562,7 +2562,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "塔吉克斯坦",
-    "description": null,
+    "description": "",
     "weight": 163,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2574,7 +2574,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "坦桑尼亚",
-    "description": null,
+    "description": "",
     "weight": 164,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2586,7 +2586,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "泰国",
-    "description": null,
+    "description": "",
     "weight": 165,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2598,7 +2598,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "多哥",
-    "description": null,
+    "description": "",
     "weight": 166,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2610,7 +2610,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "汤加",
-    "description": null,
+    "description": "",
     "weight": 167,
     "created_at": "2026-04-27T06:43:57.657Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2622,7 +2622,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "特立尼达和多巴哥",
-    "description": null,
+    "description": "",
     "weight": 168,
     "created_at": "2026-04-27T06:43:57.658Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2634,7 +2634,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "突尼斯",
-    "description": null,
+    "description": "",
     "weight": 169,
     "created_at": "2026-04-27T06:43:57.658Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2646,7 +2646,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "土耳其",
-    "description": null,
+    "description": "",
     "weight": 170,
     "created_at": "2026-04-27T06:43:57.658Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2658,7 +2658,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "土库曼斯坦",
-    "description": null,
+    "description": "",
     "weight": 171,
     "created_at": "2026-04-27T06:43:57.658Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2670,7 +2670,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "图瓦卢",
-    "description": null,
+    "description": "",
     "weight": 172,
     "created_at": "2026-04-27T06:43:57.658Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2682,7 +2682,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "乌干达",
-    "description": null,
+    "description": "",
     "weight": 173,
     "created_at": "2026-04-27T06:43:57.658Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2694,7 +2694,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "乌克兰",
-    "description": null,
+    "description": "",
     "weight": 174,
     "created_at": "2026-04-27T06:43:57.658Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2706,7 +2706,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "英国",
-    "description": null,
+    "description": "",
     "weight": 175,
     "created_at": "2026-04-27T06:43:57.658Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2718,7 +2718,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "美国",
-    "description": null,
+    "description": "",
     "weight": 176,
     "created_at": "2026-04-27T06:43:57.658Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2730,7 +2730,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "乌拉圭",
-    "description": null,
+    "description": "",
     "weight": 177,
     "created_at": "2026-04-27T06:43:57.658Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2742,7 +2742,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "乌兹别克斯坦",
-    "description": null,
+    "description": "",
     "weight": 178,
     "created_at": "2026-04-27T06:43:57.658Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
@@ -2754,22 +2754,10 @@
   "fields": {
     "taxonomy": 3,
     "name": "瓦努阿图",
-    "description": null,
+    "description": "",
     "weight": 179,
     "created_at": "2026-04-27T06:43:57.658Z",
     "updated_at": "2026-04-27T06:43:57.660Z"
-  }
-},
-{
-  "model": "core.taxonomyitem",
-  "pk": 188,
-  "fields": {
-    "taxonomy": 3,
-    "name": "梵蒂冈",
-    "description": null,
-    "weight": 180,
-    "created_at": "2026-04-27T06:43:57.658Z",
-    "updated_at": "2026-04-27T06:43:57.661Z"
   }
 },
 {
@@ -2778,7 +2766,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "委内瑞拉",
-    "description": null,
+    "description": "",
     "weight": 181,
     "created_at": "2026-04-27T06:43:57.658Z",
     "updated_at": "2026-04-27T06:43:57.661Z"
@@ -2790,7 +2778,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "越南",
-    "description": null,
+    "description": "",
     "weight": 182,
     "created_at": "2026-04-27T06:43:57.658Z",
     "updated_at": "2026-04-27T06:43:57.661Z"
@@ -2802,7 +2790,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "也门",
-    "description": null,
+    "description": "",
     "weight": 183,
     "created_at": "2026-04-27T06:43:57.658Z",
     "updated_at": "2026-04-27T06:43:57.661Z"
@@ -2814,7 +2802,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "赞比亚",
-    "description": null,
+    "description": "",
     "weight": 184,
     "created_at": "2026-04-27T06:43:57.658Z",
     "updated_at": "2026-04-27T06:43:57.661Z"
@@ -2826,7 +2814,7 @@
   "fields": {
     "taxonomy": 3,
     "name": "津巴布韦",
-    "description": null,
+    "description": "",
     "weight": 185,
     "created_at": "2026-04-27T06:43:57.658Z",
     "updated_at": "2026-04-27T06:43:57.661Z"
@@ -2838,7 +2826,7 @@
   "fields": {
     "taxonomy": 4,
     "name": "进行中",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:43:57.847Z",
     "updated_at": "2026-04-27T06:43:57.847Z"
@@ -2850,7 +2838,7 @@
   "fields": {
     "taxonomy": 4,
     "name": "已完成",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:43:57.847Z",
     "updated_at": "2026-04-27T06:43:57.847Z"
@@ -2862,7 +2850,7 @@
   "fields": {
     "taxonomy": 4,
     "name": "已暂停",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:43:57.847Z",
     "updated_at": "2026-04-27T06:43:57.847Z"
@@ -2874,7 +2862,7 @@
   "fields": {
     "taxonomy": 4,
     "name": "已取消",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:43:57.847Z",
     "updated_at": "2026-04-27T06:43:57.847Z"
@@ -2886,7 +2874,7 @@
   "fields": {
     "taxonomy": 5,
     "name": "需求调研",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:43:57.957Z",
     "updated_at": "2026-04-27T06:43:57.957Z"
@@ -2898,7 +2886,7 @@
   "fields": {
     "taxonomy": 5,
     "name": "方案设计",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:43:57.957Z",
     "updated_at": "2026-04-27T06:43:57.957Z"
@@ -2910,7 +2898,7 @@
   "fields": {
     "taxonomy": 5,
     "name": "开发中",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:43:57.957Z",
     "updated_at": "2026-04-27T06:43:57.957Z"
@@ -2922,7 +2910,7 @@
   "fields": {
     "taxonomy": 5,
     "name": "测试阶段",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:43:57.957Z",
     "updated_at": "2026-04-27T06:43:57.957Z"
@@ -2934,7 +2922,7 @@
   "fields": {
     "taxonomy": 5,
     "name": "验收阶段",
-    "description": null,
+    "description": "",
     "weight": 4,
     "created_at": "2026-04-27T06:43:57.957Z",
     "updated_at": "2026-04-27T06:43:57.957Z"
@@ -2946,7 +2934,7 @@
   "fields": {
     "taxonomy": 5,
     "name": "交付完成",
-    "description": null,
+    "description": "",
     "weight": 5,
     "created_at": "2026-04-27T06:43:57.957Z",
     "updated_at": "2026-04-27T06:43:57.957Z"
@@ -2958,7 +2946,7 @@
   "fields": {
     "taxonomy": 6,
     "name": "高",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:43:58.090Z",
     "updated_at": "2026-04-27T06:43:58.090Z"
@@ -2970,7 +2958,7 @@
   "fields": {
     "taxonomy": 6,
     "name": "中",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:43:58.090Z",
     "updated_at": "2026-04-27T06:43:58.090Z"
@@ -2982,7 +2970,7 @@
   "fields": {
     "taxonomy": 6,
     "name": "低",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:43:58.090Z",
     "updated_at": "2026-04-27T06:43:58.090Z"
@@ -2994,7 +2982,7 @@
   "fields": {
     "taxonomy": 7,
     "name": "销售部",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:43:58.207Z",
     "updated_at": "2026-04-27T06:43:58.207Z"
@@ -3006,7 +2994,7 @@
   "fields": {
     "taxonomy": 7,
     "name": "技术部",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:43:58.207Z",
     "updated_at": "2026-04-27T06:43:58.207Z"
@@ -3018,7 +3006,7 @@
   "fields": {
     "taxonomy": 7,
     "name": "财务部",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:43:58.207Z",
     "updated_at": "2026-04-27T06:43:58.207Z"
@@ -3030,7 +3018,7 @@
   "fields": {
     "taxonomy": 7,
     "name": "行政部",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:43:58.207Z",
     "updated_at": "2026-04-27T06:43:58.207Z"
@@ -3042,7 +3030,7 @@
   "fields": {
     "taxonomy": 8,
     "name": "草稿",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:43:58.340Z",
     "updated_at": "2026-04-27T06:43:58.340Z"
@@ -3054,7 +3042,7 @@
   "fields": {
     "taxonomy": 8,
     "name": "审批中",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:43:58.340Z",
     "updated_at": "2026-04-27T06:43:58.340Z"
@@ -3066,7 +3054,7 @@
   "fields": {
     "taxonomy": 8,
     "name": "已签署",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:43:58.340Z",
     "updated_at": "2026-04-27T06:43:58.340Z"
@@ -3078,7 +3066,7 @@
   "fields": {
     "taxonomy": 8,
     "name": "已到期",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:43:58.340Z",
     "updated_at": "2026-04-27T06:43:58.340Z"
@@ -3090,7 +3078,7 @@
   "fields": {
     "taxonomy": 9,
     "name": "未付款",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:43:58.491Z",
     "updated_at": "2026-04-27T06:43:58.491Z"
@@ -3102,7 +3090,7 @@
   "fields": {
     "taxonomy": 9,
     "name": "部分付款",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:43:58.491Z",
     "updated_at": "2026-04-27T06:43:58.491Z"
@@ -3114,7 +3102,7 @@
   "fields": {
     "taxonomy": 9,
     "name": "已付清",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:43:58.491Z",
     "updated_at": "2026-04-27T06:43:58.491Z"
@@ -3126,7 +3114,7 @@
   "fields": {
     "taxonomy": 10,
     "name": "待联系",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:43:58.640Z",
     "updated_at": "2026-04-27T06:43:58.640Z"
@@ -3138,7 +3126,7 @@
   "fields": {
     "taxonomy": 10,
     "name": "已联系",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:43:58.640Z",
     "updated_at": "2026-04-27T06:43:58.640Z"
@@ -3150,7 +3138,7 @@
   "fields": {
     "taxonomy": 10,
     "name": "沟通中",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:43:58.640Z",
     "updated_at": "2026-04-27T06:43:58.640Z"
@@ -3162,7 +3150,7 @@
   "fields": {
     "taxonomy": 10,
     "name": "意向明确",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:43:58.640Z",
     "updated_at": "2026-04-27T06:43:58.640Z"
@@ -3174,7 +3162,7 @@
   "fields": {
     "taxonomy": 10,
     "name": "已报价",
-    "description": null,
+    "description": "",
     "weight": 4,
     "created_at": "2026-04-27T06:43:58.640Z",
     "updated_at": "2026-04-27T06:43:58.641Z"
@@ -3186,7 +3174,7 @@
   "fields": {
     "taxonomy": 10,
     "name": "已签约",
-    "description": null,
+    "description": "",
     "weight": 5,
     "created_at": "2026-04-27T06:43:58.640Z",
     "updated_at": "2026-04-27T06:43:58.641Z"
@@ -3198,7 +3186,7 @@
   "fields": {
     "taxonomy": 10,
     "name": "已流失",
-    "description": null,
+    "description": "",
     "weight": 6,
     "created_at": "2026-04-27T06:43:58.640Z",
     "updated_at": "2026-04-27T06:43:58.641Z"
@@ -3210,7 +3198,7 @@
   "fields": {
     "taxonomy": 11,
     "name": "待开始",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:43:58.807Z",
     "updated_at": "2026-04-27T06:43:58.807Z"
@@ -3222,7 +3210,7 @@
   "fields": {
     "taxonomy": 11,
     "name": "进行中",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:43:58.807Z",
     "updated_at": "2026-04-27T06:43:58.807Z"
@@ -3234,7 +3222,7 @@
   "fields": {
     "taxonomy": 11,
     "name": "待审核",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:43:58.807Z",
     "updated_at": "2026-04-27T06:43:58.807Z"
@@ -3246,7 +3234,7 @@
   "fields": {
     "taxonomy": 11,
     "name": "已完成",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:43:58.807Z",
     "updated_at": "2026-04-27T06:43:58.807Z"
@@ -3258,7 +3246,7 @@
   "fields": {
     "taxonomy": 11,
     "name": "已延期",
-    "description": null,
+    "description": "",
     "weight": 4,
     "created_at": "2026-04-27T06:43:58.807Z",
     "updated_at": "2026-04-27T06:43:58.807Z"
@@ -3270,7 +3258,7 @@
   "fields": {
     "taxonomy": 11,
     "name": "已取消",
-    "description": null,
+    "description": "",
     "weight": 5,
     "created_at": "2026-04-27T06:43:58.807Z",
     "updated_at": "2026-04-27T06:43:58.807Z"
@@ -3282,7 +3270,7 @@
   "fields": {
     "taxonomy": 12,
     "name": "低风险",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:43:58.940Z",
     "updated_at": "2026-04-27T06:43:58.940Z"
@@ -3294,7 +3282,7 @@
   "fields": {
     "taxonomy": 12,
     "name": "中风险",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:43:58.940Z",
     "updated_at": "2026-04-27T06:43:58.940Z"
@@ -3306,7 +3294,7 @@
   "fields": {
     "taxonomy": 12,
     "name": "高风险",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:43:58.940Z",
     "updated_at": "2026-04-27T06:43:58.940Z"
@@ -3318,7 +3306,7 @@
   "fields": {
     "taxonomy": 12,
     "name": "严重",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:43:58.940Z",
     "updated_at": "2026-04-27T06:43:58.940Z"
@@ -3330,7 +3318,7 @@
   "fields": {
     "taxonomy": 13,
     "name": "小型(1-50人)",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:43:59.108Z",
     "updated_at": "2026-04-27T06:43:59.108Z"
@@ -3342,7 +3330,7 @@
   "fields": {
     "taxonomy": 13,
     "name": "中型(51-500人)",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:43:59.108Z",
     "updated_at": "2026-04-27T06:43:59.109Z"
@@ -3354,7 +3342,7 @@
   "fields": {
     "taxonomy": 13,
     "name": "大型(501-2000人)",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:43:59.108Z",
     "updated_at": "2026-04-27T06:43:59.109Z"
@@ -3366,7 +3354,7 @@
   "fields": {
     "taxonomy": 13,
     "name": "超大型(2000人+)",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:43:59.108Z",
     "updated_at": "2026-04-27T06:43:59.109Z"
@@ -3378,7 +3366,7 @@
   "fields": {
     "taxonomy": 14,
     "name": "本地户籍",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:43:59.375Z",
     "updated_at": "2026-04-27T06:43:59.375Z"
@@ -3390,7 +3378,7 @@
   "fields": {
     "taxonomy": 14,
     "name": "常住人口",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:43:59.375Z",
     "updated_at": "2026-04-27T06:43:59.375Z"
@@ -3402,7 +3390,7 @@
   "fields": {
     "taxonomy": 14,
     "name": "流动人口",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:43:59.375Z",
     "updated_at": "2026-04-27T06:43:59.375Z"
@@ -3414,7 +3402,7 @@
   "fields": {
     "taxonomy": 14,
     "name": "暂住证",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:43:59.375Z",
     "updated_at": "2026-04-27T06:43:59.375Z"
@@ -3426,7 +3414,7 @@
   "fields": {
     "taxonomy": 15,
     "name": "自有住房",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:43:59.549Z",
     "updated_at": "2026-04-27T06:43:59.549Z"
@@ -3438,7 +3426,7 @@
   "fields": {
     "taxonomy": 15,
     "name": "租房",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:43:59.549Z",
     "updated_at": "2026-04-27T06:43:59.549Z"
@@ -3450,7 +3438,7 @@
   "fields": {
     "taxonomy": 15,
     "name": "借住",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:43:59.549Z",
     "updated_at": "2026-04-27T06:43:59.549Z"
@@ -3462,7 +3450,7 @@
   "fields": {
     "taxonomy": 15,
     "name": "集体宿舍",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:43:59.549Z",
     "updated_at": "2026-04-27T06:43:59.549Z"
@@ -3474,7 +3462,7 @@
   "fields": {
     "taxonomy": 16,
     "name": "已缴纳",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:43:59.708Z",
     "updated_at": "2026-04-27T06:43:59.708Z"
@@ -3486,7 +3474,7 @@
   "fields": {
     "taxonomy": 16,
     "name": "缴纳中",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:43:59.708Z",
     "updated_at": "2026-04-27T06:43:59.708Z"
@@ -3498,7 +3486,7 @@
   "fields": {
     "taxonomy": 16,
     "name": "断缴",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:43:59.708Z",
     "updated_at": "2026-04-27T06:43:59.708Z"
@@ -3510,7 +3498,7 @@
   "fields": {
     "taxonomy": 16,
     "name": "未缴纳",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:43:59.708Z",
     "updated_at": "2026-04-27T06:43:59.708Z"
@@ -3522,7 +3510,7 @@
   "fields": {
     "taxonomy": 17,
     "name": "未婚",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:43:59.824Z",
     "updated_at": "2026-04-27T06:43:59.824Z"
@@ -3534,7 +3522,7 @@
   "fields": {
     "taxonomy": 17,
     "name": "已婚",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:43:59.824Z",
     "updated_at": "2026-04-27T06:43:59.824Z"
@@ -3546,7 +3534,7 @@
   "fields": {
     "taxonomy": 17,
     "name": "离异",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:43:59.824Z",
     "updated_at": "2026-04-27T06:43:59.824Z"
@@ -3558,7 +3546,7 @@
   "fields": {
     "taxonomy": 17,
     "name": "丧偶",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:43:59.824Z",
     "updated_at": "2026-04-27T06:43:59.824Z"
@@ -3570,7 +3558,7 @@
   "fields": {
     "taxonomy": 18,
     "name": "小学",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:43:59.941Z",
     "updated_at": "2026-04-27T06:43:59.941Z"
@@ -3582,7 +3570,7 @@
   "fields": {
     "taxonomy": 18,
     "name": "初中",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:43:59.941Z",
     "updated_at": "2026-04-27T06:43:59.941Z"
@@ -3594,7 +3582,7 @@
   "fields": {
     "taxonomy": 18,
     "name": "高中/中专",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:43:59.941Z",
     "updated_at": "2026-04-27T06:43:59.941Z"
@@ -3606,7 +3594,7 @@
   "fields": {
     "taxonomy": 18,
     "name": "大专",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:43:59.941Z",
     "updated_at": "2026-04-27T06:43:59.941Z"
@@ -3618,7 +3606,7 @@
   "fields": {
     "taxonomy": 18,
     "name": "本科",
-    "description": null,
+    "description": "",
     "weight": 4,
     "created_at": "2026-04-27T06:43:59.941Z",
     "updated_at": "2026-04-27T06:43:59.941Z"
@@ -3630,7 +3618,7 @@
   "fields": {
     "taxonomy": 18,
     "name": "硕士",
-    "description": null,
+    "description": "",
     "weight": 5,
     "created_at": "2026-04-27T06:43:59.941Z",
     "updated_at": "2026-04-27T06:43:59.941Z"
@@ -3642,7 +3630,7 @@
   "fields": {
     "taxonomy": 18,
     "name": "博士",
-    "description": null,
+    "description": "",
     "weight": 6,
     "created_at": "2026-04-27T06:43:59.941Z",
     "updated_at": "2026-04-27T06:43:59.941Z"
@@ -3654,7 +3642,7 @@
   "fields": {
     "taxonomy": 19,
     "name": "Java",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:00.058Z",
     "updated_at": "2026-04-27T06:44:00.058Z"
@@ -3666,7 +3654,7 @@
   "fields": {
     "taxonomy": 19,
     "name": "Python",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:00.058Z",
     "updated_at": "2026-04-27T06:44:00.058Z"
@@ -3678,7 +3666,7 @@
   "fields": {
     "taxonomy": 19,
     "name": "PHP",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:00.058Z",
     "updated_at": "2026-04-27T06:44:00.058Z"
@@ -3690,7 +3678,7 @@
   "fields": {
     "taxonomy": 19,
     "name": "Node.js",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:00.058Z",
     "updated_at": "2026-04-27T06:44:00.058Z"
@@ -3702,7 +3690,7 @@
   "fields": {
     "taxonomy": 19,
     "name": "Vue",
-    "description": null,
+    "description": "",
     "weight": 4,
     "created_at": "2026-04-27T06:44:00.058Z",
     "updated_at": "2026-04-27T06:44:00.058Z"
@@ -3714,7 +3702,7 @@
   "fields": {
     "taxonomy": 19,
     "name": "React",
-    "description": null,
+    "description": "",
     "weight": 5,
     "created_at": "2026-04-27T06:44:00.058Z",
     "updated_at": "2026-04-27T06:44:00.058Z"
@@ -3726,7 +3714,7 @@
   "fields": {
     "taxonomy": 19,
     "name": "MySQL",
-    "description": null,
+    "description": "",
     "weight": 6,
     "created_at": "2026-04-27T06:44:00.058Z",
     "updated_at": "2026-04-27T06:44:00.058Z"
@@ -3738,7 +3726,7 @@
   "fields": {
     "taxonomy": 19,
     "name": "PostgreSQL",
-    "description": null,
+    "description": "",
     "weight": 7,
     "created_at": "2026-04-27T06:44:00.058Z",
     "updated_at": "2026-04-27T06:44:00.058Z"
@@ -3750,7 +3738,7 @@
   "fields": {
     "taxonomy": 20,
     "name": "顺利完成",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:00.224Z",
     "updated_at": "2026-04-27T06:44:00.224Z"
@@ -3762,7 +3750,7 @@
   "fields": {
     "taxonomy": 20,
     "name": "客户终止",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:00.224Z",
     "updated_at": "2026-04-27T06:44:00.224Z"
@@ -3774,7 +3762,7 @@
   "fields": {
     "taxonomy": 20,
     "name": "预算不足",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:00.224Z",
     "updated_at": "2026-04-27T06:44:00.224Z"
@@ -3786,7 +3774,7 @@
   "fields": {
     "taxonomy": 20,
     "name": "不可抗力",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:00.224Z",
     "updated_at": "2026-04-27T06:44:00.224Z"
@@ -3798,7 +3786,7 @@
   "fields": {
     "taxonomy": 21,
     "name": "A级(重点)",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:00.416Z",
     "updated_at": "2026-04-27T06:44:00.416Z"
@@ -3810,7 +3798,7 @@
   "fields": {
     "taxonomy": 21,
     "name": "B级(普通)",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:00.416Z",
     "updated_at": "2026-04-27T06:44:00.416Z"
@@ -3822,7 +3810,7 @@
   "fields": {
     "taxonomy": 21,
     "name": "C级(潜在)",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:00.416Z",
     "updated_at": "2026-04-27T06:44:00.416Z"
@@ -3834,7 +3822,7 @@
   "fields": {
     "taxonomy": 22,
     "name": "住宅小区",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:00.789Z",
     "updated_at": "2026-04-27T06:44:00.789Z"
@@ -3846,7 +3834,7 @@
   "fields": {
     "taxonomy": 22,
     "name": "商住混合",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:00.789Z",
     "updated_at": "2026-04-27T06:44:00.789Z"
@@ -3858,7 +3846,7 @@
   "fields": {
     "taxonomy": 22,
     "name": "商业建筑",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:00.789Z",
     "updated_at": "2026-04-27T06:44:00.789Z"
@@ -3870,7 +3858,7 @@
   "fields": {
     "taxonomy": 22,
     "name": "公共建筑",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:00.789Z",
     "updated_at": "2026-04-27T06:44:00.789Z"
@@ -3882,7 +3870,7 @@
   "fields": {
     "taxonomy": 22,
     "name": "政府建筑",
-    "description": null,
+    "description": "",
     "weight": 4,
     "created_at": "2026-04-27T06:44:00.789Z",
     "updated_at": "2026-04-27T06:44:00.789Z"
@@ -3894,7 +3882,7 @@
   "fields": {
     "taxonomy": 22,
     "name": "私人住宅",
-    "description": null,
+    "description": "",
     "weight": 5,
     "created_at": "2026-04-27T06:44:00.789Z",
     "updated_at": "2026-04-27T06:44:00.789Z"
@@ -3906,7 +3894,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "北京市",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:00.975Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -3918,7 +3906,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "天津市",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -3930,7 +3918,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "上海市",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -3942,7 +3930,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "重庆市",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -3954,7 +3942,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "河北省",
-    "description": null,
+    "description": "",
     "weight": 4,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -3966,7 +3954,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "山西省",
-    "description": null,
+    "description": "",
     "weight": 5,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -3978,7 +3966,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "辽宁省",
-    "description": null,
+    "description": "",
     "weight": 6,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -3990,7 +3978,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "吉林省",
-    "description": null,
+    "description": "",
     "weight": 7,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4002,7 +3990,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "黑龙江省",
-    "description": null,
+    "description": "",
     "weight": 8,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4014,7 +4002,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "江苏省",
-    "description": null,
+    "description": "",
     "weight": 9,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4026,7 +4014,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "浙江省",
-    "description": null,
+    "description": "",
     "weight": 10,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4038,7 +4026,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "安徽省",
-    "description": null,
+    "description": "",
     "weight": 11,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4050,7 +4038,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "福建省",
-    "description": null,
+    "description": "",
     "weight": 12,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4062,7 +4050,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "江西省",
-    "description": null,
+    "description": "",
     "weight": 13,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4074,7 +4062,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "山东省",
-    "description": null,
+    "description": "",
     "weight": 14,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4086,7 +4074,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "河南省",
-    "description": null,
+    "description": "",
     "weight": 15,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4098,7 +4086,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "湖北省",
-    "description": null,
+    "description": "",
     "weight": 16,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4110,7 +4098,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "湖南省",
-    "description": null,
+    "description": "",
     "weight": 17,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4122,7 +4110,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "广东省",
-    "description": null,
+    "description": "",
     "weight": 18,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4134,7 +4122,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "海南省",
-    "description": null,
+    "description": "",
     "weight": 19,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4146,7 +4134,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "四川省",
-    "description": null,
+    "description": "",
     "weight": 20,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4158,7 +4146,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "贵州省",
-    "description": null,
+    "description": "",
     "weight": 21,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4170,7 +4158,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "云南省",
-    "description": null,
+    "description": "",
     "weight": 22,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4182,7 +4170,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "陕西省",
-    "description": null,
+    "description": "",
     "weight": 23,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4194,7 +4182,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "甘肃省",
-    "description": null,
+    "description": "",
     "weight": 24,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4206,7 +4194,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "青海省",
-    "description": null,
+    "description": "",
     "weight": 25,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4218,7 +4206,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "台湾省",
-    "description": null,
+    "description": "",
     "weight": 26,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4230,7 +4218,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "内蒙古自治区",
-    "description": null,
+    "description": "",
     "weight": 27,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4242,7 +4230,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "广西壮族自治区",
-    "description": null,
+    "description": "",
     "weight": 28,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4254,7 +4242,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "西藏自治区",
-    "description": null,
+    "description": "",
     "weight": 29,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4266,7 +4254,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "宁夏回族自治区",
-    "description": null,
+    "description": "",
     "weight": 30,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4278,7 +4266,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "新疆维吾尔自治区",
-    "description": null,
+    "description": "",
     "weight": 31,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4290,7 +4278,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "香港特别行政区",
-    "description": null,
+    "description": "",
     "weight": 32,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4302,7 +4290,7 @@
   "fields": {
     "taxonomy": 23,
     "name": "澳门特别行政区",
-    "description": null,
+    "description": "",
     "weight": 33,
     "created_at": "2026-04-27T06:44:00.976Z",
     "updated_at": "2026-04-27T06:44:00.976Z"
@@ -4314,7 +4302,7 @@
   "fields": {
     "taxonomy": 24,
     "name": "普通会员",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:01.141Z",
     "updated_at": "2026-04-27T06:44:01.141Z"
@@ -4326,7 +4314,7 @@
   "fields": {
     "taxonomy": 24,
     "name": "银卡",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:01.141Z",
     "updated_at": "2026-04-27T06:44:01.141Z"
@@ -4338,7 +4326,7 @@
   "fields": {
     "taxonomy": 24,
     "name": "金卡",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:01.141Z",
     "updated_at": "2026-04-27T06:44:01.141Z"
@@ -4350,7 +4338,7 @@
   "fields": {
     "taxonomy": 24,
     "name": "钻石卡",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:01.141Z",
     "updated_at": "2026-04-27T06:44:01.141Z"
@@ -4362,7 +4350,7 @@
   "fields": {
     "taxonomy": 25,
     "name": "正常",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:01.353Z",
     "updated_at": "2026-04-27T06:44:01.353Z"
@@ -4374,7 +4362,7 @@
   "fields": {
     "taxonomy": 25,
     "name": "冻结",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:01.353Z",
     "updated_at": "2026-04-27T06:44:01.353Z"
@@ -4386,7 +4374,7 @@
   "fields": {
     "taxonomy": 25,
     "name": "已过期",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:01.353Z",
     "updated_at": "2026-04-27T06:44:01.353Z"
@@ -4398,7 +4386,7 @@
   "fields": {
     "taxonomy": 26,
     "name": "消费",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:01.505Z",
     "updated_at": "2026-04-27T06:44:01.505Z"
@@ -4410,7 +4398,7 @@
   "fields": {
     "taxonomy": 26,
     "name": "注册",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:01.505Z",
     "updated_at": "2026-04-27T06:44:01.505Z"
@@ -4422,7 +4410,7 @@
   "fields": {
     "taxonomy": 26,
     "name": "签到",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:01.505Z",
     "updated_at": "2026-04-27T06:44:01.505Z"
@@ -4434,7 +4422,7 @@
   "fields": {
     "taxonomy": 26,
     "name": "推荐",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:01.505Z",
     "updated_at": "2026-04-27T06:44:01.505Z"
@@ -4446,7 +4434,7 @@
   "fields": {
     "taxonomy": 27,
     "name": "满减券",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:01.633Z",
     "updated_at": "2026-04-27T06:44:01.633Z"
@@ -4458,7 +4446,7 @@
   "fields": {
     "taxonomy": 27,
     "name": "折扣券",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:01.633Z",
     "updated_at": "2026-04-27T06:44:01.634Z"
@@ -4470,7 +4458,7 @@
   "fields": {
     "taxonomy": 27,
     "name": "礼品券",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:01.633Z",
     "updated_at": "2026-04-27T06:44:01.634Z"
@@ -4482,7 +4470,7 @@
   "fields": {
     "taxonomy": 27,
     "name": "代金券",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:01.633Z",
     "updated_at": "2026-04-27T06:44:01.634Z"
@@ -4494,7 +4482,7 @@
   "fields": {
     "taxonomy": 28,
     "name": "国有企业",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:01.800Z",
     "updated_at": "2026-04-27T06:44:01.800Z"
@@ -4506,7 +4494,7 @@
   "fields": {
     "taxonomy": 28,
     "name": "集体企业",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:01.800Z",
     "updated_at": "2026-04-27T06:44:01.800Z"
@@ -4518,7 +4506,7 @@
   "fields": {
     "taxonomy": 28,
     "name": "民营企业",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:01.800Z",
     "updated_at": "2026-04-27T06:44:01.800Z"
@@ -4530,7 +4518,7 @@
   "fields": {
     "taxonomy": 28,
     "name": "外资企业",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:01.800Z",
     "updated_at": "2026-04-27T06:44:01.800Z"
@@ -4542,7 +4530,7 @@
   "fields": {
     "taxonomy": 28,
     "name": "合资企业",
-    "description": null,
+    "description": "",
     "weight": 4,
     "created_at": "2026-04-27T06:44:01.800Z",
     "updated_at": "2026-04-27T06:44:01.800Z"
@@ -4554,7 +4542,7 @@
   "fields": {
     "taxonomy": 28,
     "name": "个体经营",
-    "description": null,
+    "description": "",
     "weight": 5,
     "created_at": "2026-04-27T06:44:01.800Z",
     "updated_at": "2026-04-27T06:44:01.800Z"
@@ -4566,7 +4554,7 @@
   "fields": {
     "taxonomy": 29,
     "name": "企业",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:01.947Z",
     "updated_at": "2026-04-27T06:44:01.947Z"
@@ -4578,7 +4566,7 @@
   "fields": {
     "taxonomy": 29,
     "name": "事业单位",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:01.947Z",
     "updated_at": "2026-04-27T06:44:01.947Z"
@@ -4590,7 +4578,7 @@
   "fields": {
     "taxonomy": 29,
     "name": "机关",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:01.947Z",
     "updated_at": "2026-04-27T06:44:01.947Z"
@@ -4602,7 +4590,7 @@
   "fields": {
     "taxonomy": 29,
     "name": "社会团体",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:01.947Z",
     "updated_at": "2026-04-27T06:44:01.947Z"
@@ -4614,7 +4602,7 @@
   "fields": {
     "taxonomy": 29,
     "name": "民办非企业单位",
-    "description": null,
+    "description": "",
     "weight": 4,
     "created_at": "2026-04-27T06:44:01.947Z",
     "updated_at": "2026-04-27T06:44:01.947Z"
@@ -4626,7 +4614,7 @@
   "fields": {
     "taxonomy": 29,
     "name": "基金会",
-    "description": null,
+    "description": "",
     "weight": 5,
     "created_at": "2026-04-27T06:44:01.947Z",
     "updated_at": "2026-04-27T06:44:01.948Z"
@@ -4638,7 +4626,7 @@
   "fields": {
     "taxonomy": 29,
     "name": "居委会",
-    "description": null,
+    "description": "",
     "weight": 6,
     "created_at": "2026-04-27T06:44:01.947Z",
     "updated_at": "2026-04-27T06:44:01.948Z"
@@ -4650,7 +4638,7 @@
   "fields": {
     "taxonomy": 29,
     "name": "村委会",
-    "description": null,
+    "description": "",
     "weight": 7,
     "created_at": "2026-04-27T06:44:01.947Z",
     "updated_at": "2026-04-27T06:44:01.948Z"
@@ -4662,7 +4650,7 @@
   "fields": {
     "taxonomy": 30,
     "name": "国有控股",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:02.084Z",
     "updated_at": "2026-04-27T06:44:02.084Z"
@@ -4674,7 +4662,7 @@
   "fields": {
     "taxonomy": 30,
     "name": "集体控股",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:02.084Z",
     "updated_at": "2026-04-27T06:44:02.084Z"
@@ -4686,7 +4674,7 @@
   "fields": {
     "taxonomy": 30,
     "name": "私人控股",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:02.084Z",
     "updated_at": "2026-04-27T06:44:02.084Z"
@@ -4698,7 +4686,7 @@
   "fields": {
     "taxonomy": 30,
     "name": "港澳台商控股",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:02.084Z",
     "updated_at": "2026-04-27T06:44:02.084Z"
@@ -4710,7 +4698,7 @@
   "fields": {
     "taxonomy": 30,
     "name": "外商控股",
-    "description": null,
+    "description": "",
     "weight": 4,
     "created_at": "2026-04-27T06:44:02.084Z",
     "updated_at": "2026-04-27T06:44:02.084Z"
@@ -4722,7 +4710,7 @@
   "fields": {
     "taxonomy": 31,
     "name": "国有企业",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:02.217Z",
     "updated_at": "2026-04-27T06:44:02.217Z"
@@ -4734,7 +4722,7 @@
   "fields": {
     "taxonomy": 31,
     "name": "民营企业",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:02.217Z",
     "updated_at": "2026-04-27T06:44:02.217Z"
@@ -4746,7 +4734,7 @@
   "fields": {
     "taxonomy": 31,
     "name": "集体企业",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:02.217Z",
     "updated_at": "2026-04-27T06:44:02.217Z"
@@ -4758,7 +4746,7 @@
   "fields": {
     "taxonomy": 31,
     "name": "混合所有制企业",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:02.217Z",
     "updated_at": "2026-04-27T06:44:02.217Z"
@@ -4770,7 +4758,7 @@
   "fields": {
     "taxonomy": 31,
     "name": "股份制企业",
-    "description": null,
+    "description": "",
     "weight": 4,
     "created_at": "2026-04-27T06:44:02.217Z",
     "updated_at": "2026-04-27T06:44:02.217Z"
@@ -4782,7 +4770,7 @@
   "fields": {
     "taxonomy": 31,
     "name": "上市公司",
-    "description": null,
+    "description": "",
     "weight": 5,
     "created_at": "2026-04-27T06:44:02.217Z",
     "updated_at": "2026-04-27T06:44:02.217Z"
@@ -4794,7 +4782,7 @@
   "fields": {
     "taxonomy": 31,
     "name": "外资企业",
-    "description": null,
+    "description": "",
     "weight": 6,
     "created_at": "2026-04-27T06:44:02.217Z",
     "updated_at": "2026-04-27T06:44:02.217Z"
@@ -4806,7 +4794,7 @@
   "fields": {
     "taxonomy": 31,
     "name": "合资企业",
-    "description": null,
+    "description": "",
     "weight": 7,
     "created_at": "2026-04-27T06:44:02.217Z",
     "updated_at": "2026-04-27T06:44:02.217Z"
@@ -4818,7 +4806,7 @@
   "fields": {
     "taxonomy": 31,
     "name": "港澳台资企业",
-    "description": null,
+    "description": "",
     "weight": 8,
     "created_at": "2026-04-27T06:44:02.217Z",
     "updated_at": "2026-04-27T06:44:02.217Z"
@@ -4830,7 +4818,7 @@
   "fields": {
     "taxonomy": 32,
     "name": "股份公司",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:02.333Z",
     "updated_at": "2026-04-27T06:44:02.333Z"
@@ -4842,7 +4830,7 @@
   "fields": {
     "taxonomy": 32,
     "name": "有限责任公司",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:02.333Z",
     "updated_at": "2026-04-27T06:44:02.333Z"
@@ -4854,7 +4842,7 @@
   "fields": {
     "taxonomy": 32,
     "name": "合伙企业",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:02.333Z",
     "updated_at": "2026-04-27T06:44:02.333Z"
@@ -4866,7 +4854,7 @@
   "fields": {
     "taxonomy": 32,
     "name": "个人独资企业",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:02.333Z",
     "updated_at": "2026-04-27T06:44:02.333Z"
@@ -4878,7 +4866,7 @@
   "fields": {
     "taxonomy": 32,
     "name": "合资企业",
-    "description": null,
+    "description": "",
     "weight": 4,
     "created_at": "2026-04-27T06:44:02.333Z",
     "updated_at": "2026-04-27T06:44:02.333Z"
@@ -4890,7 +4878,7 @@
   "fields": {
     "taxonomy": 32,
     "name": "子公司",
-    "description": null,
+    "description": "",
     "weight": 5,
     "created_at": "2026-04-27T06:44:02.333Z",
     "updated_at": "2026-04-27T06:44:02.333Z"
@@ -4902,7 +4890,7 @@
   "fields": {
     "taxonomy": 32,
     "name": "分公司",
-    "description": null,
+    "description": "",
     "weight": 6,
     "created_at": "2026-04-27T06:44:02.333Z",
     "updated_at": "2026-04-27T06:44:02.333Z"
@@ -4914,7 +4902,7 @@
   "fields": {
     "taxonomy": 32,
     "name": "代表处",
-    "description": null,
+    "description": "",
     "weight": 7,
     "created_at": "2026-04-27T06:44:02.333Z",
     "updated_at": "2026-04-27T06:44:02.333Z"
@@ -4926,7 +4914,7 @@
   "fields": {
     "taxonomy": 32,
     "name": "非营利组织",
-    "description": null,
+    "description": "",
     "weight": 8,
     "created_at": "2026-04-27T06:44:02.333Z",
     "updated_at": "2026-04-27T06:44:02.334Z"
@@ -4938,7 +4926,7 @@
   "fields": {
     "taxonomy": 32,
     "name": "信托",
-    "description": null,
+    "description": "",
     "weight": 9,
     "created_at": "2026-04-27T06:44:02.333Z",
     "updated_at": "2026-04-27T06:44:02.334Z"
@@ -4950,7 +4938,7 @@
   "fields": {
     "taxonomy": 33,
     "name": "正常营业",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:02.448Z",
     "updated_at": "2026-04-27T06:44:02.448Z"
@@ -4962,7 +4950,7 @@
   "fields": {
     "taxonomy": 33,
     "name": "停业(歇业)",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:02.448Z",
     "updated_at": "2026-04-27T06:44:02.448Z"
@@ -4974,7 +4962,7 @@
   "fields": {
     "taxonomy": 33,
     "name": "筹建",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:02.448Z",
     "updated_at": "2026-04-27T06:44:02.448Z"
@@ -4986,7 +4974,7 @@
   "fields": {
     "taxonomy": 33,
     "name": "当年关闭",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:02.448Z",
     "updated_at": "2026-04-27T06:44:02.448Z"
@@ -4998,7 +4986,7 @@
   "fields": {
     "taxonomy": 33,
     "name": "当年破产",
-    "description": null,
+    "description": "",
     "weight": 4,
     "created_at": "2026-04-27T06:44:02.448Z",
     "updated_at": "2026-04-27T06:44:02.448Z"
@@ -5010,7 +4998,7 @@
   "fields": {
     "taxonomy": 34,
     "name": "1-4人",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:02.590Z",
     "updated_at": "2026-04-27T06:44:02.590Z"
@@ -5022,7 +5010,7 @@
   "fields": {
     "taxonomy": 34,
     "name": "5-9人",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:02.590Z",
     "updated_at": "2026-04-27T06:44:02.590Z"
@@ -5034,7 +5022,7 @@
   "fields": {
     "taxonomy": 34,
     "name": "10-19人",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:02.590Z",
     "updated_at": "2026-04-27T06:44:02.590Z"
@@ -5046,7 +5034,7 @@
   "fields": {
     "taxonomy": 34,
     "name": "20-49人",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:02.590Z",
     "updated_at": "2026-04-27T06:44:02.590Z"
@@ -5058,7 +5046,7 @@
   "fields": {
     "taxonomy": 34,
     "name": "50-99人",
-    "description": null,
+    "description": "",
     "weight": 4,
     "created_at": "2026-04-27T06:44:02.590Z",
     "updated_at": "2026-04-27T06:44:02.590Z"
@@ -5070,7 +5058,7 @@
   "fields": {
     "taxonomy": 34,
     "name": "100-299人",
-    "description": null,
+    "description": "",
     "weight": 5,
     "created_at": "2026-04-27T06:44:02.590Z",
     "updated_at": "2026-04-27T06:44:02.590Z"
@@ -5082,7 +5070,7 @@
   "fields": {
     "taxonomy": 34,
     "name": "300-499人",
-    "description": null,
+    "description": "",
     "weight": 6,
     "created_at": "2026-04-27T06:44:02.590Z",
     "updated_at": "2026-04-27T06:44:02.590Z"
@@ -5094,7 +5082,7 @@
   "fields": {
     "taxonomy": 34,
     "name": "500-999人",
-    "description": null,
+    "description": "",
     "weight": 7,
     "created_at": "2026-04-27T06:44:02.590Z",
     "updated_at": "2026-04-27T06:44:02.590Z"
@@ -5106,7 +5094,7 @@
   "fields": {
     "taxonomy": 34,
     "name": "1000人及以上",
-    "description": null,
+    "description": "",
     "weight": 8,
     "created_at": "2026-04-27T06:44:02.590Z",
     "updated_at": "2026-04-27T06:44:02.590Z"
@@ -5118,7 +5106,7 @@
   "fields": {
     "taxonomy": 35,
     "name": "农林牧渔业",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:02.707Z",
     "updated_at": "2026-04-27T06:44:02.707Z"
@@ -5130,7 +5118,7 @@
   "fields": {
     "taxonomy": 35,
     "name": "采矿业",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:02.707Z",
     "updated_at": "2026-04-27T06:44:02.707Z"
@@ -5142,7 +5130,7 @@
   "fields": {
     "taxonomy": 35,
     "name": "制造业",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:02.707Z",
     "updated_at": "2026-04-27T06:44:02.707Z"
@@ -5154,7 +5142,7 @@
   "fields": {
     "taxonomy": 35,
     "name": "电力燃气水生产供应业",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:02.707Z",
     "updated_at": "2026-04-27T06:44:02.707Z"
@@ -5166,7 +5154,7 @@
   "fields": {
     "taxonomy": 35,
     "name": "建筑业",
-    "description": null,
+    "description": "",
     "weight": 4,
     "created_at": "2026-04-27T06:44:02.707Z",
     "updated_at": "2026-04-27T06:44:02.707Z"
@@ -5178,7 +5166,7 @@
   "fields": {
     "taxonomy": 35,
     "name": "批发零售业",
-    "description": null,
+    "description": "",
     "weight": 5,
     "created_at": "2026-04-27T06:44:02.707Z",
     "updated_at": "2026-04-27T06:44:02.707Z"
@@ -5190,7 +5178,7 @@
   "fields": {
     "taxonomy": 35,
     "name": "交通运输仓储邮政业",
-    "description": null,
+    "description": "",
     "weight": 6,
     "created_at": "2026-04-27T06:44:02.707Z",
     "updated_at": "2026-04-27T06:44:02.707Z"
@@ -5202,7 +5190,7 @@
   "fields": {
     "taxonomy": 35,
     "name": "住宿餐饮业",
-    "description": null,
+    "description": "",
     "weight": 7,
     "created_at": "2026-04-27T06:44:02.707Z",
     "updated_at": "2026-04-27T06:44:02.707Z"
@@ -5214,7 +5202,7 @@
   "fields": {
     "taxonomy": 35,
     "name": "金融业",
-    "description": null,
+    "description": "",
     "weight": 8,
     "created_at": "2026-04-27T06:44:02.707Z",
     "updated_at": "2026-04-27T06:44:02.707Z"
@@ -5226,7 +5214,7 @@
   "fields": {
     "taxonomy": 35,
     "name": "房地产业",
-    "description": null,
+    "description": "",
     "weight": 9,
     "created_at": "2026-04-27T06:44:02.707Z",
     "updated_at": "2026-04-27T06:44:02.707Z"
@@ -5238,7 +5226,7 @@
   "fields": {
     "taxonomy": 35,
     "name": "租赁商务服务业",
-    "description": null,
+    "description": "",
     "weight": 10,
     "created_at": "2026-04-27T06:44:02.707Z",
     "updated_at": "2026-04-27T06:44:02.707Z"
@@ -5250,7 +5238,7 @@
   "fields": {
     "taxonomy": 35,
     "name": "科研技术服务业",
-    "description": null,
+    "description": "",
     "weight": 11,
     "created_at": "2026-04-27T06:44:02.707Z",
     "updated_at": "2026-04-27T06:44:02.707Z"
@@ -5262,7 +5250,7 @@
   "fields": {
     "taxonomy": 35,
     "name": "水利环境公共设施管理业",
-    "description": null,
+    "description": "",
     "weight": 12,
     "created_at": "2026-04-27T06:44:02.707Z",
     "updated_at": "2026-04-27T06:44:02.707Z"
@@ -5274,7 +5262,7 @@
   "fields": {
     "taxonomy": 35,
     "name": "居民服务修理其他服务业",
-    "description": null,
+    "description": "",
     "weight": 13,
     "created_at": "2026-04-27T06:44:02.707Z",
     "updated_at": "2026-04-27T06:44:02.707Z"
@@ -5286,7 +5274,7 @@
   "fields": {
     "taxonomy": 35,
     "name": "教育",
-    "description": null,
+    "description": "",
     "weight": 14,
     "created_at": "2026-04-27T06:44:02.707Z",
     "updated_at": "2026-04-27T06:44:02.707Z"
@@ -5298,7 +5286,7 @@
   "fields": {
     "taxonomy": 35,
     "name": "卫生社会工作",
-    "description": null,
+    "description": "",
     "weight": 15,
     "created_at": "2026-04-27T06:44:02.707Z",
     "updated_at": "2026-04-27T06:44:02.707Z"
@@ -5310,7 +5298,7 @@
   "fields": {
     "taxonomy": 35,
     "name": "文化体育娱乐业",
-    "description": null,
+    "description": "",
     "weight": 16,
     "created_at": "2026-04-27T06:44:02.707Z",
     "updated_at": "2026-04-27T06:44:02.707Z"
@@ -5322,7 +5310,7 @@
   "fields": {
     "taxonomy": 35,
     "name": "公共管理社会组织",
-    "description": null,
+    "description": "",
     "weight": 17,
     "created_at": "2026-04-27T06:44:02.707Z",
     "updated_at": "2026-04-27T06:44:02.707Z"
@@ -5334,7 +5322,7 @@
   "fields": {
     "taxonomy": 36,
     "name": "企业会计制度",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:02.831Z",
     "updated_at": "2026-04-27T06:44:02.831Z"
@@ -5346,7 +5334,7 @@
   "fields": {
     "taxonomy": 36,
     "name": "事业单位会计制度",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:02.831Z",
     "updated_at": "2026-04-27T06:44:02.831Z"
@@ -5358,7 +5346,7 @@
   "fields": {
     "taxonomy": 36,
     "name": "行政单位会计制度",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:02.831Z",
     "updated_at": "2026-04-27T06:44:02.831Z"
@@ -5370,7 +5358,7 @@
   "fields": {
     "taxonomy": 36,
     "name": "民间非营利组织会计制度",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:02.831Z",
     "updated_at": "2026-04-27T06:44:02.831Z"
@@ -5382,7 +5370,7 @@
   "fields": {
     "taxonomy": 37,
     "name": "盈利",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:02.973Z",
     "updated_at": "2026-04-27T06:44:02.973Z"
@@ -5394,7 +5382,7 @@
   "fields": {
     "taxonomy": 37,
     "name": "亏损",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:02.973Z",
     "updated_at": "2026-04-27T06:44:02.973Z"
@@ -5406,7 +5394,7 @@
   "fields": {
     "taxonomy": 37,
     "name": "持平",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:02.973Z",
     "updated_at": "2026-04-27T06:44:02.973Z"
@@ -5418,7 +5406,7 @@
   "fields": {
     "taxonomy": 38,
     "name": "是",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:03.117Z",
     "updated_at": "2026-04-27T06:44:03.117Z"
@@ -5430,7 +5418,7 @@
   "fields": {
     "taxonomy": 38,
     "name": "否",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:03.117Z",
     "updated_at": "2026-04-27T06:44:03.117Z"
@@ -5442,7 +5430,7 @@
   "fields": {
     "taxonomy": 39,
     "name": "有",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:03.223Z",
     "updated_at": "2026-04-27T06:44:03.223Z"
@@ -5454,7 +5442,7 @@
   "fields": {
     "taxonomy": 39,
     "name": "无",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:03.223Z",
     "updated_at": "2026-04-27T06:44:03.223Z"
@@ -5466,7 +5454,7 @@
   "fields": {
     "taxonomy": 40,
     "name": "户主",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:03.340Z",
     "updated_at": "2026-04-27T06:44:03.340Z"
@@ -5478,7 +5466,7 @@
   "fields": {
     "taxonomy": 40,
     "name": "配偶",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:03.340Z",
     "updated_at": "2026-04-27T06:44:03.340Z"
@@ -5490,7 +5478,7 @@
   "fields": {
     "taxonomy": 40,
     "name": "子女",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:03.340Z",
     "updated_at": "2026-04-27T06:44:03.340Z"
@@ -5502,7 +5490,7 @@
   "fields": {
     "taxonomy": 40,
     "name": "父母",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:03.340Z",
     "updated_at": "2026-04-27T06:44:03.340Z"
@@ -5514,7 +5502,7 @@
   "fields": {
     "taxonomy": 40,
     "name": "兄弟姐妹",
-    "description": null,
+    "description": "",
     "weight": 4,
     "created_at": "2026-04-27T06:44:03.340Z",
     "updated_at": "2026-04-27T06:44:03.340Z"
@@ -5526,7 +5514,7 @@
   "fields": {
     "taxonomy": 40,
     "name": "祖父母",
-    "description": null,
+    "description": "",
     "weight": 5,
     "created_at": "2026-04-27T06:44:03.340Z",
     "updated_at": "2026-04-27T06:44:03.340Z"
@@ -5538,7 +5526,7 @@
   "fields": {
     "taxonomy": 40,
     "name": "外祖父母",
-    "description": null,
+    "description": "",
     "weight": 6,
     "created_at": "2026-04-27T06:44:03.340Z",
     "updated_at": "2026-04-27T06:44:03.340Z"
@@ -5550,7 +5538,7 @@
   "fields": {
     "taxonomy": 40,
     "name": "租户",
-    "description": null,
+    "description": "",
     "weight": 7,
     "created_at": "2026-04-27T06:44:03.340Z",
     "updated_at": "2026-04-27T06:44:03.340Z"
@@ -5562,7 +5550,7 @@
   "fields": {
     "taxonomy": 40,
     "name": "其他",
-    "description": null,
+    "description": "",
     "weight": 8,
     "created_at": "2026-04-27T06:44:03.340Z",
     "updated_at": "2026-04-27T06:44:03.340Z"
@@ -5574,7 +5562,7 @@
   "fields": {
     "taxonomy": 42,
     "name": "户籍人口",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:03.514Z",
     "updated_at": "2026-04-27T06:44:03.514Z"
@@ -5586,7 +5574,7 @@
   "fields": {
     "taxonomy": 42,
     "name": "常住人口",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:03.514Z",
     "updated_at": "2026-04-27T06:44:03.514Z"
@@ -5598,7 +5586,7 @@
   "fields": {
     "taxonomy": 42,
     "name": "流动人口",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:03.514Z",
     "updated_at": "2026-04-27T06:44:03.515Z"
@@ -5610,7 +5598,7 @@
   "fields": {
     "taxonomy": 42,
     "name": "暂住人口",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:03.514Z",
     "updated_at": "2026-04-27T06:44:03.515Z"
@@ -5622,7 +5610,7 @@
   "fields": {
     "taxonomy": 43,
     "name": "独居老人",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:03.665Z",
     "updated_at": "2026-04-27T06:44:03.665Z"
@@ -5634,7 +5622,7 @@
   "fields": {
     "taxonomy": 43,
     "name": "低保户",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:03.665Z",
     "updated_at": "2026-04-27T06:44:03.665Z"
@@ -5646,7 +5634,7 @@
   "fields": {
     "taxonomy": 43,
     "name": "残疾人",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:03.665Z",
     "updated_at": "2026-04-27T06:44:03.665Z"
@@ -5658,7 +5646,7 @@
   "fields": {
     "taxonomy": 43,
     "name": "重症患者",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:03.665Z",
     "updated_at": "2026-04-27T06:44:03.665Z"
@@ -5670,7 +5658,7 @@
   "fields": {
     "taxonomy": 43,
     "name": "刑满释放人员",
-    "description": null,
+    "description": "",
     "weight": 4,
     "created_at": "2026-04-27T06:44:03.665Z",
     "updated_at": "2026-04-27T06:44:03.665Z"
@@ -5682,7 +5670,7 @@
   "fields": {
     "taxonomy": 43,
     "name": "社区矫正对象",
-    "description": null,
+    "description": "",
     "weight": 5,
     "created_at": "2026-04-27T06:44:03.665Z",
     "updated_at": "2026-04-27T06:44:03.665Z"
@@ -5694,7 +5682,7 @@
   "fields": {
     "taxonomy": 43,
     "name": "涉毒人员",
-    "description": null,
+    "description": "",
     "weight": 6,
     "created_at": "2026-04-27T06:44:03.665Z",
     "updated_at": "2026-04-27T06:44:03.665Z"
@@ -5706,7 +5694,7 @@
   "fields": {
     "taxonomy": 43,
     "name": "其他",
-    "description": null,
+    "description": "",
     "weight": 7,
     "created_at": "2026-04-27T06:44:03.665Z",
     "updated_at": "2026-04-27T06:44:03.665Z"
@@ -5718,7 +5706,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "汉族",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.817Z"
@@ -5730,7 +5718,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "蒙古族",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.817Z"
@@ -5742,7 +5730,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "回族",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.817Z"
@@ -5754,7 +5742,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "藏族",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -5766,7 +5754,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "维吾尔族",
-    "description": null,
+    "description": "",
     "weight": 4,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -5778,7 +5766,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "苗族",
-    "description": null,
+    "description": "",
     "weight": 5,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -5790,7 +5778,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "彝族",
-    "description": null,
+    "description": "",
     "weight": 6,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -5802,7 +5790,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "壮族",
-    "description": null,
+    "description": "",
     "weight": 7,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -5814,7 +5802,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "布依族",
-    "description": null,
+    "description": "",
     "weight": 8,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -5826,7 +5814,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "朝鲜族",
-    "description": null,
+    "description": "",
     "weight": 9,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -5838,7 +5826,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "满族",
-    "description": null,
+    "description": "",
     "weight": 10,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -5850,7 +5838,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "侗族",
-    "description": null,
+    "description": "",
     "weight": 11,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -5862,7 +5850,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "瑶族",
-    "description": null,
+    "description": "",
     "weight": 12,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -5874,7 +5862,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "白族",
-    "description": null,
+    "description": "",
     "weight": 13,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -5886,7 +5874,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "土家族",
-    "description": null,
+    "description": "",
     "weight": 14,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -5898,7 +5886,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "哈尼族",
-    "description": null,
+    "description": "",
     "weight": 15,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -5910,7 +5898,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "哈萨克族",
-    "description": null,
+    "description": "",
     "weight": 16,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -5922,7 +5910,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "傣族",
-    "description": null,
+    "description": "",
     "weight": 17,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -5934,7 +5922,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "黎族",
-    "description": null,
+    "description": "",
     "weight": 18,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -5946,7 +5934,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "傈僳族",
-    "description": null,
+    "description": "",
     "weight": 19,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -5958,7 +5946,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "佤族",
-    "description": null,
+    "description": "",
     "weight": 20,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -5970,7 +5958,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "畲族",
-    "description": null,
+    "description": "",
     "weight": 21,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -5982,7 +5970,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "高山族",
-    "description": null,
+    "description": "",
     "weight": 22,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -5994,7 +5982,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "拉祜族",
-    "description": null,
+    "description": "",
     "weight": 23,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6006,7 +5994,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "水族",
-    "description": null,
+    "description": "",
     "weight": 24,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6018,7 +6006,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "东乡族",
-    "description": null,
+    "description": "",
     "weight": 25,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6030,7 +6018,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "纳西族",
-    "description": null,
+    "description": "",
     "weight": 26,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6042,7 +6030,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "景颇族",
-    "description": null,
+    "description": "",
     "weight": 27,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6054,7 +6042,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "柯尔克孜族",
-    "description": null,
+    "description": "",
     "weight": 28,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6066,7 +6054,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "土族",
-    "description": null,
+    "description": "",
     "weight": 29,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6078,7 +6066,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "达斡尔族",
-    "description": null,
+    "description": "",
     "weight": 30,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6090,7 +6078,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "仫佬族",
-    "description": null,
+    "description": "",
     "weight": 31,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6102,7 +6090,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "羌族",
-    "description": null,
+    "description": "",
     "weight": 32,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6114,7 +6102,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "布朗族",
-    "description": null,
+    "description": "",
     "weight": 33,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6126,7 +6114,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "撒拉族",
-    "description": null,
+    "description": "",
     "weight": 34,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6138,7 +6126,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "毛南族",
-    "description": null,
+    "description": "",
     "weight": 35,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6150,7 +6138,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "仡佬族",
-    "description": null,
+    "description": "",
     "weight": 36,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6162,7 +6150,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "锡伯族",
-    "description": null,
+    "description": "",
     "weight": 37,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6174,7 +6162,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "阿昌族",
-    "description": null,
+    "description": "",
     "weight": 38,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6186,7 +6174,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "普米族",
-    "description": null,
+    "description": "",
     "weight": 39,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6198,7 +6186,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "塔吉克族",
-    "description": null,
+    "description": "",
     "weight": 40,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6210,7 +6198,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "怒族",
-    "description": null,
+    "description": "",
     "weight": 41,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6222,7 +6210,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "乌孜别克族",
-    "description": null,
+    "description": "",
     "weight": 42,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6234,7 +6222,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "俄罗斯族",
-    "description": null,
+    "description": "",
     "weight": 43,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6246,7 +6234,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "鄂温克族",
-    "description": null,
+    "description": "",
     "weight": 44,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6258,7 +6246,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "德昂族",
-    "description": null,
+    "description": "",
     "weight": 45,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6270,7 +6258,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "保安族",
-    "description": null,
+    "description": "",
     "weight": 46,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6282,7 +6270,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "裕固族",
-    "description": null,
+    "description": "",
     "weight": 47,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6294,7 +6282,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "京族",
-    "description": null,
+    "description": "",
     "weight": 48,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6306,7 +6294,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "塔塔尔族",
-    "description": null,
+    "description": "",
     "weight": 49,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6318,7 +6306,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "独龙族",
-    "description": null,
+    "description": "",
     "weight": 50,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6330,7 +6318,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "鄂伦春族",
-    "description": null,
+    "description": "",
     "weight": 51,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6342,7 +6330,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "赫哲族",
-    "description": null,
+    "description": "",
     "weight": 52,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6354,7 +6342,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "门巴族",
-    "description": null,
+    "description": "",
     "weight": 53,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6366,7 +6354,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "珞巴族",
-    "description": null,
+    "description": "",
     "weight": 54,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6378,7 +6366,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "基诺族",
-    "description": null,
+    "description": "",
     "weight": 55,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6390,7 +6378,7 @@
   "fields": {
     "taxonomy": 44,
     "name": "其他",
-    "description": null,
+    "description": "",
     "weight": 56,
     "created_at": "2026-04-27T06:44:03.817Z",
     "updated_at": "2026-04-27T06:44:03.818Z"
@@ -6402,7 +6390,7 @@
   "fields": {
     "taxonomy": 45,
     "name": "中共党员",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:04.065Z",
     "updated_at": "2026-04-27T06:44:04.065Z"
@@ -6414,7 +6402,7 @@
   "fields": {
     "taxonomy": 45,
     "name": "中共预备党员",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:04.065Z",
     "updated_at": "2026-04-27T06:44:04.065Z"
@@ -6426,7 +6414,7 @@
   "fields": {
     "taxonomy": 45,
     "name": "共青团员",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:04.065Z",
     "updated_at": "2026-04-27T06:44:04.065Z"
@@ -6438,7 +6426,7 @@
   "fields": {
     "taxonomy": 45,
     "name": "群众",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:04.065Z",
     "updated_at": "2026-04-27T06:44:04.065Z"
@@ -6450,7 +6438,7 @@
   "fields": {
     "taxonomy": 46,
     "name": "健康",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:04.226Z",
     "updated_at": "2026-04-27T06:44:04.226Z"
@@ -6462,7 +6450,7 @@
   "fields": {
     "taxonomy": 46,
     "name": "良好",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:04.226Z",
     "updated_at": "2026-04-27T06:44:04.226Z"
@@ -6474,7 +6462,7 @@
   "fields": {
     "taxonomy": 46,
     "name": "一般",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:04.226Z",
     "updated_at": "2026-04-27T06:44:04.226Z"
@@ -6486,7 +6474,7 @@
   "fields": {
     "taxonomy": 46,
     "name": "较差",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:04.226Z",
     "updated_at": "2026-04-27T06:44:04.226Z"
@@ -6498,7 +6486,7 @@
   "fields": {
     "taxonomy": 46,
     "name": "残疾",
-    "description": null,
+    "description": "",
     "weight": 4,
     "created_at": "2026-04-27T06:44:04.226Z",
     "updated_at": "2026-04-27T06:44:04.227Z"
@@ -6510,7 +6498,7 @@
   "fields": {
     "taxonomy": 46,
     "name": "疾病",
-    "description": null,
+    "description": "",
     "weight": 5,
     "created_at": "2026-04-27T06:44:04.226Z",
     "updated_at": "2026-04-27T06:44:04.227Z"
@@ -6522,7 +6510,7 @@
   "fields": {
     "taxonomy": 46,
     "name": "慢性病",
-    "description": null,
+    "description": "",
     "weight": 6,
     "created_at": "2026-04-27T06:44:04.226Z",
     "updated_at": "2026-04-27T06:44:04.227Z"
@@ -6534,7 +6522,7 @@
   "fields": {
     "taxonomy": 18,
     "name": "研究生",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:04.373Z",
     "updated_at": "2026-04-27T06:44:04.373Z"
@@ -6546,7 +6534,7 @@
   "fields": {
     "taxonomy": 18,
     "name": "高中",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:04.373Z",
     "updated_at": "2026-04-27T06:44:04.373Z"
@@ -6558,7 +6546,7 @@
   "fields": {
     "taxonomy": 18,
     "name": "文盲",
-    "description": null,
+    "description": "",
     "weight": 6,
     "created_at": "2026-04-27T06:44:04.373Z",
     "updated_at": "2026-04-27T06:44:04.373Z"
@@ -6570,7 +6558,7 @@
   "fields": {
     "taxonomy": 41,
     "name": "网格1",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:08.111Z",
     "updated_at": "2026-04-27T06:44:08.111Z"
@@ -6582,7 +6570,7 @@
   "fields": {
     "taxonomy": 41,
     "name": "网格2",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:08.111Z",
     "updated_at": "2026-04-27T06:44:08.111Z"
@@ -6594,7 +6582,7 @@
   "fields": {
     "taxonomy": 41,
     "name": "网格3",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:08.111Z",
     "updated_at": "2026-04-27T06:44:08.111Z"
@@ -6606,7 +6594,7 @@
   "fields": {
     "taxonomy": 41,
     "name": "网格4",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:08.111Z",
     "updated_at": "2026-04-27T06:44:08.111Z"
@@ -6618,7 +6606,7 @@
   "fields": {
     "taxonomy": 41,
     "name": "网格5",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:08.111Z",
     "updated_at": "2026-04-27T06:44:08.111Z"
@@ -6630,7 +6618,7 @@
   "fields": {
     "taxonomy": 47,
     "name": "研究生",
-    "description": null,
+    "description": "",
     "weight": 0,
     "created_at": "2026-04-27T06:44:08.111Z",
     "updated_at": "2026-04-27T06:44:08.111Z"
@@ -6642,7 +6630,7 @@
   "fields": {
     "taxonomy": 47,
     "name": "本科",
-    "description": null,
+    "description": "",
     "weight": 1,
     "created_at": "2026-04-27T06:44:08.111Z",
     "updated_at": "2026-04-27T06:44:08.111Z"
@@ -6654,7 +6642,7 @@
   "fields": {
     "taxonomy": 47,
     "name": "大专",
-    "description": null,
+    "description": "",
     "weight": 2,
     "created_at": "2026-04-27T06:44:08.111Z",
     "updated_at": "2026-04-27T06:44:08.111Z"
@@ -6666,7 +6654,7 @@
   "fields": {
     "taxonomy": 47,
     "name": "高中",
-    "description": null,
+    "description": "",
     "weight": 3,
     "created_at": "2026-04-27T06:44:08.111Z",
     "updated_at": "2026-04-27T06:44:08.111Z"
@@ -6678,7 +6666,7 @@
   "fields": {
     "taxonomy": 47,
     "name": "初中",
-    "description": null,
+    "description": "",
     "weight": 4,
     "created_at": "2026-04-27T06:44:08.111Z",
     "updated_at": "2026-04-27T06:44:08.111Z"
@@ -6690,7 +6678,7 @@
   "fields": {
     "taxonomy": 47,
     "name": "小学",
-    "description": null,
+    "description": "",
     "weight": 5,
     "created_at": "2026-04-27T06:44:08.111Z",
     "updated_at": "2026-04-27T06:44:08.111Z"
@@ -6702,7 +6690,7 @@
   "fields": {
     "taxonomy": 47,
     "name": "文盲",
-    "description": null,
+    "description": "",
     "weight": 6,
     "created_at": "2026-04-27T06:44:08.111Z",
     "updated_at": "2026-04-27T06:44:08.111Z"
