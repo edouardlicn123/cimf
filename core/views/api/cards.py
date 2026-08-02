@@ -140,6 +140,10 @@ def api_dashboard_cards(request):  # noqa: ARG001
                 logger.warning(f"卡片模板渲染失败: module={module_id}, error={e}", exc_info=True)
             # 收集所有卡片，不下拉列表
 
+    if not any(p and p.get("module") for p in default_positions.values()):
+        for i, module_id in enumerate(available_modules[:6], start=1):
+            default_positions[str(i)] = {"module": module_id, "size": "medium", "config": {}}
+
     return no_cache_json_response(
         {
             "success": True,

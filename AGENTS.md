@@ -179,6 +179,7 @@ Agent 应在以下情况检查该文档：
 | 12 | **`save(update_fields=[...])` 是否覆盖全部修改字段？** — 容易遗漏新增字段 | 通用 |
 | 13 | **`@login_required` 是否冗余？** — `GlobalLoginRequiredMiddleware` 已默认强制登录，白名单路径例外 | P3 冗余装饰器 |
 | 14 | **并发安全？** — 共享资源有无 `threading.Lock` / `select_for_update`？`CronTask.run()` 可重入？ | Round 8 |
+| 15 | **配置驱动的 UI 是否有默认回退？** — 首页功能卡片位置 `user_dashboard_card_positions` 缺失曾致"快捷入口"全空，需仿照 `api_nav_cards` 的 `DEFAULT_NAV_CARDS` 提供默认布局 | Round 10 首页卡片 |
 
 **进度记录（省 token）：**
 - `docs/progress.md` 仅保留最近 ~300 条记录。
