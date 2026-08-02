@@ -23,7 +23,7 @@
 # ============================================================
 
 VERSION_MAJOR = "2"
-VERSION_MINOR = 153
+VERSION_MINOR = 154
 
 
 def get_version_display():

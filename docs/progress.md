@@ -305,3 +305,8 @@
 2. scanner_checks.py 自定义检查器改为 _has_noqa 裸代码匹配，使 CIMF_W00X 与 ruff 规则码可共存于同一 noqa 注释；ruff 解析确认：noqa 中识别码须在前，未知代码靠前会导致整个指令失效
 3. 修复 CI 必失败: 清除25个ruff错误+ci.yml补ALLOWED_HOSTS/长SECRET_KEY/锁定ruff0.16.1, scanner_checks改用_has_noqa裸码匹配, 版本v2.152
 
+
+
+# 2026-08-02 修改记录
+
+1. 修复：首页功能卡片不显示 - user_dashboard_card_positions设置为空时api_dashboard_cards无默认布局回退（非封装/修bug回归，系设计缺口），仿照api_nav_cards的DEFAULT_NAV_CARDS在服务端回退前6个可用frontpage模块填槽位1-6；已配置时不覆盖；AGENTS.md反模式自查清单新增#15配置驱动UI默认回退
