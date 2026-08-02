@@ -29,6 +29,7 @@ import logging
 import time
 from datetime import UTC, datetime, timedelta
 from urllib.request import urlopen
+from zoneinfo import ZoneInfo
 
 from django.utils.timezone import now
 
@@ -103,15 +104,30 @@ class TimeSyncService(SingletonMixin):
             with urlopen(url, timeout=5) as response:  # noqa: S310 — trusted time API server
                 if response.status == 200:
                     data = json.loads(response.read().decode("utf-8"))
+                    # 优先使用服务器权威 epoch 字段（时区无关，避免墙钟被误当 UTC）
+                    ts = data.get("timestamp") or data.get("unixtime")
+                    if ts:
+                        return datetime.fromtimestamp(int(ts), tz=UTC)
                     date_str = (
-                        data.get("date")
-                        or data.get("datetime")
+                        data.get("datetime")
+                        or data.get("date")
                         or data.get("dateTime")
                         or data.get("sysTime2")
                     )
                     if date_str:
-                        date_str = date_str.replace("T", " ").split("+")[0].rstrip("Z")
-                        return datetime.strptime(date_str[:19], "%Y-%m-%d %H:%M:%S").replace(tzinfo=UTC)
+                        date_str = str(date_str)
+                        # 先尝试带时区偏移的 ISO 格式（如 worldtimeapi 的 +08:00）
+                        try:
+                            parsed = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+                            if parsed.tzinfo is not None:
+                                return parsed
+                        except ValueError:
+                            pass
+                        # 无偏移的裸墙钟（uuni/suning 返回北京时间）按配置时区解释，勿默认 UTC
+                        tz_name = self._get_settings_value("time_zone") or "Asia/Shanghai"
+                        return datetime.strptime(date_str[:19], "%Y-%m-%d %H:%M:%S").replace(
+                            tzinfo=ZoneInfo(tz_name)
+                        )
             return None
 
         return safe_execute(_fetch, error_return=None, log_msg=f"从 {url} 获取时间失败", logger=logger)
@@ -168,7 +184,12 @@ class TimeSyncService(SingletonMixin):
         return result
 
     def get_current_time(self) -> datetime:
-        """获取当前时间"""
+        """获取当前时间（返回配置时区本地化 datetime，strftime 即显示墙钟）"""
+
+        def _to_local(dt: datetime) -> datetime:
+            tz_name = self._get_settings_value("time_zone") or "Asia/Shanghai"
+            return dt.astimezone(ZoneInfo(tz_name))
+
         # ── 第一优先：从 DB 读取持久化的同步基准 ──
         try:
             from core.services import SettingsService  # noqa: PLC0415
@@ -185,17 +206,17 @@ class TimeSyncService(SingletonMixin):
                 mono = float(monotonic_str)
                 elapsed = time.monotonic() - mono
                 if elapsed >= 0:
-                    return synced + timedelta(seconds=elapsed)
+                    return _to_local(synced + timedelta(seconds=elapsed))
         except Exception as e:
             logger.warning(f"从 DB 读取同步时间失败: {e}")
 
         # ── 第二优先：内存缓存（进程内第二次调用时更快） ──
         if self._synced_time is not None and self._sync_status == "success" and self._last_sync_timestamp is not None:
             elapsed = time.time() - self._last_sync_timestamp
-            return self._synced_time + timedelta(seconds=elapsed)
+            return _to_local(self._synced_time + timedelta(seconds=elapsed))
 
         # ── 第三优先：兜底 ──
-        return now()
+        return _to_local(now())
 
     def get_current_time_str(self, fmt: str = "%Y-%m-%d %H:%M:%S") -> str:
         """获取当前时间字符串"""
