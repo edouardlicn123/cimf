@@ -311,4 +311,6 @@
 2. 修复：首页功能卡片拖动后位置不保持 - CSRF_COOKIE_HTTPONLY=True致JS读不到csrftoken Cookie，getCsrfToken()返回空导致api_dashboard_cards_save静默403；common.js新增meta[name=csrf-token]回退读取，同时修复nav_cards/homepage_settings等所有fetch POST；AGENTS.md反模式清单新增#16 AJAX CSRF token可读性检查
 3. 修复：首页时钟时间快8小时 - TimeSyncService._fetch_time_from_server把时间服务器返回的北京墙钟date误标为UTC(replace(tzinfo=UTC))且丢弃权威timestamp字段，致system_synced_time快8h、首页时钟显示快8h；改为优先用timestamp/unixtime epoch，无偏移裸墙钟按time_zone配置(ZoneInfo)解释，get_current_time()返回本地化datetime供strftime显示，重同步覆盖陈旧DB值；common.js updateBeijingTime改data.data.time；AGENTS.md新增#17外部时间源误当UTC检查项
 4. git清理：git rm --cached -r .opencode/取消跟踪package-lock.json+7个plans计划文档(本地保留)，根.gitignore新增.opencode/；.github/workflows/ci.yml保持跟踪
+5. 时间硬化：TimeSyncService.get_current_time()增加MAX_SYNC_AGE=24h护栏，陈旧/脏同步基准自动降级到本地时间；首页时钟卡片toBeijingDate强制Asia/Shanghai显示(时间/日期/星期/农历全时区正确)；AGENTS.md反模式清单新增#18时钟改动须重启+等同步提醒
+6. 修复WhatsApp首页卡片状态显示：dashboard_card.html的{% if wa_connected %}改为{% if connected %}(get_status()返回键名是connected，原变量全项目无来源致徽标永远未连接)；get_status()增加today_sent/daily_limit(复用check_daily_limit滚动24h)，卡片今日计数由硬编码0/0改为真实数据
 

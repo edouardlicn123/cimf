@@ -47,6 +47,7 @@ class TimeSyncService(SingletonMixin):
     DEFAULT_MAX_RETRIES = 5
     DEFAULT_RETRY_DELAY = 2
     DEFAULT_SERVER_URL = "https://api.uuni.cn/api/time"
+    MAX_SYNC_AGE = 24 * 3600  # 同步基准超过该时长视为过期，降级到本地时间，避免显示陈旧/脏值
 
     BACKUP_SERVERS = [
         "http://worldtimeapi.org/api/timezone/Asia/Shanghai",
@@ -205,15 +206,20 @@ class TimeSyncService(SingletonMixin):
                     synced = make_aware(synced)
                 mono = float(monotonic_str)
                 elapsed = time.monotonic() - mono
-                if elapsed >= 0:
+                if 0 <= elapsed <= self.MAX_SYNC_AGE:
                     return _to_local(synced + timedelta(seconds=elapsed))
+                if elapsed > self.MAX_SYNC_AGE:
+                    logger.warning(
+                        f"持久化同步时间已过期({elapsed:.0f}s > {self.MAX_SYNC_AGE}s)，降级到本地时间"
+                    )
         except Exception as e:
             logger.warning(f"从 DB 读取同步时间失败: {e}")
 
         # ── 第二优先：内存缓存（进程内第二次调用时更快） ──
         if self._synced_time is not None and self._sync_status == "success" and self._last_sync_timestamp is not None:
             elapsed = time.time() - self._last_sync_timestamp
-            return _to_local(self._synced_time + timedelta(seconds=elapsed))
+            if 0 <= elapsed <= self.MAX_SYNC_AGE:
+                return _to_local(self._synced_time + timedelta(seconds=elapsed))
 
         # ── 第三优先：兜底 ──
         return _to_local(now())
