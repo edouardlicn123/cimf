@@ -305,8 +305,10 @@
 2. scanner_checks.py 自定义检查器改为 _has_noqa 裸代码匹配，使 CIMF_W00X 与 ruff 规则码可共存于同一 noqa 注释；ruff 解析确认：noqa 中识别码须在前，未知代码靠前会导致整个指令失效
 3. 修复 CI 必失败: 清除25个ruff错误+ci.yml补ALLOWED_HOSTS/长SECRET_KEY/锁定ruff0.16.1, scanner_checks改用_has_noqa裸码匹配, 版本v2.152
 
-
-
 # 2026-08-02 修改记录
 
 1. 修复：首页功能卡片不显示 - user_dashboard_card_positions设置为空时api_dashboard_cards无默认布局回退（非封装/修bug回归，系设计缺口），仿照api_nav_cards的DEFAULT_NAV_CARDS在服务端回退前6个可用frontpage模块填槽位1-6；已配置时不覆盖；AGENTS.md反模式自查清单新增#15配置驱动UI默认回退
+2. 修复：首页功能卡片拖动后位置不保持 - CSRF_COOKIE_HTTPONLY=True致JS读不到csrftoken Cookie，getCsrfToken()返回空导致api_dashboard_cards_save静默403；common.js新增meta[name=csrf-token]回退读取，同时修复nav_cards/homepage_settings等所有fetch POST；AGENTS.md反模式清单新增#16 AJAX CSRF token可读性检查
+3. 修复：首页时钟时间快8小时 - TimeSyncService._fetch_time_from_server把时间服务器返回的北京墙钟date误标为UTC(replace(tzinfo=UTC))且丢弃权威timestamp字段，致system_synced_time快8h、首页时钟显示快8h；改为优先用timestamp/unixtime epoch，无偏移裸墙钟按time_zone配置(ZoneInfo)解释，get_current_time()返回本地化datetime供strftime显示，重同步覆盖陈旧DB值；common.js updateBeijingTime改data.data.time；AGENTS.md新增#17外部时间源误当UTC检查项
+4. git清理：git rm --cached -r .opencode/取消跟踪package-lock.json+7个plans计划文档(本地保留)，根.gitignore新增.opencode/；.github/workflows/ci.yml保持跟踪
+

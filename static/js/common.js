@@ -143,8 +143,8 @@
         window.FFE.apiGet('/api/v1/time/current')
             .then(response => response.json())
             .then(data => {
-                if (data.time) {
-                    timeElement.textContent = data.time;
+                if (data.data && data.data.time) {
+                    timeElement.textContent = data.data.time;
                 }
             })
             .catch(error => {
@@ -161,7 +161,7 @@
             });
     };
 
-    // 从 Cookie 获取 CSRF Token
+    // 获取 CSRF Token：优先读 Cookie，读不到（如 CSRF_COOKIE_HTTPONLY）时回退到 meta 标签
     window.FFE.getCsrfToken = function() {
         var name = 'csrftoken';
         var cookieValue = null;
@@ -173,6 +173,12 @@
                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                     break;
                 }
+            }
+        }
+        if (!cookieValue) {
+            var meta = document.querySelector('meta[name="csrf-token"]');
+            if (meta && meta.content) {
+                cookieValue = meta.content;
             }
         }
         return cookieValue;

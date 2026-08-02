@@ -64,3 +64,6 @@ modules/customer_cn/
 # ========== 其他（包管理工具相关）==========
 pip-log.txt
 pip-delete-this-directory.txt
+
+# ========== 工具目录 ==========
+.opencode/

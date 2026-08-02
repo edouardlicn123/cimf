@@ -180,6 +180,8 @@ Agent 应在以下情况检查该文档：
 | 13 | **`@login_required` 是否冗余？** — `GlobalLoginRequiredMiddleware` 已默认强制登录，白名单路径例外 | P3 冗余装饰器 |
 | 14 | **并发安全？** — 共享资源有无 `threading.Lock` / `select_for_update`？`CronTask.run()` 可重入？ | Round 8 |
 | 15 | **配置驱动的 UI 是否有默认回退？** — 首页功能卡片位置 `user_dashboard_card_positions` 缺失曾致"快捷入口"全空，需仿照 `api_nav_cards` 的 `DEFAULT_NAV_CARDS` 提供默认布局 | Round 10 首页卡片 |
+| 16 | **AJAX fetch POST 的 CSRF token 是否可读？** — `CSRF_COOKIE_HTTPONLY=True` 时 JS 读不到 Cookie，`getCsrfToken()` 必须回退读 `<meta name="csrf-token">`，否则保存类 AJAX 静默 403（移动首页卡片刷新后位置不保持） | Round 10 卡片拖动不保存 |
+| 17 | **外部时间源/API 返回时间是否误当 UTC？** — 无时区墙钟时间须按 `time_zone` 配置解释（勿 `replace(tzinfo=UTC)`），优先用服务器权威 `timestamp`/`unixtime` epoch 字段；曾致 `system_synced_time` 快 8 小时、首页时钟显示错 | Round 10 时间不准 |
 
 **进度记录（省 token）：**
 - `docs/progress.md` 仅保留最近 ~300 条记录。
