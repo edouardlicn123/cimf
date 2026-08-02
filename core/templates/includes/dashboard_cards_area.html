@@ -326,23 +326,46 @@
         return new Date((serverTimeData.timestamp + elapsed) * 1000);
     }
 
+    function pad2(n) {
+        return (n < 10 ? '0' : '') + n;
+    }
+
+    function toBeijingDate(date) {
+        var dtf = new Intl.DateTimeFormat('en-GB', {
+            timeZone: 'Asia/Shanghai',
+            hourCycle: 'h23',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        var parts = {};
+        dtf.formatToParts(date).forEach(function(p) {
+            if (p.type !== 'literal') parts[p.type] = parseInt(p.value, 10);
+        });
+        return new Date(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second);
+    }
+
     function updateClock() {
         var now = getServerDate();
+        var beijing = toBeijingDate(now);
         var timeEl = document.querySelector('.clock-time');
         var dateWeekdayEl = document.querySelector('.clock-date-weekday');
         var lunarEl = document.querySelector('.clock-lunar');
 
         if (timeEl) {
-            timeEl.textContent = now.toLocaleTimeString('zh-CN', {hour12: false});
+            timeEl.textContent = pad2(beijing.getHours()) + ':' + pad2(beijing.getMinutes()) + ':' + pad2(beijing.getSeconds());
         }
         if (dateWeekdayEl) {
-            var dateStr = now.toLocaleDateString('zh-CN');
+            var dateStr = beijing.getFullYear() + '-' + pad2(beijing.getMonth() + 1) + '-' + pad2(beijing.getDate());
             var weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
-            var weekdayStr = weekdays[now.getDay()];
+            var weekdayStr = weekdays[beijing.getDay()];
             dateWeekdayEl.textContent = dateStr + ' ' + weekdayStr;
         }
         if (lunarEl) {
-            var lunar = getLunarDate(now);
+            var lunar = getLunarDate(beijing);
             lunarEl.textContent = lunar.lunar;
         }
     }
