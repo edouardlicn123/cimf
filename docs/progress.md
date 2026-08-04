@@ -314,3 +314,9 @@
 5. 时间硬化：TimeSyncService.get_current_time()增加MAX_SYNC_AGE=24h护栏，陈旧/脏同步基准自动降级到本地时间；首页时钟卡片toBeijingDate强制Asia/Shanghai显示(时间/日期/星期/农历全时区正确)；AGENTS.md反模式清单新增#18时钟改动须重启+等同步提醒
 6. 修复WhatsApp首页卡片状态显示：dashboard_card.html的{% if wa_connected %}改为{% if connected %}(get_status()返回键名是connected，原变量全项目无来源致徽标永远未连接)；get_status()增加today_sent/daily_limit(复用check_daily_limit滚动24h)，卡片今日计数由硬编码0/0改为真实数据
 
+# 2026-08-03 修改记录
+
+1. whatsapp 模块统一 toast：3 个模板（send/check/check_logs）移除本地 Bootstrap #liveToast 与 showToast()，改用全局 window.FFE.showToast
+2. whatsapp logs 页改为近 10 天记录 + 分页（每页 50 条），logs_view 用 paginate_queryset，模板改用 page_obj 并引入分页组件
+3. whatsapp services：新增 _log_wa_connection_failure 助手，8 处 WABridge 连接异常（含 check_health）连接拒绝时仅记简短提示不再刷完整堆栈；batch_check_whatsapp 错误提示改用中文
+
