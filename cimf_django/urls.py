@@ -2,6 +2,8 @@
 URL configuration for cimf_django project.
 """
 
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
@@ -19,3 +21,7 @@ urlpatterns = [
     path("importexport/", include((importexport_urls, "importexport"), namespace="importexport")),
     path("api/v1/", include("core.api_urls", namespace="api")),
 ]
+
+# 媒体文件静态服务（WhatsApp 媒体发送依赖 WABridge 拉取 /media/ 下的文件）
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
