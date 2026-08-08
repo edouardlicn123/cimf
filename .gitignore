@@ -15,6 +15,7 @@ venv/
 # ========== 运行时数据 ==========
 instance/
 instance/uploads/*
+storage/uploads/
 *.db
 *.sqlite3
 
