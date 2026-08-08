@@ -389,9 +389,6 @@ if DJANGO_ENV == "production":
     SECURE_HSTS_SECONDS = SECURE_HSTS_SECONDS or 31536000  # 默认1年
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
     DEBUG = False
     if ALLOWED_HOSTS == ["localhost", "127.0.0.1"]:
         raise ValueError("生产环境必须在 DJANGO_ALLOWED_HOSTS 中配置实际域名！")
