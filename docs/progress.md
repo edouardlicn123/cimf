@@ -320,3 +320,9 @@
 2. whatsapp logs 页改为近 10 天记录 + 分页（每页 50 条），logs_view 用 paginate_queryset，模板改用 page_obj 并引入分页组件
 3. whatsapp services：新增 _log_wa_connection_failure 助手，8 处 WABridge 连接异常（含 check_health）连接拒绝时仅记简短提示不再刷完整堆栈；batch_check_whatsapp 错误提示改用中文
 
+# 2026-08-08 修改记录
+
+1. 修复 WhatsApp 媒体发送 404：build_media_url 缺少 whatsapp/ 目录段
+2. 新增 serve_media 媒体视图并无条件挂载 /media/，消除生产模式 DEBUG 门控导致的 404；生产验证需关闭 SECURE_SSL_REDIRECT
+3. 生产安全配置改为尊重 DJANGO_SSL_REDIRECT/DJANGO_SESSION_COOKIE_SECURE/DJANGO_CSRF_COOKIE_SECURE 环境变量，支持无 HTTPS 单机部署
+
