@@ -1,6 +1,7 @@
 import logging
 
 from django.apps import AppConfig
+from django.core.signals import request_started
 from django.db.backends.signals import connection_created
 
 logger = logging.getLogger(__name__)
@@ -26,11 +27,11 @@ class CoreConfig(AppConfig):
         from core import checks  # noqa: F401, PLC0415
 
         connection_created.connect(_enable_sqlite_wal, dispatch_uid="enable_sqlite_wal")
-        # 启动时同步 SMTP 配置到 Django 运行时设置
-        try:
-            from core.smtp.services.smtp_service import SmtpService  # noqa: PLC0415
+        # 启动任务（SMTP 配置同步、模块自动注册）需访问数据库，不能在 ready() 中执行。
+        # 显式启动路径（run.py / wsgi.py / asgi.py）在 django.setup() 后调用
+        # core.startup.init_startup_tasks()；此处注册 request_started 兜底其它入口
+        # （如 manage.py runserver），避免应用初始化期间访问数据库的 RuntimeWarning。
+        from core.startup import run_startup_on_request  # noqa: PLC0415
 
-            SmtpService.update_django_settings()
-        except Exception:
-            logger.warning("SMTP 配置同步失败（数据库可能尚未就绪）")
+        request_started.connect(run_startup_on_request, dispatch_uid="core_run_startup_tasks")
         # Cron 服务不再在此处初始化，改为在 run.py 或 wsgi.py 中启动服务器时初始化

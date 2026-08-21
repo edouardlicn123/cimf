@@ -13,10 +13,12 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cimf_django.settings")
 
 def main():
     from core.server_service import ServerService  # noqa: PLC0415
+    from core.startup import init_startup_tasks  # noqa: PLC0415
 
     host, port = ServerService.prepare_host_port()
     ServerService.validate_production()
     ServerService.ensure_migrated()
+    init_startup_tasks()
     ServerService.init_modules()
     ServerService.print_banner(host, port)
     ServerService.start_cron_background()
