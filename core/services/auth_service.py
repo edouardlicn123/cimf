@@ -54,33 +54,30 @@ class AuthService(BaseService):
     model_class = User
 
     @classmethod
-    def authenticate(cls, username: str, password: str) -> User | None:
+    def authenticate(cls, username: str, password: str) -> tuple[User | None, User | None]:
         """
         验证用户凭据
 
-        参数：
-            username: 用户名
-            password: 密码
-
         返回：
-            用户对象（验证成功）或 None（验证失败）
+            (authenticated_user, looked_up_user)
+            - authenticated_user: 验证成功的用户，失败则为 None
+            - looked_up_user: 查找到的用户对象（即使密码错误也返回），未找到则为 None
         """
         user = cls.get_first(username=username)
         if not user:
-            return None
+            return None, None
 
         if not user.check_password(password):
-            return None
+            return None, user
 
-        return user
+        return user, user
 
     @classmethod
     def login(cls, username: str, password: str) -> dict[str, Any]:
         """处理用户登录，复用 authenticate 进行凭据验证"""
-        user = cls.authenticate(username, password)
+        user, looked_up_user = cls.authenticate(username, password)
 
         if not user:
-            looked_up_user = cls.get_first(username=username)
             if looked_up_user:
                 max_failures = cls.get_login_max_failures()
                 lock_minutes = cls.get_login_lock_minutes()

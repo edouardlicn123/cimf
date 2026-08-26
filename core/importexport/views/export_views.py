@@ -164,6 +164,7 @@ def export_exporting(request, node_type_slug):
 
 
 @permission_required("importexport.view")
+@require_http_methods(["POST"])
 def do_export(request, node_type_slug):
     """执行导出"""
     _node_type, response = _get_node_type_or_redirect(node_type_slug)
@@ -185,6 +186,6 @@ def do_export(request, node_type_slug):
             del request.session["export_filters"]
         return response
     except Exception as e:
-        logger.exception(f"导出失败: node_type={node_type_slug}")
+        logger.exception("导出失败: node_type=%s", node_type_slug)
         messages.error(request, f"导出失败：{e!s}")
         return redirect("importexport:export_select_fields", node_type_slug)

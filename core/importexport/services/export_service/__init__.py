@@ -128,4 +128,5 @@ class ExportService(FieldServiceMixin, QueryServiceMixin, ValueResolverMixin):
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
 
         wb.save(response)  # noqa: CIMF_W006 — openpyxl Workbook.save()，非 Django model
+        wb.close()
         return response

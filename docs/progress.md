@@ -329,3 +329,8 @@
 1. 修复 WhatsApp 媒体发送 404：build_media_url 缺少 whatsapp/ 目录段
 2. 新增 serve_media 媒体视图并无条件挂载 /media/，消除生产模式 DEBUG 门控导致的 404；生产验证需关闭 SECURE_SSL_REDIRECT
 3. 生产安全配置改为尊重 DJANGO_SSL_REDIRECT/DJANGO_SESSION_COOKIE_SECURE/DJANGO_CSRF_COOKIE_SECURE 环境变量，支持无 HTTPS 单机部署
+
+
+# 2026-08-26 修改记录
+
+1. 修复12个Bug+3项重构: 1.@json_body返回400 2.do_export加@require_POST 3.api_time_test异常处理 4.登录双查DB修复 5.文件句柄泄漏修复 6.时间服务器更新HTTPS 7.WABridge日志限频60s 8.module_custom_dispatch拓宽异常 9.homepage_settings加@require_GET 10.taxonomy重复创建修复 11.cards响应格式 12.logger f-string修复; P0删除僵尸services.py(1087行); P1 whatsapp/api.py统一json_success+json_error+@json_body

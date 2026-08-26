@@ -50,8 +50,8 @@ class TimeSyncService(SingletonMixin):
     MAX_SYNC_AGE = 24 * 3600  # 同步基准超过该时长视为过期，降级到本地时间，避免显示陈旧/脏值
 
     BACKUP_SERVERS = [
-        "http://worldtimeapi.org/api/timezone/Asia/Shanghai",
-        "http://quan.suning.com/getSysTime.do",
+        "https://worldtimeapi.org/api/timezone/Asia/Shanghai",
+        "https://timeapi.io/api/time/current/zone?timeZone=Asia/Shanghai",
     ]
 
     def __init__(self):
@@ -146,20 +146,20 @@ class TimeSyncService(SingletonMixin):
                 break
 
             for server_url in available:
-                logger.info(f"尝试从 {server_url} 同步时间 (尝试 {attempt + 1}/{max_retries})")
+                logger.info("尝试从 %s 同步时间 (尝试 %d/%d)", server_url, attempt + 1, max_retries)
                 server_time = self._fetch_time_from_server(server_url)
                 if server_time:
                     self._synced_time = server_time
                     self._last_sync_timestamp = time.time()
                     self._sync_status = "success"
-                    logger.info(f"时间同步成功: {server_time}")
+                    logger.info("时间同步成功: %s", server_time)
                     return True
                 failed_servers.add(server_url)
 
             if attempt < max_retries - 1:
                 retry_servers = [s for s in servers if s not in failed_servers]
                 if retry_servers:
-                    logger.info(f"部分服务器失败，{self.DEFAULT_RETRY_DELAY}秒后重试可用服务器...")
+                    logger.info("部分服务器失败，%d秒后重试可用服务器...", self.DEFAULT_RETRY_DELAY)
                     time.sleep(self.DEFAULT_RETRY_DELAY)
 
         self._sync_status = "failed"
@@ -179,9 +179,9 @@ class TimeSyncService(SingletonMixin):
 
                 SettingsService.save_setting("system_synced_time", self._synced_time.isoformat())
                 SettingsService.save_setting("system_sync_monotonic", str(time.monotonic()))
-                logger.info(f"持久化同步时间成功: {self._synced_time.isoformat()}")
+                logger.info("持久化同步时间成功: %s", self._synced_time.isoformat())
             except Exception as e:
-                logger.error(f"持久化同步时间失败: {e}")
+                logger.error("持久化同步时间失败: %s", e)
         return result
 
     def get_current_time(self) -> datetime:
@@ -210,10 +210,12 @@ class TimeSyncService(SingletonMixin):
                     return _to_local(synced + timedelta(seconds=elapsed))
                 if elapsed > self.MAX_SYNC_AGE:
                     logger.warning(
-                        f"持久化同步时间已过期({elapsed:.0f}s > {self.MAX_SYNC_AGE}s)，降级到本地时间"
+                        "持久化同步时间已过期(%.0fs > %ds)，降级到本地时间",
+                        elapsed,
+                        self.MAX_SYNC_AGE,
                     )
         except Exception as e:
-            logger.warning(f"从 DB 读取同步时间失败: {e}")
+            logger.warning("从 DB 读取同步时间失败: %s", e)
 
         # ── 第二优先：内存缓存（进程内第二次调用时更快） ──
         if self._synced_time is not None and self._sync_status == "success" and self._last_sync_timestamp is not None:

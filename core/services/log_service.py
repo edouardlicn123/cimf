@@ -85,8 +85,12 @@ class LogService:
         if not filepath.exists():
             return None
 
+        def _read():
+            with filepath.open(encoding="utf-8", errors="replace") as f:
+                return f.readlines()
+
         lines = safe_execute(
-            lambda: filepath.open(encoding="utf-8", errors="replace").readlines(),
+            _read,
             error_return=None,
             log_msg="读取日志文件失败",
             logger=logger,

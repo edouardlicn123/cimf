@@ -155,6 +155,7 @@ class TemplateGenerator:
         """构建 HTTP 响应"""
         buffer = BytesIO()
         wb.save(buffer)  # noqa: CIMF_W006 — openpyxl Workbook.save()，非 Django model
+        wb.close()
         buffer.seek(0)
 
         response = HttpResponse(

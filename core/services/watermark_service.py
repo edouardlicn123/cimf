@@ -99,7 +99,8 @@ class WatermarkService:
             是否成功
         """
         try:
-            img = Image.open(image_path).convert("RGBA")
+            with Image.open(image_path) as img_raw:
+                img = img_raw.convert("RGBA")
 
             watermark = Image.new("RGBA", img.size, (255, 255, 255, 0))
             draw = ImageDraw.Draw(watermark)
@@ -129,7 +130,7 @@ class WatermarkService:
             return True
 
         except Exception as e:
-            logger.error(f"添加水印失败: {e}", exc_info=True)
+            logger.error("添加水印失败: %s", e, exc_info=True)
             return False
 
     @classmethod
@@ -157,8 +158,10 @@ class WatermarkService:
             是否成功
         """
         try:
-            img = Image.open(image_path).convert("RGBA")
-            logo = Image.open(logo_path).convert("RGBA")
+            with Image.open(image_path) as img_raw:
+                img = img_raw.convert("RGBA")
+            with Image.open(logo_path) as logo_raw:
+                logo = logo_raw.convert("RGBA")
 
             if size:
                 logo = logo.resize(size, Image.Resampling.LANCZOS)
@@ -186,5 +189,5 @@ class WatermarkService:
             return True
 
         except Exception as e:
-            logger.error(f"添加图片水印失败: {e}", exc_info=True)
+            logger.error("添加图片水印失败: %s", e, exc_info=True)
             return False
