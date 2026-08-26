@@ -50,8 +50,8 @@ class TimeSyncService(SingletonMixin):
     MAX_SYNC_AGE = 24 * 3600  # 同步基准超过该时长视为过期，降级到本地时间，避免显示陈旧/脏值
 
     BACKUP_SERVERS = [
-        "https://worldtimeapi.org/api/timezone/Asia/Shanghai",
         "https://timeapi.io/api/time/current/zone?timeZone=Asia/Shanghai",
+        "https://timeapi.io/api/time/current/zone?timeZone=UTC",
     ]
 
     def __init__(self):
@@ -111,9 +111,9 @@ class TimeSyncService(SingletonMixin):
                         return datetime.fromtimestamp(int(ts), tz=UTC)
                     date_str = (
                         data.get("datetime")
-                        or data.get("date")
                         or data.get("dateTime")
                         or data.get("sysTime2")
+                        or data.get("date")
                     )
                     if date_str:
                         date_str = str(date_str)
@@ -124,14 +124,19 @@ class TimeSyncService(SingletonMixin):
                                 return parsed
                         except ValueError:
                             pass
-                        # 无偏移的裸墙钟（uuni/suning 返回北京时间）按配置时区解释，勿默认 UTC
+                        # 无偏移的裸墙钟按配置时区解释，勿默认 UTC
                         tz_name = self._get_settings_value("time_zone") or "Asia/Shanghai"
-                        return datetime.strptime(date_str[:19], "%Y-%m-%d %H:%M:%S").replace(
-                            tzinfo=ZoneInfo(tz_name)
-                        )
+                        for fmt in ("%Y-%m-%d %H:%M:%S", "%m/%d/%Y"):
+                            try:
+                                return datetime.strptime(date_str[:19], fmt).replace(
+                                    tzinfo=ZoneInfo(tz_name)
+                                )
+                            except ValueError:
+                                continue
             return None
 
-        return safe_execute(_fetch, error_return=None, log_msg=f"从 {url} 获取时间失败", logger=logger)
+        msg = f"从 {url} 获取时间失败"
+        return safe_execute(_fetch, error_return=None, log_msg=msg, logger=logger)
 
     def _try_sync_with_servers(self) -> bool:
         """尝试从服务器同步时间"""
