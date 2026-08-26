@@ -26,11 +26,20 @@ def api_time_current(request):  # noqa: ARG001
 @api_get_view
 def api_time_test(request):  # noqa: ARG001
     """测试时间服务器连接"""
+    import logging  # noqa: PLC0415
+
     from core.services import get_time_sync_service  # noqa: PLC0415
 
+    logger = logging.getLogger(__name__)
     time_sync = get_time_sync_service()
     server_url = time_sync.get_server_url()
-    server_time = time_sync.test_connection(server_url)
+    try:
+        server_time = time_sync.test_connection(server_url)
+    except Exception as e:
+        logger.warning("时间服务器连接测试失败: %s", e)
+        return json_success(
+            extra={"success": False, "server": server_url, "time": None, "error": str(e)}
+        )
 
     return json_success(
         extra={

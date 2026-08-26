@@ -75,18 +75,23 @@ class ModuleTaxonomyService:
             if not slug or not name:
                 continue
 
+            # 仅对已有词汇表补充缺失项；新建的已在上方 bulk_create 完成
+            if slug not in existing_taxonomies:
+                continue
+
             taxonomy = all_taxonomies.get(slug)
             if not taxonomy:
                 raise RuntimeError(f"词汇表创建失败: {slug}")
 
-            existing_item_names = {name for (tid, name) in existing_items if tid == taxonomy.id}
+            existing_item_names = {item_name for (tid, item_name) in existing_items if tid == taxonomy.id}
             expected_items = set(items)
             missing_items = expected_items - existing_item_names
 
             if missing_items:
                 logger.warning("词汇表 %s 缺少项目: %s，尝试补充", slug, missing_items)
                 TaxonomyItem.objects.bulk_create(
-                    [TaxonomyItem(taxonomy=taxonomy, name=item_name, weight=0) for item_name in missing_items]
+                    [TaxonomyItem(taxonomy=taxonomy, name=item_name, weight=0) for item_name in missing_items],
+                    ignore_conflicts=True,
                 )
 
         return created_count

@@ -127,7 +127,7 @@ def module_custom_dispatch(request, node_type_slug: str, extra_path: str):
                 match = pattern.resolve(path_to_match)
                 if match:
                     return match.func(request, **match.kwargs)
-    except ImportError as e:
+    except (ImportError, AttributeError, TypeError) as e:
         logger.warning("模块自定义路由加载失败: %s — %s", node_type_slug, e, exc_info=True)
     raise Http404
 

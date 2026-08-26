@@ -145,7 +145,7 @@ def json_body(view_func):
         try:
             request.json_data = json.loads(request.body) if request.body else {}
         except (json.JSONDecodeError, ValueError):
-            request.json_data = {}
+            return json_error("无效的 JSON 格式", 400)
         return view_func(request, *args, **kwargs)
 
     return wrapper

@@ -84,17 +84,20 @@ def read_xlsx(file) -> tuple[list[str], list[list[str]]]:
     if hasattr(file, "seek"):
         file.seek(0)
     wb = load_workbook(filename=io.BytesIO(file_content), data_only=True)
-    ws = wb.active
+    try:
+        ws = wb.active
 
-    rows = list(ws.values)
+        rows = list(ws.values)
 
-    if not rows:
-        return [], []
+        if not rows:
+            return [], []
 
-    headers = [str(h) if h is not None else "" for h in rows[0]]
-    data_rows = [[str(cell) if cell is not None else "" for cell in row] for row in rows[1:]]
+        headers = [str(h) if h is not None else "" for h in rows[0]]
+        data_rows = [[str(cell) if cell is not None else "" for cell in row] for row in rows[1:]]
 
-    return headers, data_rows
+        return headers, data_rows
+    finally:
+        wb.close()
 
 
 def read_file(file, format: str) -> tuple[list[str], list[list[str]]]:

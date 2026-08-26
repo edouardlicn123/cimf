@@ -56,7 +56,7 @@ def _collect_module_stats(module_path: str) -> dict:
                     "recent": getattr(attr, "get_recent_count", lambda _=7: 0)(7),
                 }
     except Exception:
-        logger.warning(f"模块统计加载失败: module={module_path}", exc_info=True)
+        logger.warning("模块统计加载失败: module=%s", module_path, exc_info=True)
     return {}
 
 
@@ -85,7 +85,7 @@ def api_dashboard_cards(request):  # noqa: ARG001
         try:
             positions = json.loads(setting_value)
         except Exception as e:
-            logger.warning(f"解析卡片位置配置失败: {e}", exc_info=True)
+            logger.warning("解析卡片位置配置失败: %s", e, exc_info=True)
     else:
         logger.warning("配置未找到: user_dashboard_card_positions")
 
@@ -137,7 +137,7 @@ def api_dashboard_cards(request):  # noqa: ARG001
                 else:
                     module_contents[module_id] = rendered
             except Exception as e:
-                logger.warning(f"卡片模板渲染失败: module={module_id}, error={e}", exc_info=True)
+                logger.warning("卡片模板渲染失败: module=%s, error=%s", module_id, e, exc_info=True)
             # 收集所有卡片，不下拉列表
 
     if not any(p and p.get("module") for p in default_positions.values()):

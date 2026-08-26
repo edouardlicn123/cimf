@@ -12,6 +12,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
+from django.views.decorators.http import require_GET
 
 from core.constants import Language, UserRole, UserTheme
 from core.decorators import admin_required, handle_form_errors
@@ -261,6 +262,7 @@ def profile_settings(request):
 
 
 @login_required
+@require_GET
 def homepage_settings(request):
     """首页卡片设置"""
     from core.module.services.module_service import ModuleService  # noqa: PLC0415
