@@ -170,13 +170,16 @@ class TimeSyncService(SingletonMixin):
         """测试时间服务器连接（公开入口）"""
         return self._fetch_time_from_server(url or self.get_server_url())
 
-    def _fetch_time_from_server(self, url: str) -> datetime | None:
+    def _fetch_time_from_server(self, url: str, silent: bool = False) -> datetime | None:
         """从指定服务器获取时间（统一换算为 UTC）
 
         兼容的时间源字段：
         - epoch: timestamp / unixtime
         - 带时区 ISO: datetime / dateTime（如 worldtimeapi 的 +08:00、timeapi.io 的 Z）
         - 裸墙钟 + 偏移字段: dateTime / currentDateTime + utcOffset 或 timeZone
+
+        silent=True 时静默捕获异常返回 None（供并行采集使用，单源失败属常态，
+        不刷日志，由健康机制降级 + 整体失败时才记录）。
         """
 
         def _fetch():
@@ -227,6 +230,11 @@ class TimeSyncService(SingletonMixin):
                         continue
             return None
 
+        if silent:
+            try:
+                return _fetch()
+            except Exception:
+                return None
         msg = f"从 {url} 获取时间失败"
         return safe_execute(_fetch, error_return=None, log_msg=msg, logger=logger, log_fn=logger.warning)
 
@@ -234,7 +242,7 @@ class TimeSyncService(SingletonMixin):
         """多线程并行采集多个服务器时间，返回 (url, 成功时间 or None) 列表"""
         results: list[tuple[str, datetime | None]] = []
         with ThreadPoolExecutor(max_workers=len(servers)) as executor:
-            future_map = {executor.submit(self._fetch_time_from_server, s): s for s in servers}
+            future_map = {executor.submit(self._fetch_time_from_server, s, silent=True): s for s in servers}
             for future in as_completed(future_map):
                 url = future_map[future]
                 try:
@@ -330,7 +338,7 @@ class TimeSyncService(SingletonMixin):
                 time.sleep(self.DEFAULT_RETRY_DELAY)
 
         self._sync_status = "failed"
-        logger.error("时间同步失败，已达到最大重试次数")
+        logger.error("时间同步失败，已达到最大重试次数，不可达源: %s", sorted(failed_servers) or "（全部）")
         return False
 
     def sync_time(self) -> bool:
