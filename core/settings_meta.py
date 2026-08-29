@@ -42,7 +42,7 @@ SETTINGS_META = {
     "enable_export_watermark": {"default": "false", "type": bool},
     # ===== Time Sync =====
     "enable_time_sync": {"default": "true", "type": bool},
-    "time_server_url": {"default": "https://api.uuni.cn/api/time", "type": str},
+    "time_server_url": {"default": "https://timeapi.io/api/time/current/zone?timeZone=Asia/Shanghai", "type": str},
     "time_zone": {"default": "Asia/Shanghai", "type": str},
     "time_sync_interval": {"default": "15", "type": int},
     "time_sync_max_retries": {"default": "5", "type": int},
