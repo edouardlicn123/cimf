@@ -119,7 +119,8 @@ class TimeSyncService(SingletonMixin):
         "https://timeapi.io/api/time/current/zone?timeZone=Asia/Shanghai",
         "https://timeapi.io/api/time/current/zone?timeZone=UTC",
         "http://worldclockapi.com/api/json/utc/now",
-        "https://api.uuni.cn/api/time",
+        "https://time.now/developer/api/timezone/Asia/Shanghai",
+        "https://time.now/developer/api/timezone/UTC",
     ]
 
     # 模块级服务器健康记录 {url: 连续失败次数}
