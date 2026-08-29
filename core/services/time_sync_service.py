@@ -228,7 +228,7 @@ class TimeSyncService(SingletonMixin):
             return None
 
         msg = f"从 {url} 获取时间失败"
-        return safe_execute(_fetch, error_return=None, log_msg=msg, logger=logger)
+        return safe_execute(_fetch, error_return=None, log_msg=msg, logger=logger, log_fn=logger.warning)
 
     def _collect_server_times(self, servers: list[str]) -> list[tuple[str, datetime | None]]:
         """多线程并行采集多个服务器时间，返回 (url, 成功时间 or None) 列表"""

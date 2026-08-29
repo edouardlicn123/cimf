@@ -339,4 +339,5 @@
 
 1. 重构时间同步为多服务器并行采集+多数收敛+健康动态降级: 多线程并行请求4个时间源(总耗时不累加), 统一换算UTC, 容忍1个漂移源, 连续失败服务器自动移出采集池; 兼容timeapi.io(dateTime+timeZone字段)/worldclockapi(currentDateTime+utcOffset)/uuni(epoch)
 2. 时间同步新增time.now双端点(Asia/Shanghai+UTC)替换失效的api.uuni.cn, 5源并行采集, 返回unixtime epoch权威时间零时区歧义; settings_meta中time_server_url默认值改为timeapi; 实测4/5源一致收敛成功
+3. 时间同步消除错误噪音: 清理DB中陈旧的time_server_url(uuni死源)改为timeapi默认源; safe_execute新增log_fn参数支持降级日志级别, 单源采集失败从ERROR降为WARNING(多源并行下一源失败属常态不误导同步失败); 实测5源无uuni无ERROR, 4/5收敛成功
 
