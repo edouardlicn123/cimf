@@ -62,12 +62,17 @@ def clean_optional_str(value):
     return cleaned if cleaned else None
 
 
-def safe_execute(fn, error_return=None, log_msg="操作失败", logger=None):
+def safe_execute(fn, error_return=None, log_msg="操作失败", logger=None, log_level="info", log_fn=None):
     try:
         return fn()
     except Exception as e:
         if logger:
-            logger.error(f"{log_msg}: {e}", exc_info=True)
+            if log_fn is not None:
+                log_fn(f"{log_msg}: {e}", exc_info=True)
+            elif log_level == "warning":
+                logger.warning(f"{log_msg}: {e}", exc_info=True)
+            else:
+                logger.error(f"{log_msg}: {e}", exc_info=True)
         return error_return
 
 
