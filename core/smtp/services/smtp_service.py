@@ -5,39 +5,114 @@ SMTP 配置管理服务
 import logging
 import os
 import smtplib
-import socket
 import ssl
-from contextlib import contextmanager
 from email.message import EmailMessage
 from typing import Any
 
 import socks
 from django.conf import settings
+from django.core.mail.backends.smtp import EmailBackend as SMTPEmailBackend
 
 from core.services import SettingsService
 
 logger = logging.getLogger(__name__)
 
 
-@contextmanager
-def _apply_proxy_patch(config: dict[str, Any]):
-    """如果配置了代理，替换 socket.socket 为 SOCKS5 版本"""
+def _proxy_settings(config: dict[str, Any]) -> tuple[str, int] | None:
+    """返回 (proxy_host, proxy_port)，未配置代理时返回 None"""
     if not config.get("use_proxy", False):
-        yield
-        return
-    proxy_host = config.get("proxy_host", "").strip()
+        return None
+    proxy_host = (config.get("proxy_host") or "").strip()
     if not proxy_host:
-        yield
-        return
+        return None
+    return proxy_host, int(config.get("proxy_port", 10808))
 
-    proxy_port = int(config.get("proxy_port", 10808))
-    socks.set_default_proxy(socks.SOCKS5, proxy_host, proxy_port)
-    original = socket.socket
-    socket.socket = socks.socksocket
+
+def _open_socks_socket(proxy_host: str, proxy_port: int, host: str, port: int, timeout, context):
+    """经 SOCKS5 代理建立到 host:port 的连接（仅作用于本连接）"""
+    sock = socks.socksocket()
+    sock.set_proxy(socks.SOCKS5, proxy_host, proxy_port)
+    sock.settimeout(timeout)
     try:
-        yield
-    finally:
-        socket.socket = original
+        if context is not None:
+            sock = context.wrap_socket(sock, server_hostname=host)
+        sock.connect((host, port))
+    # 关闭套接字后原样抛出，由调用方统一记录
+    except Exception:  # noqa: CIMF_W007
+        sock.close()
+        logger.debug("SOCKS5 代理连接失败: %s -> %s:%s", proxy_host, host, port, exc_info=True)
+        raise
+    return sock
+
+
+class _SocksSMTP(smtplib.SMTP):
+    """走 SOCKS5 代理的 SMTP（每连接生效，不改动全局 socket）"""
+
+    def __init__(self, host, port, *, proxy_host, proxy_port, **kwargs):
+        self._proxy_host = proxy_host
+        self._proxy_port = proxy_port
+        super().__init__(host, port, **kwargs)
+
+    def _get_socket(self, host, port, timeout):
+        return _open_socks_socket(self._proxy_host, self._proxy_port, host, port, timeout, None)
+
+
+class _SocksSMTP_SSL(smtplib.SMTP_SSL):
+    """走 SOCKS5 代理的隐式 SSL SMTP（每连接生效，不改动全局 socket）"""
+
+    def __init__(self, host, port, *, proxy_host, proxy_port, **kwargs):
+        self._proxy_host = proxy_host
+        self._proxy_port = proxy_port
+        super().__init__(host, port, **kwargs)
+
+    def _get_socket(self, host, port, timeout):
+        return _open_socks_socket(
+            self._proxy_host, self._proxy_port, host, port, timeout, getattr(self, "context", None)
+        )
+
+
+def _make_smtp(config: dict[str, Any], host: str, port, timeout, context):
+    """按配置创建 SMTP 连接：配置代理时使用 SOCKS5 子类，否则用标准类"""
+    proxy = _proxy_settings(config)
+    use_ssl = config.get("use_ssl", False)
+    if proxy is None:
+        return smtplib.SMTP_SSL(host, port, timeout=timeout, context=context) if use_ssl \
+            else smtplib.SMTP(host, port, timeout=timeout)
+    proxy_host, proxy_port = proxy
+    if use_ssl:
+        return _SocksSMTP_SSL(host, port, timeout=timeout, context=context,
+                              proxy_host=proxy_host, proxy_port=proxy_port)
+    return _SocksSMTP(host, port, timeout=timeout,
+                      proxy_host=proxy_host, proxy_port=proxy_port)
+
+
+class ProxySmtpEmailBackend(SMTPEmailBackend):
+    """支持 SOCKS5 代理的 Django 邮件后端
+
+    只替换本后端自身的 connection_class，代理仅作用于该邮件连接，
+    不会像全局猴补丁 socket.socket 那样影响进程内其它线程的网络请求。
+    """
+
+    def __init__(self, *args, proxy_host: str = "", proxy_port: int = 10808, **kwargs):
+        self._proxy_host = proxy_host
+        self._proxy_port = proxy_port
+        super().__init__(*args, **kwargs)
+
+    @property
+    def connection_class(self):
+        if self.use_ssl:
+            def factory(host, port, **kwargs):
+                return _SocksSMTP_SSL(
+                    host, port, proxy_host=self._proxy_host,
+                    proxy_port=self._proxy_port, **kwargs
+                )
+        else:
+            def factory(host, port, **kwargs):
+                return _SocksSMTP(
+                    host, port, proxy_host=self._proxy_host,
+                    proxy_port=self._proxy_port, **kwargs
+                )
+        return factory
 
 
 SMTP_PRESETS = {
@@ -225,36 +300,31 @@ class SmtpService:
             host = config.get("host", "smtp.gmail.com")
             port = config.get("port", 587)
             timeout = config.get("timeout", 30)
-            use_ssl = config.get("use_ssl", False)
             use_tls = config.get("use_tls", True)
             skip_verify = config.get("skip_verify", False)
 
-            with _apply_proxy_patch(config):
-                context = None
-                if skip_verify:
-                    context = ssl.create_default_context()
-                    context.check_hostname = False
-                    context.verify_mode = ssl.CERT_NONE
+            context = None
+            if skip_verify:
+                context = ssl.create_default_context()
+                context.check_hostname = False
+                context.verify_mode = ssl.CERT_NONE
 
-                if use_ssl:
-                    server = smtplib.SMTP_SSL(host, port, timeout=timeout, context=context)
-                else:
-                    server = smtplib.SMTP(host, port, timeout=timeout)
+            server = _make_smtp(config, host, port, timeout, context)
 
-                with server:
-                    if use_tls:
-                        server.starttls(context=context)
+            with server:
+                if use_tls:
+                    server.starttls(context=context)
 
-                    username = config.get("username", from_email)
-                    server.login(username, password)
+                username = config.get("username", from_email)
+                server.login(username, password)
 
-                    msg = EmailMessage()
-                    msg["From"] = f"{config.get('from_name', '仙芙CIMF')} <{from_email}>"
-                    msg["To"] = from_email
-                    msg["Subject"] = "CIMF 系统邮件测试"
-                    msg.set_content("这是一封来自 CIMF 系统的测试邮件，如果您收到此邮件，说明 SMTP 配置正确。")
+                msg = EmailMessage()
+                msg["From"] = f"{config.get('from_name', '仙芙CIMF')} <{from_email}>"
+                msg["To"] = from_email
+                msg["Subject"] = "CIMF 系统邮件测试"
+                msg.set_content("这是一封来自 CIMF 系统的测试邮件，如果您收到此邮件，说明 SMTP 配置正确。")
 
-                    server.send_message(msg)
+                server.send_message(msg)
 
             return True, "连接测试成功！"
 
@@ -270,7 +340,11 @@ class SmtpService:
         if not config.get("enabled"):
             return
 
-        settings.EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+        proxy = _proxy_settings(config)
+        if proxy is not None:
+            settings.EMAIL_BACKEND = "core.smtp.services.smtp_service.ProxySmtpEmailBackend"
+        else:
+            settings.EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
         settings.EMAIL_HOST = config.get("host", "smtp.gmail.com")
         settings.EMAIL_PORT = config.get("port", 587)
         settings.EMAIL_USE_TLS = config.get("use_tls", True)

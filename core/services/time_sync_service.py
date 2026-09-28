@@ -233,7 +233,9 @@ class TimeSyncService(SingletonMixin):
         if silent:
             try:
                 return _fetch()
-            except Exception:
+            # 多源采集容忍个别源失败，汇总结果由 _converge 记 warning
+            except Exception:  # noqa: CIMF_W007
+                logger.debug("时间源采集失败: %s", url, exc_info=True)
                 return None
         msg = f"从 {url} 获取时间失败"
         return safe_execute(_fetch, error_return=None, log_msg=msg, logger=logger, log_fn=logger.warning)

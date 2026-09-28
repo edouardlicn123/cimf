@@ -12,6 +12,7 @@ from django.db import transaction
 from django.http import HttpResponse
 
 from core.module.services.module_registry_service import ModuleRegistryService
+from core.services.permission_service import PermissionService
 
 from . import reader_service, transformer_service, validator_service
 
@@ -222,6 +223,19 @@ class ImportService:
                                     "row": idx,
                                     "data": row,
                                     "message": "记录已存在，已跳过",
+                                }
+                            )
+                            continue
+                        # 更新已有记录前逐条校验归属，否则可越权改写他人数据
+                        allowed, denied_msg = PermissionService.check_node_permission(
+                            user, existing.node, "edit"
+                        )
+                        if not allowed:
+                            errors.append(
+                                {
+                                    "row": idx,
+                                    "data": row,
+                                    "errors": [denied_msg or "无权修改该记录"],
                                 }
                             )
                             continue

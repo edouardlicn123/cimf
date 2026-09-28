@@ -19,6 +19,9 @@ from core.utils.response import json_error, json_success, no_cache_json_response
 
 logger = logging.getLogger(__name__)
 
+# 首页功能卡片共 6 个位，与各读取处的默认布局保持一致
+_CARD_SLOT_KEYS = frozenset(str(i) for i in range(1, 7))
+
 
 def _load_active_card_modules():
     """加载启用了 frontpage_card 的模块信息列表"""
@@ -88,6 +91,11 @@ def api_dashboard_cards(request):  # noqa: ARG001
             logger.warning("解析卡片位置配置失败: %s", e, exc_info=True)
     else:
         logger.warning("配置未找到: user_dashboard_card_positions")
+
+    # 合法 JSON 也可能是非 dict（如 "x"），与下方默认布局合并会抛 TypeError
+    if not isinstance(positions, dict):
+        logger.warning("卡片位置配置非字典，已回退默认值: %r", type(positions).__name__)
+        positions = {}
 
     default_positions = {str(i): {"module": None, "size": "medium", "config": {}} for i in range(1, 7)} | positions
 
@@ -165,6 +173,16 @@ def api_dashboard_cards_save(request):
     """保存功能卡片布局"""
     try:
         positions = request.json_data.get("positions", {})
+
+        # 布局存的是全局配置，非法结构会让所有用户首页读取时崩溃，
+        # 因此写入前按 1~6 键白名单 + 每格必须是 dict 做校验
+        if not isinstance(positions, dict):
+            return json_error("布局格式非法", 400)
+        invalid_keys = [k for k in positions if str(k) not in _CARD_SLOT_KEYS]
+        if invalid_keys:
+            return json_error(f"无效的卡片位: {', '.join(map(str, invalid_keys))}", 400)
+        if not all(isinstance(v, dict) for v in positions.values()):
+            return json_error("卡片位内容格式非法", 400)
 
         SettingsService.save_setting(
             key="user_dashboard_card_positions",

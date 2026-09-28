@@ -341,3 +341,15 @@
 2. 时间同步新增time.now双端点(Asia/Shanghai+UTC)替换失效的api.uuni.cn, 5源并行采集, 返回unixtime epoch权威时间零时区歧义; settings_meta中time_server_url默认值改为timeapi; 实测4/5源一致收敛成功
 3. 时间同步消除错误噪音: 清理DB中陈旧的time_server_url(uuni死源)改为timeapi默认源; safe_execute新增log_fn参数支持降级日志级别, 单源采集失败从ERROR降为WARNING(多源并行下一源失败属常态不误导同步失败); 实测5源无uuni无ERROR, 4/5收敛成功
 
+
+
+# 2026-09-18 修改记录
+
+1. 生成客户导入文件 customer_import_ig.xlsx（ig_whatsapp清洗2325行，国家India→印度、去重、清垃圾号/坏邮箱/截断网站）
+
+# 2026-09-27 修改记录
+
+1. 修复 whatsapp 未应用迁移：应用 0008-0011（新增送达熔断字段 last_sent_at/delivery_breaker_round_start/delivery_paused_until/delivery_probe_log_id，删除已废弃的 next_send_at/paused_count/rate_limited/resume_at）；修复 SendBatch.last_sent_at 报 no such column 导致发送批次接口全挂；备份至 storage/backups/django_20260927_143425.db
+2. 安全与健壮性修复(P0+P1共8项)：1)权限页调用不存在的 SettingsService.update_setting 导致 /system/permissions/ 必500，改 save_setting 并整体事务化；2)首页卡片布局无校验，任意登录用户 POST {"positions":"x"} 致全员首页永久500，写侧加1-6键白名单+读侧 isinstance 兜底；3)whatsapp 4个 recheck/reset 接口补 @admin_required_json；4)api_send/api_check_whatsapp 补客户归属校验(视图层)，堵越权向他人客户发消息；5)whatsapp 三处 json.dumps+|safe 改 Jinja2 tojson 修存储型XSS(顺带移除被抑制的 CIMF_W009 noqa)；6)SMTP 移除全局猴补丁 socket.socket，改 _SocksSMTP/_SocksSMTP_SSL 每连接代理 + ProxySmtpEmailBackend 后端；7)权限页空POST不再清空三角色权限；8)导出筛选项白名单校验+确认页降级，导入更新已有记录前逐条 check_node_permission。whatsapp 侧改动在 ~/cimf-whatsapp 源仓完成后同步，并一并同步积压的 runwabridge 76行漂移。验证 48/48 通过
+3. 清零 CIMF_W007 告警：manage.py check 由 2 条降为 0 条。1) core/services/time_sync_service.py 多源采集静默分支加 logger.debug + noqa（个别时间源失败属常态，汇总结果已由 _converge 以 warning 记录，见 _converge:266/274）；2) runwabridge/checks.py Node 版本探测失败分支加 noqa（独立 CLI 无 logger，已通过 err() 输出到终端），改动在源仓完成后同步。改动后按规范重启服务并实测时间同步链路正常（timeapi.io +08:00 正确换算为 UTC）。回归 48/48 通过
+

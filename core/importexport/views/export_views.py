@@ -61,12 +61,24 @@ def export_select_fields(request, node_type_slug):
             export_format = "csv"
         request.session["export_format"] = export_format
 
+        # 字段名来自 POST，必须按可筛选字段白名单校验：
+        # 非法字段名会让下游 _meta.get_field() 抛 FieldDoesNotExist 导致 500
+        allowed_filter_fields = {
+            f["name"] for f in ExportService.get_filterable_fields(node_type_slug)
+        }
+        if ExportService.has_region_field(node_type_slug):
+            allowed_filter_fields.add("region")
+
         filters = []
         for i in range(6):
             f_field = request.POST.get(f"filter_field_{i}", "")
             f_value = request.POST.get(f"filter_value_{i}", "")
-            if f_field and f_value:
-                filters.append({"field": f_field, "value": f_value.strip()})
+            if not f_field or not f_value:
+                continue
+            if f_field not in allowed_filter_fields:
+                messages.warning(request, f"已忽略不支持的筛选字段: {f_field}")
+                continue
+            filters.append({"field": f_field, "value": f_value.strip()})
 
         region_province = request.POST.get("filter_region_province", "")
         region_city = request.POST.get("filter_region_city", "")
@@ -121,10 +133,18 @@ def export_confirm(request, node_type_slug):
         return redirect("importexport:export_select_fields", node_type_slug)
 
     fields_info = ExportService.get_fields_info(node_type_slug, selected_fields)
-    record_count = ExportService.get_record_count(node_type_slug, filters)
-    preview_data = ExportService.get_preview(node_type_slug, selected_fields, filters, limit=5)
 
-    filter_summaries = ExportService.build_filter_summaries(node_type_slug, filters)
+    # session 里的筛选条件可能来自旧版本或被篡改，解析失败时降级为空结果而非 500
+    try:
+        record_count = ExportService.get_record_count(node_type_slug, filters)
+        preview_data = ExportService.get_preview(node_type_slug, selected_fields, filters, limit=5)
+        filter_summaries = ExportService.build_filter_summaries(node_type_slug, filters)
+    except Exception as e:
+        logger.warning("导出筛选条件解析失败，已忽略: %s", e, exc_info=True)
+        messages.warning(request, "筛选条件无效，已按无条件导出")
+        record_count = ExportService.get_record_count(node_type_slug, [])
+        preview_data = ExportService.get_preview(node_type_slug, selected_fields, [], limit=5)
+        filter_summaries = []
 
     return render(
         request,

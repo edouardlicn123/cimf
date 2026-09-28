@@ -10,6 +10,7 @@ from django.conf import settings as django_settings
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET
@@ -102,21 +103,26 @@ def system_settings(request):
 
 @admin_required
 def system_permissions(request):
-    """权限管理页面"""
+    """权限管理页面（POST 保存 / GET 展示）"""
     if request.method == "POST":
-        manager_perms = request.POST.getlist("permissions_manager")
-        PermissionService.save_role_permissions("manager", manager_perms)
+        # 缺 key 时 getlist 返回 []，直接保存会清空该角色全部权限，
+        # 因此必须先确认表单确实提交了该角色的权限字段
+        for role in ("manager", "leader", "employee"):
+            if f"permissions_{role}" in request.POST:
+                PermissionService.save_role_permissions(
+                    role, request.POST.getlist(f"permissions_{role}")
+                )
 
-        leader_perms = request.POST.getlist("permissions_leader")
-        PermissionService.save_role_permissions("leader", leader_perms)
-
-        employee_perms = request.POST.getlist("permissions_employee")
-        PermissionService.save_role_permissions("employee", employee_perms)
-
+        role_names = {}
         for role in COMMON_ROLES:
             role_name = request.POST.get(f"role_name_{role}", "").strip()
             if role_name:
-                SettingsService.update_setting(f"role_name_{role}", role_name)
+                role_names[f"role_name_{role}"] = role_name
+
+        # 权限与角色名要么全部保存成功、要么全部回滚，避免部分写入
+        with transaction.atomic():
+            for key, value in role_names.items():
+                SettingsService.save_setting(key, value)
 
         return redirect_with_success(request, "权限已保存", "core:system_permissions")
 
@@ -277,6 +283,11 @@ def homepage_settings(request):
             positions = {}
     elif positions_str is None:
         logger.debug("配置未找到: user_dashboard_card_positions，使用默认值")
+
+    # 合法 JSON 也可能是非 dict（如 "x"），与下方 dict 合并会抛 TypeError
+    if not isinstance(positions, dict):
+        logger.warning("卡片位置配置非字典，已回退默认值: %r", type(positions).__name__)
+        positions = {}
 
     default_positions = {str(i): {"module": None} for i in range(1, 7)} | positions
 
