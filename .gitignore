@@ -68,3 +68,21 @@ pip-delete-this-directory.txt
 
 # ========== 工具目录 ==========
 .opencode/
+
+# ========== 数据库备份与 SQLite 伴生文件 ==========
+# 注意：上面的 *.db 只匹配以 .db 结尾的文件，
+# 而 SQLite 的 -shm/-wal 伴生文件结尾是 .db-shm/.db-wal，需单独忽略
+*.db-shm
+*.db-wal
+storage/backups/
+storage/restart.lock
+
+# ========== 环境变量文件（含真实密钥，严禁入库）==========
+# 覆盖 .env / foo.env / .env.production / .env.local 等常见形态
+.env
+*.env
+.env.*
+# 样例文件仍需跟踪，作为配置模板
+!.env.sample
+!.env.example
+!*.env.sample
